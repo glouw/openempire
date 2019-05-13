@@ -1,0 +1,6 @@
+*.o
+*.cachegrind
+*.d
+*.gch
+log
+openempires
