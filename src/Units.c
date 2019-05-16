@@ -8,15 +8,24 @@
 
 static Units GenerateTestZone(Units units)
 {
-    const int32_t xmid = units.cols / 2;
-    const int32_t ymid = units.rows / 2;
+    const int32_t x_mid = units.cols / 2;
+    const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {xmid + 0, ymid + 0}, FILE_FOREST_TREE },
-        { {xmid + 0, ymid + 0}, FILE_FOREST_TREE_SHADOW },
-        { {xmid + 0, ymid + 1}, FILE_BERRY_BUSH },
-        { {xmid + 0, ymid + 2}, FILE_STONE_MINE },
-        { {xmid + 0, ymid + 3}, FILE_GOLD_MINE },
-        { {xmid - 1, ymid - 1}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE_SHADOW },
+        { {x_mid + 0, y_mid + 1}, {  0,   0}, FILE_BERRY_BUSH },
+        { {x_mid + 0, y_mid + 2}, {  0,   0}, FILE_STONE_MINE },
+        { {x_mid + 0, y_mid + 3}, {  0,   0}, FILE_GOLD_MINE },
+
+        // XXX: Our boys in blue need to be sorted.
+        // Do this before the mouse cursor is used for selecting units
+        // (eg. dont use base tile for selecting units)
+
+        { {x_mid - 1, y_mid - 1}, {+20, +20}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {-20, +20}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {+20, -20}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0,   0}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {-20, -20}, FILE_MALE_VILLAGER_STANDING },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -109,7 +118,7 @@ static void StackUnits(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        Stack* const stack = GetStack(units, unit->point);
+        Stack* const stack = GetStack(units, unit->cart_point);
         Stack_Append(stack, unit);
     }
 }

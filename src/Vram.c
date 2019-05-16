@@ -58,8 +58,8 @@ static void DrawTileNoClip(const Vram vram, const Tile tile)
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.point.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.point.y;
+        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
+        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
         const uint8_t height = Get(vram, xx, yy) >> 24;
         if(tile.height > height)
         {
@@ -78,8 +78,8 @@ static void DrawTileClip(const Vram vram, const Tile tile)
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.point.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.point.y;
+        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
+        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
 
         if(!OutOfBounds(vram, xx, yy))
         {
@@ -201,8 +201,8 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.point.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.point.y;
+        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
+        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
         if(!OutOfBounds(vram, xx, yy))
         {
             const uint32_t height = Get(vram, xx, yy) >> 24;
@@ -225,8 +225,8 @@ static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* co
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.point.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.point.y;
+        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
+        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
 
         const uint32_t height = Get(vram, xx, yy) >> 24;
 
@@ -410,7 +410,7 @@ static Tile* PrepGraphicsTiles(const Registrar graphics, const Overview overview
 
             const Point south = { 0, 1 };
             const Point shifted = Point_Add(point, south);
-            tiles[unit_count++] = Tile_GetGraphics(overview, shifted, animation, unit->file);
+            tiles[unit_count++] = Tile_GetGraphics(overview, shifted, unit->cart_fractional, animation, unit->file);
         }
     }
     return tiles;

@@ -5,7 +5,8 @@
 
 typedef struct
 {
-    Point point;
+    Point cart_point;
+    Point cart_fractional;
     Graphics file;
 }
 Unit;

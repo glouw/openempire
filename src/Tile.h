@@ -13,13 +13,14 @@
 typedef struct
 {
     Frame frame;
-    Point point;
+    Point iso_point;
+    Point iso_fractional;
     SDL_Surface* surface;
     bool needs_clipping;
     uint8_t height;
 }
 Tile;
 
-Tile Tile_GetTerrain(const Overview, const Point, const Animation, const Terrain);
+Tile Tile_GetTerrain(const Overview, const Point point, const Animation, const Terrain);
 
-Tile Tile_GetGraphics(const Overview, const Point, const Animation, const Graphics);
+Tile Tile_GetGraphics(const Overview, const Point point, const Point fractional, const Animation, const Graphics);
