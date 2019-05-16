@@ -11,21 +11,12 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE },
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE_SHADOW },
-        { {x_mid + 0, y_mid + 1}, {  0,   0}, FILE_BERRY_BUSH },
-        { {x_mid + 0, y_mid + 2}, {  0,   0}, FILE_STONE_MINE },
-        { {x_mid + 0, y_mid + 3}, {  0,   0}, FILE_GOLD_MINE },
-
-        // XXX: Our boys in blue need to be sorted.
-        // Do this before the mouse cursor is used for selecting units
-        // (eg. dont use base tile for selecting units)
-
-        { {x_mid - 1, y_mid - 1}, {+20, +20}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {-20, +20}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {+20, -20}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0,   0}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {-20, -20}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 0, y_mid + 0}, {0,0}, FILE_FOREST_TREE },
+        { {x_mid + 0, y_mid + 0}, {0,0}, FILE_FOREST_TREE_SHADOW },
+        { {x_mid + 0, y_mid + 1}, {0,0}, FILE_BERRY_BUSH },
+        { {x_mid + 0, y_mid + 2}, {0,0}, FILE_STONE_MINE },
+        { {x_mid + 0, y_mid + 3}, {0,0}, FILE_GOLD_MINE },
+        { {x_mid - 1, y_mid - 1}, {0,0}, FILE_MALE_VILLAGER_STANDING },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -37,16 +28,12 @@ Units Units_New(const int32_t max, const int32_t rows, const int32_t cols)
     const int32_t area = rows * cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
-
     UTIL_CHECK(unit);
     UTIL_CHECK(stack);
-
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-
     Units units = { unit, 0, max, stack, rows, cols };
     units = GenerateTestZone(units);
-
     return units;
 }
 
@@ -101,11 +88,22 @@ void Units_Select(const Units units, const Overview overview, const Input input)
 {
     if(input.lu)
     {
-        const Point click = { input.x, input.y };
-        const Stack stack = GetStackIso(units, click, overview);
+        const Point iso = { input.x, input.y };
+        const Stack stack = GetStackIso(units, iso, overview);
         for(int32_t i = 0; i < stack.count; i++)
             printf("%d: %s\n", i, Graphics_GetString(stack.reference[i]->file));
         putchar('\n');
+    }
+}
+
+void Units_Command(const Units units, const Overview overview, const Input input)
+{
+    //if(input.ru)
+    {
+        const Point iso = { input.x, input.y };
+        const Point cart_point = Overview_IsoToCart(overview, iso);
+        const Point cart_fractional = Point_Mod(Point_ToCart(iso), 48); // XXX. Whats the relationship here?
+        printf("%d %d %d %d\n", cart_point.x, cart_point.y, cart_fractional.x, cart_fractional.y);
     }
 }
 
@@ -114,7 +112,6 @@ static void StackUnits(const Units units)
     for(int32_t y = 0; y < units.rows; y++)
     for(int32_t x = 0; x < units.cols; x++)
         units.stack[x + y * units.cols].count = 0;
-
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];

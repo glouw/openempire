@@ -33,3 +33,5 @@ void Units_Move(const Units);
 Stack Units_GetStackCart(const Units, const Point);
 
 void Units_Select(const Units, const Overview, const Input);
+
+void Units_Command(const Units, const Overview, const Input);

@@ -32,6 +32,7 @@ int32_t main(int32_t argc, char* argv[])
 
             overview = Overview_Update(overview, input);
             Units_Select(units, overview, input);
+            Units_Command(units, overview, input);
             Units_Move(units);
             if(false)
                 Map_Edit(map, overview, input);
