@@ -24,3 +24,5 @@ Tile;
 Tile Tile_GetTerrain(const Overview, const Point point, const Animation, const Terrain);
 
 Tile Tile_GetGraphics(const Overview, const Point point, const Point fractional, const Animation, const Graphics);
+
+Point Tile_GetScreenCoords(const Tile, const int32_t x, const int32_t y);

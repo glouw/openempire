@@ -48,3 +48,12 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Poi
     tile.height = Graphics_GetHeight(file);
     return tile;
 }
+
+Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y)
+{
+    const Point coords = {
+        x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x,
+        y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y,
+    };
+    return coords;
+}

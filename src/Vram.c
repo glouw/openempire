@@ -58,16 +58,15 @@ static void DrawTileNoClip(const Vram vram, const Tile tile)
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
-        const uint8_t height = Get(vram, xx, yy) >> 24;
+        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
         if(tile.height > height)
         {
             const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
             if(surface_pixel != SURFACE_COLOR_KEY)
             {
                 const uint32_t pixel = (tile.height << 24) | surface_pixel;
-                Put(vram, xx, yy, pixel);
+                Put(vram, coords.x, coords.y, pixel);
             }
         }
     }
@@ -78,19 +77,17 @@ static void DrawTileClip(const Vram vram, const Tile tile)
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
-
-        if(!OutOfBounds(vram, xx, yy))
+        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        if(!OutOfBounds(vram, coords.x, coords.y))
         {
-            const uint8_t height = Get(vram, xx, yy) >> 24;
+            const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
             if(tile.height > height)
             {
                 const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
                 if(surface_pixel != SURFACE_COLOR_KEY)
                 {
                     const uint32_t pixel = (tile.height << 24) | surface_pixel;
-                    Put(vram, xx, yy, pixel);
+                    Put(vram, coords.x, coords.y, pixel);
                 }
             }
         }
@@ -201,19 +198,18 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
-        if(!OutOfBounds(vram, xx, yy))
+        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        if(!OutOfBounds(vram, coords.x, coords.y))
         {
-            const uint32_t height = Get(vram, xx, yy) >> 24;
+            const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
             if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
             {
                 const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
                 if(top_pixel != SURFACE_COLOR_KEY)
                 {
-                    const uint32_t blend_pixel = BlendMaskWithBuffer(vram, xx, yy, mask, x, y, top_pixel);
+                    const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
                     const uint32_t pixel = blend_pixel | (tile.height << 24);
-                    Put(vram, xx, yy, pixel);
+                    Put(vram, coords.x, coords.y, pixel);
                 }
             }
         }
@@ -225,19 +221,16 @@ static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* co
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const int32_t xx = x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x;
-        const int32_t yy = y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y;
-
-        const uint32_t height = Get(vram, xx, yy) >> 24;
-
+        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
         if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
         {
             const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
             if(top_pixel != SURFACE_COLOR_KEY)
             {
-                const uint32_t blend_pixel = BlendMaskWithBuffer(vram, xx, yy, mask, x, y, top_pixel);
+                const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
                 const uint32_t pixel = blend_pixel | (tile.height << 24);
-                Put(vram, xx, yy, pixel);
+                Put(vram, coords.x, coords.y, pixel);
             }
         }
     }
