@@ -53,22 +53,27 @@ static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
     return x < 0 || y < 0 || x >= vram.xres || y >= vram.yres;
 }
 
+static void Transfer(const Vram vram, const Tile tile, const Point coords, const int32_t x, const int32_t y)
+{
+    const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
+    if(tile.height > height)
+    {
+        const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
+        if(surface_pixel != SURFACE_COLOR_KEY)
+        {
+            const uint32_t pixel = (tile.height << 24) | surface_pixel;
+            Put(vram, coords.x, coords.y, pixel);
+        }
+    }
+}
+
 static void DrawTileNoClip(const Vram vram, const Tile tile)
 {
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
         const Point coords = Tile_GetScreenCoords(tile, x, y);
-        const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
-        if(tile.height > height)
-        {
-            const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
-            if(surface_pixel != SURFACE_COLOR_KEY)
-            {
-                const uint32_t pixel = (tile.height << 24) | surface_pixel;
-                Put(vram, coords.x, coords.y, pixel);
-            }
-        }
+        Transfer(vram, tile, coords, x, y);
     }
 }
 
@@ -79,18 +84,7 @@ static void DrawTileClip(const Vram vram, const Tile tile)
     {
         const Point coords = Tile_GetScreenCoords(tile, x, y);
         if(!OutOfBounds(vram, coords.x, coords.y))
-        {
-            const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
-            if(tile.height > height)
-            {
-                const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
-                if(surface_pixel != SURFACE_COLOR_KEY)
-                {
-                    const uint32_t pixel = (tile.height << 24) | surface_pixel;
-                    Put(vram, coords.x, coords.y, pixel);
-                }
-            }
-        }
+            Transfer(vram, tile, coords, x, y);
     }
 }
 
@@ -144,7 +138,6 @@ static Tile* PrepTerrainTiles(const Registrar terrain, const Map map, const Over
 static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, Points points)
 {
     Tile* const tiles = PrepTerrainTiles(terrain, map, overview, points);
-
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
     for(int32_t i = 0; i < vram.cpu_count; i++)
@@ -158,16 +151,12 @@ static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const M
         if(i == vram.cpu_count - 1)
             needles[i].b += remainder;
     }
-
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
     UTIL_CHECK(threads);
-
     for(int32_t i = 0; i < vram.cpu_count; i++)
         threads[i] = SDL_CreateThread(DrawBatchNeedle, "N/A", &needles[i]);
-
     for(int32_t i = 0; i < vram.cpu_count; i++)
         SDL_WaitThread(threads[i], NULL);
-
     free(needles);
     free(threads);
     free(tiles);
@@ -193,6 +182,21 @@ static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int
     return blend_pixel;
 }
 
+static void BlendTransfer(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
+{
+    const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
+    if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
+    {
+        const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
+        if(top_pixel != SURFACE_COLOR_KEY)
+        {
+            const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
+            const uint32_t pixel = blend_pixel | (tile.height << 24);
+            Put(vram, coords.x, coords.y, pixel);
+        }
+    }
+}
+
 static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* const mask)
 {
     for(int32_t y = 0; y < tile.frame.height; y++)
@@ -200,19 +204,7 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     {
         const Point coords = Tile_GetScreenCoords(tile, x, y);
         if(!OutOfBounds(vram, coords.x, coords.y))
-        {
-            const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
-            if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
-            {
-                const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
-                if(top_pixel != SURFACE_COLOR_KEY)
-                {
-                    const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
-                    const uint32_t pixel = blend_pixel | (tile.height << 24);
-                    Put(vram, coords.x, coords.y, pixel);
-                }
-            }
-        }
+            BlendTransfer(vram, tile, coords, mask, x, y);
     }
 }
 
@@ -222,17 +214,7 @@ static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* co
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
         const Point coords = Tile_GetScreenCoords(tile, x, y);
-        const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
-        if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
-        {
-            const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
-            if(top_pixel != SURFACE_COLOR_KEY)
-            {
-                const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
-                const uint32_t pixel = blend_pixel | (tile.height << 24);
-                Put(vram, coords.x, coords.y, pixel);
-            }
-        }
+        BlendTransfer(vram, tile, coords, mask, x, y);
     }
 }
 
@@ -316,7 +298,6 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
 {
     if(slice == 0)
         return 0;
-
     const int32_t width = slice * lines.count / slices;
     int32_t index = width;
     while(index < lines.count)
@@ -341,7 +322,6 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
 {
     const Lines lines = GetBlendLines(map, points);
     Lines_Sort(lines);
-
     BlendNeedle* const needles = UTIL_ALLOC(BlendNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
     for(int32_t i = 0; i < vram.cpu_count; i++)
@@ -355,16 +335,12 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
         needles[i].a = GetNextBestBlendTile(lines, i + 0, vram.cpu_count);
         needles[i].b = GetNextBestBlendTile(lines, i + 1, vram.cpu_count);
     }
-
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
     UTIL_CHECK(threads);
-
     for(int32_t i = 0; i < vram.cpu_count; i++)
         threads[i] = SDL_CreateThread(DrawBlendNeedle, "N/A", &needles[i]);
-
     for(int32_t i = 0; i < vram.cpu_count; i++)
         SDL_WaitThread(threads[i], NULL);
-
     free(needles);
     free(threads);
     Lines_Free(lines);
