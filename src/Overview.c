@@ -36,7 +36,7 @@ Overview Overview_Update(Overview overview, const Input input)
  *
  */
 
-Point Overview_IsoToCart(const Overview overview, const Point iso)
+Point Overview_IsoToCart(const Overview overview, const Point iso, Point* const cart_frac)
 {
     // Relative to middle of screen.
 
@@ -57,10 +57,18 @@ Point Overview_IsoToCart(const Overview overview, const Point iso)
 
     const int32_t rx = (xx * he + yy * we);
     const int32_t ry = (yy * we - xx * he);
-    const int32_t cx = (+2 * rx + we * he * overview.grid.cols) / (2 * we * he);
-    const int32_t cy = (-2 * ry + we * he * overview.grid.rows) / (2 * we * he);
+    const int32_t cx = (+2 * rx + we * he * overview.grid.cols) / (2 * we);
+    const int32_t cy = (-2 * ry + we * he * overview.grid.rows) / (4 * he);
 
-    const Point cart = { cx, cy };
+    if(cart_frac != NULL)
+    {
+        cart_frac->x = cx;
+        cart_frac->y = cy;
+    }
+    const Point cart = {
+        1 * cx / he,
+        2 * cy / we,
+    };
     return cart;
 }
 
@@ -95,7 +103,10 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
     const int32_t cx = mx - hw * overview.grid.cols;
     const int32_t cy = my - hh;
 
-    const Point iso = { cx - overview.point.x, cy + overview.point.y };
+    const Point iso = {
+        cx - overview.point.x,
+        cy + overview.point.y,
+    };
     return iso;
 }
 
@@ -105,16 +116,16 @@ Quad Overview_GetRenderBox(const Overview overview, const int32_t border)
     const Point p1 = { overview.xres - border, border};
     const Point p2 = { border, overview.yres - border };
     const Point p3 = { overview.xres - border, overview.yres - border};
-    const Point a = Overview_IsoToCart(overview, p0);
-    const Point b = Overview_IsoToCart(overview, p1);
-    const Point c = Overview_IsoToCart(overview, p2);
-    const Point d = Overview_IsoToCart(overview, p3);
+    const Point a = Overview_IsoToCart(overview, p0, NULL);
+    const Point b = Overview_IsoToCart(overview, p1, NULL);
+    const Point c = Overview_IsoToCart(overview, p2, NULL);
+    const Point d = Overview_IsoToCart(overview, p3, NULL);
     const Quad quad = { a, b, c, d};
     return quad;
 }
 
 Point Overview_IsoSnapTo(const Overview overview, const Point iso)
 {
-    const Point cart = Overview_IsoToCart(overview, iso);
+    const Point cart = Overview_IsoToCart(overview, iso, NULL);
     return Overview_CartToIso(overview, cart);
 }

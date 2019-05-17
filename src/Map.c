@@ -71,7 +71,7 @@ void Map_Edit(const Map map, const Overview overview, const Input input)
     if(input.l)
     {
         const Point point = { input.x, input.y };
-        const Point cartesian = Overview_IsoToCart(overview, point);
+        const Point cartesian = Overview_IsoToCart(overview, point, NULL);
         if(InBounds(map, cartesian))
             Map_SetTerrainFile(map, cartesian, file);
     }

@@ -7,13 +7,13 @@ int32_t main(int32_t argc, char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
 
-    Video video = Video_Setup(1300, 700, args.demo ? "Render Demo" : "Open Empires");
+    Video video = Video_Setup(800, 600, args.demo ? "Render Demo" : "Open Empires");
     Video_PrintTitle(video);
     Video_SetCursor(video);
 
     const Data data = Data_Load(args.path);
 
-    const Map map = Map_Make(15, 15, data.terrain);
+    const Map map = Map_Make(8, 8, data.terrain);
     const Grid grid = { map.cols, map.rows, map.tile_width, map.tile_height };
 
     Overview overview = Overview_Init(video.xres, video.yres, grid);

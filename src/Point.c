@@ -24,12 +24,6 @@ Point Point_Sub(const Point a, const Point b)
     return out;
 }
 
-Point Point_Mod(const Point a, const int32_t n)
-{
-    const Point out = { a.x % n, a.y % n };
-    return out;
-}
-
 Point Point_ToIso(const Point cart)
 {
     const Point iso = {

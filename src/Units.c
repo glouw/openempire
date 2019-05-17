@@ -80,7 +80,7 @@ Stack Units_GetStackCart(const Units units, const Point p)
 
 static Stack GetStackIso(const Units units, const Point iso, const Overview overview)
 {
-    const Point cart = Overview_IsoToCart(overview, iso);
+    const Point cart = Overview_IsoToCart(overview, iso, NULL);
     return Units_GetStackCart(units, cart);
 }
 
@@ -100,10 +100,35 @@ void Units_Command(const Units units, const Overview overview, const Input input
 {
     //if(input.ru)
     {
-        const Point iso = { input.x, input.y };
-        const Point cart_point = Overview_IsoToCart(overview, iso);
-        const Point cart_fractional = Point_Mod(Point_ToCart(iso), 48); // XXX. Whats the relationship here?
-        printf("%d %d %d %d\n", cart_point.x, cart_point.y, cart_fractional.x, cart_fractional.y);
+        const Point click = { input.x, input.y };
+
+        // Get fractional cartesian position.
+
+        Point cart_frac;
+        Overview_IsoToCart(overview, click, &cart_frac);
+
+        // Compute cartesian tile width.
+
+        const Point iso_n = { 0, +overview.grid.tile_height / 2 };
+        const Point iso_s = { 0, -overview.grid.tile_height / 2 };
+        const Point iso_e = { +overview.grid.tile_width / 2, 0 };
+        const Point a = Point_ToCart(iso_n);
+        const Point b = Point_ToCart(iso_s);
+        const Point c = Point_ToCart(iso_e);
+        const int32_t cart_w = c.x - b.x;
+        const int32_t cart_h = a.y - c.y;
+
+        // Modulous by cartesian widths and heights to get the relative tile fractional offset.
+
+        cart_frac.x %= cart_w;
+        cart_frac.y %= cart_h;
+
+        // Coordinate maths are done from tile center, so subtract tile mid point.
+
+        cart_frac.x -= cart_w / 2;
+        cart_frac.y -= cart_h / 2;
+
+        printf("%d %d\n", cart_frac.x, cart_frac.y);
     }
 }
 

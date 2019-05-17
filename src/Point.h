@@ -21,5 +21,3 @@ Point Point_Sub(const Point a, const Point b);
 Point Point_ToIso(const Point);
 
 Point Point_ToCart(const Point);
-
-Point Point_Mod(const Point, const int32_t n);
