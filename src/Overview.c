@@ -36,7 +36,7 @@ Overview Overview_Update(Overview overview, const Input input)
  *
  */
 
-Point Overview_IsoToCart(const Overview overview, const Point iso, Point* const cart_frac)
+Point Overview_IsoToCart(const Overview overview, const Point iso, Point* const cart_raw)
 {
     // Relative to middle of screen.
 
@@ -60,10 +60,10 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, Point* const 
     const int32_t cx = (+2 * rx + we * he * overview.grid.cols) / (2 * we);
     const int32_t cy = (-2 * ry + we * he * overview.grid.rows) / (4 * he);
 
-    if(cart_frac != NULL)
+    if(cart_raw != NULL)
     {
-        cart_frac->x = cx;
-        cart_frac->y = cy;
+        cart_raw->x = cx;
+        cart_raw->y = cy;
     }
     const Point cart = {
         1 * cx / he,

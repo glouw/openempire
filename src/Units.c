@@ -102,10 +102,10 @@ void Units_Command(const Units units, const Overview overview, const Input input
     {
         const Point click = { input.x, input.y };
 
-        // Get fractional cartesian position.
+        // Get raw (undivided) cartesian position.
 
-        Point cart_frac;
-        Overview_IsoToCart(overview, click, &cart_frac);
+        Point cart_raw;
+        Overview_IsoToCart(overview, click, &cart_raw);
 
         // Compute cartesian tile width.
 
@@ -119,16 +119,14 @@ void Units_Command(const Units units, const Overview overview, const Input input
         const int32_t cart_h = a.y - c.y;
 
         // Modulous by cartesian widths and heights to get the relative tile fractional offset.
-
-        cart_frac.x %= cart_w;
-        cart_frac.y %= cart_h;
-
         // Coordinate maths are done from tile center, so subtract tile mid point.
 
-        cart_frac.x -= cart_w / 2;
-        cart_frac.y -= cart_h / 2;
+        const Point cart_fractional = {
+            cart_raw.x % cart_w - cart_w / 2,
+            cart_raw.y % cart_h - cart_h / 2,
+        };
 
-        printf("%d %d\n", cart_frac.x, cart_frac.y);
+        printf("%d %d\n", cart_fractional.x, cart_fractional.y);
     }
 }
 

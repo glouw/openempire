@@ -18,7 +18,7 @@ Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid);
 
 Overview Overview_Update(Overview, const Input);
 
-Point Overview_IsoToCart(const Overview, const Point, Point* const cart_frac);
+Point Overview_IsoToCart(const Overview, const Point, Point* const cart_raw);
 
 Point Overview_CartToIso(const Overview, const Point);
 
