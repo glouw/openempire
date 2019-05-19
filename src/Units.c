@@ -80,7 +80,7 @@ Stack Units_GetStackCart(const Units units, const Point p)
 
 static Stack GetStackIso(const Units units, const Point iso, const Overview overview)
 {
-    const Point cart = Overview_IsoToCart(overview, iso, NULL);
+    const Point cart = Overview_IsoToCart(overview, iso, false);
     return Units_GetStackCart(units, cart);
 }
 
@@ -104,8 +104,7 @@ void Units_Command(const Units units, const Overview overview, const Input input
 
         // Get raw (undivided) cartesian position.
 
-        Point cart_raw;
-        Overview_IsoToCart(overview, click, &cart_raw);
+        const Point cart_raw = Overview_IsoToCart(overview, click, true);
 
         // Modulous by cartesian widths and heights to get the relative tile fractional offset.
         // Coordinate maths are done from tile center, so subtract tile mid point.

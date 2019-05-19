@@ -32,11 +32,16 @@ Overview Overview_Update(Overview overview, const Input input)
  *      +
  *
  * This isometric to cartesian projection is a little long winded,
- * where are purposely not cancelled to preserve integer rounding error.
+ * where are purposely not canceled to preserve integer rounding error.
+ *
+ * If the raw flag is set to true, the returned cartesian projection granularity will be
+ * of screen pixel width.
+ *
+ * If the raw flag is set to false, the returned granularity is that of the tile dimensions.
  *
  */
 
-Point Overview_IsoToCart(const Overview overview, const Point iso, Point* const cart_raw)
+Point Overview_IsoToCart(const Overview overview, const Point iso, const bool raw)
 {
     // Relative to middle of screen.
 
@@ -60,15 +65,12 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, Point* const 
     const int32_t cx = (+2 * rx + we * he * overview.grid.cols) / (2 * we);
     const int32_t cy = (-2 * ry + we * he * overview.grid.rows) / (4 * he);
 
-    if(cart_raw != NULL)
+    if(raw)
     {
-        cart_raw->x = cx;
-        cart_raw->y = cy;
+        const Point cart = { cx, cy };
+        return cart;
     }
-    const Point cart = {
-        1 * cx / he,
-        2 * cy / we,
-    };
+    const Point cart = { cx / he, 2 * cy / we };
     return cart;
 }
 
@@ -116,10 +118,10 @@ Quad Overview_GetRenderBox(const Overview overview, const int32_t border)
     const Point p1 = { overview.xres - border, border};
     const Point p2 = { border, overview.yres - border };
     const Point p3 = { overview.xres - border, overview.yres - border};
-    const Point a = Overview_IsoToCart(overview, p0, NULL);
-    const Point b = Overview_IsoToCart(overview, p1, NULL);
-    const Point c = Overview_IsoToCart(overview, p2, NULL);
-    const Point d = Overview_IsoToCart(overview, p3, NULL);
+    const Point a = Overview_IsoToCart(overview, p0, false);
+    const Point b = Overview_IsoToCart(overview, p1, false);
+    const Point c = Overview_IsoToCart(overview, p2, false);
+    const Point d = Overview_IsoToCart(overview, p3, false);
     const Quad quad = { a, b, c, d};
     return quad;
 }
