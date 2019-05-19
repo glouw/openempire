@@ -13,6 +13,7 @@ SRCS += Field.c
 SRCS += File.c
 SRCS += Frame.c
 SRCS += Graphics.c
+SRCS += Grid.c
 SRCS += Image.c
 SRCS += Input.c
 SRCS += Interfac.c

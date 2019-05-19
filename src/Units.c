@@ -107,23 +107,12 @@ void Units_Command(const Units units, const Overview overview, const Input input
         Point cart_raw;
         Overview_IsoToCart(overview, click, &cart_raw);
 
-        // Compute cartesian tile width.
-
-        const Point iso_n = { 0, +overview.grid.tile_height / 2 };
-        const Point iso_s = { 0, -overview.grid.tile_height / 2 };
-        const Point iso_e = { +overview.grid.tile_width / 2, 0 };
-        const Point a = Point_ToCart(iso_n);
-        const Point b = Point_ToCart(iso_s);
-        const Point c = Point_ToCart(iso_e);
-        const int32_t cart_w = c.x - b.x;
-        const int32_t cart_h = a.y - c.y;
-
         // Modulous by cartesian widths and heights to get the relative tile fractional offset.
         // Coordinate maths are done from tile center, so subtract tile mid point.
 
         const Point cart_fractional = {
-            cart_raw.x % cart_w - cart_w / 2,
-            cart_raw.y % cart_h - cart_h / 2,
+            cart_raw.x % overview.grid.cart_width  - overview.grid.cart_width  / 2,
+            cart_raw.y % overview.grid.cart_height - overview.grid.cart_height / 2,
         };
 
         printf("%d %d\n", cart_fractional.x, cart_fractional.y);
