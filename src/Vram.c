@@ -16,7 +16,7 @@ Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yre
     vram.width = (int32_t) (pitch / sizeof(*vram.pixels));
     vram.xres = xres;
     vram.yres = yres;
-    vram.cpu_count = 2 * SDL_GetCPUCount();
+    vram.cpu_count = 2 * SDL_GetCPUCount(); // XXX. Need benchmarks to find best ratio.
     return vram;
 }
 

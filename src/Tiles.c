@@ -7,6 +7,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
     Tile* const tile = UTIL_ALLOC(Tile, units.count);
     Unit** const unit = UTIL_ALLOC(Unit*, units.count);
     UTIL_CHECK(tile);
+    UTIL_CHECK(unit);
     int32_t unit_count = 0;
     for(int32_t i = points.count - 1; i >= 0; i--)
     {

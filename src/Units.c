@@ -2,6 +2,8 @@
 
 #include "Util.h"
 #include "File.h"
+#include "Rect.h"
+#include "Surface.h"
 #include "Tiles.h"
 #include "Graphics.h"
 
@@ -12,11 +14,11 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE },
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE_SHADOW },
-        { {x_mid + 0, y_mid + 1}, {  0,   0}, false, FILE_BERRY_BUSH },
-        { {x_mid + 0, y_mid + 2}, {  0,   0}, false, FILE_STONE_MINE },
-        { {x_mid + 0, y_mid + 3}, {  0,   0}, false, FILE_GOLD_MINE },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE            },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE_SHADOW     },
+        { {x_mid + 0, y_mid + 1}, {  0,   0}, false, FILE_BERRY_BUSH             },
+        { {x_mid + 0, y_mid + 2}, {  0,   0}, false, FILE_STONE_MINE             },
+        { {x_mid + 0, y_mid + 3}, {  0,   0}, false, FILE_GOLD_MINE              },
         { {x_mid - 2, y_mid + 0}, {-20, -20}, false, FILE_MALE_VILLAGER_STANDING },
         { {x_mid - 1, y_mid - 1}, {  0,   0}, false, FILE_MALE_VILLAGER_STANDING },
         { {x_mid - 1, y_mid - 1}, { 10,   0}, false, FILE_MALE_VILLAGER_STANDING },
@@ -97,14 +99,28 @@ void Units_Select(const Units units, const Overview overview, const Input input,
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
     if(input.lu)
     {
+        // XXX. Must unselect all units with click.
+
         const Point click = { input.x, input.y };
         for(int32_t i = 0; i < tiles.count; i++)
         {
-            if(Tile_ContainsPoint(tiles.tile[i], click))
+            const Tile tile = tiles.tile[i];
+            if(Tile_ContainsPoint(tile, click))
             {
-                tiles.unit[i]->selected = true;
-                puts("GOT EM");
-                break;
+                // XXX. Only select unit if point clicked is not color key pixel.
+
+                const Rect rect = Rect_Get(tile);
+
+                const Point origin_click = Point_Sub(click, rect.a);
+
+                if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
+                {
+                    // XXX. Must draw circle around selected unit.
+                    puts("GOT EM");
+                    tiles.unit[i]->selected = true;
+                    break;
+                }
+
             }
         }
     }

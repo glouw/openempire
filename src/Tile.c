@@ -1,25 +1,7 @@
 #include "Tile.h"
 
+#include "Rect.h"
 #include "Util.h"
-
-typedef struct
-{
-    Point a;
-    Point b;
-}
-Rect;
-
-static Rect GetRect(const Tile tile)
-{
-    const Point dimensions = { tile.frame.width, tile.frame.height };
-    const Point a = {
-        tile.iso_point.x + tile.iso_fractional.x - tile.frame.hotspot_x,
-        tile.iso_point.y + tile.iso_fractional.y - tile.frame.hotspot_y,
-    };
-    const Point b = Point_Add(a, dimensions);
-    const Rect rect = { a, b };
-    return rect;
-}
 
 // a---------+
 // |         | Where (*) is the point of interest.
@@ -31,7 +13,7 @@ static Rect GetRect(const Tile tile)
 
 bool Tile_ContainsPoint(const Tile tile, const Point point)
 {
-    const Rect rect = GetRect(tile);
+    const Rect rect = Rect_Get(tile);
     return point.x >= rect.a.x
         && point.y >= rect.a.y
         && point.x < rect.b.x
@@ -49,7 +31,7 @@ bool Tile_ContainsPoint(const Tile tile, const Point point)
 
 static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
 {
-    const Rect rect = GetRect(tile);
+    const Rect rect = Rect_Get(tile);
     return rect.a.x >= 0
         && rect.a.y >= 0
         && rect.b.x < xres

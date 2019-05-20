@@ -27,6 +27,7 @@ SRCS += Palette.c
 SRCS += Point.c
 SRCS += Points.c
 SRCS += Quad.c
+SRCS += Rect.c
 SRCS += Registrar.c
 SRCS += Scanline.c
 SRCS += Slp.c
