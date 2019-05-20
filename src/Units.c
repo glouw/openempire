@@ -11,12 +11,17 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {x_mid + 0, y_mid + 0}, {0,0}, FILE_FOREST_TREE },
-        { {x_mid + 0, y_mid + 0}, {0,0}, FILE_FOREST_TREE_SHADOW },
-        { {x_mid + 0, y_mid + 1}, {0,0}, FILE_BERRY_BUSH },
-        { {x_mid + 0, y_mid + 2}, {0,0}, FILE_STONE_MINE },
-        { {x_mid + 0, y_mid + 3}, {0,0}, FILE_GOLD_MINE },
-        { {x_mid - 1, y_mid - 1}, {0,0}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE_SHADOW },
+        { {x_mid + 0, y_mid + 1}, {  0,   0}, FILE_BERRY_BUSH },
+        { {x_mid + 0, y_mid + 2}, {  0,   0}, FILE_STONE_MINE },
+        { {x_mid + 0, y_mid + 3}, {  0,   0}, FILE_GOLD_MINE },
+        { {x_mid - 2, y_mid + 0}, {-20, -20}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0,   0}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, { 10,   0}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0, -10}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0, -13}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {-10, -18}, FILE_MALE_VILLAGER_STANDING },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -100,29 +105,62 @@ void Units_Command(const Units units, const Overview overview, const Input input
 {
     //if(input.ru)
     {
-        const Point click = { input.x, input.y };
-
-        // Get raw (undivided) cartesian position.
+        const Point click = {
+            input.x,
+            input.y,
+        };
 
         const Point cart_raw = Overview_IsoToCart(overview, click, true);
 
         // Modulous by cartesian widths and heights to get the relative tile fractional offset.
-        // Coordinate maths are done from tile center, so subtract tile mid point.
 
         const Point cart_fractional = {
-            cart_raw.x % overview.grid.cart_width  - overview.grid.cart_width  / 2,
-            cart_raw.y % overview.grid.cart_height - overview.grid.cart_height / 2,
+            cart_raw.x % overview.grid.tile_cart_width,
+            cart_raw.y % overview.grid.tile_cart_height,
         };
 
-        printf("%d %d\n", cart_fractional.x, cart_fractional.y);
+        // Coordinate maths are done from tile center, so subtract tile mid point.
+
+        const Point mid = {
+            overview.grid.tile_cart_width / 2,
+            overview.grid.tile_cart_height / 2,
+        };
+
+        const Point fixed = Point_Sub(cart_fractional, mid);
+
+        printf("%d %d\n", fixed.x, fixed.y);
     }
 }
 
-static void StackUnits(const Units units)
+static void ResetStacks(const Units units)
 {
     for(int32_t y = 0; y < units.rows; y++)
     for(int32_t x = 0; x < units.cols; x++)
         units.stack[x + y * units.cols].count = 0;
+}
+
+static int32_t CompareByY(const void* a, const void* b)
+{
+    Unit* const aa = *((Unit**) a);
+    Unit* const bb = *((Unit**) b);
+    const Point pa = Point_ToIso(aa->cart_fractional);
+    const Point pb = Point_ToIso(bb->cart_fractional);
+    return pa.y < pb.y;
+}
+
+static void SortStacks(const Units units)
+{
+    for(int32_t y = 0; y < units.rows; y++)
+    for(int32_t x = 0; x < units.cols; x++)
+    {
+        const Stack stack = units.stack[x + y * units.cols];
+        if(stack.count > 0)
+            qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
+    }
+}
+
+static void StackStacks(const Units units)
+{
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -131,7 +169,9 @@ static void StackUnits(const Units units)
     }
 }
 
-void Units_Move(const Units units)
+void Units_Caretake(const Units units)
 {
-    StackUnits(units); // XXX. Save for doing at end.
+    ResetStacks(units);
+    StackStacks(units);
+    SortStacks(units);
 }

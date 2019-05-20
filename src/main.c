@@ -13,7 +13,7 @@ int32_t main(int32_t argc, char* argv[])
 
     const Data data = Data_Load(args.path);
 
-    const Map map = Map_Make(8, 8, data.terrain);
+    const Map map = Map_Make(10, 10, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
 
     Overview overview = Overview_Init(video.xres, video.yres, grid);
@@ -33,7 +33,7 @@ int32_t main(int32_t argc, char* argv[])
             overview = Overview_Update(overview, input);
             Units_Select(units, overview, input);
             Units_Command(units, overview, input);
-            Units_Move(units);
+            Units_Caretake(units);
             if(false)
                 Map_Edit(map, overview, input);
 

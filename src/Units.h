@@ -28,7 +28,7 @@ Units Units_Append(Units, const Unit);
 
 void Units_Free(const Units);
 
-void Units_Move(const Units);
+void Units_Caretake(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 

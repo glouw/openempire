@@ -55,8 +55,8 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, const bool ra
 
     // Account for rounding error.
 
-    const int32_t we = overview.grid.tile_width - 1;
-    const int32_t he = overview.grid.tile_height - 1;
+    const int32_t we = overview.grid.tile_iso_width - 1;
+    const int32_t he = overview.grid.tile_iso_height - 1;
 
     // Project.
 
@@ -65,13 +65,13 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, const bool ra
     const int32_t cx = (+2 * rx + we * he * overview.grid.cols) / (2 * we);
     const int32_t cy = (-2 * ry + we * he * overview.grid.rows) / (4 * he);
 
-    if(raw)
-    {
-        const Point cart = { cx, cy };
-        return cart;
-    }
-    const Point cart = { cx / he, 2 * cy / we };
-    return cart;
+    const Point cart_raw = { cx, cy };
+    const Point cart = {
+        1 * cx / he,
+        2 * cy / we,
+    };
+
+    return raw ? cart_raw : cart;
 }
 
 /*                     +
@@ -89,8 +89,8 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
 {
     // Reverse project.
 
-    const int32_t hw = overview.grid.tile_width / 2;
-    const int32_t hh = overview.grid.tile_height / 2;
+    const int32_t hw = overview.grid.tile_iso_width / 2;
+    const int32_t hh = overview.grid.tile_iso_height / 2;
 
     const int32_t xx = (cart.y + cart.x) * hw;
     const int32_t yy = (cart.y - cart.x) * hh;
