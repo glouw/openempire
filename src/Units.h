@@ -33,6 +33,6 @@ void Units_Caretake(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-void Units_Select(const Units, const Overview, const Input, const Registrar);
+void Units_SelectOne(const Units, const Overview, const Input, const Registrar);
 
 void Units_Command(const Units, const Overview, const Input);

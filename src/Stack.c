@@ -26,3 +26,18 @@ void Stack_Free(const Stack stack)
 {
     free(stack.reference);
 }
+
+static int32_t CompareByY(const void* a, const void* b)
+{
+    Unit* const aa = *((Unit**) a);
+    Unit* const bb = *((Unit**) b);
+    const Point pa = Point_ToIso(aa->cart_fractional);
+    const Point pb = Point_ToIso(bb->cart_fractional);
+    return pa.y < pb.y;
+}
+
+void Stack_Sort(const Stack stack)
+{
+    if(stack.count > 1)
+        qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
+}

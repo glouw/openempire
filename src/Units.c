@@ -86,13 +86,7 @@ Stack Units_GetStackCart(const Units units, const Point p)
     return OutOfBounds(units, p) ? zero : *GetStack(units, p); // Return a shallow copy of the stack to prevent write access.
 }
 
-static Stack GetStackIso(const Units units, const Point iso, const Overview overview)
-{
-    const Point cart = Overview_IsoToCart(overview, iso, false);
-    return Units_GetStackCart(units, cart);
-}
-
-void Units_Select(const Units units, const Overview overview, const Input input, const Registrar graphics)
+void Units_SelectOne(const Units units, const Overview overview, const Input input, const Registrar graphics)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
@@ -110,9 +104,7 @@ void Units_Select(const Units units, const Overview overview, const Input input,
                 // XXX. Only select unit if point clicked is not color key pixel.
 
                 const Rect rect = Rect_Get(tile);
-
                 const Point origin_click = Point_Sub(click, rect.a);
-
                 if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
                 {
                     // XXX. Must draw circle around selected unit.
@@ -163,16 +155,10 @@ static void ResetStacks(const Units units)
 {
     for(int32_t y = 0; y < units.rows; y++)
     for(int32_t x = 0; x < units.cols; x++)
-        units.stack[x + y * units.cols].count = 0;
-}
-
-static int32_t CompareByY(const void* a, const void* b)
-{
-    Unit* const aa = *((Unit**) a);
-    Unit* const bb = *((Unit**) b);
-    const Point pa = Point_ToIso(aa->cart_fractional);
-    const Point pb = Point_ToIso(bb->cart_fractional);
-    return pa.y < pb.y;
+    {
+        const Point point = { x, y };
+        GetStack(units, point)->count = 0;
+    }
 }
 
 static void SortStacks(const Units units)
@@ -180,9 +166,9 @@ static void SortStacks(const Units units)
     for(int32_t y = 0; y < units.rows; y++)
     for(int32_t x = 0; x < units.cols; x++)
     {
-        const Stack stack = units.stack[x + y * units.cols];
-        if(stack.count > 1)
-            qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
+        const Point point = { x, y };
+        const Stack stack = *GetStack(units, point);
+        Stack_Sort(stack);
     }
 }
 

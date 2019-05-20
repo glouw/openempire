@@ -20,3 +20,5 @@ Stack Stack_Build(const int32_t max);
 void Stack_Append(Stack* const, Unit* const);
 
 void Stack_Free(const Stack);
+
+void Stack_Sort(const Stack);
