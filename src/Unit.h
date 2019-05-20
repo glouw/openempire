@@ -7,6 +7,7 @@ typedef struct
 {
     Point cart_point;
     Point cart_fractional;
+    bool selected;
     Graphics file;
 }
 Unit;

@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "File.h"
+#include "Tiles.h"
 #include "Graphics.h"
 
 #include <stdlib.h>
@@ -11,17 +12,17 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE },
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, FILE_FOREST_TREE_SHADOW },
-        { {x_mid + 0, y_mid + 1}, {  0,   0}, FILE_BERRY_BUSH },
-        { {x_mid + 0, y_mid + 2}, {  0,   0}, FILE_STONE_MINE },
-        { {x_mid + 0, y_mid + 3}, {  0,   0}, FILE_GOLD_MINE },
-        { {x_mid - 2, y_mid + 0}, {-20, -20}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0,   0}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, { 10,   0}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0, -10}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0, -13}, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {-10, -18}, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE },
+        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE_SHADOW },
+        { {x_mid + 0, y_mid + 1}, {  0,   0}, false, FILE_BERRY_BUSH },
+        { {x_mid + 0, y_mid + 2}, {  0,   0}, false, FILE_STONE_MINE },
+        { {x_mid + 0, y_mid + 3}, {  0,   0}, false, FILE_GOLD_MINE },
+        { {x_mid - 2, y_mid + 0}, {-20, -20}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0,   0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, { 10,   0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0, -10}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0, -13}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {-10, -18}, false, FILE_MALE_VILLAGER_STANDING },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -89,21 +90,31 @@ static Stack GetStackIso(const Units units, const Point iso, const Overview over
     return Units_GetStackCart(units, cart);
 }
 
-void Units_Select(const Units units, const Overview overview, const Input input)
+void Units_Select(const Units units, const Overview overview, const Input input, const Registrar graphics)
 {
+    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
+    const Points points = Quad_GetRenderPoints(quad);
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
     if(input.lu)
     {
-        const Point iso = { input.x, input.y };
-        const Stack stack = GetStackIso(units, iso, overview);
-        for(int32_t i = 0; i < stack.count; i++)
-            printf("%d: %s\n", i, Graphics_GetString(stack.reference[i]->file));
-        putchar('\n');
+        const Point click = { input.x, input.y };
+        for(int32_t i = 0; i < tiles.count; i++)
+        {
+            if(Tile_ContainsPoint(tiles.tile[i], click))
+            {
+                tiles.unit[i]->selected = true;
+                puts("GOT EM");
+                break;
+            }
+        }
     }
+    Points_Free(points);
+    Tiles_Free(tiles);
 }
 
 void Units_Command(const Units units, const Overview overview, const Input input)
 {
-    //if(input.ru)
+    if(input.ru)
     {
         const Point click = {
             input.x,
@@ -154,7 +165,7 @@ static void SortStacks(const Units units)
     for(int32_t x = 0; x < units.cols; x++)
     {
         const Stack stack = units.stack[x + y * units.cols];
-        if(stack.count > 0)
+        if(stack.count > 1)
             qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
     }
 }

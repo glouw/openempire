@@ -128,6 +128,7 @@ Quad Overview_GetRenderBox(const Overview overview, const int32_t border)
 
 Point Overview_IsoSnapTo(const Overview overview, const Point iso)
 {
-    const Point cart = Overview_IsoToCart(overview, iso, NULL);
-    return Overview_CartToIso(overview, cart);
+    const Point cart = Overview_IsoToCart(overview, iso, false);
+    const Point snap = Overview_CartToIso(overview, cart);
+    return snap;
 }

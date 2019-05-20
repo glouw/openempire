@@ -2,12 +2,58 @@
 
 #include "Util.h"
 
+typedef struct
+{
+    Point a;
+    Point b;
+}
+Rect;
+
+static Rect GetRect(const Tile tile)
+{
+    const Point dimensions = { tile.frame.width, tile.frame.height };
+    const Point a = {
+        tile.iso_point.x + tile.iso_fractional.x - tile.frame.hotspot_x,
+        tile.iso_point.y + tile.iso_fractional.y - tile.frame.hotspot_y,
+    };
+    const Point b = Point_Add(a, dimensions);
+    const Rect rect = { a, b };
+    return rect;
+}
+
+// a---------+
+// |         | Where (*) is the point of interest.
+// |         | and points (a, b) are a bounding rectangle.
+// |         |
+// |     *   |
+// |         |
+// +---------b
+
+bool Tile_ContainsPoint(const Tile tile, const Point point)
+{
+    const Rect rect = GetRect(tile);
+    return point.x >= rect.a.x
+        && point.y >= rect.a.y
+        && point.x < rect.b.x
+        && point.y < rect.b.y;
+}
+
+// (0, 0)
+// +-------------------+
+// |                   | Where the inner box, bounded by points (a, b),
+// |       a------+    | are within screen dimensions (0,0) and (xres, yres)
+// |       |      |    |
+// |       +------b    |
+// |                   |
+// +-------------------+ (xres, yres)
+
 static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
 {
-    return tile.iso_point.x - tile.frame.hotspot_x >= 0
-        && tile.iso_point.y - tile.frame.hotspot_y >= 0
-        && tile.iso_point.x - tile.frame.hotspot_x + tile.frame.width < xres
-        && tile.iso_point.y - tile.frame.hotspot_y + tile.frame.height < yres;
+    const Rect rect = GetRect(tile);
+    return rect.a.x >= 0
+        && rect.a.y >= 0
+        && rect.b.x < xres
+        && rect.b.y < yres;
 }
 
 static Tile Clip(Tile tile, const Overview overview)
@@ -20,7 +66,7 @@ static Tile Clip(Tile tile, const Overview overview)
     return tile;
 }
 
-static Tile Construct(const Overview overview, const Point cart_point, const Point cart_fractional, const Animation animation, const int32_t index)
+Tile Tile_Construct(const Overview overview, const Point cart_point, const Point cart_fractional, const Animation animation, const int32_t index)
 {
     static Tile zero;
     Tile tile = zero;
@@ -36,7 +82,7 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
     const int32_t bound = Util_SquareRoot(animation.count);
     const int32_t index = (cart_point.x % bound) + ((cart_point.y % bound) * bound);
     const Point cart_fractional = { 0,0 };
-    Tile tile = Construct(overview, cart_point, cart_fractional, animation, index);
+    Tile tile = Tile_Construct(overview, cart_point, cart_fractional, animation, index);
     tile.height = Terrain_GetHeight(file);
     return tile;
 }
@@ -44,7 +90,7 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Point cart_fractional, const Animation animation, const Graphics file)
 {
     const int32_t index = 1; // XXX... which one to use?
-    Tile tile = Construct(overview, cart_point, cart_fractional, animation, index);
+    Tile tile = Tile_Construct(overview, cart_point, cart_fractional, animation, index);
     tile.height = Graphics_GetHeight(file);
     return tile;
 }

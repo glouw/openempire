@@ -6,7 +6,7 @@
 #include "Units.h"
 #include "Map.h"
 #include "Overview.h"
-#include "Tile.h"
+#include "Tiles.h"
 #include "Input.h"
 #include "Blendomatic.h"
 

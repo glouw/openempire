@@ -110,34 +110,9 @@ static int32_t DrawBatchNeedle(void* data)
     return 0;
 }
 
-static int32_t CompareTileSurface(const void* a, const void* b)
-{
-    Tile* const aa = (Tile*) a;
-    Tile* const bb = (Tile*) b;
-    return aa->surface < bb->surface;
-}
-
-static Tile* PrepTerrainTiles(const Registrar terrain, const Map map, const Overview overview, const Points points)
-{
-    Tile* const tiles = UTIL_ALLOC(Tile, points.count);
-    UTIL_CHECK(tiles);
-    for(int32_t i = 0; i < points.count; i++)
-    {
-        const Point point = points.point[i];
-        const Terrain tile_file = Map_GetTerrainFile(map, point);
-        if(tile_file != FILE_TERRAIN_NONE)
-        {
-            const Animation animation = terrain.animation[COLOR_BLU][tile_file];
-            tiles[i] = Tile_GetTerrain(overview, point, animation, tile_file);
-        }
-    }
-    qsort(tiles, points.count, sizeof(*tiles), CompareTileSurface);
-    return tiles;
-}
-
 static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, Points points)
 {
-    Tile* const tiles = PrepTerrainTiles(terrain, map, overview, points);
+    const Tiles tiles = Tiles_PrepTerrain(terrain, map, overview, points);
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
     for(int32_t i = 0; i < vram.cpu_count; i++)
@@ -145,7 +120,7 @@ static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const M
         const int32_t width = points.count / vram.cpu_count;
         const int32_t remainder = points.count % vram.cpu_count;
         needles[i].vram = vram;
-        needles[i].tiles = tiles;
+        needles[i].tiles = tiles.tile;
         needles[i].a = (i + 0) * width;
         needles[i].b = (i + 1) * width;
         if(i == vram.cpu_count - 1)
@@ -159,7 +134,7 @@ static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const M
         SDL_WaitThread(threads[i], NULL);
     free(needles);
     free(threads);
-    free(tiles);
+    Tiles_Free(tiles);
 }
 
 // See:
@@ -272,7 +247,7 @@ static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
         // Outer tile is partially transparent blended tile.
         // Inner tile is a solid inner tile.
 
-        const int32_t tile_file = Map_GetTerrainFile(map, inner);
+        const Terrain tile_file = Map_GetTerrainFile(map, inner);
         const Point outer = box.point[j];
         const Line line = { inner, outer, tile_file };
         lines = Lines_Append(lines, line);
@@ -356,48 +331,14 @@ void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const
     Points_Free(points);
 }
 
-static Tile* PrepGraphicsTiles(const Registrar graphics, const Overview overview, const Units units, const Points points)
-{
-    Tile* const tiles = UTIL_ALLOC(Tile, units.count);
-    UTIL_CHECK(tiles);
-    int32_t unit_count = 0;
-    for(int32_t i = points.count - 1; i >= 0; i--)
-    {
-        const Point point = points.point[i];
-        const Stack stack = Units_GetStackCart(units, point);
-        for(int32_t j = 0; j < stack.count; j++)
-        {
-            Unit* const unit = stack.reference[j];
-
-            // XXX: Now that unit tile is indexed, the unit must be flagged as drawn, else the same unit from a different
-            // tile will call another draw for cases where a graphics file occupies more than one tile (eg. buildings).
-
-            const Animation animation = graphics.animation[COLOR_BLU][unit->file];
-
-            // A little unfortunate, but the hot spots for the terrain tiles are not centered.
-            // Units must therefor be forced to the terrain tile positions.
-
-            const Point south = { 0, 1 };
-            const Point shifted = Point_Add(point, south);
-            tiles[unit_count++] = Tile_GetGraphics(overview, shifted, unit->cart_fractional, animation, unit->file);
-        }
-    }
-    return tiles;
-}
-
-static void RenderUnits(const Vram vram, const Overview overview, const Registrar graphics, const Units units, const Points points)
-{
-    Tile* const tiles = PrepGraphicsTiles(graphics, overview, units, points);
-    for(int32_t i = 0; i < units.count; i++)
-        Vram_DrawTile(vram, tiles[i]);
-    free(tiles);
-}
-
 void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
-    RenderUnits(vram, overview, graphics, units, points);
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points);
+    for(int32_t i = 0; i < tiles.count; i++)
+        Vram_DrawTile(vram, tiles.tile[i]);
+    Tiles_Free(tiles);
     Points_Free(points);
 }
 

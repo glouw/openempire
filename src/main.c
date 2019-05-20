@@ -31,7 +31,7 @@ int32_t main(int32_t argc, char* argv[])
             const int32_t t0 = SDL_GetTicks();
 
             overview = Overview_Update(overview, input);
-            Units_Select(units, overview, input);
+            Units_Select(units, overview, input, data.graphics);
             Units_Command(units, overview, input);
             Units_Caretake(units);
             if(false)

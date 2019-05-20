@@ -2,6 +2,7 @@
 
 #include "Unit.h"
 #include "Overview.h"
+#include "Registrar.h"
 #include "Stack.h"
 
 // Units are arranged in a linear array, but also referenced with
@@ -32,6 +33,6 @@ void Units_Caretake(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-void Units_Select(const Units, const Overview, const Input);
+void Units_Select(const Units, const Overview, const Input, const Registrar);
 
 void Units_Command(const Units, const Overview, const Input);

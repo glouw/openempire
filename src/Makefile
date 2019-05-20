@@ -36,6 +36,7 @@ SRCS += Table.c
 SRCS += Terrain.c
 SRCS += Text.c
 SRCS += Tile.c
+SRCS += Tiles.c
 SRCS += Units.c
 SRCS += Util.c
 SRCS += Video.c
@@ -59,7 +60,7 @@ SANITIZE = 0
 FLAGS = -Wall -Wextra -Wshadow -pedantic
 
 ifeq (00, $(CLANG)$(CPP))
-COMPILER = gcc -std=c11
+COMPILER = gcc -std=c99
 endif
 
 ifeq (01, $(CLANG)$(CPP))
