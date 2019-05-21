@@ -7,13 +7,13 @@ int32_t main(int32_t argc, char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
 
-    Video video = Video_Setup(800, 600, args.demo ? "Render Demo" : "Open Empires");
+    Video video = Video_Setup(1024, 600, args.demo ? "Render Demo" : "Open Empires");
     Video_PrintTitle(video);
     Video_SetCursor(video);
 
     const Data data = Data_Load(args.path);
 
-    const Map map = Map_Make(10, 10, data.terrain);
+    const Map map = Map_Make(15, 15, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
 
     Overview overview = Overview_Init(video.xres, video.yres, grid);
@@ -31,9 +31,9 @@ int32_t main(int32_t argc, char* argv[])
             const int32_t t0 = SDL_GetTicks();
 
             overview = Overview_Update(overview, input);
+            Units_Caretake(units, grid);
             Units_SelectOne(units, overview, input, data.graphics);
             Units_Command(units, overview, input);
-            Units_Caretake(units);
             if(false)
                 Map_Edit(map, overview, input);
 

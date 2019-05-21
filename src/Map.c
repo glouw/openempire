@@ -16,10 +16,15 @@ static void GenerateTestZone(const Map map)
     for(int32_t i = 0; i < 50; i++)
     {
         const Point point = {
-            (Util_Rand() % 16) - 8 + map.cols / 2,
-            (Util_Rand() % 16) - 8 + map.rows / 2,
+            Util_Rand() % map.cols,
+            Util_Rand() % map.rows,
         };
-        Map_SetTerrainFile(map, point, FILE_GRASS);
+        switch(Util_Rand() % 3)
+        {
+            case 0: Map_SetTerrainFile(map, point, FILE_GRASS); break;
+            case 1: Map_SetTerrainFile(map, point, FILE_WATER); break;
+            case 2: Map_SetTerrainFile(map, point, FILE_FARM);  break;
+        }
     }
 }
 

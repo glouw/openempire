@@ -38,6 +38,7 @@ SRCS += Terrain.c
 SRCS += Text.c
 SRCS += Tile.c
 SRCS += Tiles.c
+SRCS += Unit.c
 SRCS += Units.c
 SRCS += Util.c
 SRCS += Video.c

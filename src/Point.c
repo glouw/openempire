@@ -27,8 +27,8 @@ Point Point_Sub(const Point a, const Point b)
 Point Point_ToIso(const Point cart)
 {
     const Point iso = {
-        (cart.x - cart.y),
-        (cart.x + cart.y) / 2,
+        +(cart.x + cart.y) / 1,
+        -(cart.x - cart.y) / 2,
     };
     return iso;
 }
@@ -36,8 +36,8 @@ Point Point_ToIso(const Point cart)
 Point Point_ToCart(const Point iso)
 {
     const Point cart = {
-        (2 * iso.y + iso.x) / 2,
-        (2 * iso.y - iso.x) / 2,
+        -(2 * iso.y - iso.x) / 2,
+        +(2 * iso.y + iso.x) / 2,
     };
     return cart;
 }

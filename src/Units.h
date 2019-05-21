@@ -29,10 +29,10 @@ Units Units_Append(Units, const Unit);
 
 void Units_Free(const Units);
 
-void Units_Caretake(const Units);
-
 Stack Units_GetStackCart(const Units, const Point);
 
 void Units_SelectOne(const Units, const Overview, const Input, const Registrar);
 
 void Units_Command(const Units, const Overview, const Input);
+
+void Units_Caretake(const Units, const Grid);

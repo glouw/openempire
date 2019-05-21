@@ -77,7 +77,7 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Poi
     return tile;
 }
 
-Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y)
+Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y) // XXX. Replicated in Rect.c
 {
     const Point coords = {
         x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x,

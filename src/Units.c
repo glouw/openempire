@@ -14,17 +14,30 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE            },
-        { {x_mid + 0, y_mid + 0}, {  0,   0}, false, FILE_FOREST_TREE_SHADOW     },
-        { {x_mid + 0, y_mid + 1}, {  0,   0}, false, FILE_BERRY_BUSH             },
-        { {x_mid + 0, y_mid + 2}, {  0,   0}, false, FILE_STONE_MINE             },
-        { {x_mid + 0, y_mid + 3}, {  0,   0}, false, FILE_GOLD_MINE              },
-        { {x_mid - 2, y_mid + 0}, {-20, -20}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0,   0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, { 10,   0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0, -10}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0, -13}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {-10, -18}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid + 0}, {  0,   0}, { 0, 0}, false, FILE_FOREST_TREE        },
+        { {x_mid - 1, y_mid + 0}, {  0,   0}, { 0, 0}, false, FILE_FOREST_TREE_SHADOW },
+        { {x_mid - 1, y_mid + 1}, {  0,   0}, { 0, 0}, false, FILE_BERRY_BUSH         },
+        { {x_mid - 1, y_mid + 2}, {  0,   0}, { 0, 0}, false, FILE_STONE_MINE         },
+        { {x_mid - 1, y_mid + 3}, {  0,   0}, { 0, 0}, false, FILE_GOLD_MINE          },
+
+        // Exploding villagers.
+
+        { {x_mid - 1, y_mid + 0}, {  0,   0}, {-1, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 1, y_mid + 0}, {  0,   0}, {+1, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 0, y_mid + 1}, {  0,   0}, { 0,+1}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 0, y_mid - 1}, {  0,   0}, { 0,-1}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 1, y_mid - 1}, {  0,   0}, {+1,-1}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0,   0}, {-1,-1}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid + 1}, {  0,   0}, {-1,+1}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid + 1, y_mid + 1}, {  0,   0}, {+1,+1}, false, FILE_MALE_VILLAGER_STANDING },
+
+        // Depth test villagers.
+
+        { {x_mid - 1, y_mid - 1}, {  0,   0}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, { 10,   0}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0, -10}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {  0, -13}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { {x_mid - 1, y_mid - 1}, {-10, -18}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -182,8 +195,15 @@ static void StackStacks(const Units units)
     }
 }
 
-void Units_Caretake(const Units units)
+static void Move(const Units units, const Grid grid)
 {
+    for(int32_t i = 0; i < units.count; i++)
+        units.unit[i] = Unit_Move(units.unit[i], grid);
+}
+
+void Units_Caretake(const Units units, const Grid grid)
+{
+    Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);
