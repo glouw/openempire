@@ -5,6 +5,12 @@
 #include <string.h>
 #include <stdbool.h>
 
+// Fields are one long string representing walkable tiles on the map.
+// A walkable tile, like grass, dirt, or snow, are marked by a space character.
+// An unwalkable tile is any other character.
+
+#define WALKABLE_SPACE (' ')
+
 typedef struct
 {
     Point* point;
@@ -46,7 +52,7 @@ static void Free(Queue queue)
     free(queue.point);
 }
 
-static bool Size(Queue queue)
+static int32_t Size(Queue queue)
 {
     return queue.end - queue.start;
 }
@@ -62,9 +68,19 @@ static bool InBounds(const Field field, const Point point)
         && point.y < field.rows && point.y >= 0;
 }
 
+static char Get(const Field field, const Point point)
+{
+    return field.object[point.x + point.y * field.cols];
+}
+
+static void Set(const Field field, const Point point, const char ch)
+{
+    field.object[point.x + point.y * field.cols] = ch;
+}
+
 static bool IsWalkable(const Field field, const Point point)
 {
-    return field.object[point.x + point.y * field.cols] == ' ';
+    return Get(field, point) == WALKABLE_SPACE;
 }
 
 static Points ToPoints(const Queue queue)
@@ -75,48 +91,97 @@ static Points ToPoints(const Queue queue)
     return points;
 }
 
-Points SearchBreadthFirst(const Field field, const Point start, const Point goal)
+Field Field_New(const Map map)
 {
-    Queue frontier = New(8);
+    static Field zero;
+    Field field = zero;
+    field.rows = map.rows;
+    field.cols = map.cols;
+    field.object = UTIL_ALLOC(char, field.rows * field.cols);
+    for(int32_t row = 0; row < field.rows; row++)
+    for(int32_t col = 0; col < field.cols; col++)
+    {
+        const Point point = { col, row };
+        Set(field, point, WALKABLE_SPACE);
+    }
+    return field;
+}
+
+static Point AccessQueue(const Field field, const Queue queue, const Point point)
+{
+    return queue.point[point.x + point.y * field.cols];
+}
+
+static void ModifyQueue(const Field field, const Queue queue, const Point point, const Point mod)
+{
+    queue.point[point.x + point.y * field.cols] = mod;
+}
+
+Points Field_SearchBreadthFirst(const Field field, const Point start, const Point goal)
+{
+    const Point deltas[] = {
+        { -1, +1 }, { 0, +1 }, { 1, +1 },
+        { -1,  0 },            { 1,  0 },
+        { -1, -1 }, { 0, -1 }, { 1, -1 },
+    };
+    const int32_t dirs = UTIL_LEN(deltas);
+
+    Queue frontier = New(dirs);
+    Queue came_from = New(dirs);
+
+    // Setup.
+
     frontier = Enqueue(frontier, start);
-    Queue came_from = New(8);
     const Point none = { -1, -1 };
     for(int32_t i = 0; i < field.rows * field.cols; i++)
         came_from = Enqueue(came_from, none);
+
+    // Breadth First Search.
+
     while(!IsEmpty(frontier))
     {
         Point current;
         frontier = Dequeue(frontier, &current);
         if(Point_Equal(current, goal))
             break;
-        const Point deltas[] = {
-            { -1, +1 }, { 0, +1 }, { 1, +1 },
-            { -1,  0 }, /* ---- */ { 1,  0 },
-            { -1, -1 }, { 0, -1 }, { 1, -1 },
-        };
-        for(int32_t i = 0; i < UTIL_LEN(deltas); i++)
+        for(int32_t i = 0; i < dirs; i++)
         {
             const Point next = Point_Add(current, deltas[i]);
             if(InBounds(field, next)
             && IsWalkable(field, next))
             {
-                if(Point_Equal(came_from.point[next.x + next.y * field.cols], none))
+                if(Point_Equal(AccessQueue(field, came_from, next), none))
                 {
                     frontier = Enqueue(frontier, next);
-                    came_from.point[next.x + next.y * field.cols] = current;
+                    ModifyQueue(field, came_from, next, current);
                 }
             }
         }
     }
-    Queue path = New(8);
+
+    // Construct path.
+
+    Queue path = New(dirs);
     Point current = goal;
     while(!Point_Equal(current, start))
     {
         path = Enqueue(path, current);
-        current = came_from.point[current.x + current.y * field.cols];
+        current = AccessQueue(field, came_from, current);
     }
     path = Enqueue(path, start);
     Free(frontier);
     Free(came_from);
-    return ToPoints(path);
+
+    // Export points to prevent exporting Queue type.
+    // Points are reversed as algorithm is reversed.
+
+    const Points points = ToPoints(path);
+    const Points reversed = Points_Reverse(points);
+    Points_Free(points);
+    return reversed;
+}
+
+void Field_Free(const Field field)
+{
+    free(field.object);
 }

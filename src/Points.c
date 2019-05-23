@@ -42,6 +42,25 @@ Points Points_Cat(Points a, const Points b)
 void Points_Print(const Points points)
 {
     for(int32_t i = 0; i < points.count; i++)
-        printf("%d %d\n", points.point[i].x, points.point[i].y);
+        Point_Print(points.point[i]);
     putchar('\n');
+}
+
+static Points Drop(Points points, Point* point)
+{
+    assert(points.count >= 0);
+    *point = points.point[--points.count];
+    return points;
+}
+
+Points Points_Reverse(Points points)
+{
+    Points out = Points_New(points.count);
+    for(int i = 0; i < out.max; i++)
+    {
+        Point point;
+        points = Drop(points, &point);
+        out = Points_Append(out, point);
+    }
+    return out;
 }

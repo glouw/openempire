@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "File.h"
+#include "Field.h"
 #include "Rect.h"
 #include "Surface.h"
 #include "Tiles.h"
@@ -94,30 +95,44 @@ void Units_SelectOne(const Units units, const Overview overview, const Input inp
     Tiles_Free(tiles);
 }
 
-void Units_Command(const Units units, const Overview overview, const Input input)
+void Units_Command(const Units units, const Overview overview, const Input input, const Map map)
 {
     if(input.ru)
     {
         const Point click = { input.x, input.y };
-        const Point cart_raw = Overview_IsoToCart(overview, click, true);
+        const Point cart_point = Overview_IsoToCart(overview, click, false);
 
-        // Modulous by cartesian widths and heights to get the relative tile fractional offset.
+        //const Point cart_raw = Overview_IsoToCart(overview, click, true);
 
-        const Point cart_fractional = {
-            cart_raw.x % overview.grid.tile_cart_width,
-            cart_raw.y % overview.grid.tile_cart_height,
-        };
+        //// Modulous by cartesian widths and heights to get the relative tile fractional offset.
 
-        // Coordinate maths are done from tile center, so subtract tile mid point.
+        //const Point cart_fractional = {
+        //    cart_raw.x % overview.grid.tile_cart_width,
+        //    cart_raw.y % overview.grid.tile_cart_height,
+        //};
 
-        const Point mid = {
-            overview.grid.tile_cart_width / 2,
-            overview.grid.tile_cart_height / 2,
-        };
-        const Point fixed = Point_Sub(cart_fractional, mid);
+        //// Coordinate maths are done from tile center, so subtract tile mid point.
 
-        printf("%d %d\n", cart_raw.x, cart_raw.y);
-        printf("%d %d\n", fixed.x, fixed.y);
+        //const Point mid = {
+        //    overview.grid.tile_cart_width / 2,
+        //    overview.grid.tile_cart_height / 2,
+        //};
+        //const Point fixed = Point_Sub(cart_fractional, mid);
+
+        //printf("%d %d\n", cart_raw.x, cart_raw.y);
+        //printf("%d %d\n", fixed.x, fixed.y);
+
+        for(int32_t i = 0; i < units.count; i++)
+        {
+            const Unit unit = units.unit[i];
+            if(unit.selected == true)
+            {
+                const Field field = Field_New(map);
+                const Points points = Field_SearchBreadthFirst(field, unit.cart_point, cart_point);
+                Points_Print(points);
+                Field_Free(field);
+            }
+        }
     }
 }
 

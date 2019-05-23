@@ -31,7 +31,7 @@ int32_t main(int32_t argc, char* argv[])
             overview = Overview_Update(overview, input);
             Units_Caretake(units, grid);
             Units_SelectOne(units, overview, input, data.graphics);
-            Units_Command(units, overview, input);
+            Units_Command(units, overview, input, map);
             if(false)
                 Map_Edit(map, overview, input);
 

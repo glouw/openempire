@@ -87,10 +87,14 @@ bool Tiles_Select(const Tiles tiles, const Input input)
                     // XXX. Must draw circle around selected unit.
                     puts("GOT EM");
                     tiles.unit[i]->selected = true;
+                    Point_Print(tiles.unit[i]->cart_point);
                     return true;
                 }
             }
         }
+        // No units were selected.
+        return false;
     }
-    return false;
+    // Return true if nothing happened.
+    return true;
 }
