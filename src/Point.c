@@ -4,7 +4,8 @@
 
 bool Point_Equal(const Point a, const Point b)
 {
-    return a.x == b.x && a.y == b.y;
+    return a.x == b.x
+        && a.y == b.y;
 }
 
 void Point_Print(const Point a)
@@ -14,13 +15,28 @@ void Point_Print(const Point a)
 
 Point Point_Add(const Point a, const Point b)
 {
-    const Point out = { a.x + b.x, a.y + b.y };
+    const Point out = {
+        a.x + b.x,
+        a.y + b.y,
+    };
     return out;
 }
 
 Point Point_Sub(const Point a, const Point b)
 {
-    const Point out = { a.x - b.x, a.y - b.y };
+    const Point out = {
+        a.x - b.x,
+        a.y - b.y,
+    };
+    return out;
+}
+
+Point Point_Div(const Point a, const int32_t n)
+{
+    const Point out = {
+        a.x / n,
+        a.y / n,
+    };
     return out;
 }
 
@@ -40,4 +56,10 @@ Point Point_ToCart(const Point iso)
         +(2 * iso.y + iso.x) / 2,
     };
     return cart;
+}
+
+bool Point_IsZero(const Point point)
+{
+    const Point zero = { 0, 0 };
+    return Point_Equal(zero, point);
 }

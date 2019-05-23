@@ -16,3 +16,5 @@ Tiles Tiles_PrepGraphics(const Registrar, const Overview, const Units, const Poi
 Tiles Tiles_PrepTerrain(const Registrar, const Map, const Overview, const Points);
 
 void Tiles_Free(const Tiles);
+
+bool Tiles_Select(const Tiles, const Input);

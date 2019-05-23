@@ -14,30 +14,7 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { {x_mid - 1, y_mid + 0}, {  0,   0}, { 0, 0}, false, FILE_FOREST_TREE        },
-        { {x_mid - 1, y_mid + 0}, {  0,   0}, { 0, 0}, false, FILE_FOREST_TREE_SHADOW },
-        { {x_mid - 1, y_mid + 1}, {  0,   0}, { 0, 0}, false, FILE_BERRY_BUSH         },
-        { {x_mid - 1, y_mid + 2}, {  0,   0}, { 0, 0}, false, FILE_STONE_MINE         },
-        { {x_mid - 1, y_mid + 3}, {  0,   0}, { 0, 0}, false, FILE_GOLD_MINE          },
-
-        // Exploding villagers.
-
-        { {x_mid - 1, y_mid + 0}, {  0,   0}, {-1, 0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid + 1, y_mid + 0}, {  0,   0}, {+1, 0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid + 0, y_mid + 1}, {  0,   0}, { 0,+1}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid + 0, y_mid - 1}, {  0,   0}, { 0,-1}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid + 1, y_mid - 1}, {  0,   0}, {+1,-1}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0,   0}, {-1,-1}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid + 1}, {  0,   0}, {-1,+1}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid + 1, y_mid + 1}, {  0,   0}, {+1,+1}, false, FILE_MALE_VILLAGER_STANDING },
-
-        // Depth test villagers.
-
-        { {x_mid - 1, y_mid - 1}, {  0,   0}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, { 10,   0}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0, -10}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {  0, -13}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
-        { {x_mid - 1, y_mid - 1}, {-10, -18}, { 0, 0}, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid }, { 0, 0 }, { 142, 40 }, false, FILE_MALE_VILLAGER_STANDING },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -99,36 +76,20 @@ Stack Units_GetStackCart(const Units units, const Point p)
     return OutOfBounds(units, p) ? zero : *GetStack(units, p); // Return a shallow copy of the stack to prevent write access.
 }
 
+static void UnSelectAll(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+        units.unit[i].selected = false;
+}
+
 void Units_SelectOne(const Units units, const Overview overview, const Input input, const Registrar graphics)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
-    if(input.lu)
-    {
-        // XXX. Must unselect all units with click.
-
-        const Point click = { input.x, input.y };
-        for(int32_t i = 0; i < tiles.count; i++)
-        {
-            const Tile tile = tiles.tile[i];
-            if(Tile_ContainsPoint(tile, click))
-            {
-                // XXX. Only select unit if point clicked is not color key pixel.
-
-                const Rect rect = Rect_Get(tile);
-                const Point origin_click = Point_Sub(click, rect.a);
-                if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
-                {
-                    // XXX. Must draw circle around selected unit.
-                    puts("GOT EM");
-                    tiles.unit[i]->selected = true;
-                    break;
-                }
-
-            }
-        }
-    }
+    const bool did_select = Tiles_Select(tiles, input);
+    if(!did_select)
+        UnSelectAll(units);
     Points_Free(points);
     Tiles_Free(tiles);
 }
@@ -137,11 +98,7 @@ void Units_Command(const Units units, const Overview overview, const Input input
 {
     if(input.ru)
     {
-        const Point click = {
-            input.x,
-            input.y,
-        };
-
+        const Point click = { input.x, input.y };
         const Point cart_raw = Overview_IsoToCart(overview, click, true);
 
         // Modulous by cartesian widths and heights to get the relative tile fractional offset.
@@ -157,9 +114,9 @@ void Units_Command(const Units units, const Overview overview, const Input input
             overview.grid.tile_cart_width / 2,
             overview.grid.tile_cart_height / 2,
         };
-
         const Point fixed = Point_Sub(cart_fractional, mid);
 
+        printf("%d %d\n", cart_raw.x, cart_raw.y);
         printf("%d %d\n", fixed.x, fixed.y);
     }
 }

@@ -15,6 +15,8 @@
 
 #define UTIL_FREAD(pointer, count, fp) (fread(pointer, sizeof(*pointer), count, fp))
 
+#define UTIL_MIN(a, b) ((a) < (b) ? (a) : (b))
+
 void Util_Bomb(const char* const message, ...);
 
 char* Util_StringJoin(const char* const a, const char* const b);

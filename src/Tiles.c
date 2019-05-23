@@ -1,6 +1,8 @@
 #include "Tiles.h"
 
 #include "Util.h"
+#include "Rect.h"
+#include "Surface.h"
 
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Units units, const Points points)
 {
@@ -66,4 +68,29 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     qsort(tile, points.count, sizeof(*tile), CompareTileSurface);
     const Tiles tiles = { tile, NULL, points.count};
     return tiles;
+}
+
+bool Tiles_Select(const Tiles tiles, const Input input)
+{
+    if(input.lu)
+    {
+        const Point click = { input.x, input.y };
+        for(int32_t i = 0; i < tiles.count; i++)
+        {
+            const Tile tile = tiles.tile[i];
+            if(Tile_ContainsPoint(tile, click))
+            {
+                const Rect rect = Rect_GetFrameOutline(tile);
+                const Point origin_click = Point_Sub(click, rect.a);
+                if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
+                {
+                    // XXX. Must draw circle around selected unit.
+                    puts("GOT EM");
+                    tiles.unit[i]->selected = true;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

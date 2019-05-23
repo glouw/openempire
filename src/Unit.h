@@ -8,7 +8,7 @@ typedef struct
 {
     Point cart_point;
     Point cart_fractional;
-    Point cart_velocity;
+    Point cart_goal;
     bool selected;
     Graphics file;
 }
