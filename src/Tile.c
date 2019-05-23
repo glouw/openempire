@@ -13,7 +13,7 @@
 
 bool Tile_ContainsPoint(const Tile tile, const Point point)
 {
-    const Rect rect = Rect_Get(tile);
+    const Rect rect = Rect_GetFrameOutline(tile);
     return point.x >= rect.a.x
         && point.y >= rect.a.y
         && point.x < rect.b.x
@@ -31,7 +31,7 @@ bool Tile_ContainsPoint(const Tile tile, const Point point)
 
 static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
 {
-    const Rect rect = Rect_Get(tile);
+    const Rect rect = Rect_GetFrameOutline(tile);
     return rect.a.x >= 0
         && rect.a.y >= 0
         && rect.b.x < xres
@@ -77,11 +77,17 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Poi
     return tile;
 }
 
-Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y) // XXX. Replicated in Rect.c
+Point Tile_GetHotSpotCoords(const Tile tile)
 {
     const Point coords = {
-        x - tile.frame.hotspot_x + tile.iso_point.x + tile.iso_fractional.x,
-        y - tile.frame.hotspot_y + tile.iso_point.y + tile.iso_fractional.y,
+        tile.iso_point.x + tile.iso_fractional.x - tile.frame.hotspot_x,
+        tile.iso_point.y + tile.iso_fractional.y - tile.frame.hotspot_y,
     };
     return coords;
+}
+
+Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y)
+{
+    const Point point = { x, y };
+    return Point_Add(point, Tile_GetHotSpotCoords(tile));
 }

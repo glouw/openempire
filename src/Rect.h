@@ -2,12 +2,6 @@
 
 #include "Tile.h"
 
-// a---------+
-// |         |
-// |         |
-// |         |
-// +---------b
-
 typedef struct
 {
     Point a;
@@ -15,4 +9,4 @@ typedef struct
 }
 Rect;
 
-Rect Rect_Get(const Tile);
+Rect Rect_GetFrameOutline(const Tile);
