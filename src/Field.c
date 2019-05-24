@@ -9,7 +9,8 @@
 // A walkable tile, like grass, dirt, or snow, are marked by a space character.
 // An unwalkable tile is any other character.
 
-#define WALKABLE_SPACE (' ')
+static const char WALKABLE_SPACE = ' ';
+static const char OBSTRUCT_SPACE = '#';
 
 typedef struct
 {
@@ -91,7 +92,7 @@ static Points ToPoints(const Queue queue)
     return points;
 }
 
-Field Field_New(const Map map)
+Field Field_New(const Map map, const Units units)
 {
     static Field zero;
     Field field = zero;
@@ -102,7 +103,10 @@ Field Field_New(const Map map)
     for(int32_t col = 0; col < field.cols; col++)
     {
         const Point point = { col, row };
-        Set(field, point, WALKABLE_SPACE);
+        if(Units_CanWalk(units, map, point))
+            Set(field, point, WALKABLE_SPACE);
+        else
+            Set(field, point, OBSTRUCT_SPACE);
     }
     return field;
 }

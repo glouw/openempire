@@ -37,3 +37,5 @@ void Units_SelectOne(const Units, const Overview, const Input, const Registrar);
 void Units_Command(const Units, const Overview, const Input, const Map);
 
 void Units_Caretake(const Units, const Grid);
+
+bool Units_CanWalk(const Units, const Map, const Point);

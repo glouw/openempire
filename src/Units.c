@@ -114,7 +114,7 @@ static void ApplyPaths(const Units units, const Map map, const Point cart_point)
         Unit* const unit = &units.unit[i];
         if(unit->selected)
         {
-            const Field field = Field_New(map);
+            const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
             Points_Free(unit->path);
             unit->path = Field_SearchBreadthFirst(field, unit->cart_point, cart_point);
             unit->path_index = 0;
@@ -130,28 +130,8 @@ void Units_Command(const Units units, const Overview overview, const Input input
     {
         const Point click = { input.x, input.y };
         const Point cart_point = Overview_IsoToCart(overview, click, false);
-
-        //const Point cart_raw = Overview_IsoToCart(overview, click, true);
-
-        //// Modulous by cartesian widths and heights to get the relative tile fractional offset.
-
-        //const Point cart_fractional = {
-        //    cart_raw.x % overview.grid.tile_cart_width,
-        //    cart_raw.y % overview.grid.tile_cart_height,
-        //};
-
-        //// Coordinate maths are done from tile center, so subtract tile mid point.
-
-        //const Point mid = {
-        //    overview.grid.tile_cart_width / 2,
-        //    overview.grid.tile_cart_height / 2,
-        //};
-        //const Point fixed = Point_Sub(cart_fractional, mid);
-
-        //printf("%d %d\n", cart_raw.x, cart_raw.y);
-        //printf("%d %d\n", fixed.x, fixed.y);
-
-        ApplyPaths(units, map, cart_point);
+        if(Units_CanWalk(units, map, cart_point))
+            ApplyPaths(units, map, cart_point);
     }
 }
 
@@ -186,4 +166,11 @@ void Units_Caretake(const Units units, const Grid grid)
     Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
+}
+
+bool Units_CanWalk(const Units units, const Map map, const Point point)
+{
+    const Terrain terrain = Map_GetTerrainFile(map, point);
+    const Stack stack = Units_GetStackCart(units, point);
+    return stack.reference && Terrain_IsWalkable(terrain) && Stack_IsWalkable(stack);
 }

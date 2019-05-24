@@ -21,9 +21,15 @@ static void GenerateTestZone(const Map map)
         };
         switch(Util_Rand() % 3)
         {
-            case 0: Map_SetTerrainFile(map, point, FILE_GRASS); break;
-            case 1: Map_SetTerrainFile(map, point, FILE_WATER); break;
-            case 2: Map_SetTerrainFile(map, point, FILE_FARM);  break;
+        case 0:
+            Map_SetTerrainFile(map, point, FILE_GRASS);
+            break;
+        case 1:
+            Map_SetTerrainFile(map, point, FILE_WATER);
+            break;
+        case 2:
+            Map_SetTerrainFile(map, point, FILE_FARM);
+            break;
         }
     }
 }

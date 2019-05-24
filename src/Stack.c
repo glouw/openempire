@@ -41,3 +41,13 @@ void Stack_Sort(const Stack stack)
     if(stack.count > 1)
         qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
 }
+
+bool Stack_IsWalkable(const Stack stack)
+{
+    for(int32_t i = 0; i < stack.count; i++)
+        if(Graphics_IsWalkable(stack.reference[i]->file))
+            continue;
+        else
+            return false;
+    return true;
+}

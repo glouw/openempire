@@ -2,6 +2,7 @@
 
 #include "Points.h"
 #include "Map.h"
+#include "Units.h"
 
 #include <stdint.h>
 
@@ -15,6 +16,6 @@ Field;
 
 Points Field_SearchBreadthFirst(const Field, const Point start, const Point goal);
 
-Field Field_New(const Map);
+Field Field_New(const Map, const Units);
 
 void Field_Free(const Field);
