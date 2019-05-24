@@ -1,4 +1,4 @@
-# Open Empires
+![](art/logo.png)
 
 This is a reverse engineering of Age of Empires II intended for fast network play.
 
