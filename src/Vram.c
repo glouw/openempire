@@ -323,7 +323,7 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
 
 void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Input input)
 {
-    const Quad quad = Overview_GetRenderBox(overview, -map.tile_width);
+    const Quad quad = Overview_GetRenderBox(overview, -2 * map.tile_width); // XXX: Should this really be twice the width?
     const Points points = Quad_GetRenderPoints(quad);
     RenderTerrainTiles(vram, terrain, map, overview, points);
     if(!input.key[SDL_SCANCODE_LSHIFT])
@@ -333,7 +333,7 @@ void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const
 
 void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
 {
-    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
+    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX: Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points);
     for(int32_t i = 0; i < tiles.count; i++)

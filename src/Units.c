@@ -21,6 +21,10 @@ static Units GenerateTestZone(Units units)
         { { x_mid, y_mid - 1 }, { 8, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
         { { x_mid, y_mid - 2 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
         { { x_mid, y_mid - 2 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
+        { { x_mid, y_mid - 3 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
+        { { x_mid, y_mid - 3 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
+        { { x_mid, y_mid - 4 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
+        { { x_mid, y_mid - 4 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -161,17 +165,6 @@ static void ResetStacks(const Units units)
     }
 }
 
-static void SortStacks(const Units units)
-{
-    for(int32_t y = 0; y < units.rows; y++)
-    for(int32_t x = 0; x < units.cols; x++)
-    {
-        const Point point = { x, y };
-        const Stack stack = *GetStack(units, point);
-        Stack_Sort(stack);
-    }
-}
-
 static void StackStacks(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -193,5 +186,4 @@ void Units_Caretake(const Units units, const Grid grid)
     Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
-    SortStacks(units);
 }
