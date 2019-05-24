@@ -54,7 +54,7 @@ Tile Tile_Construct(const Overview overview, const Point cart_point, const Point
     Tile tile = zero;
     tile.frame = animation.frame[index];
     tile.surface = animation.surface[index];
-    tile.iso_point_global = Overview_CartToIso(overview, cart_point);
+    tile.iso_global = Overview_CartToIso(overview, cart_point);
     tile.iso_fractional_local = Point_ToIso(cart_fractional);
     return Clip(tile, overview);
 }
@@ -80,8 +80,8 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Poi
 Point Tile_GetHotSpotCoords(const Tile tile)
 {
     const Point coords = {
-        tile.iso_point_global.x + tile.iso_fractional_local.x - tile.frame.hotspot_x,
-        tile.iso_point_global.y + tile.iso_fractional_local.y - tile.frame.hotspot_y,
+        tile.iso_global.x + tile.iso_fractional_local.x - tile.frame.hotspot_x,
+        tile.iso_global.y + tile.iso_fractional_local.y - tile.frame.hotspot_y,
     };
     return coords;
 }

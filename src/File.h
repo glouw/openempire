@@ -16,11 +16,6 @@ void File_Print(const File);
 
 File File_Load(FILE* const);
 
-#define FILE_PRIO_TERRAIN  (  1)
-#define FILE_PRIO_SHADOW   (  2)
-#define FILE_PRIO_GRAPHICS (  3)
-#define FILE_PRIO_HIGHEST  (255)
-
 // See:
 //   https://en.wikipedia.org/wiki/X_Macro
 //
@@ -29,6 +24,11 @@ File File_Load(FILE* const);
 // Formatting goes:
 //
 //  FILE_X(name, file, priority, walkable)
+
+#define FILE_PRIO_TERRAIN  (  1)
+#define FILE_PRIO_SHADOW   (  2)
+#define FILE_PRIO_GRAPHICS (  3)
+#define FILE_PRIO_HIGHEST  (255)
 
 #define FILE_X_INTERFAC \
     FILE_X(FILE_INTERFAC_NONE, /* ............... */ (-1),  FILE_PRIO_HIGHEST, true)

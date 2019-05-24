@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Point.h"
+
 #include <stdint.h>
 
 typedef struct
@@ -14,3 +16,7 @@ typedef struct
 Grid;
 
 Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_width, const int32_t tile_iso_height);
+
+Point Grid_GetGlobalCoords(const Grid, const Point);
+
+Point Grid_GetLocalCoords(const Grid, const Point);

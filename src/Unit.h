@@ -6,8 +6,9 @@
 
 typedef struct
 {
-    Point cart_point;
+    Point cart;
     Point cart_fractional_local;
+    Point cart_fractional_local_goal;
     Points path;
     int32_t path_index;
     bool selected;

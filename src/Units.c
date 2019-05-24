@@ -15,16 +15,16 @@ static Units GenerateTestZone(Units units)
     const int32_t x_mid = units.cols / 2;
     const int32_t y_mid = units.rows / 2;
     const Unit test[] = {
-        { { x_mid, y_mid + 1 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 1 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 1 }, { 0, 8 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 1 }, { 8, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 2 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
-        { { x_mid, y_mid - 2 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
-        { { x_mid, y_mid - 3 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
-        { { x_mid, y_mid - 3 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
-        { { x_mid, y_mid - 4 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
-        { { x_mid, y_mid - 4 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
+        { { x_mid, y_mid + 1 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 1 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 1 }, {0,8}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 1 }, {8,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 2 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
+        { { x_mid, y_mid - 2 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
+        { { x_mid, y_mid - 3 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
+        { { x_mid, y_mid - 3 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
+        { { x_mid, y_mid - 4 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
+        { { x_mid, y_mid - 4 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);
@@ -107,7 +107,7 @@ void Units_SelectOne(const Units units, const Overview overview, const Input inp
     Tiles_Free(tiles);
 }
 
-static void ApplyPaths(const Units units, const Map map, const Point cart_point)
+static void ApplyPathsToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_fractional_local_goal)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -116,8 +116,9 @@ static void ApplyPaths(const Units units, const Map map, const Point cart_point)
         {
             const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
             Points_Free(unit->path);
-            unit->path = Field_SearchBreadthFirst(field, unit->cart_point, cart_point);
+            unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
             unit->path_index = 0;
+            unit->cart_fractional_local_goal = cart_fractional_local_goal;
             Field_Free(field);
             Points_Print(unit->path);
         }
@@ -129,9 +130,14 @@ void Units_Command(const Units units, const Overview overview, const Input input
     if(input.ru)
     {
         const Point click = { input.x, input.y };
-        const Point cart_point = Overview_IsoToCart(overview, click, false);
-        if(Units_CanWalk(units, map, cart_point))
-            ApplyPaths(units, map, cart_point);
+        const Point cart_goal = Overview_IsoToCart(overview, click, false);
+        const Point cart_global = Overview_IsoToCart(overview, click, true);
+        const Point cart_fractional_local_goal = Grid_GetLocalCoords(overview.grid, cart_global);
+
+        printf("-->%d %d\n", cart_fractional_local_goal.x, cart_fractional_local_goal.y);
+
+        if(Units_CanWalk(units, map, cart_goal))
+            ApplyPathsToSelected(units, map, cart_goal, cart_fractional_local_goal);
     }
 }
 
@@ -150,7 +156,7 @@ static void StackStacks(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        Stack* const stack = GetStack(units, unit->cart_point);
+        Stack* const stack = GetStack(units, unit->cart);
         Stack_Append(stack, unit);
     }
 }

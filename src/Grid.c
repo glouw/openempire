@@ -23,3 +23,29 @@ Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_wi
 
     return grid;
 }
+
+Point Grid_GetGlobalCoords(const Grid grid, const Point point)
+{
+    const Point mid = {
+        grid.tile_cart_width  / 2,
+        grid.tile_cart_height / 2,
+    };
+    const Point offset = {
+        point.x * grid.tile_cart_width,
+        point.y * grid.tile_cart_height,
+    };
+    return Point_Add(mid, offset);
+}
+
+Point Grid_GetLocalCoords(const Grid grid, const Point global)
+{
+    const Point mid = {
+        grid.tile_cart_width / 2,
+        grid.tile_cart_height / 2,
+    };
+    const Point point = {
+        global.x % grid.tile_cart_width,
+        global.y % grid.tile_cart_height,
+    };
+    return Point_Sub(point, mid);
+}

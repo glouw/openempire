@@ -8,7 +8,7 @@ static int32_t CompareByCartY(const void* a, const void* b)
 {
     Tile* const aa = (Tile*) a;
     Tile* const bb = (Tile*) b;
-    return aa->reference->cart_point.y < bb->reference->cart_point.y;
+    return aa->reference->cart.y < bb->reference->cart.y;
 }
 
 static void SortByCartY(const Tiles tiles)
@@ -100,7 +100,7 @@ void Tiles_Select(const Tiles tiles, const Point click)
                 // XXX. Must draw circle around selected unit.
                 puts("GOT EM");
                 tiles.tile[i].reference->selected = true;
-                Point_Print(tiles.tile[i].reference->cart_point);
+                Point_Print(tiles.tile[i].reference->cart);
                 break;
             }
         }

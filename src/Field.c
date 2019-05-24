@@ -63,7 +63,7 @@ static bool IsEmpty(Queue queue)
     return Size(queue) == 0;
 }
 
-static bool InBounds(const Field field, const Point point)
+static bool IsInBounds(const Field field, const Point point)
 {
     return point.x < field.cols && point.x >= 0
         && point.y < field.rows && point.y >= 0;
@@ -151,7 +151,7 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
         for(int32_t i = 0; i < dirs; i++)
         {
             const Point next = Point_Add(current, deltas[i]);
-            if(InBounds(field, next)
+            if(IsInBounds(field, next)
             && IsWalkable(field, next))
             {
                 if(Point_Equal(AccessQueue(field, came_from, next), none))
@@ -177,11 +177,12 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
     Free(came_from);
 
     // Export points to prevent exporting Queue type.
-    // Points are reversed as algorithm is reversed.
+    // Points are reversed as queue is reversed.
 
     const Points points = ToPoints(path);
     const Points reversed = Points_Reverse(points);
     Points_Free(points);
+
     return reversed;
 }
 

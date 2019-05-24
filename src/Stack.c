@@ -45,9 +45,7 @@ void Stack_Sort(const Stack stack)
 bool Stack_IsWalkable(const Stack stack)
 {
     for(int32_t i = 0; i < stack.count; i++)
-        if(Graphics_IsWalkable(stack.reference[i]->file))
-            continue;
-        else
+        if(!Graphics_IsWalkable(stack.reference[i]->file))
             return false;
     return true;
 }

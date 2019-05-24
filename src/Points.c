@@ -23,7 +23,13 @@ Points Points_Free(Points points)
 
 Points Points_Append(Points points, const Point point)
 {
-    assert(points.count < points.max);
+    if(points.count == points.max)
+    {
+        points.max *= 2;
+        Point* const temp = UTIL_REALLOC(points.point, Point, points.max);
+        UTIL_CHECK(temp);
+        points.point = temp;
+    }
     points.point[points.count++] = point;
     return points;
 }
