@@ -17,6 +17,10 @@ static Units GenerateTestZone(Units units)
     const Unit test[] = {
         { { x_mid, y_mid + 1 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
         { { x_mid, y_mid - 1 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 1 }, { 0, 8 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 1 }, { 8, 0 }, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
+        { { x_mid, y_mid - 2 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
+        { { x_mid, y_mid - 2 }, { 0, 0 }, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
     };
     for(int32_t i = 0; i < UTIL_LEN(test); i++)
         units = Units_Append(units, test[i]);

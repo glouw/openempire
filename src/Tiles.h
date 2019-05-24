@@ -6,7 +6,6 @@
 typedef struct
 {
     Tile* tile;
-    Unit** unit;
     int32_t count;
 }
 Tiles;

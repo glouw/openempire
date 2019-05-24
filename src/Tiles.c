@@ -4,14 +4,24 @@
 #include "Rect.h"
 #include "Surface.h"
 
+static int32_t CompareByCartY(const void* a, const void* b)
+{
+    Tile* const aa = (Tile*) a;
+    Tile* const bb = (Tile*) b;
+    return aa->reference->cart_point.y < bb->reference->cart_point.y;
+}
+
+static void SortByCartY(const Tiles tiles)
+{
+    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByCartY);
+}
+
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Units units, const Points points)
 {
     Tile* const tile = UTIL_ALLOC(Tile, units.count);
-    Unit** const unit = UTIL_ALLOC(Unit*, units.count);
     UTIL_CHECK(tile);
-    UTIL_CHECK(unit);
     int32_t unit_count = 0;
-    for(int32_t i = points.count - 1; i >= 0; i--)
+    for(int32_t i = 0; i < points.count; i++)
     {
         const Point point = points.point[i];
         const Stack stack = Units_GetStackCart(units, point);
@@ -30,25 +40,30 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             const Point south = { 0, 1 };
             const Point shifted = Point_Add(point, south);
             tile[unit_count] = Tile_GetGraphics(overview, shifted, ref->cart_fractional_local, animation, ref->file);
-            unit[unit_count] = ref;
+            tile[unit_count].reference = ref;
             unit_count++;
         }
     }
-    const Tiles tiles = { tile, unit, unit_count };
+    const Tiles tiles = { tile, unit_count };
+    SortByCartY(tiles);
     return tiles;
 }
 
 void Tiles_Free(const Tiles tiles)
 {
     free(tiles.tile);
-    free(tiles.unit);
 }
 
-static int32_t CompareTileSurface(const void* a, const void* b)
+static int32_t CompareByTileSurface(const void* a, const void* b)
 {
     Tile* const aa = (Tile*) a;
     Tile* const bb = (Tile*) b;
     return aa->surface < bb->surface;
+}
+
+static void SortByTileSurface(const Tiles tiles)
+{
+    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByTileSurface);
 }
 
 Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview overview, const Points points)
@@ -65,8 +80,8 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
             tile[i] = Tile_GetTerrain(overview, point, animation, tile_file);
         }
     }
-    qsort(tile, points.count, sizeof(*tile), CompareTileSurface);
-    const Tiles tiles = { tile, NULL, points.count};
+    const Tiles tiles = { tile, points.count };
+    SortByTileSurface(tiles);
     return tiles;
 }
 
@@ -83,8 +98,8 @@ void Tiles_Select(const Tiles tiles, const Point click)
             {
                 // XXX. Must draw circle around selected unit.
                 puts("GOT EM");
-                tiles.unit[i]->selected = true;
-                Point_Print(tiles.unit[i]->cart_point);
+                tiles.tile[i].reference->selected = true;
+                Point_Print(tiles.tile[i].reference->cart_point);
             }
         }
     }

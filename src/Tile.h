@@ -6,6 +6,7 @@
 #include "Map.h"
 #include "Overview.h"
 #include "Animation.h"
+#include "Unit.h"
 #include "Graphics.h"
 
 #include <stdbool.h>
@@ -19,6 +20,7 @@ typedef struct
     SDL_Surface* surface;
     bool needs_clipping;
     uint8_t height;
+    Unit* reference;
 }
 Tile;
 
