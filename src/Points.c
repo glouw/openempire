@@ -12,9 +12,13 @@ Points Points_New(const int32_t max)
     return points;
 }
 
-void Points_Free(const Points points)
+Points Points_Free(Points points)
 {
     free(points.point);
+    points.point = NULL;
+    points.count = 0;
+    points.max = 0;
+    return points;
 }
 
 Points Points_Append(Points points, const Point point)

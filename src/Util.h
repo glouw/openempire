@@ -17,6 +17,8 @@
 
 #define UTIL_MIN(a, b) ((a) < (b) ? (a) : (b))
 
+#define UTIL_MAX(a, b) ((a) > (b) ? (a) : (b))
+
 void Util_Bomb(const char* const message, ...);
 
 char* Util_StringJoin(const char* const a, const char* const b);

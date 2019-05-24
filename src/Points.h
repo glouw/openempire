@@ -16,7 +16,7 @@ Points Points_New(const int32_t max);
 
 Points Points_Append(Points, const Point);
 
-void Points_Free(const Points);
+Points Points_Free(Points);
 
 Points Points_Cat(Points a, const Points b);
 

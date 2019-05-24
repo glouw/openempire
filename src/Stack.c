@@ -31,8 +31,8 @@ static int32_t CompareByY(const void* a, const void* b)
 {
     Unit* const aa = *((Unit**) a);
     Unit* const bb = *((Unit**) b);
-    const Point pa = Point_ToIso(aa->cart_fractional);
-    const Point pb = Point_ToIso(bb->cart_fractional);
+    const Point pa = Point_ToIso(aa->cart_fractional_local);
+    const Point pb = Point_ToIso(bb->cart_fractional_local);
     return pa.y < pb.y;
 }
 

@@ -17,4 +17,4 @@ Tiles Tiles_PrepTerrain(const Registrar, const Map, const Overview, const Points
 
 void Tiles_Free(const Tiles);
 
-bool Tiles_Select(const Tiles, const Input);
+void Tiles_Select(const Tiles, const Point click);

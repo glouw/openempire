@@ -14,8 +14,8 @@
 typedef struct
 {
     Frame frame;
-    Point iso_point;
-    Point iso_fractional;
+    Point iso_point_global;
+    Point iso_fractional_local;
     SDL_Surface* surface;
     bool needs_clipping;
     uint8_t height;

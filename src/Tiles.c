@@ -29,7 +29,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
 
             const Point south = { 0, 1 };
             const Point shifted = Point_Add(point, south);
-            tile[unit_count] = Tile_GetGraphics(overview, shifted, ref->cart_fractional, animation, ref->file);
+            tile[unit_count] = Tile_GetGraphics(overview, shifted, ref->cart_fractional_local, animation, ref->file);
             unit[unit_count] = ref;
             unit_count++;
         }
@@ -70,31 +70,22 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     return tiles;
 }
 
-bool Tiles_Select(const Tiles tiles, const Input input)
+void Tiles_Select(const Tiles tiles, const Point click)
 {
-    if(input.lu)
+    for(int32_t i = 0; i < tiles.count; i++)
     {
-        const Point click = { input.x, input.y };
-        for(int32_t i = 0; i < tiles.count; i++)
+        const Tile tile = tiles.tile[i];
+        if(Tile_ContainsPoint(tile, click))
         {
-            const Tile tile = tiles.tile[i];
-            if(Tile_ContainsPoint(tile, click))
+            const Rect rect = Rect_GetFrameOutline(tile);
+            const Point origin_click = Point_Sub(click, rect.a);
+            if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
             {
-                const Rect rect = Rect_GetFrameOutline(tile);
-                const Point origin_click = Point_Sub(click, rect.a);
-                if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
-                {
-                    // XXX. Must draw circle around selected unit.
-                    puts("GOT EM");
-                    tiles.unit[i]->selected = true;
-                    Point_Print(tiles.unit[i]->cart_point);
-                    return true;
-                }
+                // XXX. Must draw circle around selected unit.
+                puts("GOT EM");
+                tiles.unit[i]->selected = true;
+                Point_Print(tiles.unit[i]->cart_point);
             }
         }
-        // No units were selected.
-        return false;
     }
-    // Return true if nothing happened.
-    return true;
 }
