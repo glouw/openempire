@@ -12,7 +12,7 @@ int32_t main(int32_t argc, char* argv[])
     Video_SetCursor(video);
 
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(15, 15, data.terrain);
+    const Map map = Map_Make(30, 30, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(video.xres, video.yres, grid);
     Units units = Units_New(8, map.rows, map.cols);

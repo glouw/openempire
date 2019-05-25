@@ -53,22 +53,23 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, const bool ra
     const int32_t xx = x + overview.point.x;
     const int32_t yy = y + overview.point.y;
 
-    // Account for rounding error.
+    // Tile widths and heights must be one less than their actual sizes for clean overlap
+    // assuming tile widths and heights are odd numbers.
 
-    const int32_t we = overview.grid.tile_iso_width - 1;
-    const int32_t he = overview.grid.tile_iso_height - 1;
+    const int32_t w = overview.grid.tile_iso_width - 1;
+    const int32_t h = overview.grid.tile_iso_height - 1;
 
     // Project.
 
-    const int32_t rx = (xx * he + yy * we);
-    const int32_t ry = (yy * we - xx * he);
-    const int32_t cx = (+2 * rx + we * he * overview.grid.cols) / (2 * we);
-    const int32_t cy = (-2 * ry + we * he * overview.grid.rows) / (4 * he);
+    const int32_t rx = (xx * h + yy * w);
+    const int32_t ry = (yy * w - xx * h);
+    const int32_t cx = (+2 * rx + w * h * overview.grid.cols) / (2 * w);
+    const int32_t cy = (-2 * ry + w * h * overview.grid.rows) / (4 * h);
 
     const Point cart_raw = { cx, cy };
     const Point cart = {
-        1 * cx / he,
-        2 * cy / we,
+        1 * cx / h,
+        2 * cy / w,
     };
 
     return raw ? cart_raw : cart;
@@ -89,11 +90,11 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
 {
     // Reverse project.
 
-    const int32_t hw = overview.grid.tile_iso_width / 2;
-    const int32_t hh = overview.grid.tile_iso_height / 2;
+    const int32_t w = overview.grid.tile_iso_width - 1;
+    const int32_t h = overview.grid.tile_iso_height - 1;
 
-    const int32_t xx = (cart.y + cart.x) * hw;
-    const int32_t yy = (cart.y - cart.x) * hh;
+    const int32_t xx = (cart.y + cart.x) * (w / 2);
+    const int32_t yy = (cart.y - cart.x) * (h / 2);
 
     // Relative to middle of screen.
 
@@ -102,8 +103,8 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
 
     // Relative to center of tile.
 
-    const int32_t cx = mx - hw * overview.grid.cols;
-    const int32_t cy = my - hh;
+    const int32_t cx = mx - (w / 2) * overview.grid.cols;
+    const int32_t cy = my - (h / 2);
 
     const Point iso = {
         cx - overview.point.x,
