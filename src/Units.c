@@ -12,22 +12,38 @@
 
 static Units GenerateTestZone(Units units)
 {
-    const int32_t x_mid = units.cols / 2;
-    const int32_t y_mid = units.rows / 2;
-    const Unit test[] = {
-        { { x_mid, y_mid + 1 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 1 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 1 }, {0,8}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 1 }, {8,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_MALE_VILLAGER_STANDING },
-        { { x_mid, y_mid - 2 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
-        { { x_mid, y_mid - 2 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
-        { { x_mid, y_mid - 3 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
-        { { x_mid, y_mid - 3 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
-        { { x_mid, y_mid - 4 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE },
-        { { x_mid, y_mid - 4 }, {0,0}, {0,0}, { NULL, 0, 0 }, 0, false, FILE_FOREST_TREE_SHADOW },
-    };
-    for(int32_t i = 0; i < UTIL_LEN(test); i++)
-        units = Units_Append(units, test[i]);
+    for(int32_t i = 0; i < 30; i++)
+    {
+        const Point cart = {
+            Util_Rand() % units.cols,
+            Util_Rand() % units.rows,
+        };
+        Unit unit = Unit_Make(cart);
+        Unit shadow = Unit_Make(cart);
+        switch(Util_Rand() % 5)
+        {
+        default:
+        case 0:
+            unit.file = FILE_MALE_VILLAGER_STANDING;
+            break;
+        case 1:
+            unit.file = FILE_FOREST_TREE;
+            shadow.file = FILE_FOREST_TREE_SHADOW;
+            break;
+        case 2:
+            unit.file = FILE_GOLD_MINE;
+            break;
+        case 3:
+            unit.file = FILE_STONE_MINE;
+            break;
+        case 4:
+            unit.file = FILE_BERRY_BUSH;
+            break;
+        }
+        units = Units_Append(units, unit);
+        if(shadow.file != FILE_GRAPHICS_NONE)
+            units = Units_Append(units, shadow);
+    }
     return units;
 }
 

@@ -76,3 +76,12 @@ Unit Unit_Move(Unit unit, const Grid grid)
     }
     return unit;
 }
+
+Unit Unit_Make(const Point cart)
+{
+    static Unit zero;
+    Unit unit = zero;
+    unit.cart = cart;
+    unit.file = FILE_GRAPHICS_NONE;
+    return unit;
+}

@@ -17,3 +17,5 @@ typedef struct
 Unit;
 
 Unit Unit_Move(Unit, const Grid);
+
+Unit Unit_Make(const Point);

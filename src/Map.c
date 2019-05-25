@@ -21,6 +21,7 @@ static void GenerateTestZone(const Map map)
         };
         switch(Util_Rand() % 3)
         {
+        default:
         case 0:
             Map_SetTerrainFile(map, point, FILE_GRASS);
             break;
