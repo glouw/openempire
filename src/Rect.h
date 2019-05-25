@@ -10,3 +10,5 @@ typedef struct
 Rect;
 
 Rect Rect_GetFrameOutline(const Tile);
+
+Rect Rect_GetGridCenter(const Grid);

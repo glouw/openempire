@@ -13,3 +13,22 @@ Rect Rect_GetFrameOutline(const Tile tile)
     const Rect rect = { a, b };
     return rect;
 }
+
+// (-w/2, -h/2)
+// +---------+
+// |         |
+// |         |
+// |    +    |
+// |         |
+// |         |
+// +---------+ (w/2, h/2)
+
+Rect Rect_GetGridCenter(const Grid grid)
+{
+    const int32_t half_width = grid.tile_cart_width / 2;
+    const int32_t half_height = grid.tile_cart_height / 2;
+    const Rect rect = {
+        { -half_width, -half_height }, { half_width, half_height }
+    };
+    return rect;
+}
