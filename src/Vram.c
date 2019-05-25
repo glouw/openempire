@@ -3,6 +3,7 @@
 #include "Surface.h"
 #include "Lines.h"
 #include "Util.h"
+#include "Rect.h"
 #include "Quad.h"
 
 Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yres)
@@ -349,41 +350,61 @@ static void DrawSelectionPixel(const Vram vram, const int32_t x, const int32_t y
             Put(vram, x, y, color);
 }
 
-static void Draw4Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
-{
-    DrawSelectionPixel(vram, center.x + x, center.y + y, pixel);
-    if(x != 0)
-        DrawSelectionPixel(vram, center.x - x, center.y + y, pixel);
-    if(y != 0)
-        DrawSelectionPixel(vram, center.x + x, center.y - y, pixel);
-    if(x != 0 && y != 0)
-        DrawSelectionPixel(vram, center.x - x, center.y - y, pixel);
-}
+// See:
+//    https://gist.github.com/bert/1085538
 
-static void Draw8Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
+static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
 {
-    Draw4Points(vram, center, x, y, pixel);
-    if(x != y)
-        Draw4Points(vram, center, y, x, pixel);
-}
-
-static void DrawCircle(const Vram vram, const Point center, const int32_t radius, const uint32_t pixel)
-{
-    int32_t error = -radius;
-    int32_t x = radius;
-    int32_t y = 0;
-    while(x >= y)
+    int32_t x0 = rect.a.x;
+    int32_t y0 = rect.a.y;
+    int32_t x1 = rect.b.x;
+    int32_t y1 = rect.b.y;
+    int32_t a = abs(x1 - x0);
+    int32_t b = abs(y1 - y0);
+    int32_t b1 = b & 1;
+    int32_t dx = 4 * (1 - a ) * b * b;
+    int32_t dy = 4 * (1 + b1) * a * a;
+    int32_t err = dx + dy + b1 * a * a;
+    int32_t e2 = 0;
+    if(x0 > x1)
     {
-        Draw8Points(vram, center, x, y, pixel);
-        error += y;
-        ++y;
-        error += y;
-        if(error >= 0)
+        x0 = x1;
+        x1 += a;
+    }
+    if(y0 > y1)
+        y0 = y1;
+    y0 += (b + 1) / 2;
+    y1 = y0 - b1;
+    a *= 8 * a;
+    b1 = 8 * b * b;
+    do
+    {
+        DrawSelectionPixel(vram, x1, y0, color);
+        DrawSelectionPixel(vram, x0, y0, color);
+        DrawSelectionPixel(vram, x0, y1, color);
+        DrawSelectionPixel(vram, x1, y1, color);
+        e2 = 2 * err;
+        if(e2 >= dx)
         {
-            --x;
-            error -= x;
-            error -= x;
+            x0++;
+            x1--;
+            err += dx += b1;
         }
+        if(e2 <= dy)
+        {
+            y0++;
+            y1--;
+            err += dy += a;
+        }
+    }
+    while(x0 <= x1);
+
+    while(y0-y1 < b)
+    {
+        DrawSelectionPixel(vram, x0 - 1, y0  , color);
+        DrawSelectionPixel(vram, x1 + 1, y0++, color);
+        DrawSelectionPixel(vram, x0 - 1, y1  , color);
+        DrawSelectionPixel(vram, x1 + 1, y1--, color);
     }
 }
 
@@ -398,7 +419,8 @@ void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Un
         if(tile.reference->selected)
         {
             const Point center = Tile_GetHotSpotCoords(tile);
-            DrawCircle(vram, center, 10, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
+            const Rect rect = Rect_GetEllipse(center);
+            DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
         }
     }
     Tiles_Free(tiles);

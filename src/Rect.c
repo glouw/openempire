@@ -32,3 +32,12 @@ Rect Rect_GetGridCenter(const Grid grid)
     };
     return rect;
 }
+
+Rect Rect_GetEllipse(const Point center)
+{
+    const Rect rect = {
+        { center.x - 20, center.y - 10 },
+        { center.x + 20, center.y + 10 },
+    };
+    return rect;
+}

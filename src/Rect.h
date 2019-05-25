@@ -12,3 +12,5 @@ Rect;
 Rect Rect_GetFrameOutline(const Tile);
 
 Rect Rect_GetGridCenter(const Grid);
+
+Rect Rect_GetEllipse(const Point);
