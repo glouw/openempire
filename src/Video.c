@@ -106,8 +106,9 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, data.graphics, units, overview);
     Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input);
-    Vram_DrawMouseTileOutline(vram, data.terrain, input, overview);
+    Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
+    Vram_DrawCircle(vram, video.middle, 10, 0x00FFFFFF);
     Vram_Unlock(video.canvas);
 }
 

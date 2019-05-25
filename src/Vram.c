@@ -342,7 +342,14 @@ void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units
     Points_Free(points);
 }
 
-void Vram_DrawMouseTileOutline(const Vram vram, const Registrar terrain, const Input input, const Overview overview)
+static void DrawSelectionPixel(const Vram vram, const int32_t x, const int32_t y, const uint32_t color)
+{
+    if(!OutOfBounds(vram, x, y))
+        if((Get(vram, x, y) >> 24) < FILE_PRIO_GRAPHICS)
+            Put(vram, x, y, color);
+}
+
+void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Input input, const Overview overview)
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
@@ -367,8 +374,46 @@ void Vram_DrawMouseTileOutline(const Vram vram, const Registrar terrain, const I
         {
             const int32_t xl = left - j;
             const int32_t xr = right + j;
-            if(!OutOfBounds(vram, xl, y)) if((Get(vram, xl, y) >> 24) < FILE_PRIO_GRAPHICS) Put(vram, xl, y, color);
-            if(!OutOfBounds(vram, xr, y)) if((Get(vram, xr, y) >> 24) < FILE_PRIO_GRAPHICS) Put(vram, xr, y, color);
+            DrawSelectionPixel(vram, xl, y, color);
+            DrawSelectionPixel(vram, xr, y, color);
+        }
+    }
+}
+
+static void Draw4Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
+{
+    DrawSelectionPixel(vram, center.x + x, center.y + y, pixel);
+    if(x != 0)
+        DrawSelectionPixel(vram, center.x - x, center.y + y, pixel);
+    if(y != 0)
+        DrawSelectionPixel(vram, center.x + x, center.y - y, pixel);
+    if(x != 0 && y != 0)
+        DrawSelectionPixel(vram, center.x - x, center.y - y, pixel);
+}
+
+static void Draw8Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
+{
+    Draw4Points(vram, center, x, y, pixel);
+    if(x != y)
+        Draw4Points(vram, center, y, x, pixel);
+} 
+
+void Vram_DrawCircle(const Vram vram, const Point center, const int32_t radius, const uint32_t pixel)
+{
+    int32_t error = -radius;
+    int32_t x = radius;
+    int32_t y = 0;
+    while(x >= y)
+    {
+        Draw8Points(vram, center, x, y, pixel);
+        error += y;
+        ++y;
+        error += y;
+        if(error >= 0)
+        {
+            --x;
+            error -= x;
+            error -= x;
         }
     }
 }

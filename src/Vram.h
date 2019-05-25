@@ -37,4 +37,6 @@ void Vram_DrawMap(const Vram, const Registrar terrain, const Map, const Overview
 
 void Vram_DrawUnits(const Vram, const Registrar, const Units, const Overview);
 
-void Vram_DrawMouseTileOutline(const Vram, const Registrar, const Input, const Overview);
+void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Input, const Overview);
+
+void Vram_DrawCircle(const Vram, const Point, const int32_t radius, const uint32_t pixel);
