@@ -344,19 +344,26 @@ void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units
 
 void Vram_DrawMouseTileOutline(const Vram vram, const Registrar terrain, const Input input, const Overview overview)
 {
-    const int32_t width = 3;
+    const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
     const Image image = terrain.animation[COLOR_BLU][FILE_DIRT].image[0];
     const Frame frame = terrain.animation[COLOR_BLU][FILE_DIRT].frame[0];
     const Point iso = { input.x, input.y };
     const Point snap = Overview_IsoSnapTo(overview, iso);
-    for(int32_t i = 0; i < frame.height; i++)
+
+    // The real tile width and height is one less to allow for pixel overlaps.
+    // Look at Overview.c IsoToCart and CartToIso for more information.
+
+    const int32_t width = frame.width - 1;
+    const int32_t height = frame.height - 1;
+
+    for(int32_t i = 0; i < height; i++)
     {
         const Outline outline = image.outline_table[i];
         const int32_t left  = snap.x + outline.left_padding;
-        const int32_t right = snap.x + frame.width - outline.right_padding;
+        const int32_t right = snap.x + width - outline.right_padding;
         const int32_t y = i + snap.y;
-        for(int32_t j = 0; j < width; j++)
+        for(int32_t j = 0; j < line_width; j++)
         {
             const int32_t xl = left - j;
             const int32_t xr = right + j;
