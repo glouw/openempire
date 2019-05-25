@@ -80,14 +80,23 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Poi
 Point Tile_GetHotSpotCoords(const Tile tile)
 {
     const Point coords = {
-        tile.iso_global.x + tile.iso_fractional_local.x - tile.frame.hotspot_x,
-        tile.iso_global.y + tile.iso_fractional_local.y - tile.frame.hotspot_y,
+        tile.iso_global.x + tile.iso_fractional_local.x,
+        tile.iso_global.y + tile.iso_fractional_local.y,
     };
     return coords;
+}
+
+Point Tile_GetTopLeftCoords(const Tile tile)
+{
+    const Point hotspot = {
+        tile.frame.hotspot_x,
+        tile.frame.hotspot_y,
+    };
+    return Point_Sub(Tile_GetHotSpotCoords(tile), hotspot);
 }
 
 Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y)
 {
     const Point point = { x, y };
-    return Point_Add(point, Tile_GetHotSpotCoords(tile));
+    return Point_Add(point, Tile_GetTopLeftCoords(tile));
 }

@@ -349,6 +349,62 @@ static void DrawSelectionPixel(const Vram vram, const int32_t x, const int32_t y
             Put(vram, x, y, color);
 }
 
+static void Draw4Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
+{
+    DrawSelectionPixel(vram, center.x + x, center.y + y, pixel);
+    if(x != 0)
+        DrawSelectionPixel(vram, center.x - x, center.y + y, pixel);
+    if(y != 0)
+        DrawSelectionPixel(vram, center.x + x, center.y - y, pixel);
+    if(x != 0 && y != 0)
+        DrawSelectionPixel(vram, center.x - x, center.y - y, pixel);
+}
+
+static void Draw8Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
+{
+    Draw4Points(vram, center, x, y, pixel);
+    if(x != y)
+        Draw4Points(vram, center, y, x, pixel);
+}
+
+static void DrawCircle(const Vram vram, const Point center, const int32_t radius, const uint32_t pixel)
+{
+    int32_t error = -radius;
+    int32_t x = radius;
+    int32_t y = 0;
+    while(x >= y)
+    {
+        Draw8Points(vram, center, x, y, pixel);
+        error += y;
+        ++y;
+        error += y;
+        if(error >= 0)
+        {
+            --x;
+            error -= x;
+            error -= x;
+        }
+    }
+}
+
+void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
+{
+    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX: Border needs to be equal to largest building size.
+    const Points points = Quad_GetRenderPoints(quad);
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points);
+    for(int32_t i = 0; i < tiles.count; i++)
+    {
+        const Tile tile = tiles.tile[i];
+        if(tile.reference->selected)
+        {
+            const Point center = Tile_GetHotSpotCoords(tile);
+            DrawCircle(vram, center, 10, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
+        }
+    }
+    Tiles_Free(tiles);
+    Points_Free(points);
+}
+
 void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Input input, const Overview overview)
 {
     const int32_t line_width = 3;
@@ -376,44 +432,6 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
             const int32_t xr = right + j;
             DrawSelectionPixel(vram, xl, y, color);
             DrawSelectionPixel(vram, xr, y, color);
-        }
-    }
-}
-
-static void Draw4Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
-{
-    DrawSelectionPixel(vram, center.x + x, center.y + y, pixel);
-    if(x != 0)
-        DrawSelectionPixel(vram, center.x - x, center.y + y, pixel);
-    if(y != 0)
-        DrawSelectionPixel(vram, center.x + x, center.y - y, pixel);
-    if(x != 0 && y != 0)
-        DrawSelectionPixel(vram, center.x - x, center.y - y, pixel);
-}
-
-static void Draw8Points(const Vram vram, const Point center, const int32_t x, const int32_t y, const uint32_t pixel)
-{
-    Draw4Points(vram, center, x, y, pixel);
-    if(x != y)
-        Draw4Points(vram, center, y, x, pixel);
-} 
-
-void Vram_DrawCircle(const Vram vram, const Point center, const int32_t radius, const uint32_t pixel)
-{
-    int32_t error = -radius;
-    int32_t x = radius;
-    int32_t y = 0;
-    while(x >= y)
-    {
-        Draw8Points(vram, center, x, y, pixel);
-        error += y;
-        ++y;
-        error += y;
-        if(error >= 0)
-        {
-            --x;
-            error -= x;
-            error -= x;
         }
     }
 }
