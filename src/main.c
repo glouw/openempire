@@ -48,7 +48,7 @@ int32_t main(int32_t argc, char* argv[])
             measure_dt += tb - ta;
             if(args.measure && cycles > measure_cycles)
             {
-                printf("%f\n", measure_dt / (double) measure_cycles);
+                printf("%f\n", measure_dt / (double) measure_cycles); // XXX. This is the only use of 'double', must remove later.
                 break;
             }
         }

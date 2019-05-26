@@ -59,7 +59,7 @@ CPP = 0
 
 SANITIZE = 0
 
-FLAGS = -Wall -Wextra -Wshadow -pedantic
+FLAGS = -Wall -Wextra -Wshadow -Wpedantic
 
 ifeq (00, $(CLANG)$(CPP))
 COMPILER = gcc -std=c99
