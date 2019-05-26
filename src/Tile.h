@@ -2,6 +2,7 @@
 
 #include "Frame.h"
 #include "Point.h"
+#include "Rect.h"
 #include "File.h"
 #include "Map.h"
 #include "Overview.h"
@@ -30,10 +31,14 @@ Tile Tile_GetTerrain(const Overview, const Point point, const Animation, const T
 
 Tile Tile_GetGraphics(const Overview, const Point point, const Point fractional, const Animation, const Graphics);
 
-Point Tile_GetScreenCoords(const Tile, const int32_t x, const int32_t y);
+Point Tile_GetTopLeftOffsetCoords(const Tile, const int32_t x, const int32_t y);
 
 Tile Tile_Construct(const Overview, const Point cart_point, const Point cart_fractional, const Animation, const int32_t index);
 
 Point Tile_GetHotSpotCoords(const Tile);
 
 Point Tile_GetTopLeftCoords(const Tile);
+
+Rect Tile_GetFrameOutline(const Tile);
+
+bool Tile_IsHotspotInRect(const Tile, const Rect);

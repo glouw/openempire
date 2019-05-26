@@ -73,7 +73,7 @@ static void DrawTileNoClip(const Vram vram, const Tile tile)
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
         Transfer(vram, tile, coords, x, y);
     }
 }
@@ -83,7 +83,7 @@ static void DrawTileClip(const Vram vram, const Tile tile)
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
         if(!OutOfBounds(vram, coords.x, coords.y))
             Transfer(vram, tile, coords, x, y);
     }
@@ -111,7 +111,7 @@ static int32_t DrawBatchNeedle(void* data)
     return 0;
 }
 
-static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, Points points)
+static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Points points)
 {
     const Tiles tiles = Tiles_PrepTerrain(terrain, map, overview, points);
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
@@ -178,7 +178,7 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
         if(!OutOfBounds(vram, coords.x, coords.y))
             BlendTransfer(vram, tile, coords, mask, x, y);
     }
@@ -189,7 +189,7 @@ static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* co
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
-        const Point coords = Tile_GetScreenCoords(tile, x, y);
+        const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
         BlendTransfer(vram, tile, coords, mask, x, y);
     }
 }
@@ -405,6 +405,21 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
         DrawSelectionPixel(vram, x1 + 1, y0++, color);
         DrawSelectionPixel(vram, x0 - 1, y1  , color);
         DrawSelectionPixel(vram, x1 + 1, y1--, color);
+    }
+}
+
+void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled)
+{
+    if(enabled)
+    {
+        if(Overview_IsSelectionBoxBigEnough(overview))
+        {
+            const Rect box = Rect_CorrectOrientation(overview.selection_box);
+            for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.a.y, color);
+            for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.b.y, color);
+            for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.a.x, y, color);
+            for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.b.x, y, color);
+        }
     }
 }
 

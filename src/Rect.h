@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Tile.h"
+#include "Point.h"
+#include "Grid.h"
 
 typedef struct
 {
@@ -9,8 +10,10 @@ typedef struct
 }
 Rect;
 
-Rect Rect_GetFrameOutline(const Tile);
-
 Rect Rect_GetGridCenter(const Grid);
 
 Rect Rect_GetEllipse(const Point);
+
+int32_t Rect_GetArea(const Rect);
+
+Rect Rect_CorrectOrientation(const Rect);

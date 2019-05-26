@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tile.h"
+#include "Rect.h"
 #include "Units.h"
 
 typedef struct
@@ -16,4 +17,6 @@ Tiles Tiles_PrepTerrain(const Registrar, const Map, const Overview, const Points
 
 void Tiles_Free(const Tiles);
 
-void Tiles_Select(const Tiles, const Point click);
+void Tiles_SelectOne(const Tiles, const Point);
+
+void Tiles_SelectMany(const Tiles, const Rect);

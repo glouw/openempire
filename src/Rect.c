@@ -1,18 +1,6 @@
 #include "Rect.h"
 
-// a---------+
-// |         |
-// |         |
-// +---------b
-
-Rect Rect_GetFrameOutline(const Tile tile)
-{
-    const Point dimensions = { tile.frame.width, tile.frame.height };
-    const Point a = Tile_GetTopLeftCoords(tile);
-    const Point b = Point_Add(a, dimensions);
-    const Rect rect = { a, b };
-    return rect;
-}
+#include <stdlib.h>
 
 // (-w/2, -h/2)
 // +---------+
@@ -39,5 +27,34 @@ Rect Rect_GetEllipse(const Point center)
         { center.x - 20, center.y - 10 },
         { center.x + 20, center.y + 10 },
     };
+    return rect;
+}
+
+int32_t Rect_GetArea(const Rect rect)
+{
+    return abs(rect.b.x - rect.a.x) * abs(rect.b.y - rect.a.y);
+}
+
+// +---a
+// | A | --+
+// b---+   |
+// b---+   |    a---+
+// | B | --+--> |   |
+// +---a   |    +---b
+// +---b   |
+// | C | --+
+// a---+
+
+Rect Rect_CorrectOrientation(const Rect rect)
+{
+    const Rect a = {
+        { rect.b.x, rect.a.y },
+        { rect.a.x, rect.b.y },
+    };
+    const Rect b = { rect.b, rect.a };
+    const Rect c = { a.b, a.a };
+    if(rect.a.x > rect.b.x && rect.a.y < rect.b.y) return a;
+    if(rect.a.x > rect.b.x && rect.a.y > rect.b.y) return b;
+    if(rect.a.x < rect.b.x && rect.a.y > rect.b.y) return c;
     return rect;
 }

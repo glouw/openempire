@@ -2,6 +2,7 @@
 
 #include "Input.h"
 #include "Point.h"
+#include "Rect.h"
 #include "Grid.h"
 #include "Quad.h"
 
@@ -11,6 +12,7 @@ typedef struct
     Grid grid;
     int32_t xres;
     int32_t yres;
+    Rect selection_box;
 }
 Overview;
 
@@ -25,3 +27,5 @@ Point Overview_CartToIso(const Overview, const Point);
 Quad Overview_GetRenderBox(const Overview, const int32_t border);
 
 Point Overview_IsoSnapTo(const Overview, const Point);
+
+bool Overview_IsSelectionBoxBigEnough(const Overview);

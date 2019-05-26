@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Point.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -46,6 +48,9 @@ typedef struct
     int32_t ll;
     int32_t lm;
     int32_t lr;
+
+    Point lu_point;
+    Point ld_point;
 }
 Input;
 

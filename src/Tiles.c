@@ -86,14 +86,14 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     return tiles;
 }
 
-void Tiles_Select(const Tiles tiles, const Point click)
+void Tiles_SelectOne(const Tiles tiles, const Point click)
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
         if(Tile_ContainsPoint(tile, click))
         {
-            const Rect rect = Rect_GetFrameOutline(tile);
+            const Rect rect = Tile_GetFrameOutline(tile);
             const Point origin_click = Point_Sub(click, rect.a);
             if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
             {
@@ -103,6 +103,22 @@ void Tiles_Select(const Tiles tiles, const Point click)
                 Point_Print(tiles.tile[i].reference->cart);
                 break;
             }
+        }
+    }
+}
+
+void Tiles_SelectMany(const Tiles tiles, const Rect rect)
+{
+    const Rect box = Rect_CorrectOrientation(rect);
+    for(int32_t i = 0; i < tiles.count; i++)
+    {
+        const Tile tile = tiles.tile[i];
+        if(Tile_IsHotspotInRect(tile, box))
+        {
+            // XXX. Must draw circle around selected unit.
+            puts("GOT EM");
+            tiles.tile[i].reference->selected = true;
+            Point_Print(tiles.tile[i].reference->cart);
         }
     }
 }

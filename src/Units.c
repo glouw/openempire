@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units)
 {
-    for(int32_t i = 0; i < 30; i++)
+    for(int32_t i = 0; i < 50; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
@@ -113,11 +113,14 @@ void Units_SelectOne(const Units units, const Overview overview, const Input inp
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
+    const Point click = { input.x, input.y };
     if(input.lu)
     {
         UnSelectAll(units);
-        const Point click = { input.x, input.y };
-        Tiles_Select(tiles, click);
+        if(Overview_IsSelectionBoxBigEnough(overview))
+            Tiles_SelectMany(tiles, overview.selection_box);
+        else
+            Tiles_SelectOne(tiles, click);
     }
     Points_Free(points);
     Tiles_Free(tiles);
@@ -149,9 +152,6 @@ void Units_Command(const Units units, const Overview overview, const Input input
         const Point cart_goal = Overview_IsoToCart(overview, click, false);
         const Point cart_global = Overview_IsoToCart(overview, click, true);
         const Point cart_fractional_local_goal = Grid_GetLocalCoords(overview.grid, cart_global);
-
-        printf("-->%d %d\n", cart_fractional_local_goal.x, cart_fractional_local_goal.y);
-
         if(Units_CanWalk(units, map, cart_goal))
             ApplyPathsToSelected(units, map, cart_goal, cart_fractional_local_goal);
     }

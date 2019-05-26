@@ -3,6 +3,29 @@
 #include "Rect.h"
 #include "Util.h"
 
+bool Tile_IsHotspotInRect(const Tile tile, const Rect rect)
+{
+    const Point point = Tile_GetHotSpotCoords(tile);
+    return point.x >= rect.a.x
+        && point.y >= rect.a.y
+        && point.x < rect.b.x
+        && point.y < rect.b.y;
+}
+
+// a---------+
+// |         |
+// |         |
+// +---------b
+
+Rect Tile_GetFrameOutline(const Tile tile)
+{
+    const Point dimensions = { tile.frame.width, tile.frame.height };
+    const Point a = Tile_GetTopLeftCoords(tile);
+    const Point b = Point_Add(a, dimensions);
+    const Rect rect = { a, b };
+    return rect;
+}
+
 // a---------+
 // |         | Where (*) is the point of interest.
 // |         | and points (a, b) are a bounding rectangle.
@@ -13,7 +36,7 @@
 
 bool Tile_ContainsPoint(const Tile tile, const Point point)
 {
-    const Rect rect = Rect_GetFrameOutline(tile);
+    const Rect rect = Tile_GetFrameOutline(tile);
     return point.x >= rect.a.x
         && point.y >= rect.a.y
         && point.x < rect.b.x
@@ -31,7 +54,7 @@ bool Tile_ContainsPoint(const Tile tile, const Point point)
 
 static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
 {
-    const Rect rect = Rect_GetFrameOutline(tile);
+    const Rect rect = Tile_GetFrameOutline(tile);
     return rect.a.x >= 0
         && rect.a.y >= 0
         && rect.b.x < xres
@@ -95,7 +118,7 @@ Point Tile_GetTopLeftCoords(const Tile tile)
     return Point_Sub(Tile_GetHotSpotCoords(tile), hotspot);
 }
 
-Point Tile_GetScreenCoords(const Tile tile, const int32_t x, const int32_t y)
+Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_t y)
 {
     const Point point = { x, y };
     return Point_Add(point, Tile_GetTopLeftCoords(tile));

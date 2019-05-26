@@ -4,6 +4,7 @@
 #include "Frame.h"
 #include "Registrar.h"
 #include "Units.h"
+#include "Rect.h"
 #include "Map.h"
 #include "Overview.h"
 #include "Tiles.h"
@@ -40,3 +41,5 @@ void Vram_DrawUnits(const Vram, const Registrar, const Units, const Overview);
 void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Input, const Overview);
 
 void Vram_DrawUnitSelections(const Vram, const Registrar, const Units, const Overview);
+
+void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, const bool enabled);

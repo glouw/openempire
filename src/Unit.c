@@ -66,13 +66,13 @@ Unit Unit_Move(Unit unit, const Grid grid)
             return Unit_Move(unit, grid);
         }
 
-        // XXX. This velocity calculation is not perfect, but it gets the job done for now so I can move onto other things.
+        // XXX. This direction calculation is not perfect, but it gets the job done for now so I can move onto other things.
         // What is required is a higher resolution integer vector system, else diagonal movements will
         // always be about 41.2% faster than horizontal and vertical movements.
 
         const int32_t divisor = UTIL_MAX(abs(delta.x), abs(delta.y));
-        const Point velocity = Point_Div(delta, divisor);
-        unit = Step(unit, velocity, grid);
+        const Point direction = Point_Div(delta, divisor);
+        unit = Step(unit, direction, grid);
     }
     return unit;
 }
