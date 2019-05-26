@@ -66,7 +66,7 @@ static Points Drop(Points points, Point* point)
 Points Points_Reverse(Points points)
 {
     Points out = Points_New(points.count);
-    for(int i = 0; i < out.max; i++)
+    for(int32_t i = 0; i < out.max; i++)
     {
         Point point;
         points = Drop(points, &point);
