@@ -343,11 +343,11 @@ void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units
     Points_Free(points);
 }
 
-static void DrawSelectionPixel(const Vram vram, const int32_t x, const int32_t y, const uint32_t color)
+static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
-    if(!OutOfBounds(vram, x, y))
-        if((Get(vram, x, y) >> 24) < FILE_PRIO_GRAPHICS)
-            Put(vram, x, y, color);
+    if(!OutOfBounds(vram, point.x, point.y))
+        if((Get(vram, point.x, point.y) >> 24) < FILE_PRIO_GRAPHICS)
+            Put(vram, point.x, point.y, color);
 }
 
 // See:
@@ -379,10 +379,15 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
     b1 = 8 * b * b;
     do
     {
-        DrawSelectionPixel(vram, x1, y0, color);
-        DrawSelectionPixel(vram, x0, y0, color);
-        DrawSelectionPixel(vram, x0, y1, color);
-        DrawSelectionPixel(vram, x1, y1, color);
+        const Point point[] = {
+            { x1, y0 },
+            { x0, y0 },
+            { x0, y1 },
+            { x1, y1 },
+        };
+        for(int32_t i = 0; i < UTIL_LEN(point); i++)
+            DrawSelectionPixel(vram, point[i], color);
+
         e2 = 2 * err;
         if(e2 >= dx)
         {
@@ -401,10 +406,17 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
 
     while(y0-y1 < b)
     {
-        DrawSelectionPixel(vram, x0 - 1, y0  , color);
-        DrawSelectionPixel(vram, x1 + 1, y0++, color);
-        DrawSelectionPixel(vram, x0 - 1, y1  , color);
-        DrawSelectionPixel(vram, x1 + 1, y1--, color);
+        const Point point[] = {
+            { x0 - 1, y0 },
+            { x1 + 1, y0 },
+            { x0 - 1, y1 },
+            { x1 + 1, y1 },
+        };
+        for(int32_t i = 0; i < UTIL_LEN(point); i++)
+            DrawSelectionPixel(vram, point[i], color);
+
+        y0++;
+        y1--;
     }
 }
 
@@ -465,10 +477,12 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
         const int32_t y = i + snap.y;
         for(int32_t j = 0; j < line_width; j++)
         {
-            const int32_t xl = left - j;
-            const int32_t xr = right + j;
-            DrawSelectionPixel(vram, xl, y, color);
-            DrawSelectionPixel(vram, xr, y, color);
+            const Point point[] = {
+                { left  - j, y },
+                { right + j, y },
+            };
+            for(int32_t k = 0; k < UTIL_LEN(point); k++)
+                DrawSelectionPixel(vram, point[k], color);
         }
     }
 }

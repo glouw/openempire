@@ -32,10 +32,6 @@ void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-void Units_SelectOne(const Units, const Overview, const Input, const Registrar);
-
-void Units_Command(const Units, const Overview, const Input, const Map);
-
-void Units_Caretake(const Units, const Grid);
+void Units_Caretake(const Units, const Registrar, const Overview, const Grid, const Input, const Map);
 
 bool Units_CanWalk(const Units, const Map, const Point);

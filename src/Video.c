@@ -7,6 +7,12 @@
 
 #include "Util.h"
 
+static void PrintTitle(const Video video)
+{
+    Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 0, video.title);
+    SDL_RenderPresent(video.renderer);
+}
+
 Video Video_Setup(const int32_t xres, const int32_t yres, const char* const title)
 {
     const Point middle = { xres / 2, yres / 2 };
@@ -26,6 +32,8 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.middle = middle;
     video.bot_rite = bot_rite;
     video.top_left = top_left;
+    PrintTitle(video);
+    SDL_SetCursor(video.cursor);
     return video;
 }
 
@@ -37,12 +45,6 @@ void Video_Free(const Video video)
     SDL_FreeCursor(video.cursor);
     Text_Free(video.text);
     SDL_Quit();
-}
-
-void Video_PrintTitle(const Video video)
-{
-    Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 0, video.title);
-    SDL_RenderPresent(video.renderer);
 }
 
 static void RenderDemoTile(const Video video, const Tile tile, const int32_t index, const int32_t count)
@@ -117,9 +119,4 @@ void Video_PresentCanvas(const Video video)
 {
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
     SDL_RenderPresent(video.renderer);
-}
-
-void Video_SetCursor(const Video video)
-{
-    SDL_SetCursor(video.cursor);
 }

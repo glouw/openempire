@@ -108,7 +108,7 @@ static void UnSelectAll(const Units units)
         units.unit[i].selected = false;
 }
 
-void Units_SelectOne(const Units units, const Overview overview, const Input input, const Registrar graphics)
+static void Select(const Units units, const Overview overview, const Input input, const Registrar graphics)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
@@ -144,7 +144,7 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
     }
 }
 
-void Units_Command(const Units units, const Overview overview, const Input input, const Map map)
+static void Command(const Units units, const Overview overview, const Input input, const Map map)
 {
     if(input.ru)
     {
@@ -183,11 +183,13 @@ static void Move(const Units units, const Grid grid)
         units.unit[i] = Unit_Move(units.unit[i], grid);
 }
 
-void Units_Caretake(const Units units, const Grid grid)
+void Units_Caretake(const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
     Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
+    Select(units, overview, input, graphics);
+    Command(units, overview, input, map);
 }
 
 bool Units_CanWalk(const Units units, const Map map, const Point point)
