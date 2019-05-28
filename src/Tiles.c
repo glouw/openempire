@@ -25,7 +25,6 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
     {
         const Point point = points.point[i];
         const Stack stack = Units_GetStackCart(units, point);
-        Stack_Sort(stack);
         for(int32_t j = 0; j < stack.count; j++)
         {
             Unit* const ref = stack.reference[j];

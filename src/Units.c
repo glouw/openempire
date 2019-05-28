@@ -183,11 +183,23 @@ static void Move(const Units units, const Grid grid)
         units.unit[i] = Unit_Move(units.unit[i], grid);
 }
 
+static void SortStacks(const Units units)
+{
+    for(int32_t y = 0; y < units.rows; y++)
+    for(int32_t x = 0; x < units.cols; x++)
+    {
+        const Point point = { x, y };
+        const Stack stack = Units_GetStackCart(units, point);
+        Stack_Sort(stack);
+    }
+}
+
 void Units_Caretake(const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
     Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
+    SortStacks(units);
     Select(units, overview, input, graphics);
     Command(units, overview, input, map);
 }
