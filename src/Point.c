@@ -1,5 +1,7 @@
 #include "Point.h"
 
+#include "Util.h"
+
 #include <stdio.h>
 
 bool Point_Equal(const Point a, const Point b)
@@ -62,4 +64,9 @@ bool Point_IsZero(const Point point)
 {
     const Point zero = { 0, 0 };
     return Point_Equal(zero, point);
+}
+
+int32_t Point_Mag(const Point point)
+{
+    return Util_SquareRoot(point.x * point.x + point.y * point.y);
 }

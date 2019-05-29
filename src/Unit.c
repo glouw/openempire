@@ -44,7 +44,8 @@ Unit Unit_Move(Unit unit, const Grid grid)
     {
         // Skip moving to the middle of the first square.
 
-        if(unit.path_index == 0 && unit.path.count > 1)
+        if(unit.path_index == 0
+        && unit.path.count >= 2)
             unit.path_index++;
 
         const Point unit_global = GetGlobalCart(unit, grid);
@@ -55,7 +56,7 @@ Unit Unit_Move(Unit unit, const Grid grid)
         // as it crosses grid boundries while the path index increments...
 
         const Point delta = Point_Sub(unit_global, goal_global);
-        if(Point_IsZero(delta))
+        if(Point_Mag(delta) < 10)
         {
             unit.path_index++;
             if(unit.path_index == unit.path.count)
@@ -72,6 +73,7 @@ Unit Unit_Move(Unit unit, const Grid grid)
 
         const int32_t divisor = UTIL_MAX(abs(delta.x), abs(delta.y));
         const Point direction = Point_Div(delta, divisor);
+
         unit = Step(unit, direction, grid);
     }
     return unit;

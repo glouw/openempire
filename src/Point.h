@@ -25,3 +25,5 @@ Point Point_ToIso(const Point);
 Point Point_ToCart(const Point);
 
 bool Point_IsZero(const Point);
+
+int32_t Point_Mag(const Point);
