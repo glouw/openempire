@@ -68,5 +68,5 @@ bool Point_IsZero(const Point point)
 
 int32_t Point_Mag(const Point point)
 {
-    return Util_SquareRoot(point.x * point.x + point.y * point.y);
+    return Util_Sqrt(point.x * point.x + point.y * point.y);
 }

@@ -84,7 +84,7 @@ Tile Tile_Construct(const Overview overview, const Point cart_point, const Point
 
 Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Animation animation, const Terrain file)
 {
-    const int32_t bound = Util_SquareRoot(animation.count);
+    const int32_t bound = Util_Sqrt(animation.count);
     const int32_t index = (cart_point.x % bound) + ((cart_point.y % bound) * bound);
     const Point cart_fractional = { 0,0 };
     Tile tile = Tile_Construct(overview, cart_point, cart_fractional, animation, index);

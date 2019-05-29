@@ -27,7 +27,7 @@ char* Util_StringDup(const char* s);
 
 bool Util_StringEqual(const char* const a, const char* const b);
 
-int32_t Util_SquareRoot(const int32_t value);
+int32_t Util_Sqrt(const int32_t value);
 
 uint16_t Util_Rand(void);
 

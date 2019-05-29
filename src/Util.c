@@ -38,7 +38,7 @@ bool Util_StringEqual(const char* const a, const char* const b)
     return strcmp(a, b) == 0;
 }
 
-int32_t Util_SquareRoot(const int32_t value)
+int32_t Util_Sqrt(const int32_t value)
 {
     int32_t n = value;
     int32_t b = 0;
