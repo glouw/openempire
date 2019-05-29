@@ -463,17 +463,11 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
     const Point iso = { input.x, input.y };
     const Point snap = Overview_IsoSnapTo(overview, iso);
 
-    // The real tile width and height is one less to allow for pixel overlaps.
-    // Look at Overview.c IsoToCart and CartToIso for more information.
-
-    const int32_t width = frame.width - 1;
-    const int32_t height = frame.height - 1;
-
-    for(int32_t i = 0; i < height; i++)
+    for(int32_t i = 0; i < frame.height; i++)
     {
         const Outline outline = image.outline_table[i];
         const int32_t left  = snap.x + outline.left_padding;
-        const int32_t right = snap.x + width - outline.right_padding;
+        const int32_t right = snap.x + frame.width - outline.right_padding;
         const int32_t y = i + snap.y;
         for(int32_t j = 0; j < line_width; j++)
         {
