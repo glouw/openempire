@@ -2,5 +2,6 @@
 *.cachegrind
 *.d
 *.gch
+*.vgcore
 log
 openempires
