@@ -16,8 +16,8 @@
 typedef struct
 {
     Frame frame;
-    Point iso_global;
-    Point iso_fractional_local;
+    Point iso_pixel;
+    Point iso_pixel_offset;
     SDL_Surface* surface;
     bool needs_clipping;
     uint8_t height;
@@ -29,11 +29,11 @@ bool Tile_ContainsPoint(const Tile, const Point);
 
 Tile Tile_GetTerrain(const Overview, const Point point, const Animation, const Terrain);
 
-Tile Tile_GetGraphics(const Overview, const Point point, const Point fractional, const Animation, const Graphics);
+Tile Tile_GetGraphics(const Overview, const Point cart, const Point cart_grid_offset, const Animation, const Graphics);
 
 Point Tile_GetTopLeftOffsetCoords(const Tile, const int32_t x, const int32_t y);
 
-Tile Tile_Construct(const Overview, const Point cart_point, const Point cart_fractional, const Animation, const int32_t index);
+Tile Tile_Construct(const Overview, const Point cart, const Point cart_grid_offset, const Animation, const int32_t index);
 
 Point Tile_GetHotSpotCoords(const Tile);
 

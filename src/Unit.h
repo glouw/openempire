@@ -7,8 +7,10 @@
 typedef struct
 {
     Point cart;
-    Point cart_fractional_local;
-    Point cart_fractional_local_goal;
+    Point cart_grid_offset;
+    Point cart_grid_offset_goal;
+    Point cell;
+    int32_t speed;
     Points path;
     int32_t path_index;
     bool selected;
@@ -18,4 +20,4 @@ Unit;
 
 Unit Unit_Move(Unit, const Grid);
 
-Unit Unit_Make(const Point);
+Unit Unit_Make(const Point, const Grid);

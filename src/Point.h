@@ -20,6 +20,8 @@ Point Point_Sub(const Point a, const Point b);
 
 Point Point_Div(const Point a, const int32_t n);
 
+Point Point_Mul(const Point a, const int32_t n);
+
 Point Point_ToIso(const Point);
 
 Point Point_ToCart(const Point);

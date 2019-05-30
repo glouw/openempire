@@ -39,7 +39,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
 
             const Point south = { 0, 1 };
             const Point shifted = Point_Add(point, south);
-            tile[unit_count] = Tile_GetGraphics(overview, shifted, ref->cart_fractional_local, animation, ref->file);
+            tile[unit_count] = Tile_GetGraphics(overview, shifted, ref->cart_grid_offset, animation, ref->file);
             tile[unit_count].reference = ref;
             unit_count++;
         }

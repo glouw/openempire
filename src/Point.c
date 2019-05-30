@@ -42,6 +42,15 @@ Point Point_Div(const Point a, const int32_t n)
     return out;
 }
 
+Point Point_Mul(const Point a, const int32_t n)
+{
+    const Point out = {
+        a.x * n,
+        a.y * n,
+    };
+    return out;
+}
+
 Point Point_ToIso(const Point cart)
 {
     const Point iso = {

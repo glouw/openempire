@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-static Units GenerateTestZone(Units units)
+static Units GenerateTestZone(Units units, const Grid grid)
 {
     for(int32_t i = 0; i < 50; i++)
     {
@@ -18,13 +18,14 @@ static Units GenerateTestZone(Units units)
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        Unit unit = Unit_Make(cart);
-        Unit shadow = Unit_Make(cart);
+        Unit unit = Unit_Make(cart, grid);
+        Unit shadow = Unit_Make(cart, grid);
         switch(Util_Rand() % 5)
         {
         default:
         case 0:
             unit.file = FILE_MALE_VILLAGER_STANDING;
+            unit.speed = 1000;
             break;
         case 1:
             unit.file = FILE_FOREST_TREE;
@@ -47,17 +48,17 @@ static Units GenerateTestZone(Units units)
     return units;
 }
 
-Units Units_New(const int32_t max, const int32_t rows, const int32_t cols)
+Units Units_New(const int32_t max, const Grid grid)
 {
-    const int32_t area = rows * cols;
+    const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
     UTIL_CHECK(unit);
     UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-    Units units = { unit, 0, max, stack, rows, cols };
-    units = GenerateTestZone(units);
+    Units units = { unit, 0, max, stack, grid.rows, grid.cols };
+    units = GenerateTestZone(units, grid);
     return units;
 }
 
@@ -126,7 +127,7 @@ static void Select(const Units units, const Overview overview, const Input input
     Tiles_Free(tiles);
 }
 
-static void ApplyPathsToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_fractional_local_goal)
+static void ApplyPathsToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -137,7 +138,7 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
             Points_Free(unit->path);
             unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
             unit->path_index = 0;
-            unit->cart_fractional_local_goal = cart_fractional_local_goal;
+            unit->cart_grid_offset_goal = cart_grid_offset_goal;
             Field_Free(field);
             Points_Print(unit->path);
         }
@@ -151,9 +152,9 @@ static void Command(const Units units, const Overview overview, const Input inpu
         const Point click = { input.x, input.y };
         const Point cart_goal = Overview_IsoToCart(overview, click, false);
         const Point cart_global = Overview_IsoToCart(overview, click, true);
-        const Point cart_fractional_local_goal = Grid_GetLocalCoords(overview.grid, cart_global);
+        const Point cart_grid_offset_goal = Grid_GetOffset(overview.grid, cart_global);
         if(Units_CanWalk(units, map, cart_goal))
-            ApplyPathsToSelected(units, map, cart_goal, cart_fractional_local_goal);
+            ApplyPathsToSelected(units, map, cart_goal, cart_grid_offset_goal);
     }
 }
 

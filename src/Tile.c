@@ -71,14 +71,14 @@ static Tile Clip(Tile tile, const Overview overview)
     return tile;
 }
 
-Tile Tile_Construct(const Overview overview, const Point cart_point, const Point cart_fractional, const Animation animation, const int32_t index)
+Tile Tile_Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const int32_t index)
 {
     static Tile zero;
     Tile tile = zero;
     tile.frame = animation.frame[index];
     tile.surface = animation.surface[index];
-    tile.iso_global = Overview_CartToIso(overview, cart_point);
-    tile.iso_fractional_local = Point_ToIso(cart_fractional);
+    tile.iso_pixel = Overview_CartToIso(overview, cart);
+    tile.iso_pixel_offset = Point_ToIso(cart_grid_offset);
     return Clip(tile, overview);
 }
 
@@ -86,16 +86,16 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 {
     const int32_t bound = Util_Sqrt(animation.count);
     const int32_t index = (cart_point.x % bound) + ((cart_point.y % bound) * bound);
-    const Point cart_fractional = { 0,0 };
-    Tile tile = Tile_Construct(overview, cart_point, cart_fractional, animation, index);
+    const Point cart_grid_offset = { 0,0 };
+    Tile tile = Tile_Construct(overview, cart_point, cart_grid_offset, animation, index);
     tile.height = Terrain_GetHeight(file);
     return tile;
 }
 
-Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Point cart_fractional, const Animation animation, const Graphics file)
+Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file)
 {
     const int32_t index = 1; // XXX... which one to use?
-    Tile tile = Tile_Construct(overview, cart_point, cart_fractional, animation, index);
+    Tile tile = Tile_Construct(overview, cart, cart_grid_offset, animation, index);
     tile.height = Graphics_GetHeight(file);
     return tile;
 }
@@ -103,8 +103,8 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart_point, const Poi
 Point Tile_GetHotSpotCoords(const Tile tile)
 {
     const Point coords = {
-        tile.iso_global.x + tile.iso_fractional_local.x,
-        tile.iso_global.y + tile.iso_fractional_local.y,
+        tile.iso_pixel.x + tile.iso_pixel_offset.x,
+        tile.iso_pixel.y + tile.iso_pixel_offset.y,
     };
     return coords;
 }
