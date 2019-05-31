@@ -42,6 +42,7 @@ File File_Load(FILE* const);
 
 #define FILE_X_GRAPHICS \
     FILE_X(FILE_GRAPHICS_NONE, /* ............. */ (  -1), FILE_PRIO_HIGHEST , true)  \
+    FILE_X(FILE_STONE_MINE,  /* ............... */ ( 334), FILE_PRIO_GRAPHICS, false) \
     FILE_X(FILE_TREE_STUMPS,   /* ............. */ ( 335), FILE_PRIO_GRAPHICS, true)  \
     FILE_X(FILE_TREE_CHOPPED_DOWN,      /* .... */ ( 370), FILE_PRIO_GRAPHICS, false) \
     FILE_X(FILE_MALE_VILLAGER_FIGHTING, /* .... */ ( 430), FILE_PRIO_GRAPHICS, true)  \
@@ -56,6 +57,7 @@ File File_Load(FILE* const);
     FILE_X(FILE_MALE_VILLAGER_WOODCUTTER_DECAYING, ( 456), FILE_PRIO_GRAPHICS, true)  \
     FILE_X(FILE_FOREST_TREE_SHADOW, /* ........ */ ( 587), FILE_PRIO_SHADOW  , true)  \
     FILE_X(FILE_BERRY_BUSH,  /* ............... */ ( 698), FILE_PRIO_GRAPHICS, false) \
+    FILE_X(FILE_WAYPOINT_FLAG, /* ............. */ ( 795), FILE_PRIO_GRAPHICS, true)  \
+    FILE_X(FILE_RIGHT_CLICK_RED_ARROWS, /* .... */ ( 796), FILE_PRIO_GRAPHICS, true)  \
     FILE_X(FILE_GOLD_MINE,   /* ............... */ (1297), FILE_PRIO_GRAPHICS, false) \
-    FILE_X(FILE_STONE_MINE,  /* ............... */ ( 334), FILE_PRIO_GRAPHICS, false) \
     FILE_X(FILE_FOREST_TREE, /* ............... */ (1410), FILE_PRIO_GRAPHICS, false)

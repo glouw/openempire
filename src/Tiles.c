@@ -34,12 +34,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
 
             const Animation animation = graphics.animation[COLOR_BLU][ref->file];
 
-            // A little unfortunate, but the hot spots for the terrain tiles are not centered.
-            // Units must therefor be forced to the terrain tile positions.
-
-            const Point south = { 0, 1 };
-            const Point shifted = Point_Add(point, south);
-            tile[unit_count] = Tile_GetGraphics(overview, shifted, ref->cart_grid_offset, animation, ref->file);
+            tile[unit_count] = Tile_GetGraphics(overview, point, ref->cart_grid_offset, animation, ref->file);
             tile[unit_count].reference = ref;
             unit_count++;
         }

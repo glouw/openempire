@@ -343,6 +343,22 @@ void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units
     Points_Free(points);
 }
 
+void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        const Unit unit = units.unit[i];
+        for(int32_t j = 0; j < unit.path.count; j++)
+        {
+            const Point cart = unit.path.point[j];
+            const Point cart_grid_offset = { 0,0 };
+            const Graphics file = FILE_WAYPOINT_FLAG;
+            const Tile tile = Tile_GetGraphics(overview, cart, cart_grid_offset, graphics.animation[COLOR_BLU][file], file);
+            Vram_DrawTile(vram, tile);
+        }
+    }
+}
+
 static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
     if(!OutOfBounds(vram, point.x, point.y))

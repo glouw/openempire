@@ -30,9 +30,11 @@ Unit Unit_Move(Unit unit, const Grid grid)
             unit.path_index++;
 
         const Point unit_grid_coords = GetCoords(grid, unit.cart, unit.cart_grid_offset);
-        const Point goal_grid_coords = GetCoords(grid, unit.path.point[unit.path_index], unit.cart_grid_offset_goal);
+        const Point zero = { 0, 0 };
+        const Point select = (unit.path_index == unit.path.count - 1) ? unit.cart_grid_offset_goal : zero;
+        const Point goal_grid_coords = GetCoords(grid, unit.path.point[unit.path_index], select);
         const Point delta = Point_Sub(goal_grid_coords, unit_grid_coords);
-        if(Point_Mag(delta) < 3)
+        if(Point_IsZero(delta))
         {
             unit.path_index++;
             if(unit.path_index == unit.path.count)
@@ -50,7 +52,6 @@ Unit Unit_Make(const Point cart, const Grid grid)
     Unit unit = zero;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, unit.cart);
-    //unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
     unit.file = FILE_GRAPHICS_NONE;
     return unit;
 }

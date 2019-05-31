@@ -95,7 +95,14 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file)
 {
     const int32_t index = 1; // XXX... which one to use?
-    Tile tile = Tile_Construct(overview, cart, cart_grid_offset, animation, index);
+
+    // A little unfortunate, but the hot spots for the terrain tiles are not centered.
+    // Units must therefor be forced to the terrain tile positions.
+
+    const Point south = { 0, 1 };
+    const Point shifted = Point_Add(cart, south);
+
+    Tile tile = Tile_Construct(overview, shifted, cart_grid_offset, animation, index);
     tile.height = Graphics_GetHeight(file);
     return tile;
 }
