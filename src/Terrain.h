@@ -6,7 +6,7 @@
 
 typedef enum
 {
-#define FILE_X(name, file, prio, walkable) name = file,
+#define FILE_X(name, file, prio, walkable, type, speed) name = file,
     FILE_X_TERRAIN
 #undef FILE_X
 }

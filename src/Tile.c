@@ -130,3 +130,8 @@ Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_
     const Point point = { x, y };
     return Point_Add(point, Tile_GetTopLeftCoords(tile));
 }
+
+void Tile_Select(const Tile tile)
+{
+    tile.reference->selected = true;
+}

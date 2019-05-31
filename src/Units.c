@@ -18,32 +18,26 @@ static Units GenerateTestZone(Units units, const Grid grid)
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        Unit unit = Unit_Make(cart, grid);
-        Unit shadow = Unit_Make(cart, grid);
         switch(Util_Rand() % 5)
         {
         default:
         case 0:
-            unit.file = FILE_MALE_VILLAGER_STANDING;
-            unit.speed = 1000;
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING)); // XXX. GIMME SPEED.
             break;
         case 1:
-            unit.file = FILE_FOREST_TREE;
-            shadow.file = FILE_FOREST_TREE_SHADOW;
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW));
             break;
         case 2:
-            unit.file = FILE_GOLD_MINE;
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_GOLD_MINE));
             break;
         case 3:
-            unit.file = FILE_STONE_MINE;
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_STONE_MINE));
             break;
         case 4:
-            unit.file = FILE_BERRY_BUSH;
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH));
             break;
         }
-        units = Units_Append(units, unit);
-        if(shadow.file != FILE_GRAPHICS_NONE)
-            units = Units_Append(units, shadow);
     }
     return units;
 }
@@ -119,12 +113,13 @@ static void Select(const Units units, const Overview overview, const Input input
     {
         UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
-            Tiles_SelectMany(tiles, overview.selection_box);
+            Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
             const Tile tile = Tiles_SelectOne(tiles, click);
-            if(input.key[SDL_SCANCODE_LCTRL])
-                Tiles_SelectAllSimilar(tiles, tile);
+            if(tile.reference)
+                if(input.key[SDL_SCANCODE_LCTRL])
+                    Tiles_SelectSimilar(tiles, tile);
         }
     }
     Points_Free(points);
@@ -138,8 +133,7 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
         Unit* const unit = &units.unit[i];
         if(unit->selected)
         {
-            // No sense in calculating paths for units without speed scalars.
-            if(unit->speed > 0)
+            if(unit->speed > 0) // No sense in calculating paths for units without speed scalars.
             {
                 const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
                 Points_Free(unit->path);

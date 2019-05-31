@@ -91,7 +91,7 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
             const Point origin_click = Point_Sub(click, rect.a);
             if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
             {
-                tile.reference->selected = true;
+                Tile_Select(tile);
                 return tile;
             }
         }
@@ -100,19 +100,25 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
     return zero;
 }
 
-void Tiles_SelectAllSimilar(const Tiles tiles, const Tile tile)
+void Tiles_SelectSimilar(const Tiles tiles, const Tile similar)
 {
-    (void) tiles;
-    (void) tile;
+    for(int32_t i = 0; i < tiles.count; i++)
+    {
+        const Tile tile = tiles.tile[i];
+        const Type a = Graphics_GetType(similar.reference->file);
+        const Type b = Graphics_GetType(tile.reference->file);
+        if(a == b)
+            Tile_Select(tile);
+    }
 }
 
-void Tiles_SelectMany(const Tiles tiles, const Rect rect)
+void Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
 {
     const Rect box = Rect_CorrectOrientation(rect);
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
         if(Tile_IsHotspotInRect(tile, box))
-            tile.reference->selected = true;
+            Tile_Select(tile);
     }
 }

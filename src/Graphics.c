@@ -4,7 +4,7 @@ const char* Graphics_GetString(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, prio, walkable) case name: return #name;
+#define FILE_X(name, file, prio, walkable, type, speed) case name: return #name;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -15,7 +15,7 @@ uint8_t Graphics_GetHeight(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, prio, walkable) case name: return prio;
+#define FILE_X(name, file, prio, walkable, type, speed) case name: return prio;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -26,7 +26,29 @@ bool Graphics_IsWalkable(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, prio, walkable) case name: return walkable;
+#define FILE_X(name, file, prio, walkable, type, speed) case name: return walkable;
+        FILE_X_GRAPHICS
+#undef FILE_X
+    }
+    return 0;
+}
+
+Type Graphics_GetType(const Graphics graphics)
+{
+    switch(graphics)
+    {
+#define FILE_X(name, file, prio, walkable, type, speed) case name: return type;
+        FILE_X_GRAPHICS
+#undef FILE_X
+    }
+    return 0;
+}
+
+int32_t Graphics_GetSpeed(const Graphics graphics)
+{
+    switch(graphics)
+    {
+#define FILE_X(name, file, prio, walkable, type, speed) case name: return speed;
         FILE_X_GRAPHICS
 #undef FILE_X
     }

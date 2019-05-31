@@ -14,10 +14,11 @@ typedef struct
     Points path;
     int32_t path_index;
     bool selected;
-    Graphics file; // XXX. Should be Type with xmacro list for file lookup.
+    Graphics file;
+    const char* file_name;
 }
 Unit;
 
 Unit Unit_Move(Unit, const Grid);
 
-Unit Unit_Make(const Point, const Grid);
+Unit Unit_Make(const Point, const Grid, const Graphics);

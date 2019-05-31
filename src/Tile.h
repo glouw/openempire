@@ -42,3 +42,5 @@ Point Tile_GetTopLeftCoords(const Tile);
 Rect Tile_GetFrameOutline(const Tile);
 
 bool Tile_IsHotspotInRect(const Tile, const Rect);
+
+void Tile_Select(const Tile);
