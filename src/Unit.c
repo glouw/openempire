@@ -35,14 +35,20 @@ Unit Unit_Move(Unit unit, const Grid grid)
     return unit;
 }
 
+Unit Unit_UpdateFile(Unit unit, const Graphics file)
+{
+    unit.speed = Graphics_GetSpeed(file);
+    unit.file = file;
+    unit.file_name = Graphics_GetString(file);
+    return unit;
+}
+
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file)
 {
     static Unit zero;
     Unit unit = zero;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
-    unit.file = file;
-    unit.speed = Graphics_GetSpeed(file);;
-    unit.file_name = Graphics_GetString(file);
+    unit = Unit_UpdateFile(unit, file);
     return unit;
 }
