@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Grid grid)
 {
-    for(int32_t i = 0; i < 50; i++)
+    for(int32_t i = 0; i < 200; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
@@ -155,8 +155,8 @@ static void Command(const Units units, const Overview overview, const Input inpu
     {
         const Point click = { input.x, input.y };
         const Point cart_goal = Overview_IsoToCart(overview, click, false);
-        const Point cart_global = Overview_IsoToCart(overview, click, true);
-        const Point cart_grid_offset_goal = Grid_GetOffset(overview.grid, cart_global);
+        const Point cart = Overview_IsoToCart(overview, click, true);
+        const Point cart_grid_offset_goal = Grid_GetOffset(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
             ApplyPathsToSelected(units, map, cart_goal, cart_grid_offset_goal);
     }
@@ -213,5 +213,6 @@ bool Units_CanWalk(const Units units, const Map map, const Point point)
 {
     const Terrain terrain = Map_GetTerrainFile(map, point);
     const Stack stack = Units_GetStackCart(units, point);
-    return stack.reference && Terrain_IsWalkable(terrain) && Stack_IsWalkable(stack);
+    return Terrain_IsWalkable(terrain)
+        && Stack_IsWalkable(stack);
 }

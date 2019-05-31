@@ -13,7 +13,7 @@ static void GenerateTestZone(const Map map)
         const Point point = { x, y };
         Map_SetTerrainFile(map, point, FILE_DIRT);
     }
-    for(int32_t i = 0; i < 50; i++)
+    for(int32_t i = 0; i < 500; i++)
     {
         const Point point = {
             Util_Rand() % map.cols,
