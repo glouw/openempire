@@ -343,6 +343,8 @@ void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units
     Points_Free(points);
 }
 
+// XXX. Only useful for debugging the path finder and is not used in the final engine as units are not sorted by depth.
+
 void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -350,10 +352,10 @@ void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units u
         const Unit unit = units.unit[i];
         for(int32_t j = 0; j < unit.path.count; j++)
         {
+            static Point zero;
             const Point cart = unit.path.point[j];
-            const Point cart_grid_offset = { 0,0 };
             const Graphics file = FILE_WAYPOINT_FLAG;
-            const Tile tile = Tile_GetGraphics(overview, cart, cart_grid_offset, graphics.animation[COLOR_BLU][file], file);
+            const Tile tile = Tile_GetGraphics(overview, cart, zero, graphics.animation[COLOR_BLU][file], file);
             Vram_DrawTile(vram, tile);
         }
     }
