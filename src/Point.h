@@ -29,3 +29,5 @@ Point Point_ToCart(const Point);
 bool Point_IsZero(const Point);
 
 int32_t Point_Mag(const Point);
+
+Point Point_Normalize(const Point, const int32_t normal);

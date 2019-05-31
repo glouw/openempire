@@ -134,13 +134,17 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
         Unit* const unit = &units.unit[i];
         if(unit->selected)
         {
-            const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
-            Points_Free(unit->path);
-            unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
-            unit->path_index = 0;
-            unit->cart_grid_offset_goal = cart_grid_offset_goal;
-            Field_Free(field);
-            Points_Print(unit->path);
+            // No sense in calculting paths for units without speed scalars.
+            if(unit->speed > 0)
+            {
+                const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
+                Points_Free(unit->path);
+                unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
+                unit->path_index = 0;
+                unit->cart_grid_offset_goal = cart_grid_offset_goal;
+                Field_Free(field);
+                Points_Print(unit->path);
+            }
         }
     }
 }

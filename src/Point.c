@@ -3,6 +3,7 @@
 #include "Util.h"
 
 #include <stdio.h>
+#include <limits.h>
 
 bool Point_Equal(const Point a, const Point b)
 {
@@ -78,4 +79,16 @@ bool Point_IsZero(const Point point)
 int32_t Point_Mag(const Point point)
 {
     return Util_Sqrt(point.x * point.x + point.y * point.y);
+}
+
+Point Point_Normalize(const Point point, const int32_t normal)
+{
+    const int32_t magnitude = Point_Mag(point);
+    if(magnitude == 0)
+    {
+        const Point huge = { INT_MAX, INT_MAX };
+        return huge;
+    }
+    const Point elongated = Point_Mul(point, normal);
+    return Point_Div(elongated, magnitude);
 }
