@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Grid grid)
 {
-    for(int32_t i = 0; i < 200; i++)
+    for(int32_t i = 0; i < 100; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
@@ -156,7 +156,7 @@ static void Command(const Units units, const Overview overview, const Input inpu
         const Point click = { input.x, input.y };
         const Point cart_goal = Overview_IsoToCart(overview, click, false);
         const Point cart = Overview_IsoToCart(overview, click, true);
-        const Point cart_grid_offset_goal = Grid_GetOffset(overview.grid, cart);
+        const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
             ApplyPathsToSelected(units, map, cart_goal, cart_grid_offset_goal);
     }

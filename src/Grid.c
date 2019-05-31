@@ -25,42 +25,28 @@ Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_wi
 
     grid.cell_size = 1000;
 
+    grid.tile_cart_mid.x = grid.tile_cart_width / 2;
+    grid.tile_cart_mid.y = grid.tile_cart_height / 2;
+
     return grid;
 }
 
-Point Grid_GetCoords(const Grid grid, const Point point)
+Point Grid_GetGridPoint(const Grid grid, const Point point)
 {
-    const Point mid = {
-        grid.tile_cart_width  / 2,
-        grid.tile_cart_height / 2,
-    };
     const Point out = {
         point.x * grid.tile_cart_width,
         point.y * grid.tile_cart_height,
     };
-    return Point_Add(out, mid);
+    return Point_Add(out, grid.tile_cart_mid);
 }
 
-Point Grid_GetOffset(const Grid grid, const Point point)
+Point Grid_GetOffsetFromGridPoint(const Grid grid, const Point point)
 {
-    const Point mid = {
-        grid.tile_cart_width / 2,
-        grid.tile_cart_height / 2,
-    };
     const Point out = {
         point.x % grid.tile_cart_width,
         point.y % grid.tile_cart_height,
     };
-    return Point_Sub(out, mid);
-}
-
-Point Grid_CellToOffset(const Grid grid, const Point cell)
-{
-    const Point out = {
-        (cell.x / grid.cell_size) % grid.tile_cart_width,
-        (cell.y / grid.cell_size) % grid.tile_cart_height,
-    };
-    return out;
+    return Point_Sub(out, grid.tile_cart_mid);
 }
 
 Point Grid_CellToCart(const Grid grid, const Point cell)
@@ -74,9 +60,20 @@ Point Grid_CellToCart(const Grid grid, const Point cell)
 
 Point Grid_CartToCell(const Grid grid, const Point cart)
 {
+    const int32_t w = grid.cell_size * grid.tile_cart_width;
+    const int32_t h = grid.cell_size * grid.tile_cart_height;
     const Point out = {
-        cart.x * grid.cell_size * grid.tile_cart_width,
-        cart.y * grid.cell_size * grid.tile_cart_height,
+        w * cart.x + w / 2,
+        h * cart.y + h / 2,
     };
     return out;
+}
+
+Point Grid_CellToOffset(const Grid grid, const Point cell)
+{
+    const Point coords = {
+        (cell.x / grid.cell_size) % grid.tile_cart_width,
+        (cell.y / grid.cell_size) % grid.tile_cart_height,
+    };
+    return Point_Sub(coords, grid.tile_cart_mid);
 }

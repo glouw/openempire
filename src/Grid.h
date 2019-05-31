@@ -13,14 +13,15 @@ typedef struct
     int32_t tile_cart_width;
     int32_t tile_cart_height;
     int32_t cell_size;
+    Point tile_cart_mid;
 }
 Grid;
 
 Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_width, const int32_t tile_iso_height);
 
-Point Grid_GetCoords(const Grid, const Point);
+Point Grid_GetGridPoint(const Grid, const Point);
 
-Point Grid_GetOffset(const Grid, const Point);
+Point Grid_GetOffsetFromGridPoint(const Grid, const Point);
 
 Point Grid_CellToOffset(const Grid, const Point);
 
