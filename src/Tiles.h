@@ -17,6 +17,8 @@ Tiles Tiles_PrepTerrain(const Registrar, const Map, const Overview, const Points
 
 void Tiles_Free(const Tiles);
 
-void Tiles_SelectOne(const Tiles, const Point);
+Tile Tiles_SelectOne(const Tiles, const Point);
+
+void Tiles_SelectAllSimilar(const Tiles, const Tile);
 
 void Tiles_SelectMany(const Tiles, const Rect);

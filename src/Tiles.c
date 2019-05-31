@@ -68,11 +68,11 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     for(int32_t i = 0; i < points.count; i++)
     {
         const Point point = points.point[i];
-        const Terrain tile_file = Map_GetTerrainFile(map, point);
-        if(tile_file != FILE_TERRAIN_NONE)
+        const Terrain file = Map_GetTerrainFile(map, point);
+        if(file != FILE_TERRAIN_NONE)
         {
-            const Animation animation = terrain.animation[COLOR_BLU][tile_file];
-            tile[i] = Tile_GetTerrain(overview, point, animation, tile_file);
+            const Animation animation = terrain.animation[COLOR_BLU][file];
+            tile[i] = Tile_GetTerrain(overview, point, animation, file);
         }
     }
     const Tiles tiles = { tile, points.count };
@@ -80,7 +80,7 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     return tiles;
 }
 
-void Tiles_SelectOne(const Tiles tiles, const Point click)
+Tile Tiles_SelectOne(const Tiles tiles, const Point click)
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
@@ -91,14 +91,19 @@ void Tiles_SelectOne(const Tiles tiles, const Point click)
             const Point origin_click = Point_Sub(click, rect.a);
             if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
             {
-                // XXX. Must draw circle around selected unit.
-                puts("GOT EM");
-                tiles.tile[i].reference->selected = true;
-                Point_Print(tiles.tile[i].reference->cart);
-                break;
+                tile.reference->selected = true;
+                return tile;
             }
         }
     }
+    static Tile zero;
+    return zero;
+}
+
+void Tiles_SelectAllSimilar(const Tiles tiles, const Tile tile)
+{
+    (void) tiles;
+    (void) tile;
 }
 
 void Tiles_SelectMany(const Tiles tiles, const Rect rect)
@@ -108,11 +113,6 @@ void Tiles_SelectMany(const Tiles tiles, const Rect rect)
     {
         const Tile tile = tiles.tile[i];
         if(Tile_IsHotspotInRect(tile, box))
-        {
-            // XXX. Must draw circle around selected unit.
-            puts("GOT EM");
-            tiles.tile[i].reference->selected = true;
-            Point_Print(tiles.tile[i].reference->cart);
-        }
+            tile.reference->selected = true;
     }
 }

@@ -121,7 +121,11 @@ static void Select(const Units units, const Overview overview, const Input input
         if(Overview_IsSelectionBoxBigEnough(overview))
             Tiles_SelectMany(tiles, overview.selection_box);
         else
-            Tiles_SelectOne(tiles, click);
+        {
+            const Tile tile = Tiles_SelectOne(tiles, click);
+            if(input.key[SDL_SCANCODE_LCTRL])
+                Tiles_SelectAllSimilar(tiles, tile);
+        }
     }
     Points_Free(points);
     Tiles_Free(tiles);

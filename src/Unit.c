@@ -3,15 +3,6 @@
 #include "Rect.h"
 #include "Util.h"
 
-static Unit Velocitate(Unit unit, const Point delta, const Grid grid)
-{
-    const Point velocity = Point_Normalize(delta, unit.speed);
-    unit.cell = Point_Add(unit.cell, velocity);
-    unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell); // XXX. Unit movement is a little shakey. Can somehow integrate?
-    unit.cart = Grid_CellToCart(grid, unit.cell);
-    return unit;
-}
-
 Unit Unit_Move(Unit unit, const Grid grid)
 {
     if(unit.path.count > 0)
@@ -36,7 +27,10 @@ Unit Unit_Move(Unit unit, const Grid grid)
                 unit.path = Points_Free(unit.path);
             return unit;
         }
-        unit = Velocitate(unit, delta, grid);
+        const Point velocity = Point_Normalize(delta, unit.speed);
+        unit.cell = Point_Add(unit.cell, velocity);
+        unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell); // XXX. Unit movement is a little shakey. Can somehow integrate?
+        unit.cart = Grid_CellToCart(grid, unit.cell);
     }
     return unit;
 }

@@ -29,7 +29,7 @@ int32_t main(int32_t argc, char* argv[])
         SDL_Delay(ms < 0 ? 0 : ms);
         cycles++;
         if(args.measure)
-            if(cycles > 10)
+            if(cycles > 10) // Measure performance with valgrind --tool=cachegrind.
                 break;
     }
     Units_Free(units);

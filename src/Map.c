@@ -42,7 +42,7 @@ Map Map_Make(const int32_t rows, const int32_t cols, const Registrar terrain)
     Map map = zero;
     map.rows = rows;
     map.cols = cols;
-    map.tile_file = UTIL_ALLOC(Terrain, rows * cols);
+    map.file = UTIL_ALLOC(Terrain, rows * cols);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
     GenerateTestZone(map);
@@ -59,19 +59,19 @@ Terrain Map_GetTerrainFile(const Map map, const Point point)
 {
     if(!InBounds(map, point))
         return FILE_TERRAIN_NONE;
-    return map.tile_file[point.x + point.y * map.cols];
+    return map.file[point.x + point.y * map.cols];
 }
 
 void Map_SetTerrainFile(const Map map, const Point point, const Terrain file)
 {
     if(!InBounds(map, point))
         return;
-    map.tile_file[point.x + point.y * map.cols] = file;
+    map.file[point.x + point.y * map.cols] = file;
 }
 
 void Map_Free(const Map map)
 {
-    free(map.tile_file);
+    free(map.file);
 }
 
 void Map_Edit(const Map map, const Overview overview, const Input input)
