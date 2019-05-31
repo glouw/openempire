@@ -14,7 +14,7 @@ typedef struct
     Points path;
     int32_t path_index;
     bool selected;
-    Graphics file;
+    Graphics file; // XXX. Should be Type with xmacro list for file lookup.
 }
 Unit;
 
