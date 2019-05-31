@@ -13,9 +13,11 @@ int32_t main(int32_t argc, char* argv[])
     Overview overview = Overview_Init(video.xres, video.yres, grid);
     Units units = Units_New(8, grid);
 
+    int32_t cycles = 0;
     if(args.demo)
         Video_RenderDataDemo(video, data, args.color);
-    else for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
+    else
+    for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
         overview = Overview_Update(overview, input);
@@ -25,6 +27,10 @@ int32_t main(int32_t argc, char* argv[])
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = 1000 / 60 - (t1 - t0);
         SDL_Delay(ms < 0 ? 0 : ms);
+        cycles++;
+        if(args.measure)
+            if(cycles > 10)
+                break;
     }
     Units_Free(units);
     Map_Free(map);

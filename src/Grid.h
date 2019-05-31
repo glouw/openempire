@@ -21,6 +21,8 @@ Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_wi
 
 Point Grid_GetGridPoint(const Grid, const Point);
 
+Point Grid_GetGridPointWithOffset(const Grid, const Point cart, const Point offset);
+
 Point Grid_GetOffsetFromGridPoint(const Grid, const Point);
 
 Point Grid_CellToOffset(const Grid, const Point);

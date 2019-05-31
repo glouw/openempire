@@ -25,6 +25,9 @@ Args Args_Parse(int32_t argc, char* argv[])
                 args.color = (Color) atoi(argv[++i]);
         }
         else
+        if(Check(arg, "--measure", "-m"))
+            args.measure = true;
+        else
         if(Check(arg, "--path", "-p"))
             args.path = argv[i + 1];
     }

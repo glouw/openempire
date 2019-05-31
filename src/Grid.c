@@ -21,9 +21,7 @@ Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_wi
     grid.tile_cart_width = c.x - b.x;
     grid.tile_cart_height = c.y - a.y;
 
-    // Dictates with width and height of sub-pixels within a pixel.
-
-    grid.cell_size = 1000;
+    grid.cell_size = 1000; // Dictates with width and height of sub-pixels within a pixel.
 
     grid.tile_cart_mid.x = grid.tile_cart_width / 2;
     grid.tile_cart_mid.y = grid.tile_cart_height / 2;
@@ -38,6 +36,12 @@ Point Grid_GetGridPoint(const Grid grid, const Point point)
         point.y * grid.tile_cart_height,
     };
     return Point_Add(out, grid.tile_cart_mid);
+}
+
+Point Grid_GetGridPointWithOffset(const Grid grid, const Point cart, const Point offset)
+{
+    const Point global = Grid_GetGridPoint(grid, cart);
+    return Point_Add(global, offset);
 }
 
 Point Grid_GetOffsetFromGridPoint(const Grid grid, const Point point)
