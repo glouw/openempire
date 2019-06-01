@@ -92,3 +92,12 @@ Point Point_Normalize(const Point point, const int32_t normal)
     const Point elongated = Point_Mul(point, normal);
     return Point_Div(elongated, magnitude);
 }
+
+Point Point_Dot(const Point a, const Point b)
+{
+    const Point out = {
+        a.x * b.x,
+        a.y * b.y,
+    };
+    return out;
+}

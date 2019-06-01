@@ -133,7 +133,7 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
         Unit* const unit = &units.unit[i];
         if(unit->selected)
         {
-            if(unit->speed > 0) // No sense in calculating paths for units without speed scalars.
+            if(unit->max_speed > 0) // No sense in calculating paths for units without speed scalars.
             {
                 const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
                 Points_Free(unit->path);

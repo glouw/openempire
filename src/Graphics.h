@@ -7,7 +7,7 @@
 
 typedef enum
 {
-#define FILE_X(name, file, prio, walkable, type, speed) name = file,
+#define FILE_X(name, file, prio, walkable, type, max_speed, accel) name = file,
     FILE_X_GRAPHICS
 #undef FILE_X
 }
@@ -21,4 +21,6 @@ bool Graphics_IsWalkable(const Graphics);
 
 Type Graphics_GetType(const Graphics);
 
-int32_t Graphics_GetSpeed(const Graphics);
+int32_t Graphics_GetMaxSpeed(const Graphics);
+
+int32_t Graphics_GetAcceleration(const Graphics);
