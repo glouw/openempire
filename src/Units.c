@@ -183,23 +183,12 @@ static void StackStacks(const Units units)
     }
 }
 
+
 static Point Cohese(const Units units, const Unit unit)
 {
-    Point out = { 0,0 };
     const Stack stack = Units_GetStackCart(units, unit.cart);
-
-    if(stack.count < 2)
-        return out;
-
-    for(int32_t i = 0; i < stack.count; i++)
-    {
-        const Unit other = *stack.reference[i];
-        if(other.id != unit.id && !Point_IsZero(other.velocity))
-            out = Point_Add(out, other.cell);
-    }
-    out = Point_Div(out, stack.count - 1);
-    const Point delta = Point_Sub(out, unit.cell);
-    const Point done = Point_Div(delta, 1000); // XXX. The center of mass is shifting between units.
+    const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
+    const Point done = Point_Div(delta, 100); // XXX. The center of mass is shifting between units.
     return done;
 }
 
@@ -242,12 +231,24 @@ static void SortStacks(const Units units)
     }
 }
 
+static void CalculateCenters(const Units units)
+{
+    for(int32_t y = 0; y < units.rows; y++)
+    for(int32_t x = 0; x < units.cols; x++)
+    {
+        const Point point = { x, y };
+        Stack* const stack = GetStack(units, point);
+        Stack_UpdateCenterOfMass(stack);
+    }
+}
+
 void Units_Caretake(const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
     Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);
+    CalculateCenters(units);
     Select(units, overview, input, graphics);
     Command(units, overview, input, map);
 }

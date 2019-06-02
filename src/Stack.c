@@ -6,7 +6,7 @@ Stack Stack_Build(const int32_t max)
 {
     Unit** const reference = UTIL_ALLOC(Unit*, max);
     UTIL_CHECK(reference);
-    const Stack stack = { reference, 0, max };
+    const Stack stack = { reference, 0, max, { 0,0 } };
     return stack;
 }
 
@@ -48,4 +48,12 @@ bool Stack_IsWalkable(const Stack stack)
         if(!Graphics_IsWalkable(stack.reference[i]->file))
             return false;
     return true;
+}
+
+void Stack_UpdateCenterOfMass(Stack* const stack)
+{
+    Point out = { 0, 0 };
+    for(int32_t i = 0; i < stack->count; i++)
+        out = Point_Add(out, stack->reference[i]->cell);
+    stack->center_of_mass = (stack->count > 0) ? Point_Div(out, stack->count) : out;
 }
