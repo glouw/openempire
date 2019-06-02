@@ -18,7 +18,6 @@ typedef struct
     bool selected;
     Graphics file;
     const char* file_name;
-    int32_t id;
 }
 Unit;
 

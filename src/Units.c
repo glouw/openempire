@@ -53,7 +53,7 @@ Units Units_New(const int32_t max, const Grid grid)
     UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-    Units units = { unit, 0, max, stack, grid.rows, grid.cols, 0 };
+    Units units = { unit, 0, max, stack, grid.rows, grid.cols };
     units = GenerateTestZone(units, grid);
     return units;
 }
@@ -67,7 +67,6 @@ Units Units_Append(Units units, Unit unit)
         UTIL_CHECK(temp);
         units.unit = temp;
     }
-    unit.id = units.id_avail++;
     units.unit[units.count++] = unit;
     return units;
 }
@@ -183,7 +182,7 @@ static void StackStacks(const Units units)
     }
 }
 
-static Point Cohese(const Units units, const Unit unit)
+static Point CoheseBoids(const Units units, const Unit unit)
 {
     const Stack stack = Units_GetStackCart(units, unit.cart);
     const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
@@ -191,13 +190,13 @@ static Point Cohese(const Units units, const Unit unit)
     return done;
 }
 
-static Point Separate(const Units units, const Unit unit)
+static Point SeparateBoids(const Units units, const Unit unit)
 {
     static Point zero;
     return zero;
 }
 
-static Point Align(const Units units, const Unit unit)
+static Point AlignBoids(const Units units, const Unit unit)
 {
     static Point zero;
     return zero;
@@ -211,9 +210,9 @@ static void Move(const Units units, const Grid grid)
     for(int32_t i = 0; i < units.count; i++)
     {
         const Unit unit = units.unit[i];
-        const Point a = Cohese(units, unit);
-        const Point b = Separate(units, unit);
-        const Point c = Align(units, unit);
+        const Point a = CoheseBoids(units, unit);
+        const Point b = SeparateBoids(units, unit);
+        const Point c = AlignBoids(units, unit);
         const Point stressors = Point_Add(a, Point_Add(b, c));
         units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, stressors);
     }
