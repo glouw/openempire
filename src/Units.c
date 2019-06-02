@@ -183,12 +183,11 @@ static void StackStacks(const Units units)
     }
 }
 
-
 static Point Cohese(const Units units, const Unit unit)
 {
     const Stack stack = Units_GetStackCart(units, unit.cart);
     const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
-    const Point done = Point_Div(delta, 100); // XXX. The center of mass is shifting between units.
+    const Point done = Point_Div(delta, 100); // XXX. What is a good divisor?
     return done;
 }
 
