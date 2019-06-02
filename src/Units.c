@@ -186,8 +186,9 @@ static Point CoheseBoids(const Units units, const Unit unit)
 {
     const Stack stack = Units_GetStackCart(units, unit.cart);
     const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
-    const Point done = Point_Div(delta, 100); // XXX. What is a good divisor?
-    return done;
+    const Point cohesion = Point_Div(delta, 100); // XXX. What is a good divisor?
+    static Point zero;
+    return stack.count > 0 ? cohesion : zero;
 }
 
 static Point SeparateBoids(const Units units, const Unit unit)
