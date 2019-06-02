@@ -22,7 +22,7 @@ File File_Load(FILE* const);
 #define FILE_NONE_ACCEL (0)
 
 #define FILE_VILLAGER_MAX_SPEED (1500)
-#define FILE_VILLAGER_ACCEL      (500)
+#define FILE_VILLAGER_ACCEL      (200)
 
 #define FILE_PRIO_TERRAIN  (  1)
 #define FILE_PRIO_SHADOW   (  2)

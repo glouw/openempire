@@ -12,13 +12,15 @@
 
 static Units GenerateTestZone(Units units, const Grid grid)
 {
-    for(int32_t i = 0; i < 100; i++)
+    //for(int32_t i = 0; i < 100; i++)
+    for(int32_t i = 0; i < 10; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        switch(Util_Rand() % 5)
+        //switch(Util_Rand() % 5)
+        switch(0)
         {
         default:
         case 0:
@@ -51,12 +53,12 @@ Units Units_New(const int32_t max, const Grid grid)
     UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-    Units units = { unit, 0, max, stack, grid.rows, grid.cols };
+    Units units = { unit, 0, max, stack, grid.rows, grid.cols, 0 };
     units = GenerateTestZone(units, grid);
     return units;
 }
 
-Units Units_Append(Units units, const Unit unit)
+Units Units_Append(Units units, Unit unit)
 {
     if(units.count == units.max)
     {
@@ -65,6 +67,7 @@ Units Units_Append(Units units, const Unit unit)
         UTIL_CHECK(temp);
         units.unit = temp;
     }
+    unit.id = units.id_avail++;
     units.unit[units.count++] = unit;
     return units;
 }
@@ -180,10 +183,52 @@ static void StackStacks(const Units units)
     }
 }
 
+static Point Cohese(const Units units, const Unit unit)
+{
+    Point out = { 0,0 };
+    const Stack stack = Units_GetStackCart(units, unit.cart);
+
+    if(stack.count < 2)
+        return out;
+
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        const Unit other = *stack.reference[i];
+        if(other.id != unit.id && !Point_IsZero(other.velocity))
+            out = Point_Add(out, other.cell);
+    }
+    out = Point_Div(out, stack.count - 1);
+    const Point delta = Point_Sub(out, unit.cell);
+    const Point done = Point_Div(delta, 1000); // XXX. The center of mass is shifting between units.
+    return done;
+}
+
+static Point Separate(const Units units, const Unit unit)
+{
+    static Point zero;
+    return zero;
+}
+
+static Point Align(const Units units, const Unit unit)
+{
+    static Point zero;
+    return zero;
+}
+
+// See the boids pseudocode:
+//   http://www.kfish.org/boids/pseudocode.html
+
 static void Move(const Units units, const Grid grid)
 {
     for(int32_t i = 0; i < units.count; i++)
-        units.unit[i] = Unit_Move(units.unit[i], grid);
+    {
+        const Unit unit = units.unit[i];
+        const Point a = Cohese(units, unit);
+        const Point b = Separate(units, unit);
+        const Point c = Align(units, unit);
+        const Point stressors = Point_Add(a, Point_Add(b, c));
+        units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, stressors);
+    }
 }
 
 static void SortStacks(const Units units)

@@ -18,9 +18,10 @@ typedef struct
     bool selected;
     Graphics file;
     const char* file_name;
+    int32_t id;
 }
 Unit;
 
-Unit Unit_Move(Unit, const Grid);
+Unit Unit_MoveAlongPath(Unit, const Grid, const Point stressors);
 
 Unit Unit_Make(const Point, const Grid, const Graphics);
