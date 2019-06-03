@@ -12,13 +12,13 @@
 
 static Units GenerateTestZone(Units units, const Grid grid)
 {
-    for(int32_t i = 0; i < 300; i++)
+    for(int32_t i = 0; i < 500; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        switch(Util_Rand() % 5)
+        switch(Util_Rand() % 10)
         {
         default:
         case 0:
@@ -118,9 +118,9 @@ static void Select(const Units units, const Overview overview, const Input input
         else
         {
             const Tile tile = Tiles_SelectOne(tiles, click);
-            if(tile.reference)
-                if(input.key[SDL_SCANCODE_LCTRL])
-                    Tiles_SelectSimilar(tiles, tile);
+            if(tile.reference
+            && input.key[SDL_SCANCODE_LCTRL])
+                Tiles_SelectSimilar(tiles, tile);
         }
     }
     Points_Free(points);
@@ -132,18 +132,16 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->selected)
+        if(unit->selected
+        && unit->max_speed > 0) // No sense in calculating paths for units without speed scalars.
         {
-            if(unit->max_speed > 0) // No sense in calculating paths for units without speed scalars.
-            {
-                const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
-                Points_Free(unit->path);
-                unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
-                unit->path_index = 0;
-                unit->cart_grid_offset_goal = cart_grid_offset_goal;
-                Field_Free(field);
-                Points_Print(unit->path);
-            }
+            const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
+            Points_Free(unit->path);
+            unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
+            unit->path_index = 0;
+            unit->cart_grid_offset_goal = cart_grid_offset_goal;
+            Field_Free(field);
+            Points_Print(unit->path);
         }
     }
 }
@@ -200,7 +198,7 @@ static Point SeparateBoids(const Units units, const Unit unit)
         if(unit.id != other->id)
         {
             const Point diff = Point_Sub(other->cell, unit.cell);
-            if(Point_Mag(diff) < 16384) // XXX. What is a good width?
+            if(Point_Mag(diff) < 2 * 16384) // XXX. What is a good width?
                 out = Point_Sub(out, diff);
         }
     }
@@ -231,7 +229,7 @@ static Point AlignBoids(const Units units, const Unit unit)
 
 static void Move(const Units units, const Grid grid)
 {
-    for(int32_t i = 0; i < units.count; i++)
+    for(int32_t i = 0; i < units.count; i++) // XXX. Can be threaded.
     {
         const Unit unit = units.unit[i];
         const Point a = CoheseBoids(units, unit);
