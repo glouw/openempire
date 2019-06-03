@@ -38,17 +38,21 @@ bool Util_StringEqual(const char* const a, const char* const b)
     return strcmp(a, b) == 0;
 }
 
-int32_t Util_Sqrt(const int32_t value)
+int64_t Util_Sqrt(const int64_t val)
 {
-    int32_t n = value;
-    int32_t b = 0;
-    while(n >= 0)
+    uint64_t a = 0;
+    uint64_t b = 0;
+
+    if(val < 2)
+        return val;
+
+    a = 1255;
+    for(int32_t i = 0; i < 8; i++)
     {
-        n = n - b;
-        b = b + 1;
-        n = n - b;
+        b = val / a;
+        a = (a + b) / 2;
     }
-    return b - 1;
+    return a;
 }
 
 uint16_t Util_Rand(void)

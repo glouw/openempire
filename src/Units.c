@@ -12,15 +12,13 @@
 
 static Units GenerateTestZone(Units units, const Grid grid)
 {
-    //for(int32_t i = 0; i < 100; i++)
-    for(int32_t i = 0; i < 10; i++)
+    for(int32_t i = 0; i < 300; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        //switch(Util_Rand() % 5)
-        switch(0)
+        switch(Util_Rand() % 5)
         {
         default:
         case 0:
@@ -186,15 +184,23 @@ static Point CoheseBoids(const Units units, const Unit unit)
 {
     const Stack stack = Units_GetStackCart(units, unit.cart);
     const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
-    const Point cohesion = Point_Div(delta, 100); // XXX. What is a good divisor?
+    const Point cohesion = Point_Div(delta, 128); // XXX. What is a good divisor?
     static Point zero;
     return stack.count > 0 ? cohesion : zero;
 }
 
 static Point SeparateBoids(const Units units, const Unit unit)
 {
-    static Point zero;
-    return zero;
+    Point out = { 0,0 };
+    const Stack stack = Units_GetStackCart(units, unit.cart);
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        Unit* const other = stack.reference[i];
+        const Point diff = Point_Sub(other->cell, unit.cell);
+        if(Point_Mag(diff) < 16384) // XXX. What is a good width?
+            out = Point_Sub(out, diff);
+    }
+    return out;
 }
 
 static Point AlignBoids(const Units units, const Unit unit)
@@ -215,7 +221,8 @@ static void Move(const Units units, const Grid grid)
         const Point b = SeparateBoids(units, unit);
         const Point c = AlignBoids(units, unit);
         const Point stressors = Point_Add(a, Point_Add(b, c));
-        units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, stressors);
+        const Point normalized = Point_Mag(stressors) > unit.accel ? Point_Normalize(stressors, unit.accel) : stressors;
+        units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, normalized);
     }
 }
 

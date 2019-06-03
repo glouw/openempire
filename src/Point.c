@@ -3,7 +3,7 @@
 #include "Util.h"
 
 #include <stdio.h>
-#include <limits.h>
+#include <stdlib.h>
 
 bool Point_Equal(const Point a, const Point b)
 {
@@ -13,7 +13,7 @@ bool Point_Equal(const Point a, const Point b)
 
 void Point_Print(const Point a)
 {
-    printf("%d %d\n", a.x, a.y);
+    printf("%ld %ld\n", a.x, a.y);
 }
 
 Point Point_Add(const Point a, const Point b)
@@ -34,7 +34,7 @@ Point Point_Sub(const Point a, const Point b)
     return out;
 }
 
-Point Point_Div(const Point a, const int32_t n)
+Point Point_Div(const Point a, const int64_t n)
 {
     const Point out = {
         a.x / n,
@@ -43,7 +43,7 @@ Point Point_Div(const Point a, const int32_t n)
     return out;
 }
 
-Point Point_Mul(const Point a, const int32_t n)
+Point Point_Mul(const Point a, const int64_t n)
 {
     const Point out = {
         a.x * n,
@@ -76,14 +76,14 @@ bool Point_IsZero(const Point point)
     return Point_Equal(zero, point);
 }
 
-int32_t Point_Mag(const Point point)
+int64_t Point_Mag(const Point point)
 {
     return Util_Sqrt(point.x * point.x + point.y * point.y);
 }
 
-Point Point_Normalize(const Point point, const int32_t normal)
+Point Point_Normalize(const Point point, const int64_t normal)
 {
-    const int32_t magnitude = Point_Mag(point);
+    const int64_t magnitude = Point_Mag(point);
     const Point elongated = Point_Mul(point, normal);
     return Point_Div(elongated, magnitude);
 }

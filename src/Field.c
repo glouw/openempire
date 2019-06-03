@@ -121,7 +121,7 @@ static void ModifyQueue(const Field field, const Queue queue, const Point point,
     queue.point[point.x + point.y * field.cols] = mod;
 }
 
-Points Field_SearchBreadthFirst(const Field field, const Point start, const Point goal)
+Points Field_SearchBreadthFirst(const Field field, const Point start, const Point goal) // XXX. THIS can be ASTAR and it will be so much faster!
 {
     const Point deltas[] = {
         { -1, +1 }, { 0, +1 }, { 1, +1 },
