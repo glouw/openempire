@@ -51,7 +51,7 @@ Units Units_New(const int32_t max, const Grid grid)
     UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-    Units units = { unit, 0, max, stack, grid.rows, grid.cols };
+    Units units = { unit, 0, max, stack, grid.rows, grid.cols, 0 };
     units = GenerateTestZone(units, grid);
     return units;
 }
@@ -65,6 +65,7 @@ Units Units_Append(Units units, Unit unit)
         UTIL_CHECK(temp);
         units.unit = temp;
     }
+    unit.id = units.id_next++;
     units.unit[units.count++] = unit;
     return units;
 }
@@ -196,15 +197,31 @@ static Point SeparateBoids(const Units units, const Unit unit)
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        const Point diff = Point_Sub(other->cell, unit.cell);
-        if(Point_Mag(diff) < 16384) // XXX. What is a good width?
-            out = Point_Sub(out, diff);
+        if(unit.id != other->id)
+        {
+            const Point diff = Point_Sub(other->cell, unit.cell);
+            if(Point_Mag(diff) < 16384) // XXX. What is a good width?
+                out = Point_Sub(out, diff);
+        }
     }
     return out;
 }
 
 static Point AlignBoids(const Units units, const Unit unit)
 {
+    Point out = { 0,0 };
+    const Stack stack = Units_GetStackCart(units, unit.cart);
+    if(stack.count > 1)
+    {
+        for(int32_t i = 0; i < stack.count; i++)
+        {
+            Unit* const other = stack.reference[i];
+            if(unit.id != other->id)
+                out = Point_Add(out, other->velocity);
+        }
+        out = Point_Div(out, stack.count - 1);
+        return Point_Div(Point_Sub(out, unit.velocity), 8);
+    }
     static Point zero;
     return zero;
 }
@@ -263,6 +280,7 @@ bool Units_CanWalk(const Units units, const Map map, const Point point)
 {
     const Terrain terrain = Map_GetTerrainFile(map, point);
     const Stack stack = Units_GetStackCart(units, point);
-    return Terrain_IsWalkable(terrain)
+    return stack.reference != NULL // Out of bounds check.
+        && Terrain_IsWalkable(terrain)
         && Stack_IsWalkable(stack);
 }

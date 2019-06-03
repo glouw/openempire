@@ -21,6 +21,8 @@ typedef struct
     Stack* stack;
     int32_t rows;
     int32_t cols;
+
+    int32_t id_next;
 }
 Units;
 
