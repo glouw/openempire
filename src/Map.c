@@ -45,7 +45,9 @@ Map Map_Make(const int32_t rows, const int32_t cols, const Registrar terrain)
     map.file = UTIL_ALLOC(Terrain, rows * cols);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
+#if 0
     GenerateTestZone(map);
+#endif 
     return map;
 }
 

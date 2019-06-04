@@ -24,6 +24,7 @@ static Units GenerateTestZone(Units units, const Grid grid)
         case 0:
             units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING)); // XXX. GIMME SPEED.
             break;
+#if 0
         case 1:
             units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE));
             units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW));
@@ -37,6 +38,7 @@ static Units GenerateTestZone(Units units, const Grid grid)
         case 4:
             units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH));
             break;
+#endif
         }
     }
     return units;
@@ -198,7 +200,7 @@ static Point SeparateBoids(const Units units, const Unit unit)
         if(unit.id != other->id)
         {
             const Point diff = Point_Sub(other->cell, unit.cell);
-            if(Point_Mag(diff) < 30000) // XXX. What is a good width?
+            if(Point_Mag(diff) < 20000) // XXX. What is a good width?
                 out = Point_Sub(out, diff);
         }
     }
@@ -236,8 +238,7 @@ static void Move(const Units units, const Grid grid)
         const Point b = SeparateBoids(units, unit);
         const Point c = AlignBoids(units, unit);
         const Point stressors = Point_Add(a, Point_Add(b, c));
-        const Point normalized = Point_Mag(stressors) > unit.accel ? Point_Normalize(stressors, unit.accel) : stressors;
-        units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, normalized);
+        units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, stressors);
     }
 }
 
