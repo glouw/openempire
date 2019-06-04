@@ -18,7 +18,7 @@ static Units GenerateTestZone(Units units, const Grid grid)
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        switch(Util_Rand() % 10)
+        switch(Util_Rand() % 5)
         {
         default:
         case 0:
@@ -198,11 +198,11 @@ static Point SeparateBoids(const Units units, const Unit unit)
         if(unit.id != other->id)
         {
             const Point diff = Point_Sub(other->cell, unit.cell);
-            if(Point_Mag(diff) < 2 * 16384) // XXX. What is a good width?
+            if(Point_Mag(diff) < 30000) // XXX. What is a good width?
                 out = Point_Sub(out, diff);
         }
     }
-    return out;
+    return Point_Div(out, 128);
 }
 
 static Point AlignBoids(const Units units, const Unit unit)
