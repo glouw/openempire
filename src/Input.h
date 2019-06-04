@@ -49,6 +49,7 @@ typedef struct
     int32_t lr;
 
     Point ld_point;
+    Point rd_point;
 }
 Input;
 

@@ -114,6 +114,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
 #if 0
     Vram_DrawUnitsPath(vram, data.graphics, units, overview);
 #endif
+    Vram_DrawFormationBox(vram, overview, 0x00FFFFFF, input.r);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
 }

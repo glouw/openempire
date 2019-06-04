@@ -422,7 +422,7 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
     }
     while(x0 <= x1);
 
-    while(y0-y1 < b)
+    while(y0 - y1 < b)
     {
         const Point point[] = {
             { x0 - 1, y0 },
@@ -453,6 +453,17 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
+void Vram_DrawFormationBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled)
+{
+    if(enabled)
+    {
+        const Rect a = Rect_GetEllipse(overview.formation_box.a, 20);
+        const Rect b = Rect_GetEllipse(overview.formation_box.b, 20);
+        DrawEllipse(vram, a, 0x00FFFFFF);
+        DrawEllipse(vram, b, 0x00FFFFFF);
+    }
+}
+
 void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX: Border needs to be equal to largest building size.
@@ -464,7 +475,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Un
         if(tile.reference->selected)
         {
             const Point center = Tile_GetHotSpotCoords(tile);
-            const Rect rect = Rect_GetEllipse(center);
+            const Rect rect = Rect_GetEllipse(center, 20);
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
         }
     }

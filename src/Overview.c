@@ -14,12 +14,16 @@ Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
 
 Overview Overview_Update(Overview overview, const Input input)
 {
-    if(input.key[SDL_SCANCODE_W]) overview.point.y += 15; // XXX: Maybe add acceleration?
-    if(input.key[SDL_SCANCODE_S]) overview.point.y -= 15;
+    if(input.key[SDL_SCANCODE_W]) overview.point.y -= 15; // XXX: Maybe add acceleration?
+    if(input.key[SDL_SCANCODE_S]) overview.point.y += 15;
     if(input.key[SDL_SCANCODE_D]) overview.point.x += 15;
     if(input.key[SDL_SCANCODE_A]) overview.point.x -= 15;
+    if(input.rd)
+        overview.rd_point = overview.point;
     overview.selection_box.a = input.ld_point;
     overview.selection_box.b = input.point;
+    overview.formation_box.a = Point_Sub(Point_Add(input.rd_point, overview.rd_point), overview.point);
+    overview.formation_box.b = input.point;
     return overview;
 }
 
@@ -58,7 +62,7 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, const bool ra
     // Relative to viewport coords.
 
     const int32_t xx = x + overview.point.x;
-    const int32_t yy = y + overview.point.y;
+    const int32_t yy = y - overview.point.y;
 
     // Tile widths and heights must be one less than their actual sizes for clean overlap
     // assuming tile widths and heights are odd numbers.
@@ -115,7 +119,7 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
 
     const Point iso = {
         cx - overview.point.x,
-        cy + overview.point.y,
+        cy - overview.point.y,
     };
     return iso;
 }

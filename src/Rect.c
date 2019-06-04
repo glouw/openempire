@@ -21,11 +21,11 @@ Rect Rect_GetGridCenter(const Grid grid)
     return rect;
 }
 
-Rect Rect_GetEllipse(const Point center)
+Rect Rect_GetEllipse(const Point center, const int32_t width)
 {
     const Rect rect = {
-        { center.x - 20, center.y - 10 },
-        { center.x + 20, center.y + 10 },
+        { center.x - width, center.y - (width / 2) },
+        { center.x + width, center.y + (width / 2) },
     };
     return rect;
 }

@@ -35,8 +35,8 @@ Input Input_Pump(Input input)
     input.point.x = x;
     input.point.y = y;
 
-    if(input.l && input.ld)
-        input.ld_point = input.point;
+    if(input.ld) input.ld_point = input.point;
+    if(input.rd) input.rd_point = input.point;
 
     return input;
 }

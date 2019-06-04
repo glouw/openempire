@@ -44,4 +44,6 @@ void Vram_DrawUnitSelections(const Vram, const Registrar, const Units, const Ove
 
 void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, const bool enabled);
 
+void Vram_DrawFormationBox(const Vram, const Overview, const uint32_t color, const bool enabled);
+
 void Vram_DrawUnitsPath(const Vram, const Registrar, const Units, const Overview);
