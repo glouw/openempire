@@ -111,7 +111,6 @@ static void Select(const Units units, const Overview overview, const Input input
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
-    const Point click = { input.x, input.y };
     if(input.lu)
     {
         UnSelectAll(units);
@@ -119,7 +118,7 @@ static void Select(const Units units, const Overview overview, const Input input
             Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
-            const Tile tile = Tiles_SelectOne(tiles, click);
+            const Tile tile = Tiles_SelectOne(tiles, input.point);
             if(tile.reference
             && input.key[SDL_SCANCODE_LCTRL])
                 Tiles_SelectSimilar(tiles, tile);
@@ -152,9 +151,8 @@ static void Command(const Units units, const Overview overview, const Input inpu
 {
     if(input.ru)
     {
-        const Point click = { input.x, input.y };
-        const Point cart_goal = Overview_IsoToCart(overview, click, false);
-        const Point cart = Overview_IsoToCart(overview, click, true);
+        const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
+        const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
             ApplyPathsToSelected(units, map, cart_goal, cart_grid_offset_goal);

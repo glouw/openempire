@@ -19,7 +19,7 @@ Overview Overview_Update(Overview overview, const Input input)
     if(input.key[SDL_SCANCODE_D]) overview.point.x += 15;
     if(input.key[SDL_SCANCODE_A]) overview.point.x -= 15;
     overview.selection_box.a = input.ld_point;
-    overview.selection_box.b = input.lu_point;
+    overview.selection_box.b = input.point;
     return overview;
 }
 

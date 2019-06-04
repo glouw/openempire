@@ -28,18 +28,16 @@ Input Input_Pump(Input input)
     input.lm = input.m;
     input.lr = input.r;
 
-    SDL_GetMouseState(&input.x, &input.y);
+    int32_t x = 0;
+    int32_t y = 0;
+    SDL_GetMouseState(&x, &y);
 
-    if(input.l)
-    {
-        if(input.ld)
-        {
-            input.ld_point.x = input.x;
-            input.ld_point.y = input.y;
-        }
-        input.lu_point.x = input.x;
-        input.lu_point.y = input.y;
-    }
+    input.point.x = x;
+    input.point.y = y;
+
+    if(input.l && input.ld)
+        input.ld_point = input.point;
+
     return input;
 }
 

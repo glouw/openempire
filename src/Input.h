@@ -17,8 +17,7 @@ typedef struct
 
     // Mouse position.
 
-    int32_t x;
-    int32_t y;
+    Point point;
 
     // Mouse deltas.
 
@@ -49,7 +48,6 @@ typedef struct
     int32_t lm;
     int32_t lr;
 
-    Point lu_point;
     Point ld_point;
 }
 Input;
