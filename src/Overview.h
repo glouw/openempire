@@ -13,8 +13,6 @@ typedef struct
     int32_t xres;
     int32_t yres;
     Rect selection_box;
-    Rect formation_box;
-    Point rd_point;
 }
 Overview;
 

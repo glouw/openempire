@@ -18,12 +18,8 @@ Overview Overview_Update(Overview overview, const Input input)
     if(input.key[SDL_SCANCODE_S]) overview.point.y += 15;
     if(input.key[SDL_SCANCODE_D]) overview.point.x += 15;
     if(input.key[SDL_SCANCODE_A]) overview.point.x -= 15;
-    if(input.rd)
-        overview.rd_point = overview.point;
     overview.selection_box.a = input.ld_point;
     overview.selection_box.b = input.point;
-    overview.formation_box.a = Point_Sub(Point_Add(input.rd_point, overview.rd_point), overview.point);
-    overview.formation_box.b = input.point;
     return overview;
 }
 

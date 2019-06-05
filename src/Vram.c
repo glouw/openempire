@@ -450,29 +450,6 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
-void Vram_DrawFormationBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled, const int32_t unit_count)
-{
-    const int32_t separation = 20;
-    const int32_t width = 10;
-    if(enabled)
-    {
-        const Point a = Point_ToCart(overview.formation_box.a);
-        const Point b = Point_ToCart(overview.formation_box.b);
-        const Point dir = Point_Sub(b, a);
-        const Point step = Point_Normalize(dir, separation);
-        const int64_t mag = Point_Mag(dir);
-        const int32_t units_per_line = mag / separation;
-        const int32_t lines = units_per_line / unit_count;
-        for(int32_t unit = 0; unit < units_per_line; unit++)
-        {
-            const Point point = Point_Add(a, Point_Mul(step, unit));
-            const Point iso = Point_ToIso(point);
-            const Rect rect = Rect_GetEllipse(iso, width);
-            DrawEllipse(vram, rect, color);
-        }
-    }
-}
-
 void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX: Border needs to be equal to largest building size.
