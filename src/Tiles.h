@@ -19,6 +19,6 @@ void Tiles_Free(const Tiles);
 
 Tile Tiles_SelectOne(const Tiles, const Point);
 
-void Tiles_SelectSimilar(const Tiles, const Tile);
+int32_t Tiles_SelectSimilar(const Tiles, const Tile);
 
-void Tiles_SelectWithBox(const Tiles, const Rect);
+int32_t Tiles_SelectWithBox(const Tiles, const Rect);

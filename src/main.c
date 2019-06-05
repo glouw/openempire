@@ -21,7 +21,7 @@ int32_t main(int32_t argc, char* argv[])
     {
         const int32_t t0 = SDL_GetTicks();
         overview = Overview_Update(overview, input);
-        Units_Caretake(units, data.graphics, overview, grid, input, map);
+        units = Units_Caretake(units, data.graphics, overview, grid, input, map);
         Video_Draw(video, data, map, units, overview, input);
         Video_PresentCanvas(video);
         const int32_t t1 = SDL_GetTicks();

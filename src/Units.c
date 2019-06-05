@@ -53,7 +53,7 @@ Units Units_New(const int32_t max, const Grid grid)
     UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-    Units units = { unit, 0, max, stack, grid.rows, grid.cols, 0 };
+    Units units = { unit, 0, max, stack, grid.rows, grid.cols, 0, 0 };
     units = GenerateTestZone(units, grid);
     return units;
 }
@@ -100,32 +100,35 @@ Stack Units_GetStackCart(const Units units, const Point p)
     return OutOfBounds(units, p) ? zero : *GetStack(units, p); // Return a shallow copy of the stack to prevent write access.
 }
 
-static void UnSelectAll(const Units units)
+static Units UnSelectAll(Units units)
 {
+    units.selected = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i].selected = false;
+    return units;
 }
 
-static void Select(const Units units, const Overview overview, const Input input, const Registrar graphics)
+static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics)
 {
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
     if(input.lu)
     {
-        UnSelectAll(units);
+        units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
-            Tiles_SelectWithBox(tiles, overview.selection_box);
+            units.selected = Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
             const Tile tile = Tiles_SelectOne(tiles, input.point);
             if(tile.reference
             && input.key[SDL_SCANCODE_LCTRL])
-                Tiles_SelectSimilar(tiles, tile);
+                units.selected = Tiles_SelectSimilar(tiles, tile);
         }
     }
     Points_Free(points);
     Tiles_Free(tiles);
+    return units;
 }
 
 static void ApplyPathsToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
@@ -262,15 +265,16 @@ static void CalculateCenters(const Units units)
     }
 }
 
-void Units_Caretake(const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
     Move(units, grid);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);
     CalculateCenters(units);
-    Select(units, overview, input, graphics);
+    units = Select(units, overview, input, graphics);
     Command(units, overview, input, map);
+    return units;
 }
 
 bool Units_CanWalk(const Units units, const Map map, const Point point)

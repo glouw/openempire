@@ -440,27 +440,36 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
 
 void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled)
 {
-    if(enabled)
+    if(enabled && Overview_IsSelectionBoxBigEnough(overview))
     {
-        if(Overview_IsSelectionBoxBigEnough(overview))
-        {
-            const Rect box = Rect_CorrectOrientation(overview.selection_box);
-            for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.a.y, color);
-            for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.b.y, color);
-            for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.a.x, y, color);
-            for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.b.x, y, color);
-        }
+        const Rect box = Rect_CorrectOrientation(overview.selection_box);
+        for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.a.y, color);
+        for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.b.y, color);
+        for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.a.x, y, color);
+        for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.b.x, y, color);
     }
 }
 
-void Vram_DrawFormationBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled)
+void Vram_DrawFormationBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled, const int32_t unit_count)
 {
+    const int32_t separation = 20;
+    const int32_t width = 10;
     if(enabled)
     {
-        const Rect a = Rect_GetEllipse(overview.formation_box.a, 20);
-        const Rect b = Rect_GetEllipse(overview.formation_box.b, 20);
-        DrawEllipse(vram, a, 0x00FFFFFF);
-        DrawEllipse(vram, b, 0x00FFFFFF);
+        const Point a = Point_ToCart(overview.formation_box.a);
+        const Point b = Point_ToCart(overview.formation_box.b);
+        const Point dir = Point_Sub(b, a);
+        const Point step = Point_Normalize(dir, separation);
+        const int64_t mag = Point_Mag(dir);
+        const int32_t units_per_line = mag / separation;
+        const int32_t lines = units_per_line / unit_count;
+        for(int32_t unit = 0; unit < units_per_line; unit++)
+        {
+            const Point point = Point_Add(a, Point_Mul(step, unit));
+            const Point iso = Point_ToIso(point);
+            const Rect rect = Rect_GetEllipse(iso, width);
+            DrawEllipse(vram, rect, color);
+        }
     }
 }
 

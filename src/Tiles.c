@@ -100,25 +100,35 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
     return zero;
 }
 
-void Tiles_SelectSimilar(const Tiles tiles, const Tile similar)
+int32_t Tiles_SelectSimilar(const Tiles tiles, const Tile similar)
 {
+    int32_t count = 0;
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
         const Type a = Graphics_GetType(similar.reference->file);
         const Type b = Graphics_GetType(tile.reference->file);
         if(a == b)
+        {
             Tile_Select(tile);
+            count++;
+        }
     }
+    return count;
 }
 
-void Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
+int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
 {
+    int32_t count = 0;
     const Rect box = Rect_CorrectOrientation(rect);
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
         if(Tile_IsHotspotInRect(tile, box))
+        {
             Tile_Select(tile);
+            count++;
+        }
     }
+    return count;
 }

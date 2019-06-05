@@ -58,3 +58,11 @@ Rect Rect_CorrectOrientation(const Rect rect)
     if(rect.a.x < rect.b.x && rect.a.y > rect.b.y) return c;
     return rect;
 }
+
+bool Rect_ContainsPoint(const Rect rect, const Point point)
+{
+    return point.x >= rect.a.x
+        && point.y >= rect.a.y
+        && point.x < rect.b.x
+        && point.y < rect.b.y;
+}

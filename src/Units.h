@@ -23,6 +23,7 @@ typedef struct
     int32_t cols;
 
     int32_t id_next;
+    int32_t selected;
 }
 Units;
 
@@ -34,6 +35,6 @@ void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-void Units_Caretake(const Units, const Registrar, const Overview, const Grid, const Input, const Map);
+Units Units_Caretake(Units, const Registrar, const Overview, const Grid, const Input, const Map);
 
 bool Units_CanWalk(const Units, const Map, const Point);

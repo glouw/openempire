@@ -37,10 +37,7 @@ Rect Tile_GetFrameOutline(const Tile tile)
 bool Tile_ContainsPoint(const Tile tile, const Point point)
 {
     const Rect rect = Tile_GetFrameOutline(tile);
-    return point.x >= rect.a.x
-        && point.y >= rect.a.y
-        && point.x < rect.b.x
-        && point.y < rect.b.y;
+    return Rect_ContainsPoint(rect, point);
 }
 
 // (0, 0)
