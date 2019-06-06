@@ -3,6 +3,9 @@
 #include "Rect.h"
 #include "Util.h"
 
+// XXX. Needs collision detection for map edge and non-walkable objects (eg. tiles and units)
+// Note that unit just needs to stop dead in their tracks - the current sweep will handle the rest.
+
 static Unit Move(Unit unit, const Grid grid)
 {
     unit.cell = Point_Add(unit.cell, unit.velocity);
