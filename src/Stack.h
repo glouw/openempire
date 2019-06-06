@@ -27,3 +27,5 @@ void Stack_Sort(const Stack);
 bool Stack_IsWalkable(const Stack);
 
 void Stack_UpdateCenterOfMass(Stack* const);
+
+int32_t Stack_GetMaxPathIndex(const Stack);

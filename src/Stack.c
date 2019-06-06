@@ -4,9 +4,10 @@
 
 Stack Stack_Build(const int32_t max)
 {
+    static Point zero;
     Unit** const reference = UTIL_ALLOC(Unit*, max);
     UTIL_CHECK(reference);
-    const Stack stack = { reference, 0, max, { 0,0 } };
+    const Stack stack = { reference, 0, max, zero };
     return stack;
 }
 
@@ -52,8 +53,21 @@ bool Stack_IsWalkable(const Stack stack)
 
 void Stack_UpdateCenterOfMass(Stack* const stack)
 {
-    Point out = { 0, 0 };
+    static Point zero;
+    Point out = zero;
     for(int32_t i = 0; i < stack->count; i++)
         out = Point_Add(out, stack->reference[i]->cell);
     stack->center_of_mass = (stack->count > 0) ? Point_Div(out, stack->count) : out;
+}
+
+int32_t Stack_GetMaxPathIndex(const Stack stack)
+{
+    int32_t max = 0;
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        Unit* const unit = stack.reference[i];
+        if(unit->path_index > max)
+            max = unit->path_index;
+    }
+    return max;
 }

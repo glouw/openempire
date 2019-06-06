@@ -136,8 +136,7 @@ static void ApplyPathsToSelected(const Units units, const Map map, const Point c
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->selected
-        && unit->max_speed > 0) // No sense in calculating paths for units without speed scalars.
+        if(unit->selected && unit->max_speed > 0) // No sense in calculating paths for units without speed scalars.
         {
             const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
             Points_Free(unit->path);
@@ -184,16 +183,17 @@ static void StackStacks(const Units units)
 
 static Point CoheseBoids(const Units units, const Unit unit)
 {
+    static Point zero;
     const Stack stack = Units_GetStackCart(units, unit.cart);
     const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
     const Point cohesion = Point_Div(delta, 128); // XXX. What is a good divisor?
-    static Point zero;
     return stack.count > 0 ? cohesion : zero;
 }
 
 static Point SeparateBoids(const Units units, const Unit unit)
 {
-    Point out = { 0,0 };
+    static Point zero;
+    Point out = zero;
     const Stack stack = Units_GetStackCart(units, unit.cart);
     for(int32_t i = 0; i < stack.count; i++)
     {
@@ -201,16 +201,17 @@ static Point SeparateBoids(const Units units, const Unit unit)
         if(unit.id != other->id)
         {
             const Point diff = Point_Sub(other->cell, unit.cell);
-            if(Point_Mag(diff) < 20000) // XXX. What is a good width?
+            if(Point_Mag(diff) < 15000) // XXX. What is a good width?
                 out = Point_Sub(out, diff);
         }
     }
-    return Point_Div(out, 128);
+    return Point_Div(out, 32);
 }
 
 static Point AlignBoids(const Units units, const Unit unit)
 {
-    Point out = { 0,0 };
+    static Point zero;
+    Point out = zero;
     const Stack stack = Units_GetStackCart(units, unit.cart);
     if(stack.count > 1)
     {
@@ -223,8 +224,24 @@ static Point AlignBoids(const Units units, const Unit unit)
         out = Point_Div(out, stack.count - 1);
         return Point_Div(Point_Sub(out, unit.velocity), 8);
     }
-    static Point zero;
     return zero;
+}
+
+// Boids, when swept up in a current of other boids, will
+// try to go back to a path point if they were swept past the path point.
+// This function ensures all boids on a tile share the same path index
+// so the group acts like it guided by a single leader.
+
+static void UnifyBoids(const Units units, const Unit unit)
+{
+    const Stack stack = Units_GetStackCart(units, unit.cart);
+    const int32_t max = Stack_GetMaxPathIndex(stack);
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        Unit* const other = stack.reference[i];
+        if(max < other->path.count)
+            other->path_index = max;
+    }
 }
 
 // See the boids pseudocode:
@@ -235,11 +252,12 @@ static void Move(const Units units, const Grid grid)
     for(int32_t i = 0; i < units.count; i++) // XXX. Can be threaded.
     {
         const Unit unit = units.unit[i];
+        UnifyBoids(units, unit);
         const Point a = CoheseBoids(units, unit);
         const Point b = SeparateBoids(units, unit);
         const Point c = AlignBoids(units, unit);
         const Point stressors = Point_Add(a, Point_Add(b, c));
-        units.unit[i] = Unit_MoveAlongPath(units.unit[i], grid, stressors);
+        units.unit[i] = Unit_MoveAlongPath(unit, grid, stressors);
     }
 }
 
