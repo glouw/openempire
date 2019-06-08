@@ -194,15 +194,21 @@ static Point SeparateBoids(const Units units, const Unit unit)
 {
     static Point zero;
     Point out = zero;
-    const Stack stack = Units_GetStackCart(units, unit.cart);
-    for(int32_t i = 0; i < stack.count; i++)
+    for(int32_t x = -1; x <= 1; x++)
+    for(int32_t y = -1; y <= 1; y++)
     {
-        Unit* const other = stack.reference[i];
-        if(unit.id != other->id)
+        const Point offset = { x, y };
+        const Point cart = Point_Add(unit.cart, offset);
+        const Stack stack = Units_GetStackCart(units, cart);
+        for(int32_t i = 0; i < stack.count; i++)
         {
-            const Point diff = Point_Sub(other->cell, unit.cell);
-            if(Point_Mag(diff) < 15000) // XXX. What is a good width?
-                out = Point_Sub(out, diff);
+            Unit* const other = stack.reference[i];
+            if(unit.id != other->id)
+            {
+                const Point diff = Point_Sub(other->cell, unit.cell);
+                if(Point_Mag(diff) < 15000) // XXX. What is a good width?
+                    out = Point_Sub(out, diff);
+            }
         }
     }
     return Point_Div(out, 32);
@@ -227,23 +233,6 @@ static Point AlignBoids(const Units units, const Unit unit)
     return zero;
 }
 
-// Boids, when swept up in a current of other boids, will
-// try to go back to a path point if they were swept past the path point.
-// This function ensures all boids on a tile share the same path index
-// so the group acts like it guided by a single leader.
-
-static void UnifyBoids(const Units units, const Unit unit)
-{
-    const Stack stack = Units_GetStackCart(units, unit.cart);
-    const int32_t max = Stack_GetMaxPathIndex(stack);
-    for(int32_t i = 0; i < stack.count; i++)
-    {
-        Unit* const other = stack.reference[i];
-        if(max < other->path.count)
-            other->path_index = max;
-    }
-}
-
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
@@ -252,11 +241,15 @@ static void Move(const Units units, const Grid grid)
     for(int32_t i = 0; i < units.count; i++) // XXX. Can be threaded.
     {
         const Unit unit = units.unit[i];
-        UnifyBoids(units, unit);
-        const Point a = CoheseBoids(units, unit);
-        const Point b = SeparateBoids(units, unit);
-        const Point c = AlignBoids(units, unit);
-        const Point stressors = Point_Add(a, Point_Add(b, c));
+        const Point point[] = {
+            CoheseBoids(units, unit),
+            SeparateBoids(units, unit),
+            AlignBoids(units, unit),
+        };
+        static Point zero;
+        Point stressors = zero;
+        for(int32_t j = 0; j < UTIL_LEN(point); j++)
+            stressors = Point_Add(stressors, point[j]);
         units.unit[i] = Unit_MoveAlongPath(unit, grid, stressors);
     }
 }

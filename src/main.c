@@ -20,6 +20,7 @@ int32_t main(int32_t argc, char* argv[])
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
+        Map_Edit(map, overview, input);
         overview = Overview_Update(overview, input);
         units = Units_Caretake(units, data.graphics, overview, grid, input, map);
         Video_Draw(video, data, map, units, overview, input);
