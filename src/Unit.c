@@ -20,10 +20,9 @@ static Unit Accelerate(Unit unit, const Grid grid)
     {
         if(unit.path.count > 1 && unit.path_index == 0)
             unit.path_index++;
-
-        const Point zero = { 0, 0 };
-        const Point select = (unit.path_index == unit.path.count - 1) ? unit.cart_grid_offset_goal : zero;
-        const Point goal_grid_coords = Grid_GetGridPointWithOffset(grid, unit.path.point[unit.path_index], select);
+        static Point zero;
+        const Point point = (unit.path_index == unit.path.count - 1) ? unit.cart_grid_offset_goal : zero;
+        const Point goal_grid_coords = Grid_GetGridPointWithOffset(grid, unit.path.point[unit.path_index], point);
         const Point unit_grid_coords = Grid_GetGridPointWithOffset(grid, unit.cart, unit.cart_grid_offset);
         const Point delta = Point_Sub(goal_grid_coords, unit_grid_coords);
         if(Point_Mag(delta) < 10) // XXX: Is this too small? What about really fast moving guys?

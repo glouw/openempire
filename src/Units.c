@@ -233,6 +233,23 @@ static Point AlignBoids(const Units units, const Unit unit)
     return zero;
 }
 
+// Boids, when swept up in a current of other boids, will
+// try to go back to a path point if they were swept past the path point.
+// This function ensures all boids on a tile share the same path index
+// so the group acts like it guided by a single leader.
+
+static void UnifyBoids(const Units units, const Unit unit)
+{
+    const Stack stack = Units_GetStackCart(units, unit.cart);
+    const int32_t max = Stack_GetMaxPathIndex(stack);
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        Unit* const other = stack.reference[i];
+        if(max < other->path.count)
+            other->path_index = max;
+    }
+}
+
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
@@ -241,6 +258,7 @@ static void Move(const Units units, const Grid grid)
     for(int32_t i = 0; i < units.count; i++) // XXX. Can be threaded.
     {
         const Unit unit = units.unit[i];
+        UnifyBoids(units, unit);
         const Point point[] = {
             CoheseBoids(units, unit),
             SeparateBoids(units, unit),
