@@ -25,3 +25,5 @@ Unit;
 Unit Unit_MoveAlongPath(Unit, const Grid, const Point stressors);
 
 Unit Unit_Make(const Point, const Grid, const Graphics);
+
+void Unit_Print(const Unit);
