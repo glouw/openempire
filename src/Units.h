@@ -23,7 +23,9 @@ typedef struct
     int32_t cols;
 
     int32_t id_next;
-    int32_t selected;
+    int32_t selection_group_next;
+
+    int32_t select_count;
 }
 Units;
 

@@ -53,7 +53,13 @@ Units Units_New(const int32_t max, const Grid grid)
     UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
-    Units units = { unit, 0, max, stack, grid.rows, grid.cols, 0, 0 };
+    static Units zero;
+    Units units = zero;
+    units.unit = unit;
+    units.max = max;
+    units.stack = stack;
+    units.rows = grid.rows;
+    units.cols = grid.cols;
     units = GenerateTestZone(units, grid);
     return units;
 }
@@ -102,7 +108,7 @@ Stack Units_GetStackCart(const Units units, const Point p)
 
 static Units UnSelectAll(Units units)
 {
-    units.selected = 0;
+    units.select_count = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i].selected = false;
     return units;
@@ -117,13 +123,15 @@ static Units Select(Units units, const Overview overview, const Input input, con
     {
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
-            units.selected = Tiles_SelectWithBox(tiles, overview.selection_box);
+            units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
             const Tile tile = Tiles_SelectOne(tiles, input.point);
             if(tile.reference
             && input.key[SDL_SCANCODE_LCTRL])
-                units.selected = Tiles_SelectSimilar(tiles, tile);
+                units.select_count = Tiles_SelectSimilar(tiles, tile);
+            else
+                units.select_count = 1;
         }
     }
     Points_Free(points);
@@ -250,6 +258,20 @@ static void UnifyBoids(const Units units, const Unit unit)
     }
 }
 
+// When one boid reaches their final destinatin, tag all other boids in the same
+// grid square that they too have reach their destination.
+
+static void StopBoids(const Units units, const Unit unit)
+{
+    const Stack stack = Units_GetStackCart(units, unit.cart);
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        Unit* const other = stack.reference[i];
+        if(unit.path.count == 0)
+            other->path = Points_Free(other->path);
+    }
+}
+
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
@@ -259,6 +281,7 @@ static void Move(const Units units, const Grid grid)
     {
         const Unit unit = units.unit[i];
         UnifyBoids(units, unit);
+        StopBoids(units, unit); // XXX. Unit groups require a tagging system.
         const Point point[] = {
             CoheseBoids(units, unit),
             SeparateBoids(units, unit),
@@ -268,7 +291,7 @@ static void Move(const Units units, const Grid grid)
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        units.unit[i] = Unit_MoveAlongPath(unit, grid, stressors);
+        units.unit[i] = Unit_MoveAlongPath(unit, grid, stressors); // XXX. Put a "dead zone" for stressors so units stop shaking when at rest.
     }
 }
 

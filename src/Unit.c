@@ -30,7 +30,7 @@ static Unit ReachGoal(Unit unit)
 static Unit AccelerateAlongPath(Unit unit, const Grid grid)
 {
     const Point delta = GetDelta(unit, grid);
-    if(Point_Mag(delta) < 40) // XXX: Is this too small? What about really fast moving guys?
+    if(Point_Mag(delta) < 10) // XXX: Is this too small? What about really fast moving guys?
         return ReachGoal(unit);
     const Point dv = Point_Normalize(delta, unit.accel);
     unit.velocity = Point_Add(unit.velocity, dv);
@@ -54,7 +54,7 @@ static Unit FollowPath(Unit unit, const Grid grid)
         unit = SkipFirstPoint(unit);
         unit = AccelerateAlongPath(unit, grid);
     }
-    else if(Point_Mag(unit.velocity) > 0) // Decelerate if there is no path.
+    else if(Point_Mag(unit.velocity) > 0)
         unit = Decelerate(unit);
     return unit;
 }
