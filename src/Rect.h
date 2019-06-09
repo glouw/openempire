@@ -14,7 +14,7 @@ Rect Rect_GetGridCenter(const Grid);
 
 Rect Rect_GetEllipse(const Point, const int32_t width);
 
-int32_t Rect_GetArea(const Rect);
+int64_t Rect_GetArea(const Rect);
 
 Rect Rect_CorrectOrientation(const Rect);
 

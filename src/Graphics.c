@@ -41,7 +41,7 @@ Type Graphics_GetType(const Graphics graphics)
         FILE_X_GRAPHICS
 #undef FILE_X
     }
-    return 0;
+    return TYPE_NONE;
 }
 
 int32_t Graphics_GetMaxSpeed(const Graphics graphics)
