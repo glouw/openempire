@@ -19,6 +19,7 @@ typedef struct
     Graphics file;
     const char* file_name;
     int32_t id;
+    int32_t command_group;
 }
 Unit;
 

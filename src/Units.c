@@ -139,34 +139,41 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static void ApplyPathsToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+static Unit ApplyPath(const Units units, Unit unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+{
+    const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
+    Points_Free(unit.path);
+    unit.path = Field_SearchBreadthFirst(field, unit.cart, cart_goal);
+    unit.path_index = 0;
+    unit.cart_grid_offset_goal = cart_grid_offset_goal;
+    unit.command_group = units.command_group_next;
+    Field_Free(field);
+    return unit;
+}
+
+static void ApplyPathToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        Unit* const unit = &units.unit[i];
-        if(unit->selected && unit->max_speed > 0) // No sense in calculating paths for units without speed scalars.
-        {
-            const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
-            Points_Free(unit->path);
-            unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
-            unit->path_index = 0;
-            unit->cart_grid_offset_goal = cart_grid_offset_goal;
-            Field_Free(field);
-            Points_Print(unit->path);
-        }
+        const Unit unit = units.unit[i];
+        if(unit.selected
+        && unit.max_speed > 0)
+            units.unit[i] = ApplyPath(units, unit, map, cart_goal, cart_grid_offset_goal);
     }
 }
 
-static void Command(const Units units, const Overview overview, const Input input, const Map map)
+static Units Command(Units units, const Overview overview, const Input input, const Map map)
 {
     if(input.ru)
     {
+        units.command_group_next += 1;
         const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
         const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
-            ApplyPathsToSelected(units, map, cart_goal, cart_grid_offset_goal);
+            ApplyPathToSelected(units, map, cart_goal, cart_grid_offset_goal);
     }
+    return units;
 }
 
 static void ResetStacks(const Units units)
@@ -253,7 +260,8 @@ static void UnifyBoids(const Units units, const Unit unit)
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        if(max < other->path.count)
+        if(max < other->path.count
+        && unit.command_group == other->command_group)
             other->path_index = max;
     }
 }
@@ -267,7 +275,8 @@ static void StopBoids(const Units units, const Unit unit)
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        if(unit.path.count == 0)
+        if(unit.path.count == 0
+        && unit.command_group == other->command_group)
             other->path = Points_Free(other->path);
     }
 }
@@ -325,7 +334,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     SortStacks(units);
     CalculateCenters(units);
     units = Select(units, overview, input, graphics);
-    Command(units, overview, input, map);
+    units = Command(units, overview, input, map);
     return units;
 }
 

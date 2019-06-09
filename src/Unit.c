@@ -120,4 +120,5 @@ void Unit_Print(const Unit unit)
     printf("file                  :: %d\n",      unit.file);
     printf("file_name             :: %s\n",      unit.file_name);
     printf("id                    :: %d\n",      unit.id);
+    printf("group                 :: %d\n",      unit.command_group);
 }
