@@ -266,8 +266,10 @@ static void UnifyBoids(const Units units, const Unit unit)
     }
 }
 
-// When one boid reaches their final destinatin, tag all other boids in the same
-// grid square that they too have reach their destination.
+// Boids, when reaching their final destination, will struggle in
+// a "mosh pit" like style to reach the final point in the grid tile.
+// A simple solution is to stop all boids from reaching their final point
+// within a grid tile by stopping all boids within the grid tile.
 
 static void StopBoids(const Units units, const Unit unit)
 {
@@ -286,11 +288,17 @@ static void StopBoids(const Units units, const Unit unit)
 
 static void Move(const Units units, const Grid grid)
 {
-    for(int32_t i = 0; i < units.count; i++) // XXX. Can be threaded.
+    for(int32_t i = 0; i < units.count; i++) // XXX. Needs to be threaded for sure at a later point.
     {
         const Unit unit = units.unit[i];
+
+        // Logic control rules.
+
         UnifyBoids(units, unit);
         StopBoids(units, unit); // XXX. Unit groups require a tagging system.
+
+        // Stressor rules.
+
         const Point point[] = {
             CoheseBoids(units, unit),
             SeparateBoids(units, unit),
