@@ -30,7 +30,7 @@ static Unit ReachGoal(Unit unit)
 static Unit AccelerateAlongPath(Unit unit, const Grid grid)
 {
     const Point delta = GetDelta(unit, grid);
-    if(Point_Mag(delta) < 10) // XXX: Is this too small? What about really fast moving guys?
+    if(Point_Mag(delta) < 5) // XXX: Is this too small? What about really fast moving guys?
         return ReachGoal(unit);
     const Point dv = Point_Normalize(delta, unit.accel);
     unit.velocity = Point_Add(unit.velocity, dv);
@@ -47,7 +47,7 @@ static Unit Decelerate(Unit unit)
     return unit;
 }
 
-static Unit FollowPath(Unit unit, const Grid grid)
+Unit Unit_FollowPath(Unit unit, const Grid grid)
 {
     if(unit.path.count > 0)
     {
@@ -59,7 +59,7 @@ static Unit FollowPath(Unit unit, const Grid grid)
     return unit;
 }
 
-static Unit CapSpeed(Unit unit)
+Unit Unit_CapSpeed(Unit unit)
 {
     if(Point_Mag(unit.velocity) > unit.max_speed)
         unit.velocity = Point_Normalize(unit.velocity, unit.max_speed);
@@ -69,7 +69,7 @@ static Unit CapSpeed(Unit unit)
 // XXX. Needs collision detection for map edge and non-walkable objects (eg. tiles and units)
 // Note that unit just needs to stop dead in their tracks - the current sweep will handle the rest.
 
-static Unit Move(Unit unit, const Grid grid)
+Unit Unit_Move(Unit unit, const Grid grid)
 {
     unit.cell = Point_Add(unit.cell, unit.velocity);
     unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
@@ -77,16 +77,7 @@ static Unit Move(Unit unit, const Grid grid)
     return unit;
 }
 
-Unit Unit_MoveAlongPath(Unit unit, const Grid grid, const Point stressors)
-{
-    unit = FollowPath(unit, grid);
-    unit.velocity = Point_Add(unit.velocity, stressors);
-    unit = CapSpeed(unit);
-    unit = Move(unit, grid);
-    return unit;
-}
-
-Unit Unit_UpdateFile(Unit unit, const Graphics file)
+static Unit UpdateFile(Unit unit, const Graphics file)
 {
     unit.max_speed = Graphics_GetMaxSpeed(file);
     unit.accel = Graphics_GetAcceleration(file);
@@ -101,7 +92,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file)
     Unit unit = zero;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
-    unit = Unit_UpdateFile(unit, file);
+    unit = UpdateFile(unit, file);
     return unit;
 }
 

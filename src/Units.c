@@ -286,16 +286,16 @@ static void StopBoids(const Units units, const Unit unit)
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
-static void Move(const Units units, const Grid grid)
+static void PathFindBoid(const Units units, const Grid grid, const Map map)
 {
-    for(int32_t i = 0; i < units.count; i++) // XXX. Needs to be threaded for sure at a later point.
+    for(int32_t i = 0; i < units.count; i++) // XXX. Cannot be threaded due to read writes.
     {
-        const Unit unit = units.unit[i];
+        Unit unit = units.unit[i];
 
         // Logic control rules.
 
         UnifyBoids(units, unit);
-        StopBoids(units, unit); // XXX. Unit groups require a tagging system.
+        StopBoids(units, unit);
 
         // Stressor rules.
 
@@ -303,12 +303,21 @@ static void Move(const Units units, const Grid grid)
             CoheseBoids(units, unit),
             SeparateBoids(units, unit),
             AlignBoids(units, unit),
+            // XXX. Need a separation rule for immoveable objects.
         };
         static Point zero;
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        units.unit[i] = Unit_MoveAlongPath(unit, grid, stressors); // XXX. Put a "dead zone" for stressors so units stop shaking when at rest.
+
+        // Follow path and apply stressors.
+
+        unit = Unit_FollowPath(unit, grid);
+        unit.velocity = Point_Add(unit.velocity, stressors);
+        unit = Unit_CapSpeed(unit);
+        if(Units_CanWalk(units, map, unit.cart))
+            unit = Unit_Move(unit, grid);
+        units.unit[i] = unit;
     }
 }
 
@@ -336,7 +345,7 @@ static void CalculateCenters(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
-    Move(units, grid);
+    PathFindBoid(units, grid, map);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);

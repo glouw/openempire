@@ -23,8 +23,12 @@ typedef struct
 }
 Unit;
 
-Unit Unit_MoveAlongPath(Unit, const Grid, const Point stressors);
-
 Unit Unit_Make(const Point, const Grid, const Graphics);
 
 void Unit_Print(const Unit);
+
+Unit Unit_FollowPath(Unit, const Grid);
+
+Unit Unit_CapSpeed(Unit);
+
+Unit Unit_Move(Unit, const Grid);
