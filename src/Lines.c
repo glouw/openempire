@@ -42,7 +42,7 @@ static int32_t CompareByTileFile(const void* a, const void* b)
 {
     Line* const aa = (Line*) a;
     Line* const bb = (Line*) b;
-    return aa->tile_file > bb->tile_file;
+    return aa->file > bb->file;
 }
 
 void Lines_Sort(const Lines lines)

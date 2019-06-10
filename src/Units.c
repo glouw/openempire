@@ -166,7 +166,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
 {
     if(input.ru)
     {
-        units.command_group_next += 1;
+        units.command_group_next++;
         const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
         const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
@@ -248,6 +248,20 @@ static Point AlignBoids(const Units units, const Unit unit)
     return zero;
 }
 
+static Point ObstructBoids(const Units units, const Unit unit, const Map map, const Grid grid)
+{
+    static Point zero;
+    if(!Point_IsZero(unit.velocity))
+    {
+        const Point feeler = Point_Normalize(unit.velocity, 10000); // XXX. Should reference 10 * grid.cell_size or something.
+        const Point feel = Point_Add(unit.cell, feeler);
+        const Point point = Grid_CellToCart(grid, feel);
+        if(!Units_CanWalk(units, map, point))
+            return Point_Normalize(feeler, -5000);
+    }
+    return zero;
+}
+
 // Boids, when swept up in a current of other boids, will
 // try to go back to a path point if they were swept past the path point.
 // This function ensures all boids on a tile share the same path index
@@ -283,41 +297,38 @@ static void StopBoids(const Units units, const Unit unit)
     }
 }
 
+static Point CalculateStressors(const Units units, const Unit unit, const Map map, const Grid grid)
+{
+    const Point point[] = {
+        CoheseBoids(units, unit),
+        SeparateBoids(units, unit),
+        AlignBoids(units, unit),
+        ObstructBoids(units, unit, map, grid),
+    };
+    static Point zero;
+    Point stressors = zero;
+    for(int32_t j = 0; j < UTIL_LEN(point); j++)
+        stressors = Point_Add(stressors, point[j]);
+    return stressors;
+}
+
+static void Rule(const Units units, const Unit unit)
+{
+    UnifyBoids(units, unit);
+    StopBoids(units, unit);
+}
+
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
-static void PathFindBoid(const Units units, const Grid grid, const Map map)
+static void PathFindBoids(const Units units, const Grid grid, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++) // XXX. Cannot be threaded due to read writes.
     {
-        Unit unit = units.unit[i];
-
-        // Logic control rules.
-
-        UnifyBoids(units, unit);
-        StopBoids(units, unit);
-
-        // Stressor rules.
-
-        const Point point[] = {
-            CoheseBoids(units, unit),
-            SeparateBoids(units, unit),
-            AlignBoids(units, unit),
-            // XXX. Need a separation rule for immoveable objects.
-        };
-        static Point zero;
-        Point stressors = zero;
-        for(int32_t j = 0; j < UTIL_LEN(point); j++)
-            stressors = Point_Add(stressors, point[j]);
-
-        // Follow path and apply stressors.
-
-        unit = Unit_FollowPath(unit, grid);
-        unit.velocity = Point_Add(unit.velocity, stressors);
-        unit = Unit_CapSpeed(unit);
-        if(Units_CanWalk(units, map, unit.cart))
-            unit = Unit_Move(unit, grid);
-        units.unit[i] = unit;
+        const Unit unit = units.unit[i];
+        Rule(units, unit);
+        const Point stressors = CalculateStressors(units, unit, map, grid);
+        units.unit[i] = Unit_Flow(unit, grid, stressors);
     }
 }
 
@@ -345,7 +356,7 @@ static void CalculateCenters(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
-    PathFindBoid(units, grid, map);
+    PathFindBoids(units, grid, map);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);

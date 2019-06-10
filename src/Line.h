@@ -7,6 +7,6 @@ typedef struct
 {
     Point inner;
     Point outer;
-    Terrain tile_file;
+    Terrain file;
 }
 Line;

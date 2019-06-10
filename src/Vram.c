@@ -203,13 +203,13 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
 {
     const Point inner = line.inner;
     const Point outer = line.outer;
-    const Terrain inner_tile_file = Map_GetTerrainFile(map, inner);
+    const Terrain file = Map_GetTerrainFile(map, inner);
 
     // The outer tile uses the outer tile animation,
-    // but with the inner tile_file so that the correct surface can be looked up.
+    // but with the inner file so that the correct surface can be looked up.
 
-    const Animation outer_animation = terrain.animation[COLOR_BLU][inner_tile_file];
-    const Tile outer_tile = Tile_GetTerrain(overview, outer, outer_animation, inner_tile_file);
+    const Animation outer_animation = terrain.animation[COLOR_BLU][file];
+    const Tile outer_tile = Tile_GetTerrain(overview, outer, outer_animation, file);
 
     const Mode blend_mode = blendomatic.mode[0]; // XXX: Which mode? How to choose?
     const int32_t blend_id = Mode_GetBlendIndex(inner, outer);
@@ -248,9 +248,9 @@ static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
         // Outer tile is partially transparent blended tile.
         // Inner tile is a solid inner tile.
 
-        const Terrain tile_file = Map_GetTerrainFile(map, inner);
+        const Terrain file = Map_GetTerrainFile(map, inner);
         const Point outer = box.point[j];
-        const Line line = { inner, outer, tile_file };
+        const Line line = { inner, outer, file };
         lines = Lines_Append(lines, line);
     }
     Points_Free(box);

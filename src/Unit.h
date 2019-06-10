@@ -27,8 +27,4 @@ Unit Unit_Make(const Point, const Grid, const Graphics);
 
 void Unit_Print(const Unit);
 
-Unit Unit_FollowPath(Unit, const Grid);
-
-Unit Unit_CapSpeed(Unit);
-
-Unit Unit_Move(Unit, const Grid);
+Unit Unit_Flow(Unit, const Grid, const Point);

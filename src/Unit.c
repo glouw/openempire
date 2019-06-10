@@ -47,7 +47,7 @@ static Unit Decelerate(Unit unit)
     return unit;
 }
 
-Unit Unit_FollowPath(Unit unit, const Grid grid)
+static Unit FollowPath(Unit unit, const Grid grid)
 {
     if(unit.path.count > 0)
     {
@@ -59,7 +59,7 @@ Unit Unit_FollowPath(Unit unit, const Grid grid)
     return unit;
 }
 
-Unit Unit_CapSpeed(Unit unit)
+static Unit CapSpeed(Unit unit)
 {
     if(Point_Mag(unit.velocity) > unit.max_speed)
         unit.velocity = Point_Normalize(unit.velocity, unit.max_speed);
@@ -69,7 +69,7 @@ Unit Unit_CapSpeed(Unit unit)
 // XXX. Needs collision detection for map edge and non-walkable objects (eg. tiles and units)
 // Note that unit just needs to stop dead in their tracks - the current sweep will handle the rest.
 
-Unit Unit_Move(Unit unit, const Grid grid)
+static Unit Move(Unit unit, const Grid grid)
 {
     unit.cell = Point_Add(unit.cell, unit.velocity);
     unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
@@ -112,4 +112,13 @@ void Unit_Print(const Unit unit)
     printf("file_name             :: %s\n",      unit.file_name);
     printf("id                    :: %d\n",      unit.id);
     printf("group                 :: %d\n",      unit.command_group);
+}
+
+Unit Unit_Flow(Unit unit, const Grid grid, const Point stressors)
+{
+    unit = FollowPath(unit, grid);
+    unit.velocity = Point_Add(unit.velocity, stressors);
+    unit = CapSpeed(unit);
+    unit = Move(unit, grid);
+    return unit;
 }
