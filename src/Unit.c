@@ -69,7 +69,7 @@ static Unit CapSpeed(Unit unit)
 // XXX. Needs collision detection for map edge and non-walkable objects (eg. tiles and units)
 // Note that unit just needs to stop dead in their tracks - the current sweep will handle the rest.
 
-static Unit Move(Unit unit, const Grid grid)
+Unit Unit_Move(Unit unit, const Grid grid)
 {
     unit.cell = Point_Add(unit.cell, unit.velocity);
     unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
@@ -119,6 +119,5 @@ Unit Unit_Flow(Unit unit, const Grid grid, const Point stressors)
     unit = FollowPath(unit, grid);
     unit.velocity = Point_Add(unit.velocity, stressors);
     unit = CapSpeed(unit);
-    unit = Move(unit, grid);
     return unit;
 }

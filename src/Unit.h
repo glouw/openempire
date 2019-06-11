@@ -28,3 +28,5 @@ Unit Unit_Make(const Point, const Grid, const Graphics);
 void Unit_Print(const Unit);
 
 Unit Unit_Flow(Unit, const Grid, const Point);
+
+Unit Unit_Move(Unit, const Grid);

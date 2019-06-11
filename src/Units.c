@@ -248,18 +248,33 @@ static Point AlignBoids(const Units units, const Unit unit)
     return zero;
 }
 
-static Point ObstructBoids(const Units units, const Unit unit, const Map map, const Grid grid)
+// +--*---*---*--+
+// |   \  |  /   |
+// |    \ | /    |
+// |     \|/     |
+// |      +      |
+// |             |
+// +-------------+
+
+// XXX. This needs to behave like separate boids, where each tile has dummy "sentries" almost
+// guarding its edges like in the figure above. This will push the boids away.
+
+static Point WallRunBoids(const Units units, const Unit unit, const Map map)
 {
     static Point zero;
-    if(!Point_IsZero(unit.velocity))
+    Point out = zero;
+    for(int32_t x = -1; x <= 1; x++)
+    for(int32_t y = -1; y <= 1; y++)
     {
-        const Point feeler = Point_Normalize(unit.velocity, 10000); // XXX. Should reference 10 * grid.cell_size or something.
-        const Point feel = Point_Add(unit.cell, feeler);
-        const Point point = Grid_CellToCart(grid, feel);
-        if(!Units_CanWalk(units, map, point))
-            return Point_Normalize(feeler, -5000);
+        const Point offset = { x, y };
+        const Point cart = Point_Add(unit.cart, offset);
+        if(!Units_CanWalk(units, map, cart))
+        {
+            const Point repel = Point_Normalize(offset, 100);
+            out = Point_Sub(out, repel);
+        }
     }
-    return zero;
+    return out;
 }
 
 // Boids, when swept up in a current of other boids, will
@@ -297,13 +312,12 @@ static void StopBoids(const Units units, const Unit unit)
     }
 }
 
-static Point CalculateStressors(const Units units, const Unit unit, const Map map, const Grid grid)
+static Point CalculateStressors(const Units units, const Unit unit, const Map map)
 {
     const Point point[] = {
         CoheseBoids(units, unit),
         SeparateBoids(units, unit),
         AlignBoids(units, unit),
-        ObstructBoids(units, unit, map, grid),
     };
     static Point zero;
     Point stressors = zero;
@@ -325,10 +339,14 @@ static void PathFindBoids(const Units units, const Grid grid, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++) // XXX. Cannot be threaded due to read writes.
     {
-        const Unit unit = units.unit[i];
+        Unit unit = units.unit[i];
         Rule(units, unit);
-        const Point stressors = CalculateStressors(units, unit, map, grid);
-        units.unit[i] = Unit_Flow(unit, grid, stressors);
+        const Point stressors = CalculateStressors(units, unit, map);
+        if(Units_CanWalk(units, map, unit.cart))
+        {
+            unit = Unit_Flow(unit, grid, stressors);
+            units.unit[i] = Unit_Move(unit, grid);
+        }
     }
 }
 
