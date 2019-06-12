@@ -10,22 +10,17 @@ Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_wi
     grid.rows = rows;
     grid.tile_iso_width = tile_iso_width;
     grid.tile_iso_height = tile_iso_height;
-
     const Point iso_n = { 0, -tile_iso_height / 2 }; // n
     const Point iso_s = { 0, +tile_iso_height / 2 }; //   e
     const Point iso_e = { +tile_iso_width / 2, 0 };  // s
     const Point a = Point_ToCart(iso_n); //     a
     const Point b = Point_ToCart(iso_s); //     |
     const Point c = Point_ToCart(iso_e); // b - c
-
     grid.tile_cart_width = c.x - b.x;
     grid.tile_cart_height = c.y - a.y;
-
     grid.cell_size = 1000; // Dictates with width and height of sub-pixels within a pixel.
-
     grid.tile_cart_mid.x = grid.tile_cart_width / 2;
     grid.tile_cart_mid.y = grid.tile_cart_height / 2;
-
     return grid;
 }
 
@@ -80,4 +75,9 @@ Point Grid_CellToOffset(const Grid grid, const Point cell)
         (cell.y / grid.cell_size) % grid.tile_cart_height,
     };
     return Point_Sub(coords, grid.tile_cart_mid);
+}
+
+Point Grid_GetCornerOffset(const Grid grid, const Point offset)
+{
+    return Point_Add(offset, grid.tile_cart_mid);
 }

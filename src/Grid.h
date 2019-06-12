@@ -30,3 +30,5 @@ Point Grid_CellToOffset(const Grid, const Point);
 Point Grid_CellToCart(const Grid, const Point);
 
 Point Grid_CartToCell(const Grid, const Point);
+
+Point Grid_GetCornerOffset(const Grid, const Point);

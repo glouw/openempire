@@ -212,8 +212,8 @@ static Point SeparateBoids(const Units units, const Unit unit)
     for(int32_t x = -1; x <= 1; x++)
     for(int32_t y = -1; y <= 1; y++)
     {
-        const Point offset = { x, y };
-        const Point cart = Point_Add(unit.cart, offset);
+        const Point cart_offset = { x, y };
+        const Point cart = Point_Add(unit.cart, cart_offset);
         const Stack stack = Units_GetStackCart(units, cart);
         for(int32_t i = 0; i < stack.count; i++)
         {
@@ -259,21 +259,33 @@ static Point AlignBoids(const Units units, const Unit unit)
 // XXX. This needs to behave like separate boids, where each tile has dummy "sentries" almost
 // guarding its edges like in the figure above. This will push the boids away.
 
-static Point WallRunBoids(const Units units, const Unit unit, const Map map)
+static Point WallPushBoids(const Units units, const Unit unit, const Map map, const Grid grid)
 {
+    const Point n = {  0, -1 };
+    const Point e = { +1,  0 };
+    const Point s = {  0, +1 };
+    const Point w = { -1,  0 };
+    const Point n_point = Point_Add(unit.cart, n);
+    const Point e_point = Point_Add(unit.cart, e);
+    const Point s_point = Point_Add(unit.cart, s);
+    const Point w_point = Point_Add(unit.cart, w);
+    const bool n_walk = Units_CanWalk(units, map, n_point);
+    const bool e_walk = Units_CanWalk(units, map, e_point);
+    const bool s_walk = Units_CanWalk(units, map, s_point);
+    const bool w_walk = Units_CanWalk(units, map, w_point);
+    const Point offset = Grid_GetCornerOffset(grid, unit.cart_grid_offset);
+    const int32_t repulsion = 10 * unit.accel; // XXX. Show strong should this be?
+    const Point n_force = Point_Mul(n, repulsion);
+    const Point e_force = Point_Mul(e, repulsion);
+    const Point s_force = Point_Mul(s, repulsion);
+    const Point w_force = Point_Mul(w, repulsion);
+    const int32_t width = 10;
     static Point zero;
     Point out = zero;
-    for(int32_t x = -1; x <= 1; x++)
-    for(int32_t y = -1; y <= 1; y++)
-    {
-        const Point offset = { x, y };
-        const Point cart = Point_Add(unit.cart, offset);
-        if(!Units_CanWalk(units, map, cart))
-        {
-            const Point repel = Point_Normalize(offset, 100);
-            out = Point_Sub(out, repel);
-        }
-    }
+    if(!n_walk && offset.y < width) out = Point_Add(out, s_force);
+    if(!w_walk && offset.x < width) out = Point_Add(out, e_force);
+    if(!s_walk && offset.y > grid.tile_cart_height - width) out = Point_Add(out, n_force);
+    if(!e_walk && offset.x > grid.tile_cart_width  - width) out = Point_Add(out, w_force);
     return out;
 }
 
@@ -312,12 +324,13 @@ static void StopBoids(const Units units, const Unit unit)
     }
 }
 
-static Point CalculateStressors(const Units units, const Unit unit, const Map map)
+static Point CalculateStressors(const Units units, const Unit unit, const Map map, const Grid grid)
 {
     const Point point[] = {
         CoheseBoids(units, unit),
         SeparateBoids(units, unit),
         AlignBoids(units, unit),
+        WallPushBoids(units, unit, map, grid),
     };
     static Point zero;
     Point stressors = zero;
@@ -341,12 +354,9 @@ static void PathFindBoids(const Units units, const Grid grid, const Map map)
     {
         Unit unit = units.unit[i];
         Rule(units, unit);
-        const Point stressors = CalculateStressors(units, unit, map);
-        if(Units_CanWalk(units, map, unit.cart))
-        {
-            unit = Unit_Flow(unit, grid, stressors);
-            units.unit[i] = Unit_Move(unit, grid);
-        }
+        const Point stressors = CalculateStressors(units, unit, map, grid);
+        unit = Unit_Flow(unit, grid, stressors);
+        units.unit[i] = Unit_Move(unit, grid);
     }
 }
 
