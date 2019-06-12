@@ -79,7 +79,7 @@ static void Set(const Field field, const Point point, const char ch)
     field.object[point.x + point.y * field.cols] = ch;
 }
 
-static bool IsWalkable(const Field field, const Point point)
+static bool IsWalkable(const Field field, const Point point) // XXX. MUST expand this to avoid pathing into corners.
 {
     return Get(field, point) == WALKABLE_SPACE;
 }
@@ -175,10 +175,8 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
     Point current = goal;
     while(!Point_Equal(current, start))
     {
-        if(!IsInBounds(field, current)) // XXX. Is there faster way to time out?
+        if(!IsInBounds(field, current)) // XXX. No path was found... Is there faster way to time out?
         {
-            // Actually, no path was found!
-
             static Points zero;
             return zero;
         }

@@ -223,7 +223,7 @@ static Point SeparateBoids(const Units units, const Unit unit)
                 const Point diff = Point_Sub(other->cell, unit.cell);
                 if(Point_IsZero(diff))
                 {
-                    const Point nudge = { 1000, 0 };
+                    const Point nudge = { 1000, 0 }; // For when boids on top of one another.
                     out = Point_Sub(out, nudge);
                 }
                 else
@@ -267,7 +267,7 @@ static Point AlignBoids(const Units units, const Unit unit)
 
 static Point WallPushBoids(const Units units, const Unit unit, const Map map, const Grid grid)
 {
-    const Point n = {  0, -1 };
+    const Point n = {  0, -1 }; // XXX. Rewrite this all with loops.
     const Point e = { +1,  0 };
     const Point s = {  0, +1 };
     const Point w = { -1,  0 };
@@ -275,23 +275,23 @@ static Point WallPushBoids(const Units units, const Unit unit, const Map map, co
     const Point e_point = Point_Add(unit.cart, e);
     const Point s_point = Point_Add(unit.cart, s);
     const Point w_point = Point_Add(unit.cart, w);
-    const bool n_walk = Units_CanWalk(units, map, n_point);
+    const bool n_walk = Units_CanWalk(units, map, n_point); // XXX. This is very heavy duty. Is there another way to nicely slide off walks eg. dot product?
     const bool e_walk = Units_CanWalk(units, map, e_point);
     const bool s_walk = Units_CanWalk(units, map, s_point);
     const bool w_walk = Units_CanWalk(units, map, w_point);
     const Point offset = Grid_GetCornerOffset(grid, unit.cart_grid_offset);
-    const int32_t repulsion = 10 * unit.accel; // XXX. Show strong should this be?
+    const int32_t repulsion = 10 * unit.accel; // XXX. How strong should this be?
     const Point n_force = Point_Mul(n, repulsion);
     const Point e_force = Point_Mul(e, repulsion);
     const Point s_force = Point_Mul(s, repulsion);
     const Point w_force = Point_Mul(w, repulsion);
-    const int32_t width = 10;
+    const int32_t border = 10;
     static Point zero;
     Point out = zero;
-    if(!n_walk && offset.y < width) out = Point_Add(out, s_force);
-    if(!w_walk && offset.x < width) out = Point_Add(out, e_force);
-    if(!s_walk && offset.y > grid.tile_cart_height - width) out = Point_Add(out, n_force);
-    if(!e_walk && offset.x > grid.tile_cart_width  - width) out = Point_Add(out, w_force);
+    if(!n_walk && offset.y < border) out = Point_Add(out, s_force);
+    if(!w_walk && offset.x < border) out = Point_Add(out, e_force);
+    if(!s_walk && offset.y > grid.tile_cart_height - border) out = Point_Add(out, n_force);
+    if(!e_walk && offset.x > grid.tile_cart_width  - border) out = Point_Add(out, w_force);
     return out;
 }
 
@@ -349,6 +349,8 @@ static void Rule(const Units units, const Unit unit)
 {
     UnifyBoids(units, unit);
     StopBoids(units, unit);
+
+    // XXX. Need a rule to reset boid paths when stuck behind squares.
 }
 
 // See the boids pseudocode:

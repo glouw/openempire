@@ -27,10 +27,11 @@ int32_t main(int32_t argc, char* argv[])
         Video_PresentCanvas(video);
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = 1000 / 60 - (t1 - t0);
+        printf("%d\n", t1 - t0);
         SDL_Delay(ms < 0 ? 0 : ms);
         cycles++;
         if(args.measure)
-            if(cycles > 10) // Measure performance with valgrind --tool=cachegrind.
+            if(cycles > 10) // NOTE: Measure performance with valgrind --tool=cachegrind.
                 break;
     }
     Units_Free(units);
