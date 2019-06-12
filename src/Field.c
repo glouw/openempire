@@ -124,9 +124,15 @@ static void ModifyQueue(const Field field, const Queue queue, const Point point,
 Points Field_SearchBreadthFirst(const Field field, const Point start, const Point goal) // XXX. THIS can be ASTAR and it will be so much faster!
 {
     const Point deltas[] = {
+#if 1
         { -1, +1 }, { 0, +1 }, { 1, +1 },
         { -1,  0 },            { 1,  0 },
         { -1, -1 }, { 0, -1 }, { 1, -1 },
+#else
+                    { 0, +1 },
+        { -1,  0 },            { 1,  0 },
+                    { 0, -1 },
+#endif
     };
     const int32_t dirs = UTIL_LEN(deltas);
 
@@ -163,12 +169,19 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
         }
     }
 
-    // Construct path.
+    // Path found - construct it.
 
     Queue path = New(dirs);
     Point current = goal;
     while(!Point_Equal(current, start))
     {
+        if(!IsInBounds(field, current)) // XXX. Is there faster way to time out?
+        {
+            // Actually, no path was found!
+
+            static Points zero;
+            return zero;
+        }
         path = Enqueue(path, current);
         current = AccessQueue(field, came_from, current);
     }
