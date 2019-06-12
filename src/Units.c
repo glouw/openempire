@@ -221,6 +221,12 @@ static Point SeparateBoids(const Units units, const Unit unit)
             if(unit.id != other->id)
             {
                 const Point diff = Point_Sub(other->cell, unit.cell);
+                if(Point_IsZero(diff))
+                {
+                    const Point nudge = { 1000, 0 };
+                    out = Point_Sub(out, nudge);
+                }
+                else
                 if(Point_Mag(diff) < 15000) // XXX. What is a good width?
                     out = Point_Sub(out, diff);
             }
