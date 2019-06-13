@@ -22,7 +22,7 @@ static Units GenerateTestZone(Units units, const Grid grid)
         {
         default:
         case 0:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED)); // XXX. GIMME SPEED.
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, Util_Rand() % COLOR_COUNT));
             break;
 #if 0
         case 1:

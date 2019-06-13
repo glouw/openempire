@@ -111,7 +111,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, data.graphics, units, overview);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
-#if 1
+#if 0
     Vram_DrawUnitsPath(vram, data.graphics, units, overview);
 #endif
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);

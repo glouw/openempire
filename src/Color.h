@@ -4,7 +4,7 @@ typedef enum
 {
     COLOR_BLU,
     COLOR_RED,
-#if 1
+#if 0
     COLOR_GRN,
     COLOR_YEL,
     COLOR_ORG,
