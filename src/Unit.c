@@ -86,12 +86,13 @@ static Unit UpdateFile(Unit unit, const Graphics file)
     return unit;
 }
 
-Unit Unit_Make(const Point cart, const Grid grid, const Graphics file)
+Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color)
 {
     static Unit zero;
     Unit unit = zero;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
+    unit.color = color;
     unit = UpdateFile(unit, file);
     return unit;
 }

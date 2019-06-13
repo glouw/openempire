@@ -22,21 +22,21 @@ static Units GenerateTestZone(Units units, const Grid grid)
         {
         default:
         case 0:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING)); // XXX. GIMME SPEED.
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED)); // XXX. GIMME SPEED.
             break;
 #if 0
         case 1:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE));
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE, COLOR_BLU));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU));
             break;
         case 2:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_GOLD_MINE));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_GOLD_MINE, COLOR_BLU));
             break;
         case 3:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_STONE_MINE));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_STONE_MINE, COLOR_BLU));
             break;
         case 4:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH, COLOR_BLU));
             break;
 #endif
         }

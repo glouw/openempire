@@ -2,6 +2,7 @@
 
 #include "Points.h"
 #include "Graphics.h"
+#include "Color.h"
 #include "Grid.h"
 
 typedef struct
@@ -20,10 +21,11 @@ typedef struct
     const char* file_name;
     int32_t id;
     int32_t command_group;
+    Color color;
 }
 Unit;
 
-Unit Unit_Make(const Point, const Grid, const Graphics);
+Unit Unit_Make(const Point, const Grid, const Graphics, const Color);
 
 void Unit_Print(const Unit);
 

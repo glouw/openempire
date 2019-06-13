@@ -3,8 +3,8 @@
 typedef enum
 {
     COLOR_BLU,
-#if 1
     COLOR_RED,
+#if 1
     COLOR_GRN,
     COLOR_YEL,
     COLOR_ORG,

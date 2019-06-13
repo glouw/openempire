@@ -32,7 +32,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             // XXX: Now that unit tile is indexed, the unit must be flagged as drawn, else the same unit from a different
             // tile will call another draw for cases where a graphics file occupies more than one tile (eg. buildings).
 
-            const Animation animation = graphics.animation[COLOR_BLU][ref->file];
+            const Animation animation = graphics.animation[ref->color][ref->file];
 
             tile[unit_count] = Tile_GetGraphics(overview, point, ref->cart_grid_offset, animation, ref->file);
             tile[unit_count].reference = ref;
