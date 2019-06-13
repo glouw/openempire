@@ -24,8 +24,8 @@ int32_t main(int32_t argc, char* argv[])
         overview = Overview_Update(overview, input);
         units = Units_Caretake(units, data.graphics, overview, grid, input, map);
         Video_Draw(video, data, map, units, overview, input);
-        Video_PresentCanvas(video);
         const int32_t t1 = SDL_GetTicks();
+        Video_PresentCanvas(video);
         const int32_t ms = 1000 / 60 - (t1 - t0);
         printf("%d\n", t1 - t0);
         SDL_Delay(ms < 0 ? 0 : ms);

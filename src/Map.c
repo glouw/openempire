@@ -47,7 +47,7 @@ Map Map_Make(const int32_t rows, const int32_t cols, const Registrar terrain)
     map.tile_height = frame.height;
 #if 1
     GenerateTestZone(map);
-#endif 
+#endif
     return map;
 }
 
@@ -78,15 +78,18 @@ void Map_Free(const Map map)
 
 void Map_Edit(const Map map, const Overview overview, const Input input)
 {
-    Terrain file = FILE_DIRT;
-    if(input.key[SDL_SCANCODE_1]) file = FILE_GRASS;
-    if(input.key[SDL_SCANCODE_2]) file = FILE_WATER;
-    if(input.key[SDL_SCANCODE_3]) file = FILE_FARM;
-    if(input.l)
+    if(input.key[SDL_SCANCODE_LSHIFT])
     {
-        const Point cartesian = Overview_IsoToCart(overview, input.point, false);
-        if(InBounds(map, cartesian))
-            Map_SetTerrainFile(map, cartesian, file);
+        Terrain file = FILE_DIRT;
+        if(input.key[SDL_SCANCODE_1]) file = FILE_GRASS;
+        if(input.key[SDL_SCANCODE_2]) file = FILE_WATER;
+        if(input.key[SDL_SCANCODE_3]) file = FILE_FARM;
+        if(input.l)
+        {
+            const Point cartesian = Overview_IsoToCart(overview, input.point, false);
+            if(InBounds(map, cartesian))
+                Map_SetTerrainFile(map, cartesian, file);
+        }
     }
 }
 
