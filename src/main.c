@@ -27,7 +27,9 @@ int32_t main(int32_t argc, char* argv[])
         const int32_t t1 = SDL_GetTicks();
         Video_PresentCanvas(video);
         const int32_t ms = 1000 / 60 - (t1 - t0);
+#if 0
         printf("%d\n", t1 - t0);
+#endif
         SDL_Delay(ms < 0 ? 0 : ms);
         cycles++;
         if(args.measure)

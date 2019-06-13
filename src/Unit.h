@@ -16,6 +16,7 @@ typedef struct
     Point velocity;
     Points path;
     int32_t path_index;
+    int32_t path_index_time;
     bool selected;
     Graphics file;
     const char* file_name;

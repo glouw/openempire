@@ -22,6 +22,7 @@ static Point GetDelta(const Unit unit, const Grid grid)
 static Unit ReachGoal(Unit unit)
 {
     unit.path_index++;
+    unit.path_index_time = 0;
     if(unit.path_index >= unit.path.count)
         unit.path = Points_Free(unit.path);
     return unit;
@@ -30,6 +31,7 @@ static Unit ReachGoal(Unit unit)
 static Unit AccelerateAlongPath(Unit unit, const Grid grid)
 {
     const Point delta = GetDelta(unit, grid);
+    unit.path_index_time++;
     if(Point_Mag(delta) < 10) // XXX: Is this too small? What about really fast moving guys?
         return ReachGoal(unit);
     const Point dv = Point_Normalize(delta, unit.accel);
@@ -106,6 +108,7 @@ void Unit_Print(const Unit unit)
     printf("max_speed             :: %d\n",      unit.max_speed);
     printf("accel                 :: %d\n",      unit.accel);
     printf("velocity              :: %ld %ld\n", unit.velocity.x, unit.velocity.y);
+    printf("path_index_time       :: %d\n",      unit.path_index_time);
     printf("path_index            :: %d\n",      unit.path_index);
     printf("path.count            :: %d\n",      unit.path.count);
     printf("selected              :: %d\n",      unit.selected);

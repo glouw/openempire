@@ -22,7 +22,7 @@ static Units GenerateTestZone(Units units, const Grid grid)
         {
         default:
         case 0:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, Util_Rand() % COLOR_COUNT));
+            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, (Color) (Util_Rand() % COLOR_COUNT)));
             break;
 #if 0
         case 1:
@@ -143,8 +143,9 @@ static Unit ApplyPath(const Units units, Unit unit, const Map map, const Point c
 {
     const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
     Points_Free(unit.path);
-    unit.path = Field_SearchBreadthFirst(field, unit.cart, cart_goal);
     unit.path_index = 0;
+    unit.path_index_time = 0;
+    unit.path = Field_SearchBreadthFirst(field, unit.cart, cart_goal);
     unit.cart_grid_offset_goal = cart_grid_offset_goal;
     unit.command_group = units.command_group_next;
     Field_Free(field);
@@ -345,7 +346,25 @@ static Point CalculateStressors(const Units units, const Unit unit, const Map ma
     return stressors;
 }
 
-static void Rule(const Units units, const Unit unit)
+static void RepathStuckBoids(const Units units, const Map map)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        const Unit unit = units.unit[i];
+        if(unit.path_index_time > 500)
+        {
+            const Stack stack = Units_GetStackCart(units, unit.cart);
+            const Point cart_goal = unit.path.point[unit.path.count - 1];
+            for(int32_t j = 0; j < stack.count; j++)
+            {
+                Unit* const reference = stack.reference[j];
+                *reference = ApplyPath(units, *reference, map, cart_goal, unit.cart_grid_offset_goal);
+            }
+        }
+    }
+}
+
+static void ApplyHardRules(const Units units, const Unit unit)
 {
     UnifyBoids(units, unit);
     StopBoids(units, unit);
@@ -361,11 +380,12 @@ static void PathFindBoids(const Units units, const Grid grid, const Map map)
     for(int32_t i = 0; i < units.count; i++) // XXX. Cannot be threaded due to read writes.
     {
         Unit unit = units.unit[i];
-        Rule(units, unit);
+        ApplyHardRules(units, unit);
         const Point stressors = CalculateStressors(units, unit, map, grid);
         unit = Unit_Flow(unit, grid, stressors);
         units.unit[i] = Unit_Move(unit, grid);
     }
+    RepathStuckBoids(units, map);
 }
 
 static void SortStacks(const Units units)
