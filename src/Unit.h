@@ -33,3 +33,5 @@ void Unit_Move(Unit* const, const Grid);
 void Unit_Print(Unit* const);
 
 void Unit_Flow(Unit* const, const Grid, const Point stressors);
+
+bool Unit_InPlatoon(Unit* const unit, Unit* const other);

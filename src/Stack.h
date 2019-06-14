@@ -28,4 +28,4 @@ bool Stack_IsWalkable(const Stack);
 
 void Stack_UpdateCenterOfMass(Stack* const);
 
-int32_t Stack_GetMaxPathIndex(const Stack, const Color);
+int32_t Stack_GetMaxPathIndex(const Stack, const Color, const int32_t command_group);

@@ -124,15 +124,9 @@ static void ModifyQueue(const Field field, const Queue queue, const Point point,
 Points Field_SearchBreadthFirst(const Field field, const Point start, const Point goal) // XXX. THIS can be ASTAR and it will be so much faster!
 {
     const Point deltas[] = {
-#if 1
         { -1, +1 }, { 0, +1 }, { 1, +1 },
         { -1,  0 },            { 1,  0 },
         { -1, -1 }, { 0, -1 }, { 1, -1 },
-#else
-                    { 0, +1 },
-        { -1,  0 },            { 1,  0 },
-                    { 0, -1 },
-#endif
     };
     const int32_t dirs = UTIL_LEN(deltas);
 
@@ -157,9 +151,9 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
         for(int32_t i = 0; i < dirs; i++)
         {
             const Point next = Point_Add(current, deltas[i]);
-            if(IsInBounds(field, next)
-            && IsWalkable(field, next))
-            {
+            if(IsInBounds(field, next)  // XXX. Needs one more check to make sure point is not a corner between between two non walkable tiles.
+            && IsWalkable(field, next)) // eg. #
+            {                           //     x #
                 if(Point_Equal(AccessQueue(field, came_from, next), none))
                 {
                     frontier = Enqueue(frontier, next);

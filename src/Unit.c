@@ -120,3 +120,9 @@ void Unit_Flow(Unit* const unit, const Grid grid, const Point stressors)
     unit->velocity = Point_Add(unit->velocity, stressors);
     CapSpeed(unit);
 }
+
+bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for same unit type as well.
+{
+    return unit->command_group == other->command_group
+        && unit->color == other->color;
+}

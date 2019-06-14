@@ -303,13 +303,11 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
 static void UnifyBoids(const Units units, Unit* const unit)
 {
     const Stack stack = Units_GetStackCart(units, unit->cart);
-    const int32_t max = Stack_GetMaxPathIndex(stack, unit->color);
+    const int32_t max = Stack_GetMaxPathIndex(stack, unit->color, unit->command_group);
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        if(max < other->path.count
-        && unit->command_group == other->command_group
-        && unit->color == other->color)
+        if(other->path.count >max && Unit_InPlatoon(unit, other))
             other->path_index = max;
     }
 }
@@ -325,9 +323,7 @@ static void StopBoids(const Units units, Unit* const unit)
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        if(unit->path.count == 0
-        && unit->command_group == other->command_group
-        && unit->color == other->color)
+        if(unit->path.count == 0 && Unit_InPlatoon(unit, other))
             other->path = Points_Free(other->path);
     }
 }
