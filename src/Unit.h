@@ -26,10 +26,10 @@ typedef struct
 }
 Unit;
 
-Unit Unit_Make(const Point, const Grid, const Graphics, const Color);
+Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color);
 
-void Unit_Print(const Unit);
+void Unit_Move(Unit* const, const Grid);
 
-Unit Unit_Flow(Unit, const Grid, const Point);
+void Unit_Print(Unit* const);
 
-Unit Unit_Move(Unit, const Grid);
+void Unit_Flow(Unit* const, const Grid, const Point stressors);

@@ -405,7 +405,6 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
         };
         for(int32_t i = 0; i < UTIL_LEN(point); i++)
             DrawSelectionPixel(vram, point[i], color);
-
         e2 = 2 * err;
         if(e2 >= dx)
         {
@@ -421,7 +420,6 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
         }
     }
     while(x0 <= x1);
-
     while(y0 - y1 < b)
     {
         const Point point[] = {
@@ -432,7 +430,6 @@ static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
         };
         for(int32_t i = 0; i < UTIL_LEN(point); i++)
             DrawSelectionPixel(vram, point[i], color);
-
         y0++;
         y1--;
     }
@@ -458,12 +455,10 @@ void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Un
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
+        const Point center = Tile_GetHotSpotCoords(tile);
+        const Rect rect = Rect_GetEllipse(center, 20);
         if(tile.reference->selected)
-        {
-            const Point center = Tile_GetHotSpotCoords(tile);
-            const Rect rect = Rect_GetEllipse(center, 20);
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
-        }
     }
     Tiles_Free(tiles);
     Points_Free(points);

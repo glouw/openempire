@@ -60,13 +60,14 @@ void Stack_UpdateCenterOfMass(Stack* const stack)
     stack->center_of_mass = (stack->count > 0) ? Point_Div(out, stack->count) : out;
 }
 
-int32_t Stack_GetMaxPathIndex(const Stack stack)
+int32_t Stack_GetMaxPathIndex(const Stack stack, const Color color)
 {
     int32_t max = 0;
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const unit = stack.reference[i];
-        if(unit->path_index > max)
+        if(unit->path_index > max
+        && unit->color == color)
             max = unit->path_index;
     }
     return max;

@@ -7,6 +7,7 @@ BIN = ../openempires
 SRCS  = Animation.c
 SRCS += Args.c
 SRCS += Blendomatic.c
+SRCS += Color.c
 SRCS += Data.c
 SRCS += Drs.c
 SRCS += Field.c

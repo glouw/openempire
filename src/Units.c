@@ -139,27 +139,26 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static Unit ApplyPath(const Units units, Unit unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+static void ApplyPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
-    Points_Free(unit.path);
-    unit.path_index = 0;
-    unit.path_index_time = 0;
-    unit.path = Field_SearchBreadthFirst(field, unit.cart, cart_goal);
-    unit.cart_grid_offset_goal = cart_grid_offset_goal;
-    unit.command_group = units.command_group_next;
+    Points_Free(unit->path);
+    unit->path_index = 0;
+    unit->path_index_time = 0;
+    unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
+    unit->cart_grid_offset_goal = cart_grid_offset_goal;
+    unit->command_group = units.command_group_next;
     Field_Free(field);
-    return unit;
 }
 
 static void ApplyPathToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        const Unit unit = units.unit[i];
-        if(unit.selected
-        && unit.max_speed > 0)
-            units.unit[i] = ApplyPath(units, unit, map, cart_goal, cart_grid_offset_goal);
+        Unit* const unit = &units.unit[i];
+        if(unit->selected
+        && unit->max_speed > 0)
+            ApplyPath(units, unit, map, cart_goal, cart_grid_offset_goal);
     }
 }
 
@@ -197,16 +196,16 @@ static void StackStacks(const Units units)
     }
 }
 
-static Point CoheseBoids(const Units units, const Unit unit)
+static Point CoheseBoids(const Units units, Unit* const unit)
 {
     static Point zero;
-    const Stack stack = Units_GetStackCart(units, unit.cart);
-    const Point delta = Point_Sub(stack.center_of_mass, unit.cell);
+    const Stack stack = Units_GetStackCart(units, unit->cart);
+    const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
     const Point cohesion = Point_Div(delta, 128); // XXX. What is a good divisor?
     return stack.count > 0 ? cohesion : zero;
 }
 
-static Point SeparateBoids(const Units units, const Unit unit)
+static Point SeparateBoids(const Units units, Unit* const unit)
 {
     static Point zero;
     Point out = zero;
@@ -214,14 +213,14 @@ static Point SeparateBoids(const Units units, const Unit unit)
     for(int32_t y = -1; y <= 1; y++)
     {
         const Point cart_offset = { x, y };
-        const Point cart = Point_Add(unit.cart, cart_offset);
+        const Point cart = Point_Add(unit->cart, cart_offset);
         const Stack stack = Units_GetStackCart(units, cart);
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(unit.id != other->id)
+            if(unit->id != other->id)
             {
-                const Point diff = Point_Sub(other->cell, unit.cell);
+                const Point diff = Point_Sub(other->cell, unit->cell);
                 if(Point_IsZero(diff))
                 {
                     const Point nudge = { 1000, 0 }; // For when boids on top of one another.
@@ -236,21 +235,21 @@ static Point SeparateBoids(const Units units, const Unit unit)
     return Point_Div(out, 32);
 }
 
-static Point AlignBoids(const Units units, const Unit unit)
+static Point AlignBoids(const Units units, Unit* const unit)
 {
     static Point zero;
     Point out = zero;
-    const Stack stack = Units_GetStackCart(units, unit.cart);
+    const Stack stack = Units_GetStackCart(units, unit->cart);
     if(stack.count > 1)
     {
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(unit.id != other->id)
+            if(unit->id != other->id)
                 out = Point_Add(out, other->velocity);
         }
         out = Point_Div(out, stack.count - 1);
-        return Point_Div(Point_Sub(out, unit.velocity), 8);
+        return Point_Div(Point_Sub(out, unit->velocity), 8);
     }
     return zero;
 }
@@ -266,26 +265,26 @@ static Point AlignBoids(const Units units, const Unit unit)
 // XXX. This needs to behave like separate boids, where each tile has dummy "sentries" almost
 // guarding its edges like in the figure above. This will push the boids away.
 
-static Point WallPushBoids(const Units units, const Unit unit, const Map map, const Grid grid)
+static Point WallPushBoids(const Units units, Unit* const unit, const Map map, const Grid grid)
 {
     const Point n = {  0, -1 }; // XXX. Rewrite this all with loops.
     const Point e = { +1,  0 };
     const Point s = {  0, +1 };
     const Point w = { -1,  0 };
-    const Point n_point = Point_Add(unit.cart, n);
-    const Point e_point = Point_Add(unit.cart, e);
-    const Point s_point = Point_Add(unit.cart, s);
-    const Point w_point = Point_Add(unit.cart, w);
+    const Point n_point = Point_Add(unit->cart, n);
+    const Point e_point = Point_Add(unit->cart, e);
+    const Point s_point = Point_Add(unit->cart, s);
+    const Point w_point = Point_Add(unit->cart, w);
     const bool n_walk = Units_CanWalk(units, map, n_point); // XXX. This is very heavy duty. Is there another way to nicely slide off walks eg. dot product?
     const bool e_walk = Units_CanWalk(units, map, e_point);
     const bool s_walk = Units_CanWalk(units, map, s_point);
     const bool w_walk = Units_CanWalk(units, map, w_point);
-    const Point offset = Grid_GetCornerOffset(grid, unit.cart_grid_offset);
-    const int32_t repulsion = 10 * unit.accel; // XXX. How strong should this be?
+    const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
+    const int32_t repulsion = 10 * unit->accel; // XXX. How strong should this be?
     const Point n_force = Point_Mul(n, repulsion);
     const Point e_force = Point_Mul(e, repulsion);
     const Point s_force = Point_Mul(s, repulsion);
-    const Point w_force = Point_Mul(w, repulsion);
+    const Point w_force = Point_Mul(w, repulsion); // XXX. Boids are still jumping out of walls - need some sort of reset to put them back in their last good spot.
     const int32_t border = 10;
     static Point zero;
     Point out = zero;
@@ -301,15 +300,16 @@ static Point WallPushBoids(const Units units, const Unit unit, const Map map, co
 // This function ensures all boids on a tile share the same path index
 // so the group acts like it guided by a single leader.
 
-static void UnifyBoids(const Units units, const Unit unit)
+static void UnifyBoids(const Units units, Unit* const unit)
 {
-    const Stack stack = Units_GetStackCart(units, unit.cart);
-    const int32_t max = Stack_GetMaxPathIndex(stack);
+    const Stack stack = Units_GetStackCart(units, unit->cart);
+    const int32_t max = Stack_GetMaxPathIndex(stack, unit->color);
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
         if(max < other->path.count
-        && unit.command_group == other->command_group)
+        && unit->command_group == other->command_group
+        && unit->color == other->color)
             other->path_index = max;
     }
 }
@@ -319,19 +319,20 @@ static void UnifyBoids(const Units units, const Unit unit)
 // A simple solution is to stop all boids from reaching their final point
 // within a grid tile by stopping all boids within the grid tile.
 
-static void StopBoids(const Units units, const Unit unit)
+static void StopBoids(const Units units, Unit* const unit)
 {
-    const Stack stack = Units_GetStackCart(units, unit.cart);
+    const Stack stack = Units_GetStackCart(units, unit->cart);
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        if(unit.path.count == 0
-        && unit.command_group == other->command_group)
+        if(unit->path.count == 0
+        && unit->command_group == other->command_group
+        && unit->color == other->color)
             other->path = Points_Free(other->path);
     }
 }
 
-static Point CalculateStressors(const Units units, const Unit unit, const Map map, const Grid grid)
+static Point CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
 {
     const Point point[] = {
         CoheseBoids(units, unit),
@@ -346,44 +347,45 @@ static Point CalculateStressors(const Units units, const Unit unit, const Map ma
     return stressors;
 }
 
-static void RepathStuckBoids(const Units units, const Map map)
+// If any boid is stuck, chances are good a few surrounding boids
+// are stuck too. This repath function will reroute all stuck boids on one tlie
+// if one boid is stuck on that tile.
+
+static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing segfaults.
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         const Unit unit = units.unit[i];
-        if(unit.path_index_time > 500)
+        if(unit.path_index_time > 500) // XXX, What is a good timeout time?
         {
             const Stack stack = Units_GetStackCart(units, unit.cart);
-            const Point cart_goal = unit.path.point[unit.path.count - 1];
-            for(int32_t j = 0; j < stack.count; j++)
+            if(unit.path.count > 0) // Unit must have a goal already.
             {
-                Unit* const reference = stack.reference[j];
-                *reference = ApplyPath(units, *reference, map, cart_goal, unit.cart_grid_offset_goal);
+                const Point cart_goal = unit.path.point[unit.path.count - 1];
+                for(int32_t j = 0; j < stack.count; j++)
+                {
+                    Unit* const reference = stack.reference[j];
+                    if(reference->color == unit.color)
+                        ApplyPath(units, reference, map, cart_goal, unit.cart_grid_offset_goal);
+                }
             }
         }
     }
 }
 
-static void ApplyHardRules(const Units units, const Unit unit)
-{
-    UnifyBoids(units, unit);
-    StopBoids(units, unit);
-
-    // XXX. Need a rule to reset boid paths when stuck behind squares.
-}
-
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
-static void PathFindBoids(const Units units, const Grid grid, const Map map)
+static void FollowPathBoids(const Units units, const Grid grid, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++) // XXX. Cannot be threaded due to read writes.
     {
-        Unit unit = units.unit[i];
-        ApplyHardRules(units, unit);
-        const Point stressors = CalculateStressors(units, unit, map, grid);
-        unit = Unit_Flow(unit, grid, stressors);
-        units.unit[i] = Unit_Move(unit, grid);
+        Unit* const unit = &units.unit[i];
+        UnifyBoids(units, unit);
+        StopBoids(units, unit);
+        const Point stressors = CalculateBoidStressors(units, unit, map, grid);
+        Unit_Flow(unit, grid, stressors);
+        Unit_Move(unit, grid);
     }
     RepathStuckBoids(units, map);
 }
@@ -412,7 +414,7 @@ static void CalculateCenters(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
-    PathFindBoids(units, grid, map);
+    FollowPathBoids(units, grid, map);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);
