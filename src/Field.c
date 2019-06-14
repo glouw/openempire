@@ -81,7 +81,8 @@ static void Set(const Field field, const Point point, const char ch)
 
 static bool IsWalkable(const Field field, const Point point) // XXX. MUST expand this to avoid pathing into corners.
 {
-    return Get(field, point) == WALKABLE_SPACE;
+    return IsInBounds(field, point)
+        && Get(field, point) == WALKABLE_SPACE;
 }
 
 static Points ToPoints(const Queue queue)
@@ -151,9 +152,8 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
         for(int32_t i = 0; i < dirs; i++)
         {
             const Point next = Point_Add(current, deltas[i]);
-            if(IsInBounds(field, next)  // XXX. Needs one more check to make sure point is not a corner between between two non walkable tiles.
-            && IsWalkable(field, next)) // eg. #
-            {                           //     x #
+            if(IsWalkable(field, next))
+            {
                 if(Point_Equal(AccessQueue(field, came_from, next), none))
                 {
                     frontier = Enqueue(frontier, next);
