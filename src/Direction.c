@@ -36,14 +36,14 @@ Direction Direction_CartToIso(const Direction dir)
 {
     const int32_t index = (int32_t) dir;
     const Direction dirs[] = {
-        DIRECTION_E,
-        DIRECTION_SE,
+        DIRECTION_SE, // Notice how south east is now first instead of last - this is essentially a 45 degree rotation, eg. cart to iso.
         DIRECTION_S,
         DIRECTION_SW,
         DIRECTION_W,
         DIRECTION_NW,
         DIRECTION_N,
         DIRECTION_NE,
+        DIRECTION_E,
     };
     return dirs[index];
 }
