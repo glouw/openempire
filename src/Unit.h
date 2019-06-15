@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "Color.h"
 #include "Grid.h"
+#include "Direction.h"
 
 typedef struct
 {
@@ -24,6 +25,7 @@ typedef struct
     int32_t id;
     int32_t command_group;
     Color color;
+    Direction dir;
 }
 Unit;
 

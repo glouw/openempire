@@ -90,18 +90,12 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
     return tile;
 }
 
-Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file)
+Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file, const Direction dir)
 {
     const int32_t direction_frames = animation.count / 5;
-
-    int32_t direction = (Timer_GetCycles() / 60) % 8; // XXX. Take from Unit.
-
     bool flip_vert = false;
-    if(direction == 5) { direction = 3; flip_vert = true; }
-    if(direction == 6) { direction = 2; flip_vert = true; }
-    if(direction == 7) { direction = 1; flip_vert = true; }
-
-    const int32_t index = direction_frames * direction + (Timer_GetKeyFrames() % direction_frames);
+    const Direction fixed_dir = Direction_Fix(dir, &flip_vert);
+    const int32_t index = direction_frames * fixed_dir + (Timer_GetKeyFrames() % direction_frames);
 
     // A little unfortunate, but the hot spots for the terrain tiles are not centered.
     // Units must therefor be forced to the terrain tile positions.

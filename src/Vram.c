@@ -355,7 +355,7 @@ void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units u
             static Point zero;
             const Point cart = unit.path.point[j];
             const Graphics file = FILE_WAYPOINT_FLAG;
-            const Tile tile = Tile_GetGraphics(overview, cart, zero, graphics.animation[COLOR_BLU][file], file);
+            const Tile tile = Tile_GetGraphics(overview, cart, zero, graphics.animation[COLOR_BLU][file], file, DIRECTION_S);
             Vram_DrawTile(vram, tile);
         }
     }
@@ -471,7 +471,6 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
     const Image image = terrain.animation[COLOR_BLU][FILE_DIRT].image[0];
     const Frame frame = terrain.animation[COLOR_BLU][FILE_DIRT].frame[0];
     const Point snap = Overview_IsoSnapTo(overview, input.point);
-
     for(int32_t i = 0; i < frame.height; i++)
     {
         const Outline outline = image.outline_table[i];

@@ -34,7 +34,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
 
             const Animation animation = graphics.animation[ref->color][ref->file];
 
-            tile[unit_count] = Tile_GetGraphics(overview, point, ref->cart_grid_offset, animation, ref->file);
+            tile[unit_count] = Tile_GetGraphics(overview, point, ref->cart_grid_offset, animation, ref->file, ref->dir);
             tile[unit_count].reference = ref;
             unit_count++;
         }

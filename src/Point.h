@@ -33,3 +33,5 @@ int64_t Point_Mag(const Point);
 Point Point_Normalize(const Point, const int64_t normal);
 
 Point Point_Dot(const Point a, const Point b);
+
+int32_t Point_Slope(const Point);
