@@ -3,10 +3,9 @@
 #include "Rect.h"
 #include "Util.h"
 
-static void SkipFirstPoint(Unit* const unit)
+static void ConditionallySkipFirstPoint(Unit* const unit)
 {
-    if(unit->path.count > 1
-    && unit->path_index == 0)
+    if(unit->path.count > 1 && unit->path_index == 0)
         unit->path_index++;
 }
 
@@ -55,7 +54,7 @@ static void FollowPath(Unit* const unit, const Grid grid)
 {
     if(unit->path.count > 0)
     {
-        SkipFirstPoint(unit);
+        ConditionallySkipFirstPoint(unit);
         AccelerateAlongPath(unit, grid);
     }
     else if(Point_Mag(unit->velocity) > 0)
@@ -127,10 +126,10 @@ void Unit_Print(Unit* const unit)
     printf("group                 :: %d\n",      unit->command_group);
 }
 
-void Unit_Flow(Unit* const unit, const Grid grid, const Point stressors)
+void Unit_Flow(Unit* const unit, const Grid grid)
 {
     FollowPath(unit, grid);
-    unit->velocity = Point_Add(unit->velocity, stressors);
+    unit->velocity = Point_Add(unit->velocity, unit->stressors);
     CapSpeed(unit);
 }
 

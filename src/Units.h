@@ -17,14 +17,11 @@ typedef struct
     Unit* unit;
     int32_t count;
     int32_t max;
-
     Stack* stack;
     int32_t rows;
     int32_t cols;
-
     int32_t id_next;
     int32_t command_group_next;
-
     int32_t select_count;
 }
 Units;

@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-    for(int32_t i = 0; i < 500; i++)
+    for(int32_t i = 0; i < 25; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
@@ -227,11 +227,14 @@ static Point SeparateBoids(const Units units, Unit* const unit)
                 const Point diff = Point_Sub(other->cell, unit->cell);
                 if(Point_IsZero(diff))
                 {
-                    const Point nudge = { 1000, 0 }; // For when boids on top of one another.
+                    const Point nudge = {
+                        1000 * ((Util_Rand() % 1000) - 500),
+                        1000 * ((Util_Rand() % 1000) - 500),
+                    };
                     out = Point_Sub(out, nudge);
                 }
                 else
-                if(Point_Mag(diff) < 15000) // XXX. What is a good width?
+                if(Point_Mag(diff) < 20000) // XXX. What is a good width?
                     out = Point_Sub(out, diff);
             }
         }
@@ -300,7 +303,7 @@ static void UnifyBoids(const Units units, Unit* const unit)
     for(int32_t i = 0; i < stack.count; i++)
     {
         Unit* const other = stack.reference[i];
-        if(other->path.count >max && Unit_InPlatoon(unit, other))
+        if(other->path.count > max && Unit_InPlatoon(unit, other))
             other->path_index = max;
     }
 }
@@ -321,7 +324,7 @@ static void StopBoids(const Units units, Unit* const unit)
     }
 }
 
-static Point CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
+static void CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
 {
     const Point point[] = {
         CoheseBoids(units, unit),
@@ -333,7 +336,7 @@ static Point CalculateBoidStressors(const Units units, Unit* const unit, const M
     Point stressors = zero;
     for(int32_t j = 0; j < UTIL_LEN(point); j++)
         stressors = Point_Add(stressors, point[j]);
-    return stressors;
+    unit->stressors = stressors;
 }
 
 // If any boid is stuck, chances are good a few surrounding boids
@@ -367,13 +370,29 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
 
 static void FollowPathBoids(const Units units, const Grid grid, const Map map)
 {
-    for(int32_t i = 0; i < units.count; i++) // XXX. Cannot be threaded due to read writes.
+    // XXX. To be single threaded.
+
+    for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         UnifyBoids(units, unit);
         StopBoids(units, unit);
-        const Point stressors = CalculateBoidStressors(units, unit, map, grid);
-        Unit_Flow(unit, grid, stressors);
+    }
+
+    // XXX. To be multi threaded - all reads.
+
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        CalculateBoidStressors(units, unit, map, grid);
+    }
+
+    // XXX. To be multi threaded - all writes.
+
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        Unit_Flow(unit, grid);
         Unit_Move(unit, grid);
         if(!Units_CanWalk(units, map, unit->cart))
             Unit_UndoMove(unit, grid);

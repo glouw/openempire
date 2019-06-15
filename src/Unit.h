@@ -26,6 +26,7 @@ typedef struct
     int32_t command_group;
     Color color;
     Direction dir;
+    Point stressors;
 }
 Unit;
 
@@ -37,6 +38,6 @@ void Unit_Move(Unit* const, const Grid);
 
 void Unit_Print(Unit* const);
 
-void Unit_Flow(Unit* const, const Grid, const Point stressors);
+void Unit_Flow(Unit* const, const Grid);
 
 bool Unit_InPlatoon(Unit* const unit, Unit* const other);
