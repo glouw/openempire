@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-static Units GenerateTestZone(Units units, const Grid grid)
+static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
     for(int32_t i = 0; i < 500; i++)
     {
@@ -18,33 +18,34 @@ static Units GenerateTestZone(Units units, const Grid grid)
             Util_Rand() % units.cols,
             Util_Rand() % units.rows,
         };
-        switch(Util_Rand() % 5)
-        {
-        default:
-        case 0:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, (Color) (Util_Rand() % COLOR_COUNT)));
-            break;
+        if(Units_CanWalk(units, map, cart))
+            switch(Util_Rand() % 5)
+            {
+            default:
+            case 0:
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, (Color) (Util_Rand() % COLOR_COUNT)));
+                break;
 #if 0
-        case 1:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE, COLOR_BLU));
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU));
-            break;
-        case 2:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_GOLD_MINE, COLOR_BLU));
-            break;
-        case 3:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_STONE_MINE, COLOR_BLU));
-            break;
-        case 4:
-            units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH, COLOR_BLU));
-            break;
+            case 1:
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE, COLOR_BLU));
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU));
+                break;
+            case 2:
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_GOLD_MINE, COLOR_BLU));
+                break;
+            case 3:
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_STONE_MINE, COLOR_BLU));
+                break;
+            case 4:
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH, COLOR_BLU));
+                break;
 #endif
-        }
+            }
     }
     return units;
 }
 
-Units Units_New(const int32_t max, const Grid grid)
+Units Units_New(const int32_t max, const Map map, const Grid grid)
 {
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
@@ -60,7 +61,7 @@ Units Units_New(const int32_t max, const Grid grid)
     units.stack = stack;
     units.rows = grid.rows;
     units.cols = grid.cols;
-    units = GenerateTestZone(units, grid);
+    units = GenerateTestZone(units, map, grid);
     return units;
 }
 
@@ -254,17 +255,6 @@ static Point AlignBoids(const Units units, Unit* const unit)
     return zero;
 }
 
-// +--*---*---*--+
-// |   \  |  /   |
-// |    \ | /    |
-// |     \|/     |
-// |      +      |
-// |             |
-// +-------------+
-
-// XXX. This needs to behave like separate boids, where each tile has dummy "sentries" almost
-// guarding its edges like in the figure above. This will push the boids away.
-
 static Point WallPushBoids(const Units units, Unit* const unit, const Map map, const Grid grid)
 {
     const Point n = {  0, -1 }; // XXX. Rewrite this all with loops.
@@ -382,6 +372,11 @@ static void FollowPathBoids(const Units units, const Grid grid, const Map map)
         const Point stressors = CalculateBoidStressors(units, unit, map, grid);
         Unit_Flow(unit, grid, stressors);
         Unit_Move(unit, grid);
+        if(!Units_CanWalk(units, map, unit->cart))
+        {
+            Unit_UndoMove(unit, grid);
+            puts("CANT MOVE THERE");
+        }
     }
     RepathStuckBoids(units, map);
 }

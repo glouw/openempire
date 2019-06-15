@@ -11,6 +11,7 @@ typedef struct
     Point cart_grid_offset;
     Point cart_grid_offset_goal;
     Point cell;
+    Point cell_last;
     int32_t max_speed;
     int32_t accel;
     Point velocity;
@@ -27,6 +28,8 @@ typedef struct
 Unit;
 
 Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color);
+
+void Unit_UndoMove(Unit* const, const Grid);
 
 void Unit_Move(Unit* const, const Grid);
 

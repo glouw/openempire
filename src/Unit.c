@@ -66,14 +66,25 @@ static void CapSpeed(Unit* const unit)
         unit->velocity = Point_Normalize(unit->velocity, unit->max_speed);
 }
 
-// XXX. Needs collision detection for map edge and non-walkable objects (eg. tiles and units)
-// Note that unit just needs to stop dead in their tracks - the current sweep will handle the rest.
+static void UpdateCart(Unit* const unit, const Grid grid)
+{
+    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
+    unit->cart = Grid_CellToCart(grid, unit->cell);
+}
+
+void Unit_UndoMove(Unit* const unit, const Grid grid)
+{
+    unit->cell = unit->cell_last;
+    UpdateCart(unit, grid);
+    static Point zero;
+    unit->velocity = zero;
+}
 
 void Unit_Move(Unit* const unit, const Grid grid)
 {
+    unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
-    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
-    unit->cart = Grid_CellToCart(grid, unit->cell);
+    UpdateCart(unit, grid);
 }
 
 static void UpdateFile(Unit* const unit, const Graphics file)

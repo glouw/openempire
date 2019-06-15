@@ -29,7 +29,7 @@ typedef struct
 }
 Units;
 
-Units Units_New(const int32_t max, const Grid grid);
+Units Units_New(const int32_t max, const Map map, const Grid grid);
 
 Units Units_Append(Units, const Unit);
 
