@@ -22,6 +22,7 @@ typedef struct
     bool needs_clipping;
     uint8_t height;
     Unit* reference;
+    bool flip_vert;
 }
 Tile;
 

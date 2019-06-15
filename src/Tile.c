@@ -98,7 +98,6 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
 
     const Point south = { 0, 1 };
     const Point shifted = Point_Add(cart, south);
-
     Tile tile = Tile_Construct(overview, shifted, cart_grid_offset, animation, index);
     tile.height = Graphics_GetHeight(file);
     return tile;
@@ -106,25 +105,23 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
 
 Point Tile_GetHotSpotCoords(const Tile tile)
 {
-    const Point coords = {
-        tile.iso_pixel.x + tile.iso_pixel_offset.x,
-        tile.iso_pixel.y + tile.iso_pixel_offset.y,
-    };
-    return coords;
+    return Point_Add(tile.iso_pixel, tile.iso_pixel_offset);
 }
 
 Point Tile_GetTopLeftCoords(const Tile tile)
 {
     const Point hotspot = {
-        tile.frame.hotspot_x,
-        tile.frame.hotspot_y,
+        tile.flip_vert ? (tile.frame.width - 1 - tile.frame.hotspot_x) : tile.frame.hotspot_x,
+        tile.frame.hotspot_y
     };
     return Point_Sub(Tile_GetHotSpotCoords(tile), hotspot);
 }
 
 Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_t y)
 {
-    const Point point = { x, y };
+    const Point point = {
+        tile.flip_vert ? (tile.frame.width - 1 - x) : x, y
+    };
     return Point_Add(point, Tile_GetTopLeftCoords(tile));
 }
 

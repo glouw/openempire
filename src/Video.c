@@ -62,15 +62,17 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
         SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
         Text_Printf(video.text, video.renderer, video.bot_rite, POSITION_BOT_RITE, 0xFF, 0, "%d / %d", index, count);
         SDL_RenderPresent(video.renderer);
-        SDL_Delay(20);
+        SDL_Delay(60);
     }
 }
 
 static void RenderAnimationDemo(const Video video, const Animation animation, const Point point)
 {
+    const bool flips[] = { false, true };
+    for(int32_t j = 0; j < UTIL_LEN(flips); j++)
     for(int32_t i = 0; i < animation.count; i++)
     {
-        const Tile tile = { animation.frame[i], point, {0,0}, animation.surface[i], true, 255, NULL };
+        const Tile tile = { animation.frame[i], point, {0,0}, animation.surface[i], true, 255, NULL, flips[j] };
         RenderDemoTile(video, tile, i, animation.count);
     }
 }
@@ -91,7 +93,7 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
     for(int32_t j = 0; j < (int32_t) blendomatic.nr_tiles; j++)
     {
         const Mode mode = blendomatic.mode[i];
-        const Tile tile = { mode.frame, video.middle, {0,0}, mode.mask_demo[j], true, 255, NULL };
+        const Tile tile = { mode.frame, video.middle, {0,0}, mode.mask_demo[j], true, 255, NULL, false };
         RenderDemoTile(video, tile, j, blendomatic.nr_tiles);
     }
 }

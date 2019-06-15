@@ -54,7 +54,7 @@ static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
     return x < 0 || y < 0 || x >= vram.xres || y >= vram.yres;
 }
 
-static void Transfer(const Vram vram, const Tile tile, const Point coords, const int32_t x, const int32_t y)
+static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)
 {
     const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
     if(tile.height > height)
@@ -74,7 +74,7 @@ static void DrawTileNoClip(const Vram vram, const Tile tile)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
         const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
-        Transfer(vram, tile, coords, x, y);
+        TransferTilePixel(vram, tile, coords, x, y);
     }
 }
 
@@ -85,7 +85,7 @@ static void DrawTileClip(const Vram vram, const Tile tile)
     {
         const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
         if(!OutOfBounds(vram, coords.x, coords.y))
-            Transfer(vram, tile, coords, x, y);
+            TransferTilePixel(vram, tile, coords, x, y);
     }
 }
 
@@ -158,7 +158,7 @@ static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int
     return blend_pixel;
 }
 
-static void BlendTransfer(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
+static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
 {
     const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
     if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
@@ -180,7 +180,7 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     {
         const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
         if(!OutOfBounds(vram, coords.x, coords.y))
-            BlendTransfer(vram, tile, coords, mask, x, y);
+            BlendTilePixel(vram, tile, coords, mask, x, y);
     }
 }
 
@@ -190,7 +190,7 @@ static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* co
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
         const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
-        BlendTransfer(vram, tile, coords, mask, x, y);
+        BlendTilePixel(vram, tile, coords, mask, x, y);
     }
 }
 
