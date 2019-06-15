@@ -345,7 +345,7 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->path_index_time > 500) // XXX, What is a good timeout time?
+        if(unit->path_index_time > 100) // XXX, What is a good timeout time?
         {
             const Stack stack = Units_GetStackCart(units, unit->cart);
             if(unit->path.count > 0) // Unit must have a goal already.
@@ -376,10 +376,7 @@ static void FollowPathBoids(const Units units, const Grid grid, const Map map)
         Unit_Flow(unit, grid, stressors);
         Unit_Move(unit, grid);
         if(!Units_CanWalk(units, map, unit->cart))
-        {
             Unit_UndoMove(unit, grid);
-            puts("CANT MOVE THERE");
-        }
     }
     RepathStuckBoids(units, map);
 }
