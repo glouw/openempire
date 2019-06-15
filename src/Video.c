@@ -26,6 +26,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.canvas = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
     video.title = title;
     video.text = Text_Build("art/blood_and_blade.ttf", 50, 0x00FF0000);
+    video.text_small = Text_Build("art/blood_and_blade.ttf", 25, 0x00FFFF00);
     video.xres = xres;
     video.yres = yres;
     video.cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -44,6 +45,7 @@ void Video_Free(const Video video)
     SDL_DestroyTexture(video.canvas);
     SDL_FreeCursor(video.cursor);
     Text_Free(video.text);
+    Text_Free(video.text_small);
     SDL_Quit();
 }
 
@@ -123,8 +125,12 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_Unlock(video.canvas);
 }
 
-void Video_PresentCanvas(const Video video)
+void Video_CopyRenderer(const Video video)
 {
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
+}
+
+void Video_Present(const Video video)
+{
     SDL_RenderPresent(video.renderer);
 }

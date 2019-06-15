@@ -12,6 +12,7 @@ int32_t main(int32_t argc, char* argv[])
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(video.xres, video.yres, grid);
     Units units = Units_New(8, grid);
+    int32_t dt_hold = 0;
 
     int32_t cycles = 0;
     if(args.demo)
@@ -25,11 +26,13 @@ int32_t main(int32_t argc, char* argv[])
         units = Units_Caretake(units, data.graphics, overview, grid, input, map);
         Video_Draw(video, data, map, units, overview, input);
         const int32_t t1 = SDL_GetTicks();
-        Video_PresentCanvas(video);
-        const int32_t ms = 1000 / 60 - (t1 - t0);
-#if 0
-        printf("%d\n", t1 - t0);
-#endif
+        const int32_t dt = t1 - t0;
+        const int32_t ms = 1000 / 60 - dt;
+        Video_CopyRenderer(video);
+        if(cycles % 10 == 0)
+            dt_hold = dt;
+        Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0, "dt %3d\n", dt_hold);
+        Video_Present(video);
         SDL_Delay(ms < 0 ? 0 : ms);
         cycles++;
         if(args.measure)
