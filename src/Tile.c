@@ -94,14 +94,12 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
 {
     const int32_t direction_frames = animation.count / 5;
 
-    int32_t direction = (Timer_GetCycles() / 60) % 10; // XXX. Take from Unit.
+    int32_t direction = (Timer_GetCycles() / 60) % 8; // XXX. Take from Unit.
 
     bool flip_vert = false;
-    if(direction == 5) { direction = 4; flip_vert = true; }
-    if(direction == 6) { direction = 3; flip_vert = true; }
-    if(direction == 7) { direction = 2; flip_vert = true; }
-    if(direction == 8) { direction = 1; flip_vert = true; }
-    if(direction == 9) { direction = 0; flip_vert = true; }
+    if(direction == 5) { direction = 3; flip_vert = true; }
+    if(direction == 6) { direction = 2; flip_vert = true; }
+    if(direction == 7) { direction = 1; flip_vert = true; }
 
     const int32_t index = direction_frames * direction + (Timer_GetKeyFrames() % direction_frames);
 
