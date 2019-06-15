@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-    for(int32_t i = 0; i < 25; i++)
+    for(int32_t i = 0; i < 500; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
@@ -336,7 +336,10 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     Point stressors = zero;
     for(int32_t j = 0; j < UTIL_LEN(point); j++)
         stressors = Point_Add(stressors, point[j]);
-    unit->stressors = stressors;
+    if(Point_Mag(stressors) < 300)
+        unit->stressors = zero;
+    else
+        unit->stressors = stressors;
 }
 
 // If any boid is stuck, chances are good a few surrounding boids
@@ -370,8 +373,6 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
 
 static void FollowPathBoids(const Units units, const Grid grid, const Map map)
 {
-    // XXX. To be single threaded.
-
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
