@@ -19,11 +19,13 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
             Util_Rand() % units.rows,
         };
         if(Units_CanWalk(units, map, cart))
+        {
+            const Color color = (Color) (Util_Rand() % COLOR_COUNT);
             switch(Util_Rand() % 5)
             {
             default:
             case 0:
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, (Color) (Util_Rand() % COLOR_COUNT)));
+                units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, color));
                 break;
 #if 0
             case 1:
@@ -41,6 +43,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
                 break;
 #endif
             }
+        }
     }
     return units;
 }
@@ -140,9 +143,9 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static void ApplyPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+static void FindPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
-    const Field field = Field_New(map, units); // XXX. Should really only construct this once, unless the map is always changing?
+    const Field field = Field_New(map, units);
     Points_Free(unit->path);
     unit->path_index = 0;
     unit->path_index_time = 0;
@@ -152,14 +155,14 @@ static void ApplyPath(const Units units, Unit* const unit, const Map map, const 
     Field_Free(field);
 }
 
-static void ApplyPathToSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+static void FindPathForSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->selected
         && unit->max_speed > 0)
-            ApplyPath(units, unit, map, cart_goal, cart_grid_offset_goal);
+            FindPath(units, unit, map, cart_goal, cart_grid_offset_goal);
     }
 }
 
@@ -172,7 +175,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
-            ApplyPathToSelected(units, map, cart_goal, cart_grid_offset_goal);
+            FindPathForSelected(units, map, cart_goal, cart_grid_offset_goal);
     }
     return units;
 }
@@ -341,18 +344,18 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        const Unit unit = units.unit[i];
-        if(unit.path_index_time > 500) // XXX, What is a good timeout time?
+        Unit* const unit = &units.unit[i];
+        if(unit->path_index_time > 500) // XXX, What is a good timeout time?
         {
-            const Stack stack = Units_GetStackCart(units, unit.cart);
-            if(unit.path.count > 0) // Unit must have a goal already.
+            const Stack stack = Units_GetStackCart(units, unit->cart);
+            if(unit->path.count > 0) // Unit must have a goal already.
             {
-                const Point cart_goal = unit.path.point[unit.path.count - 1];
+                const Point cart_goal = unit->path.point[unit->path.count - 1];
                 for(int32_t j = 0; j < stack.count; j++)
                 {
                     Unit* const reference = stack.reference[j];
-                    if(reference->color == unit.color)
-                        ApplyPath(units, reference, map, cart_goal, unit.cart_grid_offset_goal);
+                    if(reference->color == unit->color)
+                        FindPath(units, reference, map, cart_goal, unit->cart_grid_offset_goal);
                 }
             }
         }
