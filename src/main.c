@@ -33,7 +33,7 @@ int32_t main(int32_t argc, char* argv[])
         Video_CopyRenderer(video);
         if(cycles % 10 == 0)
             dt_hold = dt;
-        Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0, "dt %3d\n", dt_hold);
+        Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0, "DT: %4d / 16.667\n", dt_hold);
         Video_Present(video);
         SDL_Delay(ms < 0 ? 0 : ms);
         cycles++;
