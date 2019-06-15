@@ -39,6 +39,7 @@ SRCS += Terrain.c
 SRCS += Text.c
 SRCS += Tile.c
 SRCS += Tiles.c
+SRCS += Timer.c
 SRCS += Unit.c
 SRCS += Units.c
 SRCS += Util.c

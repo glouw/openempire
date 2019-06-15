@@ -1,6 +1,7 @@
 #include "Tile.h"
 
 #include "Rect.h"
+#include "Timer.h"
 #include "Util.h"
 
 bool Tile_IsHotspotInRect(const Tile tile, const Rect rect)
@@ -91,7 +92,18 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 
 Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file)
 {
-    const int32_t index = 1; // XXX... which one to use?
+    const int32_t direction_frames = animation.count / 5;
+
+    int32_t direction = (Timer_GetCycles() / 60) % 10; // XXX. Take from Unit.
+
+    bool flip_vert = false;
+    if(direction == 5) { direction = 4; flip_vert = true; }
+    if(direction == 6) { direction = 3; flip_vert = true; }
+    if(direction == 7) { direction = 2; flip_vert = true; }
+    if(direction == 8) { direction = 1; flip_vert = true; }
+    if(direction == 9) { direction = 0; flip_vert = true; }
+
+    const int32_t index = direction_frames * direction + (Timer_GetKeyFrames() % direction_frames);
 
     // A little unfortunate, but the hot spots for the terrain tiles are not centered.
     // Units must therefor be forced to the terrain tile positions.
@@ -100,6 +112,8 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
     const Point shifted = Point_Add(cart, south);
     Tile tile = Tile_Construct(overview, shifted, cart_grid_offset, animation, index);
     tile.height = Graphics_GetHeight(file);
+    tile.flip_vert = flip_vert;
+
     return tile;
 }
 
