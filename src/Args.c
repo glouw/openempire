@@ -22,7 +22,11 @@ Args Args_Parse(int32_t argc, char* argv[])
         {
             args.demo = true;
             if(i != argc - 1)
-                args.color = (Color) atoi(argv[++i]);
+            {
+                const Color color = (Color) atoi(argv[++i]);
+                if(color < COLOR_COUNT)
+                    args.color = color;
+            }
         }
         else
         if(Check(arg, "--measure", "-m"))

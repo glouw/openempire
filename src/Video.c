@@ -62,7 +62,7 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
         SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
         Text_Printf(video.text, video.renderer, video.bot_rite, POSITION_BOT_RITE, 0xFF, 0, "%d / %d", index, count);
         SDL_RenderPresent(video.renderer);
-        SDL_Delay(60);
+        SDL_Delay(20);
     }
 }
 
