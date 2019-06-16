@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-    for(int32_t i = 0; i < 500; i++)
+    for(int32_t i = 0; i < 1000; i++)
     {
         const Point cart = {
             Util_Rand() % units.cols,
