@@ -35,8 +35,6 @@ Tile Tile_GetGraphics(const Overview, const Point cart, const Point cart_grid_of
 
 Point Tile_GetTopLeftOffsetCoords(const Tile, const int32_t x, const int32_t y);
 
-Tile Tile_Construct(const Overview, const Point cart, const Point cart_grid_offset, const Animation, const int32_t index);
-
 Point Tile_GetHotSpotCoords(const Tile);
 
 Point Tile_GetTopLeftCoords(const Tile);

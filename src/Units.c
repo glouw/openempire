@@ -12,6 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
+#if 0
     for(int32_t x = 0; x < 10; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
@@ -24,6 +25,12 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
         const Point cart = { x, y };
         units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
     }
+#endif
+    const Point cart = {
+        map.cols / 2,
+        map.rows / 2,
+    };
+    units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
     return units;
 }
 
@@ -530,8 +537,20 @@ static void CalculateCenters(const Units units)
     }
 }
 
+void Delete(const Units units, const Input input)
+{
+    if(input.key[SDL_SCANCODE_DELETE])
+        for(int32_t i = 0; i < units.count; i++)
+        {
+            Unit* const unit = &units.unit[i];
+            if(unit->selected)
+                Unit_UpdateFileByState(unit, STATE_DECAY);
+        }
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
 {
+    Delete(units, input);
     FollowPathBoids(units, grid, map);
     ResetStacks(units);
     StackStacks(units);

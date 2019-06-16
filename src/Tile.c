@@ -69,7 +69,7 @@ static Tile Clip(Tile tile, const Overview overview)
     return tile;
 }
 
-Tile Tile_Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const int32_t index)
+static Tile Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const int32_t index, const bool flip_vert, const uint8_t height)
 {
     static Tile zero;
     Tile tile = zero;
@@ -77,6 +77,8 @@ Tile Tile_Construct(const Overview overview, const Point cart, const Point cart_
     tile.surface = animation.surface[index];
     tile.iso_pixel = Overview_CartToIso(overview, cart);
     tile.iso_pixel_offset = Point_ToIso(cart_grid_offset);
+    tile.flip_vert = flip_vert;
+    tile.height = height;
     return Clip(tile, overview);
 }
 
@@ -84,10 +86,9 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 {
     const int32_t bound = Util_Sqrt(animation.count);
     const int32_t index = (cart_point.x % bound) + ((cart_point.y % bound) * bound);
-    const Point cart_grid_offset = { 0,0 };
-    Tile tile = Tile_Construct(overview, cart_point, cart_grid_offset, animation, index);
-    tile.height = Terrain_GetHeight(file);
-    return tile;
+    const Point cart_grid_offset = { 0, 0 };
+    const uint8_t height = Terrain_GetHeight(file);
+    return Construct(overview, cart_point, cart_grid_offset, animation, index, false, height);
 }
 
 Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file, const Direction dir)
@@ -102,11 +103,8 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
 
     const Point south = { 0, 1 };
     const Point shifted = Point_Add(cart, south);
-    Tile tile = Tile_Construct(overview, shifted, cart_grid_offset, animation, index);
-    tile.height = Graphics_GetHeight(file);
-    tile.flip_vert = flip_vert;
-
-    return tile;
+    const uint8_t height = Graphics_GetHeight(file);
+    return Construct(overview, shifted, cart_grid_offset, animation, index, flip_vert, height);
 }
 
 Point Tile_GetHotSpotCoords(const Tile tile)
