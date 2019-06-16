@@ -12,38 +12,17 @@
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-    for(int32_t i = 0; i < 1000; i++)
+    for(int32_t x = 0; x < 10; x++)
+    for(int32_t y = 0; y < map.rows; y++)
     {
-        const Point cart = {
-            Util_Rand() % units.cols,
-            Util_Rand() % units.rows,
-        };
-        if(Units_CanWalk(units, map, cart))
-        {
-            const Color color = (Color) (Util_Rand() % COLOR_COUNT);
-            switch(Util_Rand() % 5)
-            {
-            default:
-            case 0:
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, color));
-                break;
-#if 0
-            case 1:
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE, COLOR_BLU));
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU));
-                break;
-            case 2:
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_GOLD_MINE, COLOR_BLU));
-                break;
-            case 3:
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_STONE_MINE, COLOR_BLU));
-                break;
-            case 4:
-                units = Units_Append(units, Unit_Make(cart, grid, FILE_BERRY_BUSH, COLOR_BLU));
-                break;
-#endif
-            }
-        }
+        const Point cart = { x, y };
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_BLU));
+    }
+    for(int32_t x = map.cols - 10; x < map.cols; x++)
+    for(int32_t y = 0; y < map.rows; y++)
+    {
+        const Point cart = { x, y };
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
     }
     return units;
 }
@@ -337,6 +316,24 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     unit->stressors = (Point_Mag(stressors) < 300) ? zero : stressors;
 }
 
+static void Repath(const Units units, const Map map, Unit* const unit)
+{
+    if(unit->path_index_time > 100) // XXX, What is a good timeout time?
+    {
+        const Stack stack = Units_GetStackCart(units, unit->cart);
+        if(unit->path.count > 0) // Unit must have a goal already.
+        {
+            const Point cart_goal = unit->path.point[unit->path.count - 1];
+            for(int32_t j = 0; j < stack.count; j++)
+            {
+                Unit* const reference = stack.reference[j];
+                if(reference->color == unit->color)
+                    FindPath(units, reference, map, cart_goal, unit->cart_grid_offset_goal);
+            }
+        }
+    }
+}
+
 // If any boid is stuck, chances are good a few surrounding boids
 // are stuck too. This repath function will reroute all stuck boids on one tlie
 // if one boid is stuck on that tile.
@@ -348,41 +345,43 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->path_index_time > 100) // XXX, What is a good timeout time?
+        Repath(units, map, unit);
+    }
+}
+
+static void FightBoids(const Units units, Unit* const unit)
+{
+    for(int32_t x = -1; x <= 1; x++)
+    for(int32_t y = -1; y <= 1; y++)
+    {
+        const Point cart_offset = { x, y };
+        const Point cart = Point_Add(unit->cart, cart_offset);
+        const Stack stack = Units_GetStackCart(units, cart);
+        for(int32_t i = 0; i < stack.count; i++)
         {
-            const Stack stack = Units_GetStackCart(units, unit->cart);
-            if(unit->path.count > 0) // Unit must have a goal already.
+            Unit* const other = stack.reference[i];
+            if(unit->color != other->color)
             {
-                const Point cart_goal = unit->path.point[unit->path.count - 1];
-                for(int32_t j = 0; j < stack.count; j++)
+                const Point diff = Point_Sub(other->cell, unit->cell);
+                const int64_t mag = Point_Mag(diff); // XXX. Use unit width.
+                if(mag < 30000)
                 {
-                    Unit* const reference = stack.reference[j];
-                    if(reference->color == unit->color)
-                        FindPath(units, reference, map, cart_goal, unit->cart_grid_offset_goal);
+                    unit->dir = Direction_CartToIso(Direction_GetCart(diff));
+                    Unit_UpdateFileByState(unit, STATE_ATTACK);
+                    other->health -= unit->attack;
                 }
             }
         }
     }
 }
 
-//if(mag < width + 5000 && unit->color != other->color)
-//{
-//    unit->dir = Direction_CartToIso(Direction_GetCart(diff));
-//    Unit_UpdateFileByState(unit, STATE_ATTACK);
-//}
-
 // DO NOT multithread.
 
 static void RunHardBoidRules(const Units units)
 {
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        UnifyBoids(units, unit);
-        ConditionallyStopBoids(units, unit);
-
-        // XXX: FIGHT HERE.
-    }
+    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
 
 typedef struct
