@@ -30,6 +30,7 @@ typedef struct
     Point stressors;
     State state;
     int32_t health;
+    int32_t attack;
 }
 Unit;
 

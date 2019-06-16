@@ -32,6 +32,7 @@ SRCS += Quad.c
 SRCS += Rect.c
 SRCS += Registrar.c
 SRCS += Scanline.c
+SRCS += State.c
 SRCS += Slp.c
 SRCS += Stack.c
 SRCS += Surface.c

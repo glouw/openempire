@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef enum
 {
     STATE_ATTACK,
@@ -9,3 +11,5 @@ typedef enum
     STATE_MOVE
 }
 State;
+
+bool State_IsDead(const State state);

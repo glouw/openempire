@@ -119,6 +119,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.accel = Graphics_GetAcceleration(file);
     unit.file_name = Graphics_GetString(file);
     unit.health = Graphics_GetHealth(file);
+    unit.attack = Graphics_GetAttack(file);
     unit.file = file;
     return unit;
 }
