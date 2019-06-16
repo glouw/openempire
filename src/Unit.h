@@ -2,6 +2,7 @@
 
 #include "Points.h"
 #include "Graphics.h"
+#include "State.h"
 #include "Color.h"
 #include "Grid.h"
 #include "Direction.h"
@@ -27,6 +28,7 @@ typedef struct
     Color color;
     Direction dir;
     Point stressors;
+    State state;
 }
 Unit;
 
@@ -41,3 +43,7 @@ void Unit_Print(Unit* const);
 void Unit_Flow(Unit* const, const Grid);
 
 bool Unit_InPlatoon(Unit* const unit, Unit* const other);
+
+void Unit_UpdateFileByState(Unit* const, const State);
+
+void Unit_FreePath(Unit* const);

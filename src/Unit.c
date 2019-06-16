@@ -18,12 +18,29 @@ static Point GetDelta(Unit* const unit, const Grid grid)
     return Point_Sub(goal_grid_coords, unit_grid_coords);
 }
 
+void Unit_FreePath(Unit* const unit)
+{
+    Unit_UpdateFileByState(unit, STATE_IDLE);
+    unit->path_index = 0;
+    unit->path_index_time = 0;
+    unit->path = Points_Free(unit->path);
+}
+
 static void ReachGoal(Unit* const unit)
 {
     unit->path_index++;
     unit->path_index_time = 0;
     if(unit->path_index >= unit->path.count)
-        unit->path = Points_Free(unit->path);
+        Unit_FreePath(unit);
+}
+
+static void GotoGoal(Unit* const unit, const Point delta)
+{
+    const Point dv = Point_Normalize(delta, unit->accel);
+    unit->velocity = Point_Add(unit->velocity, dv);
+    const Direction cart_dir = Direction_GetCart(dv);
+    unit->dir = Direction_CartToIso(cart_dir);
+    Unit_UpdateFileByState(unit, STATE_MOVE);
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
@@ -33,12 +50,7 @@ static void AccelerateAlongPath(Unit* const unit, const Grid grid)
     if(Point_Mag(delta) < 10) // XXX: Is this too small? What about really fast moving guys?
         ReachGoal(unit);
     else
-    {
-        const Point dv = Point_Normalize(delta, unit->accel);
-        unit->velocity = Point_Add(unit->velocity, dv);
-        const Direction cart_dir = Direction_GetCart(dv);
-        unit->dir = Direction_CartToIso(cart_dir);
-    }
+        GotoGoal(unit, delta);
 }
 
 static void Decelerate(Unit* const unit)
@@ -57,8 +69,7 @@ static void FollowPath(Unit* const unit, const Grid grid)
         ConditionallySkipFirstPoint(unit);
         AccelerateAlongPath(unit, grid);
     }
-    else if(Point_Mag(unit->velocity) > 0)
-        Decelerate(unit);
+    else if(Point_Mag(unit->velocity) > 0) Decelerate(unit);
 }
 
 static void CapSpeed(Unit* const unit)
@@ -96,6 +107,15 @@ static void UpdateFile(Unit* const unit, const Graphics file)
     unit->file_name = Graphics_GetString(file);
 }
 
+void Unit_UpdateFileByState(Unit* const unit, const State state)
+{
+    const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
+    const int32_t next = base + (int32_t) state;
+    const Graphics file = (Graphics) next;
+    unit->state = state;
+    UpdateFile(unit, file);
+}
+
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color)
 {
     static Unit zero;
@@ -103,6 +123,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
+    unit.state = STATE_IDLE; // This is the base state, and is required for all new units as UpdateFileByState() references this base state.
     UpdateFile(&unit, file);
     return unit;
 }

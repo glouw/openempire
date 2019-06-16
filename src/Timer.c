@@ -5,7 +5,7 @@ static Timer timer;
 void Timer_Update(const int64_t cycles)
 {
     timer.cycles = cycles;
-    timer.key_frames = cycles / 5;
+    timer.key_frames = cycles / 3;
 }
 
 int64_t Timer_GetCycles(void)

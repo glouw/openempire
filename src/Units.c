@@ -147,9 +147,7 @@ static Units Select(Units units, const Overview overview, const Input input, con
 static void FindPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     const Field field = Field_New(map, units);
-    Points_Free(unit->path);
-    unit->path_index = 0;
-    unit->path_index_time = 0;
+    Unit_FreePath(unit);
     unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
     unit->cart_grid_offset_goal = cart_grid_offset_goal;
     unit->command_group = units.command_group_next;
@@ -321,7 +319,7 @@ static void StopBoids(const Units units, Unit* const unit)
     {
         Unit* const other = stack.reference[i];
         if(unit->path.count == 0 && Unit_InPlatoon(unit, other))
-            other->path = Points_Free(other->path);
+            Unit_FreePath(other);
     }
 }
 
@@ -344,7 +342,7 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
 // are stuck too. This repath function will reroute all stuck boids on one tlie
 // if one boid is stuck on that tile.
 //
-// DO NOT multithreaded.
+// DO NOT multithread.
 
 static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing segfaults.
 {
@@ -368,7 +366,7 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
     }
 }
 
-// DO NOT multithreaded.
+// DO NOT multithread.
 
 static void RunHardBoidsRules(const Units units)
 {
