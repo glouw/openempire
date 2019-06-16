@@ -65,6 +65,7 @@ Units Units_New(const int32_t max, const Map map, const Grid grid)
     units.rows = grid.rows;
     units.cols = grid.cols;
     units = GenerateTestZone(units, map, grid);
+    units.cpu_count = 2 * SDL_GetCPUCount();
     return units;
 }
 
@@ -336,15 +337,14 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     Point stressors = zero;
     for(int32_t j = 0; j < UTIL_LEN(point); j++)
         stressors = Point_Add(stressors, point[j]);
-    if(Point_Mag(stressors) < 300)
-        unit->stressors = zero;
-    else
-        unit->stressors = stressors;
+    unit->stressors = (Point_Mag(stressors) < 300) ? zero : stressors;
 }
 
 // If any boid is stuck, chances are good a few surrounding boids
 // are stuck too. This repath function will reroute all stuck boids on one tlie
 // if one boid is stuck on that tile.
+//
+// DO NOT multithreaded.
 
 static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing segfaults.
 {
@@ -368,10 +368,9 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
     }
 }
 
-// See the boids pseudocode:
-//   http://www.kfish.org/boids/pseudocode.html
+// DO NOT multithreaded.
 
-static void FollowPathBoids(const Units units, const Grid grid, const Map map)
+static void RunHardBoidsRules(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -379,25 +378,74 @@ static void FollowPathBoids(const Units units, const Grid grid, const Map map)
         UnifyBoids(units, unit);
         StopBoids(units, unit);
     }
+}
 
-    // XXX. To be multi threaded - all reads.
+typedef struct
+{
+    Units units;
+    Map map;
+    Grid grid;
+    int32_t a;
+    int32_t b;
+}
+Needle;
 
-    for(int32_t i = 0; i < units.count; i++)
+static int32_t RunStressorNeedle(void* data)
+{
+    Needle* const needle = (Needle*) data;
+    for(int32_t i = needle->a; i < needle->b; i++)
     {
-        Unit* const unit = &units.unit[i];
-        CalculateBoidStressors(units, unit, map, grid);
+        Unit* const unit = &needle->units.unit[i];
+        CalculateBoidStressors(needle->units, unit, needle->map, needle->grid);
     }
+    return 0;
+}
 
-    // XXX. To be multi threaded - all writes.
-
-    for(int32_t i = 0; i < units.count; i++)
+static void BulkProcess(const Units units, const Map map, const Grid grid, int32_t Run(void* data))
+{
+    Needle* const needles = UTIL_ALLOC(Needle, units.cpu_count);
+    SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, units.cpu_count);
+    UTIL_CHECK(needles);
+    UTIL_CHECK(threads);
+    const int32_t width = units.count / units.cpu_count;
+    const int32_t remainder = units.count % units.cpu_count;
+    for(int32_t i = 0; i < units.cpu_count; i++)
     {
-        Unit* const unit = &units.unit[i];
-        Unit_Flow(unit, grid);
-        Unit_Move(unit, grid);
-        if(!Units_CanWalk(units, map, unit->cart))
-            Unit_UndoMove(unit, grid);
+        needles[i].units = units;
+        needles[i].map = map;
+        needles[i].grid = grid;
+        needles[i].a = (i + 0) * width;
+        needles[i].b = (i + 1) * width;
     }
+    needles[units.cpu_count - 1].b += remainder;
+    for(int32_t i = 0; i < units.cpu_count; i++) threads[i] = SDL_CreateThread(Run, "N/A", &needles[i]);
+    for(int32_t i = 0; i < units.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
+    free(needles);
+    free(threads);
+}
+
+static int32_t RunFlowNeedle(void* data)
+{
+    Needle* const needle = (Needle*) data;
+    for(int32_t i = needle->a; i < needle->b; i++)
+    {
+        Unit* const unit = &needle->units.unit[i];
+        Unit_Flow(unit, needle->grid);
+        Unit_Move(unit, needle->grid);
+        if(!Units_CanWalk(needle->units, needle->map, unit->cart))
+            Unit_UndoMove(unit, needle->grid);
+    }
+    return 0;
+}
+
+// See the boids pseudocode:
+//   http://www.kfish.org/boids/pseudocode.html
+
+static void FollowPathBoids(const Units units, const Grid grid, const Map map)
+{
+    RunHardBoidsRules(units);
+    BulkProcess(units, map, grid, RunStressorNeedle);
+    BulkProcess(units, map, grid, RunFlowNeedle);
     RepathStuckBoids(units, map);
 }
 

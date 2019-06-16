@@ -116,23 +116,20 @@ static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const M
     const Tiles tiles = Tiles_PrepTerrain(terrain, map, overview, points);
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
+    const int32_t width = points.count / vram.cpu_count;
+    const int32_t remainder = points.count % vram.cpu_count;
     for(int32_t i = 0; i < vram.cpu_count; i++)
     {
-        const int32_t width = points.count / vram.cpu_count;
-        const int32_t remainder = points.count % vram.cpu_count;
         needles[i].vram = vram;
         needles[i].tiles = tiles.tile;
         needles[i].a = (i + 0) * width;
         needles[i].b = (i + 1) * width;
-        if(i == vram.cpu_count - 1)
-            needles[i].b += remainder;
     }
+    needles[vram.cpu_count - 1].b += remainder;
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
     UTIL_CHECK(threads);
-    for(int32_t i = 0; i < vram.cpu_count; i++)
-        threads[i] = SDL_CreateThread(DrawBatchNeedle, "N/A", &needles[i]);
-    for(int32_t i = 0; i < vram.cpu_count; i++)
-        SDL_WaitThread(threads[i], NULL);
+    for(int32_t i = 0; i < vram.cpu_count; i++) threads[i] = SDL_CreateThread(DrawBatchNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);
     free(threads);
     Tiles_Free(tiles);
@@ -313,10 +310,8 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
     }
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
     UTIL_CHECK(threads);
-    for(int32_t i = 0; i < vram.cpu_count; i++)
-        threads[i] = SDL_CreateThread(DrawBlendNeedle, "N/A", &needles[i]);
-    for(int32_t i = 0; i < vram.cpu_count; i++)
-        SDL_WaitThread(threads[i], NULL);
+    for(int32_t i = 0; i < vram.cpu_count; i++) threads[i] = SDL_CreateThread(DrawBlendNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);
     free(threads);
     Lines_Free(lines);
