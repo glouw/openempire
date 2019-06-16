@@ -232,19 +232,8 @@ static Point SeparateBoids(const Units units, Unit* const unit)
                     };
                     out = Point_Sub(out, nudge);
                 }
-                else
-                {
-                    const int32_t mag = Point_Mag(diff);
-                    const int32_t width = 22000; // XXX. Use unit width.
-                    if(mag < width)
-                        out = Point_Sub(out, diff);
-
-                    if(mag < width + 5000 && unit->color != other->color)
-                    {
-                        unit->dir = Direction_CartToIso(Direction_GetCart(diff));
-                        Unit_UpdateFileByState(unit, STATE_ATTACK);
-                    }
-                }
+                else if(Point_Mag(diff) < 20000) // XXX. Use unit width.
+                    out = Point_Sub(out, diff);
             }
         }
     }
@@ -376,6 +365,12 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
     }
 }
 
+//if(mag < width + 5000 && unit->color != other->color)
+//{
+//    unit->dir = Direction_CartToIso(Direction_GetCart(diff));
+//    Unit_UpdateFileByState(unit, STATE_ATTACK);
+//}
+
 // DO NOT multithread.
 
 static void RunHardBoidRules(const Units units)
@@ -385,6 +380,8 @@ static void RunHardBoidRules(const Units units)
         Unit* const unit = &units.unit[i];
         UnifyBoids(units, unit);
         ConditionallyStopBoids(units, unit);
+
+        // XXX: FIGHT HERE.
     }
 }
 
@@ -451,16 +448,10 @@ static int32_t RunFlowNeedle(void* data)
 
 static void FollowPathBoids(const Units units, const Grid grid, const Map map)
 {
-    // Yields unit state one of STATE_IDLE, STATE_MOVE.
-
+    BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
     RepathStuckBoids(units, map);
     RunHardBoidRules(units);
-
-    // Yields unit state one of: STATE_ATTACK, STATE_FALL, STATE_DECAY.
-
-    BulkProcess(units, map, grid, RunStressorNeedle);
-
 }
 
 static void SortStacks(const Units units)
