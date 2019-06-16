@@ -26,11 +26,12 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
         units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
     }
 #else
-    const Point cart = {
-        map.cols / 2,
-        map.rows / 2,
+    const Point carts[] = {
+        { 0 + map.cols / 2, 0 + map.rows / 2 },
+        { 2 + map.cols / 2, 2 + map.rows / 2 },
     };
-    units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
+    units = Units_Append(units, Unit_Make(carts[0], grid, FILE_MALE_VILLAGER_STANDING, COLOR_BLU));
+    units = Units_Append(units, Unit_Make(carts[1], grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
 #endif
     return units;
 }
@@ -245,6 +246,45 @@ static Point SeparateBoids(const Units units, Unit* const unit)
     return Point_Div(out, 32);
 }
 
+static Point ChaseBoids(const Units units, Unit* const unit)
+{
+    static Point zero;
+    if(!State_IsDead(unit->state))
+    {
+        Unit* closest = NULL;
+        int64_t max = INT64_MAX;
+        for(int32_t x = -1; x <= 1; x++)
+        for(int32_t y = -1; y <= 1; y++)
+        {
+            const Point cart_offset = { x, y };
+            const Point cart = Point_Add(unit->cart, cart_offset);
+            const Stack stack = Units_GetStackCart(units, cart);
+            for(int32_t i = 0; i < stack.count; i++)
+            {
+                Unit* const other = stack.reference[i];
+                if(other->color != unit->color)
+                    if(!State_IsDead(other->state))
+                    {
+                        const Point diff = Point_Sub(other->cell, unit->cell);
+                        const int64_t mag = Point_Mag(diff);
+                        if(mag < max)
+                        {
+                            max = mag;
+                            closest = other;
+                        }
+                    }
+            }
+        }
+        if(closest != NULL)
+        {
+            const Point diff = Point_Sub(closest->cell, unit->cell);
+            if(!Point_IsZero(diff))
+                return Point_Normalize(diff, 150);
+        }
+    }
+    return zero;
+}
+
 static Point AlignBoids(const Units units, Unit* const unit)
 {
     static Point zero;
@@ -351,13 +391,14 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
             SeparateBoids(units, unit),
             AlignBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
+            ChaseBoids(units, unit),
             // XXX. Need a rule for attracting boids to enemies.
         };
         static Point zero;
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        unit->stressors = (Point_Mag(stressors) < 300) ? zero : stressors;
+        unit->stressors = (Point_Mag(stressors) < 100) ? zero : stressors;
     }
 }
 
