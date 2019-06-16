@@ -312,7 +312,7 @@ static void UnifyBoids(const Units units, Unit* const unit)
 // A simple solution is to stop all boids from reaching their final point
 // within a grid tile by stopping all boids within the grid tile.
 
-static void StopBoids(const Units units, Unit* const unit)
+static void ConditionallyStopBoids(const Units units, Unit* const unit)
 {
     const Stack stack = Units_GetStackCart(units, unit->cart);
     for(int32_t i = 0; i < stack.count; i++)
@@ -368,13 +368,13 @@ static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing s
 
 // DO NOT multithread.
 
-static void RunHardBoidsRules(const Units units)
+static void RunHardBoidRules(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         UnifyBoids(units, unit);
-        StopBoids(units, unit);
+        ConditionallyStopBoids(units, unit);
     }
 }
 
@@ -441,10 +441,16 @@ static int32_t RunFlowNeedle(void* data)
 
 static void FollowPathBoids(const Units units, const Grid grid, const Map map)
 {
-    RunHardBoidsRules(units);
-    BulkProcess(units, map, grid, RunStressorNeedle);
+    // Yields unit state one of STATE_IDLE, STATE_MOVE.
+
     BulkProcess(units, map, grid, RunFlowNeedle);
     RepathStuckBoids(units, map);
+    RunHardBoidRules(units);
+
+    // Yields unit state one of: STATE_ATTACK, STATE_FALL, STATE_DECAY.
+
+    BulkProcess(units, map, grid, RunStressorNeedle);
+
 }
 
 static void SortStacks(const Units units)

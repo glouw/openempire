@@ -99,21 +99,13 @@ void Unit_Move(Unit* const unit, const Grid grid)
     UpdateCart(unit, grid);
 }
 
-static void UpdateFile(Unit* const unit, const Graphics file)
-{
-    unit->max_speed = Graphics_GetMaxSpeed(file);
-    unit->accel = Graphics_GetAcceleration(file);
-    unit->file = file;
-    unit->file_name = Graphics_GetString(file);
-}
-
 void Unit_UpdateFileByState(Unit* const unit, const State state)
 {
     const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
     const int32_t next = base + (int32_t) state;
     const Graphics file = (Graphics) next;
     unit->state = state;
-    UpdateFile(unit, file);
+    unit->file = file;
 }
 
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color)
@@ -124,7 +116,10 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
     unit.state = STATE_IDLE; // This is the base state, and is required for all new units as UpdateFileByState() references this base state.
-    UpdateFile(&unit, file);
+    unit.max_speed = Graphics_GetMaxSpeed(file);
+    unit.accel = Graphics_GetAcceleration(file);
+    unit.file_name = Graphics_GetString(file);
+    unit.file = file;
     return unit;
 }
 
