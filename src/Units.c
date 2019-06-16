@@ -233,8 +233,18 @@ static Point SeparateBoids(const Units units, Unit* const unit)
                     out = Point_Sub(out, nudge);
                 }
                 else
-                if(Point_Mag(diff) < 20000) // XXX. What is a good width?
-                    out = Point_Sub(out, diff);
+                {
+                    const int32_t mag = Point_Mag(diff);
+                    const int32_t width = 22000; // XXX. Use unit width.
+                    if(mag < width)
+                        out = Point_Sub(out, diff);
+
+                    if(mag < width + 5000 && unit->color != other->color)
+                    {
+                        unit->dir = Direction_CartToIso(Direction_GetCart(diff));
+                        Unit_UpdateFileByState(unit, STATE_ATTACK);
+                    }
+                }
             }
         }
     }

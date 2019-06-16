@@ -38,8 +38,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     const Point dv = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, dv);
-    const Direction cart_dir = Direction_GetCart(dv);
-    unit->dir = Direction_CartToIso(cart_dir);
+    unit->dir = Direction_CartToIso(Direction_GetCart(dv));
     Unit_UpdateFileByState(unit, STATE_MOVE);
 }
 
