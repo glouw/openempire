@@ -18,10 +18,12 @@ This is a reverse engineering of Age of Empires II intended for fast network pla
 
     [x] Assest loading
     [x] Terrain renderering and blending
-    [ ] Elevation
     [x] Multithreaded CPU rendering
     [x] Macro level pathfinding (breadth first search)
-    [ ] Micro level pathfinding (boids)
+    [x] Micro level pathfinding (boids)
+    [x] Fast compile times
+    [ ] Melee combat
+    [ ] Ranged combat
     [ ] Multiplayer networking
 
 ## Development Blog
