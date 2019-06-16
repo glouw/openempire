@@ -12,7 +12,7 @@
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-#if 0
+#if 1
     for(int32_t x = 0; x < 10; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
@@ -25,12 +25,13 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
         const Point cart = { x, y };
         units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
     }
-#endif
+#else
     const Point cart = {
         map.cols / 2,
         map.rows / 2,
     };
     units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
+#endif
     return units;
 }
 

@@ -86,7 +86,8 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 {
     const int32_t bound = Util_Sqrt(animation.count);
     const int32_t index = (cart_point.x % bound) + ((cart_point.y % bound) * bound);
-    const Point cart_grid_offset = { 0, 0 };
+    static Point zero;
+    const Point cart_grid_offset = zero;
     const uint8_t height = Terrain_GetHeight(file);
     return Construct(overview, cart_point, cart_grid_offset, animation, index, false, height);
 }
