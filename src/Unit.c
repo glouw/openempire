@@ -118,6 +118,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.max_speed = Graphics_GetMaxSpeed(file);
     unit.accel = Graphics_GetAcceleration(file);
     unit.file_name = Graphics_GetString(file);
+    unit.health = Graphics_GetHealth(file);
     unit.file = file;
     return unit;
 }
@@ -139,6 +140,7 @@ void Unit_Print(Unit* const unit)
     printf("file_name             :: %s\n",      unit->file_name);
     printf("id                    :: %d\n",      unit->id);
     printf("group                 :: %d\n",      unit->command_group);
+    printf("health                :: %d\n",      unit->health);
 }
 
 void Unit_Flow(Unit* const unit, const Grid grid)

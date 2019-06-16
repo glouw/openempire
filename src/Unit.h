@@ -29,6 +29,7 @@ typedef struct
     Direction dir;
     Point stressors;
     State state;
+    int32_t health;
 }
 Unit;
 
