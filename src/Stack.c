@@ -55,9 +55,17 @@ void Stack_UpdateCenterOfMass(Stack* const stack)
 {
     static Point zero;
     Point out = zero;
+    int32_t count = 0;
     for(int32_t i = 0; i < stack->count; i++)
-        out = Point_Add(out, stack->reference[i]->cell);
-    stack->center_of_mass = (stack->count > 0) ? Point_Div(out, stack->count) : out;
+    {
+        Unit* const unit = stack->reference[i];
+        if(!State_IsDead(unit->state))
+        {
+            out = Point_Add(out, unit->cell);
+            count++;
+        }
+    }
+    stack->center_of_mass = (count > 0) ? Point_Div(out, count) : out;
 }
 
 int32_t Stack_GetMaxPathIndex(const Stack stack, const Color color, const int32_t command_group)
