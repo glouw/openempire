@@ -1,8 +1,11 @@
 ![](art/logo.png)
 
-This is a custom game engine written in pure C99 and SDL2 for Age of Empires II intended for fast network play.
+This is a custom game engine for Age of Empires II written in pure C99 and SDL2 built for fast network play.
+
+The inspiration for this engine draws from combining core Age II mechanics and Rome Total War style battles.
+
 Data, art, and sound files are not supplied - to play Open Empires you must either own the original boxed-set
-of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on steam.
+of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on Steam.
 
 ## Dependencies
 
@@ -17,8 +20,8 @@ of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on stea
 
 ## Running
 
-Assuming you were able to install Age of Empires II HD with steam on Linux (enable Proton under Beta options in settings), simply
-run the compiled executable with the path flag pointing to the data folder of your game's installation.
+Assuming you were able to install Age of Empires II HD with steam on Linux (enable Proton under Beta options in settings),
+simply run the compiled executable with the path flag pointing to the data folder of your game's installation:
 
     ./openempires --path "/home/gl/.steam/steam/steamapps/common/Age2HD/Directory/data/"
 
@@ -29,10 +32,11 @@ run the compiled executable with the path flag pointing to the data folder of yo
     [x] Multi-threaded macro level pathfinding (breadth first search)
     [x] Multi-threaded micro level pathfinding (boids)
     [x] Multi-threaded unit software rendering
-    [x] Fast compile times
+    [ ] Unit state switching
     [ ] Melee combat
     [ ] Ranged combat
     [ ] Multiplayer networking
+    [x] Fast compile times with link time optimization (full build: 5.157 seconds on a Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz)
 
 ## Development Blog
 
