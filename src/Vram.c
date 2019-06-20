@@ -350,7 +350,11 @@ void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units u
             static Point zero;
             const Point cart = unit.path.point[j];
             const Graphics file = FILE_WAYPOINT_FLAG;
-            const Tile tile = Tile_GetGraphics(overview, cart, zero, graphics.animation[COLOR_BLU][file], file, DIRECTION_S);
+            static Unit none;
+            Unit flag = none;
+            flag.file = file;
+            flag.dir = DIRECTION_S;
+            const Tile tile = Tile_GetGraphics(overview, cart, zero, graphics.animation[COLOR_BLU][file], &flag);
             Vram_DrawTile(vram, tile);
         }
     }

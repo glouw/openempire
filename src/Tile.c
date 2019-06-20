@@ -69,7 +69,7 @@ static Tile Clip(Tile tile, const Overview overview)
     return tile;
 }
 
-static Tile Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const int32_t index, const bool flip_vert, const uint8_t height)
+static Tile Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const int32_t index, const bool flip_vert, const uint8_t height, Unit* const reference)
 {
     static Tile zero;
     Tile tile = zero;
@@ -79,6 +79,7 @@ static Tile Construct(const Overview overview, const Point cart, const Point car
     tile.iso_pixel_offset = Point_ToIso(cart_grid_offset);
     tile.flip_vert = flip_vert;
     tile.height = height;
+    tile.reference = reference;
     return Clip(tile, overview);
 }
 
@@ -89,23 +90,24 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
     static Point zero;
     const Point cart_grid_offset = zero;
     const uint8_t height = Terrain_GetHeight(file);
-    return Construct(overview, cart_point, cart_grid_offset, animation, index, false, height);
+    return Construct(overview, cart_point, cart_grid_offset, animation, index, false, height, NULL);
 }
 
-Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Graphics file, const Direction dir)
+Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
 {
-    const int32_t direction_frames = animation.count / 5;
+    const int32_t frames_per_direction = animation.count / 5;
     bool flip_vert = false;
-    const Direction fixed_dir = Direction_Fix(dir, &flip_vert);
-    const int32_t index = direction_frames * fixed_dir + (Timer_GetKeyFrames() % direction_frames);
+    const Direction fixed_dir = Direction_Fix(reference->dir, &flip_vert);
+    const int32_t frame = (State_IsDead(reference->state) ? Timer_GetDeathFrames() : Timer_GetKeyFrames()) % frames_per_direction;
+    const int32_t index = frames_per_direction * fixed_dir + frame;
 
     // A little unfortunate, but the hot spots for the terrain tiles are not centered.
     // Units must therefor be forced to the terrain tile positions.
 
     const Point south = { 0, 1 };
     const Point shifted = Point_Add(cart, south);
-    const uint8_t height = Graphics_GetHeight(file);
-    return Construct(overview, shifted, cart_grid_offset, animation, index, flip_vert, height);
+    const uint8_t height = Graphics_GetHeight(reference->file);
+    return Construct(overview, shifted, cart_grid_offset, animation, index, flip_vert, height, reference);
 }
 
 Point Tile_GetHotSpotCoords(const Tile tile)

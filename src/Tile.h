@@ -31,7 +31,7 @@ bool Tile_ContainsPoint(const Tile, const Point);
 
 Tile Tile_GetTerrain(const Overview, const Point point, const Animation, const Terrain);
 
-Tile Tile_GetGraphics(const Overview, const Point cart, const Point cart_grid_offset, const Animation, const Graphics, const Direction);
+Tile Tile_GetGraphics(const Overview, const Point cart, const Point cart_grid_offset, const Animation, Unit* const reference);
 
 Point Tile_GetTopLeftOffsetCoords(const Tile, const int32_t x, const int32_t y);
 
