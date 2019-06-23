@@ -449,7 +449,7 @@ static void Melee(Unit* const unit, Unit* const other)
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             other->health -= unit->attack;
             if(other->health <= 0)
-                Unit_UpdateFileByState(other, STATE_DECAY, true);
+                Unit_UpdateFileByState(other, STATE_FALL, true);
         }
     }
 }
