@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define DIRECTION_COUNT_NOT_MIRRORED (5)
+
 typedef enum
 {
     DIRECTION_S,

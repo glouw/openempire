@@ -446,10 +446,10 @@ static void Melee(Unit* const unit, Unit* const other)
         if(Point_Mag(diff) < 30000)
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
-            Unit_UpdateFileByState(unit, STATE_ATTACK);
+            Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             other->health -= unit->attack;
             if(other->health <= 0)
-                Unit_UpdateFileByState(other, STATE_DECAY);
+                Unit_UpdateFileByState(other, STATE_DECAY, true);
         }
     }
 }
@@ -585,9 +585,30 @@ void Delete(const Units units, const Input input)
         for(int32_t i = 0; i < units.count; i++)
         {
             Unit* const unit = &units.unit[i];
-            if(unit->selected)
-                Unit_UpdateFileByState(unit, STATE_DECAY);
+            if(unit->selected
+            && !State_IsDead(unit->state))
+                Unit_UpdateFileByState(unit, STATE_FALL, true);
         }
+}
+
+static void Tick(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        unit->timer++;
+    }
+}
+
+static void Decay(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->state == STATE_FALL
+        && unit->timer == 45) // XXX: Reasonable to cheat with this hardcoded 25? Can get from Animation, but Tiles are only constructed with units on screen.
+            Unit_UpdateFileByState(unit, STATE_DECAY, true);
+    }
 }
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
@@ -600,6 +621,9 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     CalculateCenters(units);
     units = Select(units, overview, input, graphics);
     units = Command(units, overview, input, map);
+    Tick(units);
+    Decay(units);
+    // XXX. Need a unit Remove() function to take unit off map when they are fully decayed.
     return units;
 }
 

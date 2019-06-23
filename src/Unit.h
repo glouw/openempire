@@ -31,6 +31,7 @@ typedef struct
     State state;
     int32_t health;
     int32_t attack;
+    int64_t timer;
 }
 Unit;
 
@@ -46,6 +47,6 @@ void Unit_Flow(Unit* const, const Grid);
 
 bool Unit_InPlatoon(Unit* const unit, Unit* const other);
 
-void Unit_UpdateFileByState(Unit* const, const State);
+void Unit_UpdateFileByState(Unit* const, const State, const bool reset_timer);
 
 void Unit_FreePath(Unit* const);

@@ -1,7 +1,6 @@
 #include "Tile.h"
 
 #include "Rect.h"
-#include "Timer.h"
 #include "Util.h"
 
 bool Tile_IsHotspotInRect(const Tile tile, const Rect rect)
@@ -95,10 +94,11 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 
 Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
 {
-    const int32_t frames_per_direction = animation.count / 5;
+    const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
     bool flip_vert = false;
     const Direction fixed_dir = Direction_Fix(reference->dir, &flip_vert);
-    const int32_t frame = (State_IsDead(reference->state) ? Timer_GetDeathFrames() : Timer_GetKeyFrames()) % frames_per_direction;
+    const int64_t ticks = reference->timer / (reference->state == STATE_DECAY ? ANIMATION_DECAY_DIVISOR : ANIMATION_DIVISOR);
+    const int32_t frame = ticks % frames_per_direction;
     const int32_t index = frames_per_direction * fixed_dir + frame;
 
     // A little unfortunate, but the hot spots for the terrain tiles are not centered.

@@ -20,7 +20,7 @@ static Point GetDelta(Unit* const unit, const Grid grid)
 
 void Unit_FreePath(Unit* const unit)
 {
-    Unit_UpdateFileByState(unit, STATE_IDLE);
+    Unit_UpdateFileByState(unit, STATE_IDLE, false);
     unit->path_index = 0;
     unit->path_index_time = 0;
     unit->path = Points_Free(unit->path);
@@ -39,7 +39,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
     const Point dv = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, dv);
     unit->dir = Direction_CartToIso(Direction_GetCart(dv));
-    Unit_UpdateFileByState(unit, STATE_MOVE);
+    Unit_UpdateFileByState(unit, STATE_MOVE, false);
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
@@ -98,13 +98,15 @@ void Unit_Move(Unit* const unit, const Grid grid)
     UpdateCart(unit, grid);
 }
 
-void Unit_UpdateFileByState(Unit* const unit, const State state)
+void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_timer)
 {
     const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
     const int32_t next = base + (int32_t) state;
     const Graphics file = (Graphics) next;
     unit->state = state;
     unit->file = file;
+    if(reset_timer)
+        unit->timer = 0;
 }
 
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color)

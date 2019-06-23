@@ -1,5 +1,6 @@
 #include "Animation.h"
 
+#include "Direction.h"
 #include "Util.h"
 
 Animation Animation_Get(const Slp slp, const Palette palette, const Color color)
@@ -34,4 +35,9 @@ void Animation_Free(const Animation animation)
     free(animation.surface);
     free(animation.frame);
     free(animation.image);
+}
+
+int32_t Animation_GetFramesPerDirection(const Animation animation)
+{
+    return animation.count / DIRECTION_COUNT_NOT_MIRRORED;
 }

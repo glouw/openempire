@@ -9,6 +9,9 @@
 
 #include <SDL2/SDL.h>
 
+#define ANIMATION_DIVISOR (3)
+#define ANIMATION_DECAY_DIVISOR (100 * ANIMATION_DIVISOR)
+
 typedef struct
 {
     SDL_Surface** surface;
@@ -21,3 +24,5 @@ Animation;
 Animation Animation_Get(const Slp, const Palette, const Color);
 
 void Animation_Free(const Animation);
+
+int32_t Animation_GetFramesPerDirection(const Animation);
