@@ -624,6 +624,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     Tick(units);
     Decay(units);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed.
+    // Just sort and lower count value.
     return units;
 }
 
