@@ -392,7 +392,6 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
             AlignBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
             ChaseBoids(units, unit),
-            // XXX. Need a rule for attracting boids to enemies.
         };
         static Point zero;
         Point stressors = zero;
@@ -606,7 +605,7 @@ static void Decay(const Units units)
     {
         Unit* const unit = &units.unit[i];
         if(unit->state == STATE_FALL
-        && unit->timer == 45) // XXX: Reasonable to cheat with this hardcoded 25? Can get from Animation, but Tiles are only constructed with units on screen.
+        && unit->timer == 15 * ANIMATION_DIVISOR) // XXX: Reasonable to cheat with this hardcoding? Can get from Animation, but Tiles are only constructed with units on screen.
             Unit_UpdateFileByState(unit, STATE_DECAY, true);
     }
 }
