@@ -246,9 +246,8 @@ static Point SeparateBoids(const Units units, Unit* const unit)
     return Point_Div(out, 32);
 }
 
-static Point ChaseBoids(const Units units, Unit* const unit)
+static void ChaseBoids(const Units units, Unit* const unit, const Map map)
 {
-    static Point zero;
     if(!State_IsDead(unit->state))
     {
         Unit* closest = NULL;
@@ -276,13 +275,8 @@ static Point ChaseBoids(const Units units, Unit* const unit)
             }
         }
         if(closest != NULL)
-        {
-            const Point diff = Point_Sub(closest->cell, unit->cell);
-            if(!Point_IsZero(diff))
-                return Point_Normalize(diff, 150);
-        }
+            FindPath(units, unit, map, closest->cart, closest->cart_grid_offset);
     }
-    return zero;
 }
 
 static Point AlignBoids(const Units units, Unit* const unit)
@@ -391,7 +385,6 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
             SeparateBoids(units, unit),
             AlignBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
-            ChaseBoids(units, unit),
         };
         static Point zero;
         Point stressors = zero;
@@ -477,10 +470,11 @@ static void FightBoids(const Units units, Unit* const unit)
 
 // DO NOT multithread.
 
-static void RunHardBoidRules(const Units units)
+static void RunHardBoidRules(const Units units, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i], map);
     for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
 
@@ -553,7 +547,7 @@ static void FollowPathBoids(const Units units, const Grid grid, const Map map)
     BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
     RepathStuckBoids(units, map);
-    RunHardBoidRules(units);
+    RunHardBoidRules(units, map);
 }
 
 static void SortStacks(const Units units)
