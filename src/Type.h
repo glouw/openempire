@@ -4,6 +4,7 @@ typedef enum
 {
     TYPE_NONE = -1,
     TYPE_VILLAGER,
+    TYPE_TEUTONIC_KNIGHT,
     TYPE_BERRY_BUSH,
     TYPE_GOLD_MINE,
     TYPE_STONE_MINE,

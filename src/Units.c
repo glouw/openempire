@@ -10,6 +10,19 @@
 
 #include <stdlib.h>
 
+static void FindPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+{
+    if(!State_IsDead(unit->state))
+    {
+        const Field field = Field_New(map, units);
+        Unit_FreePath(unit);
+        unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
+        unit->cart_grid_offset_goal = cart_grid_offset_goal;
+        unit->command_group = units.command_group_next;
+        Field_Free(field);
+    }
+}
+
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
 #if 1
@@ -17,13 +30,23 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_BLU));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
     }
     for(int32_t x = map.cols - 10; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED));
+    }
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        static Point zero;
+        Unit* const unit = &units.unit[i];
+        const Point point = {
+            map.cols / 2,
+            unit->cart.y < (map.rows / 2) ? (map.rows / 2 - map.rows / 6): (map.rows / 2 + map.rows / 6),
+        };
+        FindPath(units, unit, map, point, zero);
     }
 #else
     const Point carts[] = {
@@ -130,19 +153,6 @@ static Units Select(Units units, const Overview overview, const Input input, con
     Points_Free(points);
     Tiles_Free(tiles);
     return units;
-}
-
-static void FindPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
-{
-    if(!State_IsDead(unit->state))
-    {
-        const Field field = Field_New(map, units);
-        Unit_FreePath(unit);
-        unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
-        unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->command_group = units.command_group_next;
-        Field_Free(field);
-    }
 }
 
 static void FindPathForSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
