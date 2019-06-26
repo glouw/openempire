@@ -271,17 +271,17 @@ static void ChaseBoids(const Units units, Unit* const unit, const Map map)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
-                if(other->color != unit->color)
-                    if(!State_IsDead(other->state))
+                if(other->color != unit->color
+                && !State_IsDead(other->state))
+                {
+                    const Point diff = Point_Sub(other->cell, unit->cell);
+                    const int64_t mag = Point_Mag(diff);
+                    if(mag < max)
                     {
-                        const Point diff = Point_Sub(other->cell, unit->cell);
-                        const int64_t mag = Point_Mag(diff);
-                        if(mag < max)
-                        {
-                            max = mag;
-                            closest = other;
-                        }
+                        max = mag;
+                        closest = other;
                     }
+                }
             }
         }
         if(closest != NULL)

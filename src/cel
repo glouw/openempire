@@ -1,0 +1,120 @@
+Unit.c:    if(unit->path.count > 1 && unit->path_index == 0)
+Unit.c:        unit->path_index++;
+Unit.c:    const Point point = (unit->path_index == unit->path.count - 1) ? unit->cart_grid_offset_goal : zero;
+Unit.c:    const Point goal_grid_coords = Grid_GetGridPointWithOffset(grid, unit->path.point[unit->path_index], point);
+Unit.c:    const Point unit_grid_coords = Grid_GetGridPointWithOffset(grid, unit->cart, unit->cart_grid_offset);
+Unit.c:    unit->path_index = 0;
+Unit.c:    unit->path_index_time = 0;
+Unit.c:    unit->path = Points_Free(unit->path);
+Unit.c:    unit->path_index++;
+Unit.c:    unit->path_index_time = 0;
+Unit.c:    if(unit->path_index >= unit->path.count)
+Unit.c:    const Point dv = Point_Normalize(delta, unit->accel);
+Unit.c:    unit->velocity = Point_Add(unit->velocity, dv);
+Unit.c:    unit->dir = Direction_CartToIso(Direction_GetCart(dv));
+Unit.c:    unit->path_index_time++;
+Unit.c:    const Point deccel = Point_Normalize(unit->velocity, unit->accel);
+Unit.c:    const Point velocity = Point_Sub(unit->velocity, deccel);
+Unit.c:    const Point dot = Point_Dot(velocity, unit->velocity);
+Unit.c:    unit->velocity = (dot.x >= 0 && dot.y >= 0) ? velocity : zero; // XXX. Double check the math...
+Unit.c:    if(unit->path.count > 0)
+Unit.c:    else if(Point_Mag(unit->velocity) > 0) Decelerate(unit);
+Unit.c:    if(Point_Mag(unit->velocity) > unit->max_speed)
+Unit.c:        unit->velocity = Point_Normalize(unit->velocity, unit->max_speed);
+Unit.c:    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
+Unit.c:    unit->cart = Grid_CellToCart(grid, unit->cell);
+Unit.c:    unit->cell = unit->cell_last;
+Unit.c:    unit->velocity = zero;
+Unit.c:    if(unit->state == STATE_ATTACK)
+Unit.c:        unit->velocity = zero;
+Unit.c:    unit->cell_last = unit->cell;
+Unit.c:    unit->cell = Point_Add(unit->cell, unit->velocity);
+Unit.c:    const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
+Unit.c:    unit->state = state;
+Unit.c:    unit->file = file;
+Unit.c:        unit->timer = 0;
+Unit.c:    printf("cart                  :: %ld %ld\n", unit->cart.x, unit->cart.y);
+Unit.c:    printf("cart_grid_offset      :: %ld %ld\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+Unit.c:    printf("cart_grid_offset_goal :: %ld %ld\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
+Unit.c:    printf("cell                  :: %ld %ld\n", unit->cell.x, unit->cell.y);
+Unit.c:    printf("max_speed             :: %d\n",      unit->max_speed);
+Unit.c:    printf("accel                 :: %d\n",      unit->accel);
+Unit.c:    printf("velocity              :: %ld %ld\n", unit->velocity.x, unit->velocity.y);
+Unit.c:    printf("path_index_time       :: %d\n",      unit->path_index_time);
+Unit.c:    printf("path_index            :: %d\n",      unit->path_index);
+Unit.c:    printf("path.count            :: %d\n",      unit->path.count);
+Unit.c:    printf("selected              :: %d\n",      unit->selected);
+Unit.c:    printf("file                  :: %d\n",      unit->file);
+Unit.c:    printf("file_name             :: %s\n",      unit->file_name);
+Unit.c:    printf("id                    :: %d\n",      unit->id);
+Unit.c:    printf("group                 :: %d\n",      unit->command_group);
+Unit.c:    printf("health                :: %d\n",      unit->health);
+Unit.c:    unit->velocity = Point_Add(unit->velocity, unit->stressors);
+Unit.c:    return unit->command_group == other->command_group
+Unit.c:        && unit->color == other->color;
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
+Units.c:        unit->cart_grid_offset_goal = cart_grid_offset_goal;
+Units.c:        unit->command_group = units.command_group_next;
+Units.c:            unit->cart.y < (map.rows / 2) ? (map.rows / 2 - map.rows / 6): (map.rows / 2 + map.rows / 6),
+Units.c:        if(unit->selected
+Units.c:        && unit->max_speed > 0)
+Units.c:        Stack* const stack = GetStack(units, unit->cart);
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        const Stack stack = Units_GetStackCart(units, unit->cart);
+Units.c:        const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
+Units.c:    if(!State_IsDead(other->state) && unit->id != other->id)
+Units.c:        const Point diff = Point_Sub(other->cell, unit->cell);
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:            const Point cart = Point_Add(unit->cart, cart_offset);
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:            const Point cart = Point_Add(unit->cart, cart_offset);
+Units.c:                if(other->color != unit->color
+Units.c:                    const Point diff = Point_Sub(other->cell, unit->cell);
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        const Stack stack = Units_GetStackCart(units, unit->cart);
+Units.c:                    if(unit->id != other->id)
+Units.c:            return Point_Div(Point_Sub(out, unit->velocity), 8);
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        const Point n_point = Point_Add(unit->cart, n);
+Units.c:        const Point e_point = Point_Add(unit->cart, e);
+Units.c:        const Point s_point = Point_Add(unit->cart, s);
+Units.c:        const Point w_point = Point_Add(unit->cart, w);
+Units.c:        const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
+Units.c:        const int32_t repulsion = 10 * unit->accel; // XXX. How strong should this be?
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        const Stack stack = Units_GetStackCart(units, unit->cart);
+Units.c:        const int32_t max = Stack_GetMaxPathIndex(stack, unit->color, unit->command_group);
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        const Stack stack = Units_GetStackCart(units, unit->cart);
+Units.c:                if(unit->path.count == 0 && Unit_InPlatoon(unit, other))
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:        unit->stressors = (Point_Mag(stressors) < 100) ? zero : stressors;
+Units.c:        if(Point_Mag(unit->stressors) < 500) // XXX. Whats a good threshold?
+Units.c:            unit->stressors = zero;
+Units.c:    if(!State_IsDead(unit->state) && unit->path_index_time > 100) // XXX, What is a good timeout time?
+Units.c:        const Stack stack = Units_GetStackCart(units, unit->cart);
+Units.c:        if(unit->path.count > 0) // Unit must have a goal already.
+Units.c:            const Point cart_goal = unit->path.point[unit->path.count - 1];
+Units.c:                if(reference->color == unit->color)
+Units.c:                    FindPath(units, reference, map, cart_goal, unit->cart_grid_offset_goal);
+Units.c:    if(!State_IsDead(unit->state)
+Units.c:        const Point diff = Point_Sub(other->cell, unit->cell);
+Units.c:            unit->dir = Direction_CartToIso(Direction_GetCart(diff));
+Units.c:            other->health -= unit->attack;
+Units.c:    if(!State_IsDead(unit->state))
+Units.c:            const Point cart = Point_Add(unit->cart, cart_offset);
+Units.c:                if(unit->color != other->color)
+Units.c:        if(!State_IsDead(unit->state))
+Units.c:            if(!Units_CanWalk(needle->units, needle->map, unit->cart))
+Units.c:            if(unit->selected
+Units.c:            && !State_IsDead(unit->state))
+Units.c:        unit->timer++;
+Units.c:        if(unit->state == STATE_FALL
+Units.c:        && unit->timer == 15 * ANIMATION_DIVISOR) // XXX: Reasonable to cheat with this hardcoding? Can get from Animation, but Tiles are only constructed with units on screen.
+Stack.c:        if(!State_IsDead(unit->state))
+Stack.c:            out = Point_Add(out, unit->cell);
+Stack.c:        if(unit->path_index > max
+Stack.c:        && unit->color == color
+Stack.c:        && unit->command_group == command_group) // XXX. Needs check for unit type too.
+Stack.c:            max = unit->path_index;

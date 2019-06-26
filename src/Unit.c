@@ -39,7 +39,6 @@ static void GotoGoal(Unit* const unit, const Point delta)
     const Point dv = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, dv);
     unit->dir = Direction_CartToIso(Direction_GetCart(dv));
-    Unit_UpdateFileByState(unit, STATE_MOVE, false);
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
@@ -96,6 +95,7 @@ void Unit_Move(Unit* const unit, const Grid grid)
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
     UpdateCart(unit, grid);
+    Unit_UpdateFileByState(unit, STATE_MOVE, false);
 }
 
 void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_timer)

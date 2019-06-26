@@ -33,7 +33,7 @@ File File_Load(FILE* const);
 #define FILE_PRIO_TERRAIN  (  1)
 #define FILE_PRIO_SHADOW   (  2)
 #define FILE_PRIO_DECAY    (  3)
-#define FILE_PRIO_FALLING  (  4)
+#define FILE_PRIO_FALLING  (  5)
 #define FILE_PRIO_GRAPHICS (  5)
 #define FILE_PRIO_HIGHEST  (255)
 
