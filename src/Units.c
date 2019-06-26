@@ -43,13 +43,14 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
 #if 1
-    for(int32_t x = 0; x < 20; x++)
+    const int32_t depth = 20;
+    for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
         units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
     }
-    for(int32_t x = map.cols - 20; x < map.cols; x++)
+    for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
@@ -100,7 +101,7 @@ Units Units_New(const int32_t max, const Map map, const Grid grid)
     units.rows = grid.rows;
     units.cols = grid.cols;
     units = GenerateTestZone(units, map, grid);
-    units.cpu_count = 2 * SDL_GetCPUCount();
+    units.cpu_count = 1 * SDL_GetCPUCount();
     return units;
 }
 
@@ -617,8 +618,7 @@ void Delete(const Units units, const Input input)
         for(int32_t i = 0; i < units.count; i++)
         {
             Unit* const unit = &units.unit[i];
-            if(unit->selected
-            && !State_IsDead(unit->state))
+            if(unit->selected && !State_IsDead(unit->state))
                 Unit_UpdateFileByState(unit, STATE_FALL, true);
         }
 }

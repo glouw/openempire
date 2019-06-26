@@ -130,13 +130,11 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
         for(int32_t i = 0; i < dirs; i++)
         {
             const Point next = Point_Add(current, deltas[i]);
-            if(IsWalkable(field, next))
+            if(IsWalkable(field, next)
+            && Point_Equal(AccessQueue(field, came_from, next), none))
             {
-                if(Point_Equal(AccessQueue(field, came_from, next), none))
-                {
-                    frontier = Enqueue(frontier, next);
-                    ModifyQueue(field, came_from, next, current);
-                }
+                frontier = Enqueue(frontier, next);
+                ModifyQueue(field, came_from, next, current);
             }
         }
     }
