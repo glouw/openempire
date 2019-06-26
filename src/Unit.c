@@ -20,7 +20,6 @@ static Point GetDelta(Unit* const unit, const Grid grid)
 
 void Unit_FreePath(Unit* const unit)
 {
-    Unit_UpdateFileByState(unit, STATE_IDLE, false);
     unit->path_index = 0;
     unit->path_index_time = 0;
     unit->path = Points_Free(unit->path);
@@ -31,7 +30,10 @@ static void ReachGoal(Unit* const unit)
     unit->path_index++;
     unit->path_index_time = 0;
     if(unit->path_index >= unit->path.count)
+    {
+        Unit_UpdateFileByState(unit, STATE_IDLE, false);
         Unit_FreePath(unit);
+    }
 }
 
 static void GotoGoal(Unit* const unit, const Point delta)

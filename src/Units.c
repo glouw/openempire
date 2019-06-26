@@ -381,7 +381,10 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
             Unit* const other = stack.reference[i];
             if(!State_IsDead(other->state))
                 if(unit->path.count == 0 && Unit_InPlatoon(unit, other))
+                {
+                    Unit_UpdateFileByState(unit, STATE_IDLE, false);
                     Unit_FreePath(other);
+                }
         }
     }
 }
@@ -447,7 +450,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 30000)
+        if(Point_Mag(diff) < 30000) // XXX. Should be per unit.
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
@@ -484,8 +487,8 @@ static void FightBoids(const Units units, Unit* const unit)
 
 static void RunHardBoidRules(const Units units, const Map map)
 {
-    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i], map);
     for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
