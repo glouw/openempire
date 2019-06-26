@@ -125,6 +125,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.health = Graphics_GetHealth(file);
     unit.attack = Graphics_GetAttack(file);
     unit.file = file;
+    unit.timer = Util_Rand() % 10;
     return unit;
 }
 

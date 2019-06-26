@@ -9,9 +9,6 @@
 // A walkable tile, like grass, dirt, or snow, are marked by a space character.
 // An unwalkable tile is any other character.
 
-static const char WALKABLE_SPACE = ' ';
-static const char OBSTRUCT_SPACE = '#';
-
 typedef struct
 {
     Point* point;
@@ -69,12 +66,12 @@ static bool IsInBounds(const Field field, const Point point)
         && point.y < field.rows && point.y >= 0;
 }
 
-static char Get(const Field field, const Point point)
+char Field_Get(const Field field, const Point point)
 {
     return field.object[point.x + point.y * field.cols];
 }
 
-static void Set(const Field field, const Point point, const char ch)
+void Field_Set(const Field field, const Point point, const char ch)
 {
     field.object[point.x + point.y * field.cols] = ch;
 }
@@ -82,7 +79,7 @@ static void Set(const Field field, const Point point, const char ch)
 static bool IsWalkable(const Field field, const Point point) // XXX. MUST expand this to avoid pathing into corners.
 {
     return IsInBounds(field, point)
-        && Get(field, point) == WALKABLE_SPACE;
+        && Field_Get(field, point) == FIELD_WALKABLE_SPACE;
 }
 
 static Points ToPoints(const Queue queue)
@@ -91,25 +88,6 @@ static Points ToPoints(const Queue queue)
     for(int32_t i = 0; i < points.max; i++)
         points = Points_Append(points, queue.point[i + queue.start]);
     return points;
-}
-
-Field Field_New(const Map map, const Units units)
-{
-    static Field zero;
-    Field field = zero;
-    field.rows = map.rows;
-    field.cols = map.cols;
-    field.object = UTIL_ALLOC(char, field.rows * field.cols);
-    for(int32_t row = 0; row < field.rows; row++)
-    for(int32_t col = 0; col < field.cols; col++)
-    {
-        const Point point = { col, row };
-        if(Units_CanWalk(units, map, point))
-            Set(field, point, WALKABLE_SPACE);
-        else
-            Set(field, point, OBSTRUCT_SPACE);
-    }
-    return field;
 }
 
 static Point AccessQueue(const Field field, const Queue queue, const Point point)

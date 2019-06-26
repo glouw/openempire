@@ -10,16 +10,33 @@
 
 #include <stdlib.h>
 
-static void FindPath(const Units units, Unit* const unit, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+Field Units_Field(const Units units, const Map map)
+{
+    static Field zero;
+    Field field = zero;
+    field.rows = map.rows;
+    field.cols = map.cols;
+    field.object = UTIL_ALLOC(char, field.rows * field.cols);
+    for(int32_t row = 0; row < field.rows; row++)
+    for(int32_t col = 0; col < field.cols; col++)
+    {
+        const Point point = { col, row };
+        if(Units_CanWalk(units, map, point))
+            Field_Set(field, point, FIELD_WALKABLE_SPACE);
+        else
+            Field_Set(field, point, FIELD_OBSTRUCT_SPACE);
+    }
+    return field;
+}
+
+static void FindPath(const Units units, Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
     if(!State_IsDead(unit->state))
     {
-        const Field field = Field_New(map, units);
         Unit_FreePath(unit);
         unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
         unit->command_group = units.command_group_next;
-        Field_Free(field);
     }
 }
 
@@ -38,6 +55,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
         const Point cart = { x, y };
         units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED));
     }
+    const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
     {
         static Point zero;
@@ -46,8 +64,9 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
             map.cols / 2,
             unit->cart.y < (map.rows / 2) ? (map.rows / 2 - map.rows / 6): (map.rows / 2 + map.rows / 6),
         };
-        FindPath(units, unit, map, point, zero);
+        FindPath(units, unit, point, zero, field);
     }
+    Field_Free(field);
 #else
     const Point carts[] = {
         { 0 + map.cols / 2, 0 + map.rows / 2 },
@@ -155,18 +174,18 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Map map, const Point cart_goal, const Point cart_grid_offset_goal)
+static void FindPathForSelected(const Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->selected
         && unit->max_speed > 0)
-            FindPath(units, unit, map, cart_goal, cart_grid_offset_goal);
+            FindPath(units, unit, cart_goal, cart_grid_offset_goal, field);
     }
 }
 
-static Units Command(Units units, const Overview overview, const Input input, const Map map)
+static Units Command(Units units, const Overview overview, const Input input, const Map map, const Field field)
 {
     if(input.ru)
     {
@@ -175,7 +194,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
-            FindPathForSelected(units, map, cart_goal, cart_grid_offset_goal);
+            FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
     }
     return units;
 }
@@ -256,7 +275,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
     return Point_Div(out, 32);
 }
 
-static void ChaseBoids(const Units units, Unit* const unit, const Map map)
+static void ChaseBoids(const Units units, Unit* const unit, const Field field)
 {
     if(!State_IsDead(unit->state))
     {
@@ -285,7 +304,7 @@ static void ChaseBoids(const Units units, Unit* const unit, const Map map)
             }
         }
         if(closest != NULL)
-            FindPath(units, unit, map, closest->cart, closest->cart_grid_offset);
+            FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
     }
 }
 
@@ -409,7 +428,7 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     }
 }
 
-static void Repath(const Units units, const Map map, Unit* const unit)
+static void Repath(const Units units, Unit* const unit, const Field field)
 {
     if(!State_IsDead(unit->state) && unit->path_index_time > 100) // XXX, What is a good timeout time?
     {
@@ -421,7 +440,7 @@ static void Repath(const Units units, const Map map, Unit* const unit)
             {
                 Unit* const reference = stack.reference[j];
                 if(reference->color == unit->color)
-                    FindPath(units, reference, map, cart_goal, unit->cart_grid_offset_goal);
+                    FindPath(units, reference, cart_goal, unit->cart_grid_offset_goal, field);
             }
         }
     }
@@ -433,12 +452,12 @@ static void Repath(const Units units, const Map map, Unit* const unit)
 //
 // DO NOT multithread.
 
-static void RepathStuckBoids(const Units units, const Map map) // XXX. Causing segfaults.
+static void RepathStuckBoids(const Units units, const Field field) // XXX. Causing segfaults.
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        Repath(units, map, unit);
+        Repath(units, unit, field);
     }
 }
 
@@ -485,11 +504,11 @@ static void FightBoids(const Units units, Unit* const unit)
 
 // DO NOT multithread.
 
-static void RunHardBoidRules(const Units units, const Map map)
+static void RunHardBoidRules(const Units units, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i], map);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i], field);
     for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
 
@@ -557,12 +576,12 @@ static int32_t RunFlowNeedle(void* data)
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
-static void FollowPathBoids(const Units units, const Grid grid, const Map map)
+static void FollowPathBoids(const Units units, const Grid grid, const Map map, const Field field)
 {
     BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
-    RepathStuckBoids(units, map);
-    RunHardBoidRules(units, map);
+    RepathStuckBoids(units, field);
+    RunHardBoidRules(units, field);
 }
 
 static void SortStacks(const Units units)
@@ -619,16 +638,16 @@ static void Decay(const Units units)
     }
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
 {
     Delete(units, input);
-    FollowPathBoids(units, grid, map);
+    FollowPathBoids(units, grid, map, field);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);
     CalculateCenters(units);
     units = Select(units, overview, input, graphics);
-    units = Command(units, overview, input, map);
+    units = Command(units, overview, input, map, field);
     Tick(units);
     Decay(units);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed.

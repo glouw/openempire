@@ -35,14 +35,14 @@ static void GenerateTestZone(const Map map)
     }
 }
 
-Map Map_Make(const int32_t rows, const int32_t cols, const Registrar terrain)
+Map Map_Make(const int32_t size, const Registrar terrain)
 {
     const Frame frame = terrain.animation[COLOR_BLU][FILE_DIRT].frame[0];
     static Map zero;
     Map map = zero;
-    map.rows = rows;
-    map.cols = cols;
-    map.file = UTIL_ALLOC(Terrain, rows * cols);
+    map.rows = size;
+    map.cols = size;
+    map.file = UTIL_ALLOC(Terrain, map.rows * map.cols);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
 #if 1

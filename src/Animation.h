@@ -9,7 +9,7 @@
 
 #include <SDL2/SDL.h>
 
-#define ANIMATION_DIVISOR (3)
+#define ANIMATION_DIVISOR (4)
 #define ANIMATION_DECAY_DIVISOR (500 * ANIMATION_DIVISOR)
 
 typedef struct

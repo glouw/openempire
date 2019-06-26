@@ -2,9 +2,11 @@
 
 #include "Points.h"
 #include "Map.h"
-#include "Units.h"
 
 #include <stdint.h>
+
+#define FIELD_WALKABLE_SPACE (' ')
+#define FIELD_OBSTRUCT_SPACE ('#')
 
 typedef struct
 {
@@ -16,6 +18,8 @@ Field;
 
 Points Field_SearchBreadthFirst(const Field, const Point start, const Point goal);
 
-Field Field_New(const Map, const Units);
-
 void Field_Free(const Field);
+
+char Field_Get(const Field, const Point);
+
+void Field_Set(const Field, const Point, const char ch);

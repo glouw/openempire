@@ -17,7 +17,7 @@ typedef struct
 }
 Map;
 
-Map Map_Make(const int32_t rows, const int32_t cols, const Registrar terrain);
+Map Map_Make(const int32_t size, const Registrar terrain);
 
 Terrain Map_GetTerrainFile(const Map, const Point);
 

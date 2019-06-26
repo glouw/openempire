@@ -42,10 +42,8 @@ int64_t Util_Sqrt(const int64_t val)
 {
     uint64_t a = 0;
     uint64_t b = 0;
-
     if(val < 2)
         return val;
-
     a = 1255;
     for(int32_t i = 0; i < 8; i++)
     {
