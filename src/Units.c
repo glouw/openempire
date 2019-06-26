@@ -43,13 +43,13 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
 #if 1
-    for(int32_t x = 0; x < 10; x++)
+    for(int32_t x = 0; x < 20; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
         units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
     }
-    for(int32_t x = map.cols - 10; x < map.cols; x++)
+    for(int32_t x = map.cols - 20; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
@@ -60,11 +60,16 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     {
         static Point zero;
         Unit* const unit = &units.unit[i];
-        const Point point = {
-            map.cols / 2,
-            unit->cart.y < (map.rows / 2) ? (map.rows / 2 - map.rows / 6): (map.rows / 2 + map.rows / 6),
-        };
-        FindPath(units, unit, point, zero, field);
+        if(unit->color == COLOR_BLU)
+        {
+            const Point point = { map.cols - 1, map.rows / 2 };
+            FindPath(units, unit, point, zero, field);
+        }
+        else
+        {
+            const Point point = { 0, map.rows / 2 };
+            FindPath(units, unit, point, zero, field);
+        }
     }
     Field_Free(field);
 #else
