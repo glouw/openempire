@@ -32,8 +32,8 @@ simply run the compiled executable with the path flag pointing to the data folde
     [x] Multi-threaded macro level pathfinding (breadth first search)
     [x] Multi-threaded micro level pathfinding (boids)
     [x] Multi-threaded unit software rendering
-    [ ] Unit state switching
-    [ ] Melee combat
+    [x] Unit state switching
+    [x] Melee combat
     [ ] Ranged combat
     [ ] Multiplayer networking
     [x] Fast compile times with link time optimization (full build: 5.157 seconds on a Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz)
