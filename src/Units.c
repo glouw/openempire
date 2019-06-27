@@ -632,14 +632,18 @@ static void Tick(const Units units)
     }
 }
 
-static void Decay(const Units units)
+static void Decay(const Units units, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->state == STATE_FALL
-        && unit->timer == 15 * ANIMATION_DIVISOR) // XXX: Reasonable to cheat with this hardcoding? Can get from Animation, but Tiles are only constructed with units on screen.
-            Unit_UpdateFileByState(unit, STATE_DECAY, true);
+        if(unit->state == STATE_FALL)
+        {
+            const Animation animation = graphics.animation[unit->color][unit->file];
+            const int32_t frames = animation.count / DIRECTION_COUNT_NOT_MIRRORED;
+            if(unit->timer == frames * ANIMATION_DIVISOR)
+                Unit_UpdateFileByState(unit, STATE_DECAY, true);
+        }
     }
 }
 
@@ -654,7 +658,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Select(units, overview, input, graphics);
     units = Command(units, overview, input, map, field);
     Tick(units);
-    Decay(units);
+    Decay(units, graphics);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed.
     // Just sort and lower count value.
     return units;
