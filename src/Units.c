@@ -43,7 +43,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
 #if 1
-    const int32_t depth = 20;
+    const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
@@ -475,7 +475,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 30000) // XXX. Should be per unit.
+        if(Point_Mag(diff) < 35000) // XXX. Should be per unit.
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);

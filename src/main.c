@@ -8,7 +8,7 @@ int32_t main(int32_t argc, char* argv[])
     const Args args = Args_Parse(argc, argv);
     const Video video = Video_Setup(1300, 700, args.demo ? "Render Demo" : "Open Empires");
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(40, data.terrain);
+    const Map map = Map_Make(25, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(video.xres, video.yres, grid);
     Units units = Units_New(8, map, grid);
