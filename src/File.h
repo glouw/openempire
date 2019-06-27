@@ -20,15 +20,15 @@ File File_Load(FILE* const);
 
 #define FILE_NONE (0)
 
-#define FILE_VILLAGER_MAX_SPEED        (1400)
-#define FILE_VILLAGER_ACCEL            ( 200)
-#define FILE_VILLAGER_HEALTH           (3000)
-#define FILE_VILLAGER_ATTACK           (   5)
+#define FILE_VILLAGER_MAX_SPEED (1400)
+#define FILE_VILLAGER_ACCEL     ( 200)
+#define FILE_VILLAGER_HEALTH    (3000)
+#define FILE_VILLAGER_ATTACK    (   5)
 
-#define FILE_KNIGHT_MAX_SPEED        (1400)
-#define FILE_KNIGHT_ACCEL            ( 200)
-#define FILE_KNIGHT_HEALTH           (3000)
-#define FILE_KNIGHT_ATTACK           (   5)
+#define FILE_KNIGHT_MAX_SPEED (1400)
+#define FILE_KNIGHT_ACCEL     ( 200)
+#define FILE_KNIGHT_HEALTH    (3000)
+#define FILE_KNIGHT_ATTACK    (   5)
 
 #define FILE_TEUTONIC_KNIGHT_MAX_SPEED (1000)
 #define FILE_TEUTONIC_KNIGHT_ACCEL     ( 200)
@@ -38,7 +38,7 @@ File File_Load(FILE* const);
 #define FILE_PRIO_TERRAIN  (  1)
 #define FILE_PRIO_SHADOW   (  2)
 #define FILE_PRIO_DECAY    (  3)
-#define FILE_PRIO_FALLING  (  5)
+#define FILE_PRIO_FALLING  (  4)
 #define FILE_PRIO_GRAPHICS (  5)
 #define FILE_PRIO_HIGHEST  (255)
 
