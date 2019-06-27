@@ -163,6 +163,7 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
     const Points points = ToPoints(path);
     const Points reversed = Points_Reverse(points);
     Points_Free(points);
+    Free(path);
 
     return reversed; // XXX. Need to cleanup, lines can go straight from Point A to D if points B and C are free. Considering using DDA for that.
 }
