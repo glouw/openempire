@@ -25,6 +25,11 @@ File File_Load(FILE* const);
 #define FILE_VILLAGER_HEALTH           (3000)
 #define FILE_VILLAGER_ATTACK           (   5)
 
+#define FILE_KNIGHT_MAX_SPEED        (1400)
+#define FILE_KNIGHT_ACCEL            ( 200)
+#define FILE_KNIGHT_HEALTH           (3000)
+#define FILE_KNIGHT_ATTACK           (   5)
+
 #define FILE_TEUTONIC_KNIGHT_MAX_SPEED (1000)
 #define FILE_TEUTONIC_KNIGHT_ACCEL     ( 200)
 #define FILE_TEUTONIC_KNIGHT_HEALTH    (3000)
@@ -62,6 +67,11 @@ File File_Load(FILE* const);
 
 #define FILE_X_GRAPHICS \
     FILE_X(FILE_GRAPHICS_NONE,                       (  -1),   FILE_PRIO_HIGHEST,  (true ),    TYPE_NONE,              FILE_NONE,                      FILE_NONE,                  FILE_NONE,                   FILE_NONE) \
+    FILE_X(FILE_KNIGHT_FIGHTING,                     ( 190),   FILE_PRIO_GRAPHICS, (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_ACCEL,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK) \
+    FILE_X(FILE_KNIGHT_FALLING,                      ( 191),   FILE_PRIO_FALLING,  (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_ACCEL,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK) \
+    FILE_X(FILE_KNIGHT_IDLE,                         ( 192),   FILE_PRIO_GRAPHICS, (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_ACCEL,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK) \
+    FILE_X(FILE_KNIGHT_DECAYING,                     ( 193),   FILE_PRIO_DECAY,    (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_ACCEL,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK) \
+    FILE_X(FILE_KNIGHT_MOVING,                       ( 194),   FILE_PRIO_GRAPHICS, (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_ACCEL,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK) \
     FILE_X(FILE_STONE_MINE,                          ( 334),   FILE_PRIO_GRAPHICS, (false),    TYPE_STONE_MINE,        FILE_NONE,                      FILE_NONE,                  FILE_NONE,                   FILE_NONE) \
     FILE_X(FILE_TREE_STUMPS,                         ( 335),   FILE_PRIO_GRAPHICS, (true ),    TYPE_NONE,              FILE_NONE,                      FILE_NONE,                  FILE_NONE,                   FILE_NONE) \
     FILE_X(FILE_TREE_CHOPPED_DOWN,                   ( 370),   FILE_PRIO_GRAPHICS, (false),    TYPE_TREE_CHOPPED_DOWN, FILE_NONE,                      FILE_NONE,                  FILE_NONE,                   FILE_NONE) \
