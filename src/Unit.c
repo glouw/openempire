@@ -126,6 +126,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.attack = Graphics_GetAttack(file);
     unit.file = file;
     unit.timer = Util_Rand() % 10;
+    unit.width = Graphics_GetWidth(file);
     return unit;
 }
 

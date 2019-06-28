@@ -54,7 +54,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -252,7 +252,8 @@ static Point Separate(Unit* const unit, Unit* const other)
             };
             return nudge;
         }
-        if(Point_Mag(diff) < 20000) // XXX. Use unit width.
+        const int32_t width = UTIL_MAX(unit->width, other->width);
+        if(Point_Mag(diff) < width) // XXX. Use unit width.
             return diff;
     }
     return zero;
@@ -262,10 +263,11 @@ static Point SeparateBoids(const Units units, Unit* const unit)
 {
     static Point zero;
     Point out = zero;
+    const int32_t width = 1;
     if(!State_IsDead(unit->state))
     {
-        for(int32_t x = -1; x <= 1; x++)
-        for(int32_t y = -1; y <= 1; y++)
+        for(int32_t x = -width; x <= width; x++)
+        for(int32_t y = -width; y <= width; y++)
         {
             const Point cart_offset = { x, y };
             const Point cart = Point_Add(unit->cart, cart_offset);
@@ -283,12 +285,13 @@ static Point SeparateBoids(const Units units, Unit* const unit)
 
 static void ChaseBoids(const Units units, Unit* const unit, const Field field)
 {
+    const int32_t width = 1;
     if(!State_IsDead(unit->state))
     {
         Unit* closest = NULL;
         int64_t max = INT64_MAX;
-        for(int32_t x = -1; x <= 1; x++)
-        for(int32_t y = -1; y <= 1; y++)
+        for(int32_t x = -width; x <= width; x++)
+        for(int32_t y = -width; y <= width; y++)
         {
             const Point cart_offset = { x, y };
             const Point cart = Point_Add(unit->cart, cart_offset);
@@ -318,21 +321,28 @@ static Point AlignBoids(const Units units, Unit* const unit)
 {
     static Point zero;
     Point out = zero;
+    const int32_t width = 1;
     if(!State_IsDead(unit->state))
     {
-        const Stack stack = Units_GetStackCart(units, unit->cart);
-        if(stack.count > 1)
+        int32_t count = 0;
+        for(int32_t x = -width; x <= width; x++)
+        for(int32_t y = -width; y <= width; y++)
         {
+            const Point cart_offset = { x, y };
+            const Point cart = Point_Add(unit->cart, cart_offset);
+            const Stack stack = Units_GetStackCart(units, cart);
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
-                if(!State_IsDead(other->state))
-                    if(unit->id != other->id)
-                        out = Point_Add(out, other->velocity);
+                if(!State_IsDead(other->state)
+                && unit->id != other->id)
+                    out = Point_Add(out, other->velocity);
             }
-            out = Point_Div(out, stack.count - 1);
-            return Point_Div(Point_Sub(out, unit->velocity), 8);
+            count += stack.count;
         }
+        if(count > 0)
+            out = Point_Div(out, count);
+        return Point_Div(Point_Sub(out, unit->velocity), 8);
     }
     return zero;
 }
