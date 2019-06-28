@@ -438,9 +438,7 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        unit->stressors = (Point_Mag(stressors) < 100) ? zero : stressors;
-        if(Point_Mag(unit->stressors) < 500) // XXX. Whats a good threshold?
-            unit->stressors = zero;
+        unit->stressors = (Point_Mag(stressors) < 500) ? zero : stressors;
     }
 }
 
