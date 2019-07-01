@@ -150,10 +150,15 @@ void Unit_Print(Unit* const unit)
     printf("health                :: %d\n",      unit->health);
 }
 
+void ApplyStressors(Unit* const unit)
+{
+    unit->velocity = Point_Add(unit->velocity, unit->stressors);
+}
+
 void Unit_Flow(Unit* const unit, const Grid grid)
 {
     FollowPath(unit, grid);
-    unit->velocity = Point_Add(unit->velocity, unit->stressors);
+    ApplyStressors(unit);
     CapSpeed(unit);
 }
 

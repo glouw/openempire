@@ -261,9 +261,9 @@ static Point Separate(Unit* const unit, Unit* const other)
 
 static Point SeparateBoids(const Units units, Unit* const unit)
 {
+    const int32_t width = 1;
     static Point zero;
     Point out = zero;
-    const int32_t width = 1;
     if(!State_IsDead(unit->state))
     {
         for(int32_t x = -width; x <= width; x++)
@@ -319,9 +319,9 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
 
 static Point AlignBoids(const Units units, Unit* const unit)
 {
+    const int32_t width = 1;
     static Point zero;
     Point out = zero;
-    const int32_t width = 1;
     if(!State_IsDead(unit->state))
     {
         int32_t count = 0;
@@ -498,10 +498,11 @@ static void Melee(Unit* const unit, Unit* const other)
 
 static void FightBoids(const Units units, Unit* const unit)
 {
+    const int32_t width = 1;
     if(!State_IsDead(unit->state))
     {
-        for(int32_t x = -1; x <= 1; x++)
-        for(int32_t y = -1; y <= 1; y++)
+        for(int32_t x = -width; x <= width; x++)
+        for(int32_t y = -width; y <= width; y++)
         {
             const Point cart_offset = { x, y };
             const Point cart = Point_Add(unit->cart, cart_offset);
