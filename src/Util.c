@@ -5,6 +5,18 @@
 #include <stdarg.h>
 #include <string.h>
 
+void Util_Log(const char* const message, ...)
+{
+    static FILE* log;
+    static int log_count = 0;
+    if(log_count++ > 0)
+        log = fopen("log.txt", "w");
+    va_list args;
+    va_start(args, message);
+    vfprintf(log, message, args);
+    va_end(args);
+}
+
 void Util_Bomb(const char* const message, ...)
 {
     va_list args;

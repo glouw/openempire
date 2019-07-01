@@ -32,3 +32,5 @@ int64_t Util_Sqrt(const int64_t value);
 uint16_t Util_Rand(void);
 
 int32_t Util_Time(void);
+
+void Util_Log(const char* const message, ...);
