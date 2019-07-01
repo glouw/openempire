@@ -82,7 +82,7 @@ static void RenderRegistrarDemo(const Video video, const Registrar registrar, co
     for(int32_t i = 0; i < registrar.file_count; i++)
     {
         const int32_t file = registrar.files[i];
-        if(file != -1)
+        if(file != FILE_NONE)
             RenderAnimationDemo(video, registrar.animation[color][file], point);
     }
 }

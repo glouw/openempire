@@ -40,7 +40,6 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
-    unit->dir = Direction_CartToIso(Direction_GetCart(accel));
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
@@ -167,4 +166,9 @@ bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for
 {
     return unit->command_group == other->command_group
         && unit->color == other->color;
+}
+
+void Unit_SetDir(Unit* const unit, const Point dir)
+{
+    unit->dir = Direction_CartToIso(Direction_GetCart(dir));
 }

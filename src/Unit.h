@@ -52,3 +52,5 @@ bool Unit_InPlatoon(Unit* const unit, Unit* const other);
 void Unit_UpdateFileByState(Unit* const, const State, const bool reset_timer);
 
 void Unit_FreePath(Unit* const);
+
+void Unit_SetDir(Unit* const, const Point);

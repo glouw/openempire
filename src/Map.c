@@ -99,10 +99,11 @@ void Map_Edit(const Map map, const Overview overview, const Input input)
 
 Points Map_GetBlendBox(const Map map, const Point inner)
 {
+    const int32_t width = 1;
     Points points = Points_New(8);
     const int32_t inner_tile = Map_GetTerrainFile(map, inner);
-    for(int32_t dx = -1; dx <= 1; dx++)
-    for(int32_t dy = -1; dy <= 1; dy++)
+    for(int32_t dx = -width; dx <= width; dx++)
+    for(int32_t dy = -width; dy <= width; dy++)
     {
         const Point delta = { dx, dy };
         const Point outer = Point_Add(inner, delta);

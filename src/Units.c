@@ -230,7 +230,7 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        const Point cohesion = Point_Div(delta, 32); // XXX. What is a good divisor?
+        const Point cohesion = Point_Div(delta, 16); // XXX. What is a good divisor?
         return stack.count > 0 ? cohesion : zero;
     }
     return zero;
@@ -292,7 +292,6 @@ static Point AlignBoids(const Units units, Unit* const unit)
     Point out = zero;
     if(!State_IsDead(unit->state))
     {
-        int32_t count = 0;
         for(int32_t x = -width; x <= width; x++)
         for(int32_t y = -width; y <= width; y++)
         {
@@ -303,15 +302,12 @@ static Point AlignBoids(const Units units, Unit* const unit)
             {
                 Unit* const other = stack.reference[i];
                 if(!State_IsDead(other->state)
-                && unit->id != other->id)
+                && unit->id != other->id
+                && Unit_InPlatoon(unit, other))
                     out = Point_Add(out, other->velocity);
             }
-            count += stack.count;
         }
-        if(count > 0)
-            out = Point_Div(out, count);
-        out = Point_Sub(out, unit->velocity);
-        return Point_Div(out, 8);
+        return Point_Div(out, 32);
     }
     return zero;
 }
@@ -354,22 +350,24 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     if(!State_IsDead(unit->state))
     {
         const Point point[] = {
+            AlignBoids(units, unit),
             CoheseBoids(units, unit),
             SeparateBoids(units, unit),
-            AlignBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };
+
+        // Assuming the zeroth point is always the alignment rule,
+        // the unit direction is the direction of the moving pack.
+
+        const Point dir = point[0];
+        if(Point_Mag(dir) > 30)
+            Unit_SetDir(unit, dir);
+
         static Point zero;
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
-        {
-            if(unit->id == 0)
-                Util_Log("%5d %5d\t", point[j].x, point[j].y);
             stressors = Point_Add(stressors, point[j]);
-        }
-        if(unit->id == 0)
-            Util_Log("\n");
-        unit->stressors = Point_Mag(stressors) < 50 ? zero : stressors;
+        unit->stressors = Point_Mag(stressors) < 75 ? zero : stressors;
     }
 }
 
@@ -458,7 +456,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 3500) // XXX. Should be per unit in FILE.
+        if(Point_Mag(diff) < 4000) // XXX. Should be per unit in FILE.
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
