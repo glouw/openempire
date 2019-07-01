@@ -33,6 +33,7 @@ typedef struct
     int32_t attack;
     int32_t timer;
     int32_t width;
+    Type type;
 }
 Unit;
 

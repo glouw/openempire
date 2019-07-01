@@ -18,25 +18,35 @@ void File_Print(const File);
 
 File File_Load(FILE* const);
 
+//  Assuming:
+//      Force = Mass * Acceleration
+//  Where Mass is equal to 1, force applied from one unit to
+//  another unit is directly proportional to the difference in
+//  unit acceleration scalars configured in the following file defines.
+
 #define FILE_NONE (0)
 
-#define FILE_VILLAGER_MAX_SPEED  (130)
-#define FILE_VILLAGER_ACCEL      ( 30)
+#define FILE_VILLAGER_MAX_SPEED  (100)
+#define FILE_VILLAGER_ACCEL      (100)
 #define FILE_VILLAGER_HEALTH    (2000)
 #define FILE_VILLAGER_ATTACK     (  5)
-#define FILE_VILLAGER_WIDTH     (2100)
+#define FILE_VILLAGER_WIDTH     (2800)
 
 #define FILE_KNIGHT_MAX_SPEED  (250)
-#define FILE_KNIGHT_ACCEL      ( 30)
+#define FILE_KNIGHT_ACCEL      (150)
 #define FILE_KNIGHT_HEALTH    (6000)
 #define FILE_KNIGHT_ATTACK     ( 25)
 #define FILE_KNIGHT_WIDTH     (2800)
 
 #define FILE_TEUTONIC_KNIGHT_MAX_SPEED (100)
-#define FILE_TEUTONIC_KNIGHT_ACCEL     ( 20)
+#define FILE_TEUTONIC_KNIGHT_ACCEL     ( 70)
 #define FILE_TEUTONIC_KNIGHT_HEALTH   (8000)
 #define FILE_TEUTONIC_KNIGHT_ATTACK    ( 18)
 #define FILE_TEUTONIC_KNIGHT_WIDTH    (2200)
+
+// File priority ensures the software renderer will not render the same pixel twice.
+// This is essentially a Z-Buffer stored in the alpha channel of all VRAM pixels.
+// Larger priorities take precedence, and may not be drawn over by smaller priorities.
 
 #define FILE_PRIO_TERRAIN  (  1)
 #define FILE_PRIO_SHADOW   (  2)

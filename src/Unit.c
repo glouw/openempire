@@ -38,9 +38,9 @@ static void ReachGoal(Unit* const unit)
 
 static void GotoGoal(Unit* const unit, const Point delta)
 {
-    const Point dv = Point_Normalize(delta, unit->accel);
-    unit->velocity = Point_Add(unit->velocity, dv);
-    unit->dir = Direction_CartToIso(Direction_GetCart(dv));
+    const Point accel = Point_Normalize(delta, unit->accel);
+    unit->velocity = Point_Add(unit->velocity, accel);
+    unit->dir = Direction_CartToIso(Direction_GetCart(accel));
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
@@ -127,6 +127,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.file = file;
     unit.timer = Util_Rand() % 10;
     unit.width = Graphics_GetWidth(file);
+    unit.type = Graphics_GetType(file);
     return unit;
 }
 

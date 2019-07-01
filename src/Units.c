@@ -42,7 +42,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-#if 0
+#if 1
     const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
@@ -76,7 +76,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 #else
     const Point a = { 21, 21 };
     const Point b = { 20, 20 };
-    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
+    units = Units_Append(units, Unit_Make(a, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
     units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
 #endif
     return units;
@@ -230,10 +230,19 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        const Point cohesion = Point_Div(delta, 128); // XXX. What is a good divisor?
+        const Point cohesion = Point_Div(delta, 32); // XXX. What is a good divisor?
         return stack.count > 0 ? cohesion : zero;
     }
     return zero;
+}
+
+static Point Nudge(void)
+{
+    const Point nudge = {
+        1000 * ((Util_Rand() % 1000) - 500),
+        1000 * ((Util_Rand() % 1000) - 500),
+    };
+    return nudge;
 }
 
 static Point Separate(Unit* const unit, Unit* const other)
@@ -243,15 +252,9 @@ static Point Separate(Unit* const unit, Unit* const other)
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_IsZero(diff))
-        {
-            const Point nudge = {
-                1000 * ((Util_Rand() % 1000) - 500),
-                1000 * ((Util_Rand() % 1000) - 500),
-            };
-            return nudge;
-        }
+            return Nudge();
         const int32_t width = UTIL_MAX(unit->width, other->width);
-        if(Point_Mag(diff) < width) // XXX. Use unit width.
+        if(Point_Mag(diff) < width)
             return diff;
     }
     return zero;
@@ -278,41 +281,8 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             }
         }
     }
-    return Point_Div(out, 32);
-}
-
-static void ChaseBoids(const Units units, Unit* const unit, const Field field)
-{
-    const int32_t width = 1;
-    if(!State_IsDead(unit->state))
-    {
-        Unit* closest = NULL;
-        int32_t max = INT32_MAX;
-        for(int32_t x = -width; x <= width; x++)
-        for(int32_t y = -width; y <= width; y++)
-        {
-            const Point cart_offset = { x, y };
-            const Point cart = Point_Add(unit->cart, cart_offset);
-            const Stack stack = Units_GetStackCart(units, cart);
-            for(int32_t i = 0; i < stack.count; i++)
-            {
-                Unit* const other = stack.reference[i];
-                if(other->color != unit->color
-                && !State_IsDead(other->state))
-                {
-                    const Point diff = Point_Sub(other->cell, unit->cell);
-                    const int32_t mag = Point_Mag(diff);
-                    if(mag < max)
-                    {
-                        max = mag;
-                        closest = other;
-                    }
-                }
-            }
-        }
-        if(closest != NULL)
-            FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
-    }
+    out = Point_Div(out, 16);
+    return out;
 }
 
 static Point AlignBoids(const Units units, Unit* const unit)
@@ -340,7 +310,8 @@ static Point AlignBoids(const Units units, Unit* const unit)
         }
         if(count > 0)
             out = Point_Div(out, count);
-        return Point_Div(Point_Sub(out, unit->velocity), 8);
+        out = Point_Sub(out, unit->velocity);
+        return Point_Div(out, 8);
     }
     return zero;
 }
@@ -376,6 +347,30 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         if(!e_walk && offset.x > grid.tile_cart_width  - border) out = Point_Add(out, w_force);
     }
     return out;
+}
+
+static void CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
+{
+    if(!State_IsDead(unit->state))
+    {
+        const Point point[] = {
+            CoheseBoids(units, unit),
+            SeparateBoids(units, unit),
+            AlignBoids(units, unit),
+            WallPushBoids(units, unit, map, grid),
+        };
+        static Point zero;
+        Point stressors = zero;
+        for(int32_t j = 0; j < UTIL_LEN(point); j++)
+        {
+            if(unit->id == 0)
+                Util_Log("%5d %5d\t", point[j].x, point[j].y);
+            stressors = Point_Add(stressors, point[j]);
+        }
+        if(unit->id == 0)
+            Util_Log("\n");
+        unit->stressors = Point_Mag(stressors) < 50 ? zero : stressors;
+    }
 }
 
 // Boids, when swept up in a current of other boids, will
@@ -422,30 +417,6 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-static void CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
-{
-    if(!State_IsDead(unit->state))
-    {
-        const Point point[] = {
-            CoheseBoids(units, unit),
-            SeparateBoids(units, unit),
-            AlignBoids(units, unit),
-            WallPushBoids(units, unit, map, grid),
-        };
-        static Point zero;
-        Point stressors = zero;
-        for(int32_t j = 0; j < UTIL_LEN(point); j++)
-        {
-            if(unit->id == 0)
-                Util_Log("%5d %5d\t", point[j].x, point[j].y);
-            stressors = Point_Add(stressors, point[j]);
-        }
-        if(unit->id == 0)
-            Util_Log("\n");
-        unit->stressors = (Point_Mag(stressors) < (GRID_CELL_SIZE / 2)) ? zero : stressors;
-    }
-}
-
 static void Repath(const Units units, Unit* const unit, const Field field)
 {
     if(!State_IsDead(unit->state) && unit->path_index_time > 100) // XXX, What is a good timeout time?
@@ -487,7 +458,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < GRID_CELL_SIZE * 35) // XXX. Should be per unit.
+        if(Point_Mag(diff) < 3500) // XXX. Should be per unit in FILE.
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
@@ -518,6 +489,48 @@ static void FightBoids(const Units units, Unit* const unit)
                     Melee(unit, other);
             }
         }
+    }
+}
+
+static Unit* GetClosestBoid(const Units units, Unit* const unit)
+{
+    const int32_t width = 1;
+    Unit* closest = NULL;
+    int32_t max = INT32_MAX;
+    for(int32_t x = -width; x <= width; x++)
+    for(int32_t y = -width; y <= width; y++)
+    {
+        const Point cart_offset = { x, y };
+        const Point cart = Point_Add(unit->cart, cart_offset);
+        const Stack stack = Units_GetStackCart(units, cart);
+        for(int32_t i = 0; i < stack.count; i++)
+        {
+            Unit* const other = stack.reference[i];
+            if(other->color != unit->color
+                    && !State_IsDead(other->state))
+            {
+                const Point diff = Point_Sub(other->cell, unit->cell);
+                const int32_t mag = Point_Mag(diff);
+                if(mag < max)
+                {
+                    max = mag;
+                    closest = other;
+                }
+            }
+        }
+    }
+    return closest;
+}
+
+// DO NOT multithread.
+
+static void ChaseBoids(const Units units, Unit* const unit, const Field field)
+{
+    if(!State_IsDead(unit->state))
+    {
+        Unit* const closest = GetClosestBoid(units, unit);
+        if(closest != NULL)
+            FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
     }
 }
 
@@ -595,7 +608,7 @@ static int32_t RunFlowNeedle(void* data)
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
-static void FollowPathBoids(const Units units, const Grid grid, const Map map, const Field field)
+static void ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
 {
     BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
@@ -660,20 +673,30 @@ static void Decay(const Units units, const Registrar graphics)
     }
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
+static void ManageStacks(const Units units)
 {
-    Delete(units, input);
-    FollowPathBoids(units, grid, map, field);
     ResetStacks(units);
     StackStacks(units);
     SortStacks(units);
     CalculateCenters(units);
+}
+
+static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field)
+{
     units = Select(units, overview, input, graphics);
     units = Command(units, overview, input, map, field);
     Tick(units);
     Decay(units, graphics);
-    // XXX. Need a unit Remove() function to take unit off map when they are fully decayed.
-    // Just sort and lower count value.
+    Delete(units, input);
+    // XXX. Need a unit Remove() function to take unit off map when they are fully decayed. Just sort and lower count value.
+    return units;
+}
+
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
+{
+    ManagePathFinding(units, grid, map, field);
+    ManageStacks(units);
+    units = ManageAction(units, graphics, overview, input, map, field);
     return units;
 }
 
