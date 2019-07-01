@@ -18,7 +18,6 @@ Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_wi
     const Point c = Point_ToCart(iso_e); // b - c
     grid.tile_cart_width = c.x - b.x;
     grid.tile_cart_height = c.y - a.y;
-    grid.cell_size = 1000; // Dictates with width and height of sub-pixels within a pixel.
     grid.tile_cart_mid.x = grid.tile_cart_width / 2;
     grid.tile_cart_mid.y = grid.tile_cart_height / 2;
     return grid;
@@ -51,16 +50,16 @@ Point Grid_GetOffsetFromGridPoint(const Grid grid, const Point point)
 Point Grid_CellToCart(const Grid grid, const Point cell)
 {
     const Point out = {
-        (cell.x / grid.cell_size) / grid.tile_cart_width,
-        (cell.y / grid.cell_size) / grid.tile_cart_height,
+        (cell.x / GRID_CELL_SIZE) / grid.tile_cart_width,
+        (cell.y / GRID_CELL_SIZE) / grid.tile_cart_height,
     };
     return out;
 }
 
 Point Grid_CartToCell(const Grid grid, const Point cart)
 {
-    const int32_t w = grid.cell_size * grid.tile_cart_width;
-    const int32_t h = grid.cell_size * grid.tile_cart_height;
+    const int32_t w = GRID_CELL_SIZE * grid.tile_cart_width;
+    const int32_t h = GRID_CELL_SIZE * grid.tile_cart_height;
     const Point out = {
         w * cart.x + w / 2,
         h * cart.y + h / 2,
@@ -71,8 +70,8 @@ Point Grid_CartToCell(const Grid grid, const Point cart)
 Point Grid_CellToOffset(const Grid grid, const Point cell)
 {
     const Point coords = {
-        (cell.x / grid.cell_size) % grid.tile_cart_width,
-        (cell.y / grid.cell_size) % grid.tile_cart_height,
+        (cell.x / GRID_CELL_SIZE) % grid.tile_cart_width,
+        (cell.y / GRID_CELL_SIZE) % grid.tile_cart_height,
     };
     return Point_Sub(coords, grid.tile_cart_mid);
 }

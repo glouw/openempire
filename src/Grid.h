@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+#define GRID_CELL_SIZE 100
+
 typedef struct
 {
     int32_t cols;
@@ -12,7 +14,6 @@ typedef struct
     int32_t tile_iso_height;
     int32_t tile_cart_width;
     int32_t tile_cart_height;
-    int32_t cell_size;
     Point tile_cart_mid;
 }
 Grid;

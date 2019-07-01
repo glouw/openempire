@@ -436,7 +436,7 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        unit->stressors = (Point_Mag(stressors) < 500) ? zero : stressors;
+        unit->stressors = (Point_Mag(stressors) < (GRID_CELL_SIZE / 2)) ? zero : stressors;
     }
 }
 
@@ -481,7 +481,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 35000) // XXX. Should be per unit.
+        if(Point_Mag(diff) < GRID_CELL_SIZE * 35) // XXX. Should be per unit.
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
