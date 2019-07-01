@@ -42,7 +42,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-#if 0
+#if 1
     const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
