@@ -42,7 +42,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-#if 1
+#if 0
     const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
@@ -428,14 +428,22 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     {
         const Point point[] = {
             CoheseBoids(units, unit),
-            SeparateBoids(units, unit),
-            AlignBoids(units, unit),
-            WallPushBoids(units, unit, map, grid),
+            //SeparateBoids(units, unit),
+            //AlignBoids(units, unit),
+            //WallPushBoids(units, unit, map, grid),
         };
         static Point zero;
         Point stressors = zero;
+        Util_Log("---\n");
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
+        {
+            if(unit->id == 0)
+            {
+                Point_Print(point[j]);
+                printf("%d %d\n", point[j].x, point[j].y);
+            }
             stressors = Point_Add(stressors, point[j]);
+        }
         unit->stressors = (Point_Mag(stressors) < (GRID_CELL_SIZE / 2)) ? zero : stressors;
     }
 }

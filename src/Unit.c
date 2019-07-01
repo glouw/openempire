@@ -132,22 +132,22 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
 
 void Unit_Print(Unit* const unit)
 {
-    Util_Log("cart                  :: %ld %ld\n", unit->cart.x, unit->cart.y);
-    Util_Log("cart_grid_offset      :: %ld %ld\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
-    Util_Log("cart_grid_offset_goal :: %ld %ld\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
-    Util_Log("cell                  :: %ld %ld\n", unit->cell.x, unit->cell.y);
-    Util_Log("max_speed             :: %d\n",      unit->max_speed);
-    Util_Log("accel                 :: %d\n",      unit->accel);
-    Util_Log("velocity              :: %ld %ld\n", unit->velocity.x, unit->velocity.y);
-    Util_Log("path_index_time       :: %d\n",      unit->path_index_time);
-    Util_Log("path_index            :: %d\n",      unit->path_index);
-    Util_Log("path.count            :: %d\n",      unit->path.count);
-    Util_Log("selected              :: %d\n",      unit->selected);
-    Util_Log("file                  :: %d\n",      unit->file);
-    Util_Log("file_name             :: %s\n",      unit->file_name);
-    Util_Log("id                    :: %d\n",      unit->id);
-    Util_Log("group                 :: %d\n",      unit->command_group);
-    Util_Log("health                :: %d\n",      unit->health);
+    Util_Log("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
+    Util_Log("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+    Util_Log("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
+    Util_Log("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
+    Util_Log("max_speed             :: %d\n",    unit->max_speed);
+    Util_Log("accel                 :: %d\n",    unit->accel);
+    Util_Log("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
+    Util_Log("path_index_time       :: %d\n",    unit->path_index_time);
+    Util_Log("path_index            :: %d\n",    unit->path_index);
+    Util_Log("path.count            :: %d\n",    unit->path.count);
+    Util_Log("selected              :: %d\n",    unit->selected);
+    Util_Log("file                  :: %d\n",    unit->file);
+    Util_Log("file_name             :: %s\n",    unit->file_name);
+    Util_Log("id                    :: %d\n",    unit->id);
+    Util_Log("group                 :: %d\n",    unit->command_group);
+    Util_Log("health                :: %d\n",    unit->health);
 }
 
 void ApplyStressors(Unit* const unit)
