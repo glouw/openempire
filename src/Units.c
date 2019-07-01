@@ -428,22 +428,20 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     {
         const Point point[] = {
             CoheseBoids(units, unit),
-            //SeparateBoids(units, unit),
-            //AlignBoids(units, unit),
-            //WallPushBoids(units, unit, map, grid),
+            SeparateBoids(units, unit),
+            AlignBoids(units, unit),
+            WallPushBoids(units, unit, map, grid),
         };
         static Point zero;
         Point stressors = zero;
-        Util_Log("---\n");
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
         {
             if(unit->id == 0)
-            {
-                Point_Print(point[j]);
-                printf("%d %d\n", point[j].x, point[j].y);
-            }
+                Util_Log("%5d %5d\t", point[j].x, point[j].y);
             stressors = Point_Add(stressors, point[j]);
         }
+        if(unit->id == 0)
+            Util_Log("\n");
         unit->stressors = (Point_Mag(stressors) < (GRID_CELL_SIZE / 2)) ? zero : stressors;
     }
 }
