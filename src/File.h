@@ -27,21 +27,21 @@ File File_Load(FILE* const);
 #define FILE_NONE (0)
 
 #define FILE_VILLAGER_MAX_SPEED  (100)
-#define FILE_VILLAGER_ACCEL      (100)
-#define FILE_VILLAGER_HEALTH    (2000)
-#define FILE_VILLAGER_ATTACK     (  5)
-#define FILE_VILLAGER_WIDTH     (2800)
+#define FILE_VILLAGER_ACCEL       (60)
+#define FILE_VILLAGER_HEALTH    (8000)
+#define FILE_VILLAGER_ATTACK      (18)
+#define FILE_VILLAGER_WIDTH     (2200)
 
 #define FILE_KNIGHT_MAX_SPEED  (250)
-#define FILE_KNIGHT_ACCEL      (150)
+#define FILE_KNIGHT_ACCEL      (220)
 #define FILE_KNIGHT_HEALTH    (6000)
-#define FILE_KNIGHT_ATTACK     ( 25)
-#define FILE_KNIGHT_WIDTH     (2800)
+#define FILE_KNIGHT_ATTACK      (13)
+#define FILE_KNIGHT_WIDTH     (3200)
 
 #define FILE_TEUTONIC_KNIGHT_MAX_SPEED (100)
-#define FILE_TEUTONIC_KNIGHT_ACCEL     ( 70)
+#define FILE_TEUTONIC_KNIGHT_ACCEL      (80)
 #define FILE_TEUTONIC_KNIGHT_HEALTH   (8000)
-#define FILE_TEUTONIC_KNIGHT_ATTACK    ( 18)
+#define FILE_TEUTONIC_KNIGHT_ATTACK     (18)
 #define FILE_TEUTONIC_KNIGHT_WIDTH    (2200)
 
 // File priority ensures the software renderer will not render the same pixel twice.
