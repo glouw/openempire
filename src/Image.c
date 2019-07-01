@@ -71,22 +71,22 @@ void Image_Print(const Image image)
 {
     // Print padding.
 
-    printf("\t\t\tpadding:\n");
+    Util_Log("\t\t\tpadding:\n");
     for(int32_t i = 0; i < image.height; i++)
     {
         const bool transparent = Outline_IsTransparent(image.outline_table[i]);
-        printf("\t\t\t\t%3d: transparent = %d\n", i, transparent);
+        Util_Log("\t\t\t\t%3d: transparent = %d\n", i, transparent);
     }
 
     // Print command table.
     // Only prints first command byte for reference.
 
-    printf("\t\t\tcmd_table:\n");
+    Util_Log("\t\t\tcmd_table:\n");
     for(int32_t i = 0; i < image.height; i++)
     {
         const uint32_t address = image.cmd_table[i];
         const uint8_t cmd = image.data[address];
-        printf("\t\t\t\t%3d: 0x%08X -> 0x%02X\n", i, address, cmd);
+        Util_Log("\t\t\t\t%3d: 0x%08X -> 0x%02X\n", i, address, cmd);
     }
 }
 

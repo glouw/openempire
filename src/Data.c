@@ -1,5 +1,7 @@
 #include "Data.h"
 
+#include "Util.h"
+
 Data Data_Load(const char* const path)
 {
     const int32_t t0 = SDL_GetTicks();
@@ -10,7 +12,7 @@ Data Data_Load(const char* const path)
     data.interfac = Registrar_LoadInterfac(path);
     data.blendomatic = Blendomatic_Load(path, data.terrain);
     const int32_t t1 = SDL_GetTicks();
-    printf("Data load time: %d ms\n", t1 - t0);
+    Util_Log("Data load time: %d ms\n", t1 - t0);
     return data;
 }
 

@@ -18,12 +18,12 @@ Table Table_Load(FILE* const fp)
 
 void Table_Print(const Table table)
 {
-    printf("\t\tfile_extension   : %s\n", table.file_extension);
-    printf("\t\tfile_info_offset : %d\n", table.file_info_offset);
-    printf("\t\tnum_files        : %d\n", table.num_files);
+    Util_Log("\t\tfile_extension   : %s\n", table.file_extension);
+    Util_Log("\t\tfile_info_offset : %d\n", table.file_info_offset);
+    Util_Log("\t\tnum_files        : %d\n", table.num_files);
     for(int32_t i = 0; i < table.num_files; i++)
     {
-        printf("\t\tFile %d\n", i);
+        Util_Log("\t\tFile %d\n", i);
         File_Print(table.file[i]);
     }
 }

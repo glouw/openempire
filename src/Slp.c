@@ -4,12 +4,12 @@
 
 void Slp_Print(const Slp slp)
 {
-    printf("version    : %s\n", slp.version);
-    printf("num_frames : %d\n", slp.num_frames);
-    printf("comment    : %s\n", slp.comment);
+    Util_Log("version    : %s\n", slp.version);
+    Util_Log("num_frames : %d\n", slp.num_frames);
+    Util_Log("comment    : %s\n", slp.comment);
     for(uint32_t i = 0; i < slp.num_frames; i++)
     {
-        printf("\tFrame %d\n", i);
+        Util_Log("\tFrame %d\n", i);
         Frame_Print(slp.frame[i]);
         Image_Print(slp.image[i]);
     }
