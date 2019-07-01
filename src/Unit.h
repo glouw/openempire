@@ -31,7 +31,7 @@ typedef struct
     State state;
     int32_t health;
     int32_t attack;
-    int64_t timer;
+    int32_t timer;
     int32_t width;
 }
 Unit;

@@ -97,7 +97,7 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
     const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
     bool flip_vert = false;
     const Direction fixed_dir = Direction_Fix(reference->dir, &flip_vert);
-    const int64_t ticks = reference->timer / (reference->state == STATE_DECAY ? ANIMATION_DECAY_DIVISOR : ANIMATION_DIVISOR);
+    const int32_t ticks = reference->timer / (reference->state == STATE_DECAY ? ANIMATION_DECAY_DIVISOR : ANIMATION_DIVISOR);
     const int32_t frame = ticks % frames_per_direction;
     const int32_t index = frames_per_direction * fixed_dir + frame;
 

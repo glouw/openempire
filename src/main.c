@@ -14,7 +14,7 @@ int32_t main(int32_t argc, char* argv[])
     Units units = Units_New(8, map, grid);
     int32_t dt_hold = 0;
 
-    int64_t cycles = 0;
+    int32_t cycles = 0;
     if(args.demo)
         Video_RenderDataDemo(video, data, args.color);
     else

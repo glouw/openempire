@@ -42,7 +42,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 {
-#if 1
+#if 0
     const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
@@ -74,12 +74,10 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     }
     Field_Free(field);
 #else
-    const Point carts[] = {
-        { 0 + map.cols / 2, 0 + map.rows / 2 },
-        { 2 + map.cols / 2, 2 + map.rows / 2 },
-    };
-    units = Units_Append(units, Unit_Make(carts[0], grid, FILE_MALE_VILLAGER_STANDING, COLOR_BLU));
-    units = Units_Append(units, Unit_Make(carts[1], grid, FILE_MALE_VILLAGER_STANDING, COLOR_RED));
+    const Point a = { 21, 21 };
+    const Point b = { 20, 20 };
+    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
+    units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
 #endif
     return units;
 }
@@ -289,7 +287,7 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
     if(!State_IsDead(unit->state))
     {
         Unit* closest = NULL;
-        int64_t max = INT64_MAX;
+        int32_t max = INT32_MAX;
         for(int32_t x = -width; x <= width; x++)
         for(int32_t y = -width; y <= width; y++)
         {
@@ -303,7 +301,7 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
                 && !State_IsDead(other->state))
                 {
                     const Point diff = Point_Sub(other->cell, unit->cell);
-                    const int64_t mag = Point_Mag(diff);
+                    const int32_t mag = Point_Mag(diff);
                     if(mag < max)
                     {
                         max = mag;
