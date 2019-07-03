@@ -40,10 +40,8 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
-    if(Point_Mag(unit->alignment) > 30)
-        Unit_SetDir(unit, unit->alignment);
-    else
-        Unit_SetDir(unit, accel);
+    const Point dir = Point_Mag(unit->group_alignment) > 5 ? unit->group_alignment : accel;
+    Unit_SetDir(unit, dir);
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
@@ -174,5 +172,9 @@ bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for
 
 void Unit_SetDir(Unit* const unit, const Point dir)
 {
-    unit->dir = Direction_CartToIso(Direction_GetCart(dir));
+    if(unit->spin_timer > 10)
+    {
+        unit->dir = Direction_CartToIso(Direction_GetCart(dir));
+        unit->spin_timer = 0;
+    }
 }

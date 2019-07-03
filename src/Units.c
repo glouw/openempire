@@ -255,7 +255,7 @@ static Point Separate(Unit* const unit, Unit* const other)
             return Nudge();
         const int32_t width = UTIL_MAX(unit->width, other->width);
         if(Point_Mag(diff) < width)
-            return diff;
+            return Point_Normalize(diff, width);
     }
     return zero;
 }
@@ -281,7 +281,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             }
         }
     }
-    out = Point_Div(out, 16);
+    out = Point_Div(out, 12);
     return out;
 }
 
@@ -349,13 +349,13 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
 {
     if(!State_IsDead(unit->state))
     {
+        unit->group_alignment = AlignBoids(units, unit);
         const Point point[] = {
-            AlignBoids(units, unit),
+            unit->group_alignment,
             CoheseBoids(units, unit),
             SeparateBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };
-        unit->alignment = point[0]; //
 
         static Point zero;
         Point stressors = zero;
@@ -452,7 +452,7 @@ static void Melee(Unit* const unit, Unit* const other)
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_Mag(diff) < 3500) // XXX. Should be per unit in FILE.
         {
-            unit->dir = Direction_CartToIso(Direction_GetCart(diff));
+            Unit_SetDir(unit, diff);
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             other->health -= unit->attack;
             if(other->health <= 0)
@@ -647,6 +647,7 @@ static void Tick(const Units units)
     {
         Unit* const unit = &units.unit[i];
         unit->timer++;
+        unit->spin_timer++;
     }
 }
 

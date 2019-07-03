@@ -22,10 +22,10 @@ int32_t main(int32_t argc, char* argv[])
     {
         const Field field = Units_Field(units, map);
         const int32_t t0 = SDL_GetTicks();
-        Video_Draw(video, data, map, units, overview, input);
         Map_Edit(map, overview, input);
         overview = Overview_Update(overview, input);
         units = Units_Caretake(units, data.graphics, overview, grid, input, map, field);
+        Video_Draw(video, data, map, units, overview, input);
         const int32_t t1 = SDL_GetTicks();
         const int32_t dt = t1 - t0;
         const int32_t ms = 1000 / 60 - dt;
