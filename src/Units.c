@@ -48,13 +48,13 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -167,6 +167,7 @@ static Units Select(Units units, const Overview overview, const Input input, con
         {
             const Tile tile = Tiles_SelectOne(tiles, input.point);
             if(tile.reference
+            && !State_IsDead(tile.reference->state)
             && input.key[SDL_SCANCODE_LCTRL])
                 units.select_count = Tiles_SelectSimilar(tiles, tile);
             else
@@ -450,7 +451,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 3500) // XXX. Should be per unit in FILE.
+        if(Point_Mag(diff) < 4000) // XXX. Should be per unit in FILE.
         {
             Unit_SetDir(unit, diff);
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
