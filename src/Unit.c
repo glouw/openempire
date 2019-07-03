@@ -40,6 +40,10 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
+    if(Point_Mag(unit->alignment) > 30)
+        Unit_SetDir(unit, unit->alignment);
+    else
+        Unit_SetDir(unit, accel);
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)

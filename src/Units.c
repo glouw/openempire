@@ -355,19 +355,13 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
             SeparateBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };
-
-        // Assuming the zeroth point is always the alignment rule,
-        // the unit direction is the direction of the moving pack.
-
-        const Point dir = point[0];
-        if(Point_Mag(dir) > 30)
-            Unit_SetDir(unit, dir);
+        unit->alignment = point[0]; //
 
         static Point zero;
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        unit->stressors = Point_Mag(stressors) < 75 ? zero : stressors;
+        unit->stressors = Point_Mag(stressors) < 150 ? zero : stressors;
     }
 }
 
@@ -456,7 +450,7 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 4000) // XXX. Should be per unit in FILE.
+        if(Point_Mag(diff) < 3500) // XXX. Should be per unit in FILE.
         {
             unit->dir = Direction_CartToIso(Direction_GetCart(diff));
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);

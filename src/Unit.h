@@ -34,6 +34,7 @@ typedef struct
     int32_t timer;
     int32_t width;
     Type type;
+    Point alignment;
 }
 Unit;
 

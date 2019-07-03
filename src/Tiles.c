@@ -106,8 +106,8 @@ int32_t Tiles_SelectSimilar(const Tiles tiles, const Tile similar)
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
-        const Type t_a = Graphics_GetType(similar.reference->file);
-        const Type t_b = Graphics_GetType(tile.reference->file);
+        const Type t_a = similar.reference->type;
+        const Type t_b = tile.reference->type;
         const Color c_a = similar.reference->color;
         const Color c_b = tile.reference->color;
         if(t_a == t_b
