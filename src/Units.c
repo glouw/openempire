@@ -7,6 +7,7 @@
 #include "Surface.h"
 #include "Tiles.h"
 #include "Graphics.h"
+#include "Config.h"
 
 #include <stdlib.h>
 
@@ -149,7 +150,7 @@ static Units UnSelectAll(Units units)
 {
     units.select_count = 0;
     for(int32_t i = 0; i < units.count; i++)
-        units.unit[i].selected = false;
+        units.unit[i].is_selected = false;
     return units;
 }
 
@@ -184,7 +185,7 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->selected
+        if(unit->is_selected
         && unit->max_speed > 0)
             FindPath(units, unit, cart_goal, cart_grid_offset_goal, field);
     }
@@ -380,9 +381,10 @@ static void UnifyBoids(const Units units, Unit* const unit)
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(!State_IsDead(other->state))
-                if(other->path.count > max && Unit_InPlatoon(unit, other))
-                    other->path_index = max;
+            if(!State_IsDead(other->state)
+            && other->path.count > max
+            && Unit_InPlatoon(unit, other))
+                other->path_index = max;
         }
     }
 }
@@ -400,22 +402,26 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(!State_IsDead(other->state))
-                if(unit->path.count == 0 && Unit_InPlatoon(unit, other))
-                {
-                    Unit_UpdateFileByState(unit, STATE_IDLE, false);
-                    Unit_FreePath(other);
-                }
+            if(!State_IsDead(other->state)
+            && unit->path.count == 0
+            && Unit_InPlatoon(unit, other))
+            {
+                Unit_UpdateFileByState(unit, STATE_IDLE, false);
+                Unit_FreePath(other);
+            }
         }
     }
 }
 
 static void Repath(const Units units, Unit* const unit, const Field field)
 {
-    if(!State_IsDead(unit->state) && unit->path_index_time > 100) // XXX, What is a good timeout time?
+    if(!State_IsDead(unit->state) && unit->path_index_time > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
-        if(unit->path.count > 0) // Unit must have a goal already.
+
+        // Unit must have a goal already.
+
+        if(unit->path.count > 0)
         {
             const Point cart_goal = unit->path.point[unit->path.count - 1];
             for(int32_t j = 0; j < stack.count; j++)
@@ -434,7 +440,7 @@ static void Repath(const Units units, Unit* const unit, const Field field)
 //
 // DO NOT multithread.
 
-static void RepathStuckBoids(const Units units, const Field field) // XXX. Causing segfaults.
+static void RepathStuckBoids(const Units units, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -451,9 +457,8 @@ static void Melee(Unit* const unit, Unit* const other)
     && !State_IsDead(other->state))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < 4000) // XXX. Should be per unit in FILE.
+        if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
-            Unit_SetDir(unit, diff);
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             other->health -= unit->attack;
             if(other->health <= 0)
@@ -487,7 +492,7 @@ static void FightBoids(const Units units, Unit* const unit)
 
 static Unit* GetClosestBoid(const Units units, Unit* const unit)
 {
-    const int32_t width = 1;
+    const int32_t width = 2;
     Unit* closest = NULL;
     int32_t max = INT32_MAX;
     for(int32_t x = -width; x <= width; x++)
@@ -523,7 +528,16 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
     {
         Unit* const closest = GetClosestBoid(units, unit);
         if(closest != NULL)
+        {
+            const Point cell_diff = Point_Sub(closest->cell, unit->cell);
+
+            // The override timer is set here so that the user chaotically faces the direction of their nearest enemy.
+
+            Unit_SetDir(unit, cell_diff, true);
             FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
+            unit->is_chasing = true;
+        }
+        else unit->is_chasing = false;
     }
 }
 
@@ -637,7 +651,7 @@ void Delete(const Units units, const Input input)
         for(int32_t i = 0; i < units.count; i++)
         {
             Unit* const unit = &units.unit[i];
-            if(unit->selected && !State_IsDead(unit->state))
+            if(unit->is_selected && !State_IsDead(unit->state))
                 Unit_UpdateFileByState(unit, STATE_FALL, true);
         }
 }
@@ -648,7 +662,7 @@ static void Tick(const Units units)
     {
         Unit* const unit = &units.unit[i];
         unit->timer++;
-        unit->spin_timer++;
+        unit->dir_timer++;
     }
 }
 
@@ -660,8 +674,8 @@ static void Decay(const Units units, const Registrar graphics)
         if(unit->state == STATE_FALL)
         {
             const Animation animation = graphics.animation[unit->color][unit->file];
-            const int32_t frames = animation.count / DIRECTION_COUNT_NOT_MIRRORED;
-            if(unit->timer == frames * ANIMATION_DIVISOR)
+            const int32_t frames = animation.count / CONFIG_DIRECTION_COUNT_NOT_MIRRORED;
+            if(unit->timer == frames * CONFIG_ANIMATION_DIVISOR)
                 Unit_UpdateFileByState(unit, STATE_DECAY, true);
         }
     }

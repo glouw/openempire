@@ -4,8 +4,6 @@
 
 #include <stdint.h>
 
-#define GRID_CELL_SIZE 100
-
 typedef struct
 {
     int32_t cols;

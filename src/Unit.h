@@ -20,7 +20,7 @@ typedef struct
     Points path;
     int32_t path_index;
     int32_t path_index_time;
-    bool selected;
+    bool is_selected;
     Graphics file;
     const char* file_name;
     int32_t id;
@@ -35,7 +35,8 @@ typedef struct
     int32_t width;
     Type type;
     Point group_alignment;
-    int32_t spin_timer;
+    int32_t dir_timer;
+    bool is_chasing;
 }
 Unit;
 
@@ -55,4 +56,4 @@ void Unit_UpdateFileByState(Unit* const, const State, const bool reset_timer);
 
 void Unit_FreePath(Unit* const);
 
-void Unit_SetDir(Unit* const, const Point);
+void Unit_SetDir(Unit* const, const Point, const bool override_timer);

@@ -2,6 +2,7 @@
 
 #include "Rect.h"
 #include "Util.h"
+#include "Config.h"
 
 static void ConditionallySkipFirstPoint(Unit* const unit)
 {
@@ -40,15 +41,23 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
-    const Point dir = Point_Mag(unit->group_alignment) > 5 ? unit->group_alignment : accel;
-    Unit_SetDir(unit, dir);
+    if(!unit->is_chasing)
+    {
+        const bool enough_alignment_force = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
+        const Point dir = enough_alignment_force ? unit->group_alignment : accel;
+
+        // To avoid random directional jitters, the overide timer is not set.
+        // This effectively creates a low pass filter for sprite direction changes.
+
+        Unit_SetDir(unit, dir, false);
+    }
 }
 
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
 {
     const Point delta = GetDelta(unit, grid);
     unit->path_index_time++;
-    if(Point_Mag(delta) < 10) // XXX: Is this too small? What about really fast moving guys?
+    if(Point_Mag(delta) < CONFIG_POINT_GOAL_CLOSE_ENOUGH_MAG)
         ReachGoal(unit);
     else
         GotoGoal(unit, delta);
@@ -144,7 +153,7 @@ void Unit_Print(Unit* const unit)
     Util_Log("path_index_time       :: %d\n",    unit->path_index_time);
     Util_Log("path_index            :: %d\n",    unit->path_index);
     Util_Log("path.count            :: %d\n",    unit->path.count);
-    Util_Log("selected              :: %d\n",    unit->selected);
+    Util_Log("selected              :: %d\n",    unit->is_selected);
     Util_Log("file                  :: %d\n",    unit->file);
     Util_Log("file_name             :: %s\n",    unit->file_name);
     Util_Log("id                    :: %d\n",    unit->id);
@@ -170,11 +179,12 @@ bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for
         && unit->color == other->color;
 }
 
-void Unit_SetDir(Unit* const unit, const Point dir)
+void Unit_SetDir(Unit* const unit, const Point dir, const bool override_timer)
 {
-    if(unit->spin_timer > 10)
+    if(override_timer
+    || unit->dir_timer > CONFIG_UNIT_DIRECTION_TIMER_EXPIRE)
     {
         unit->dir = Direction_CartToIso(Direction_GetCart(dir));
-        unit->spin_timer = 0;
+        unit->dir_timer = 0;
     }
 }

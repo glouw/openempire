@@ -456,7 +456,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Un
         const Tile tile = tiles.tile[i];
         const Point center = Tile_GetHotSpotCoords(tile);
         const Rect rect = Rect_GetEllipse(center, 20);
-        if(tile.reference->selected)
+        if(tile.reference->is_selected)
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
     }
     Tiles_Free(tiles);
