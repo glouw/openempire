@@ -674,7 +674,7 @@ static void Decay(const Units units, const Registrar graphics)
         if(unit->state == STATE_FALL)
         {
             const Animation animation = graphics.animation[unit->color][unit->file];
-            const int32_t frames = animation.count / CONFIG_DIRECTION_COUNT_NOT_MIRRORED;
+            const int32_t frames = Animation_GetFramesPerDirection(animation);
             if(unit->timer == frames * CONFIG_ANIMATION_DIVISOR)
                 Unit_UpdateFileByState(unit, STATE_DECAY, true);
         }
