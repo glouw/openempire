@@ -136,5 +136,5 @@ Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_
 void Tile_Select(const Tile tile)
 {
     if(!State_IsDead(tile.reference->state))
-        tile.reference->is_selected = true;
+        tile.reference->is_selected = true; // XXX. How will the work over multiplayer without md5sum screwups?
 }
