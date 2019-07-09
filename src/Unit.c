@@ -108,6 +108,8 @@ void Unit_Move(Unit* const unit, const Grid grid)
     unit->cell = Point_Add(unit->cell, unit->velocity);
     UpdateCart(unit, grid);
     Unit_UpdateFileByState(unit, STATE_MOVE, false);
+    if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
+        Unit_UpdateFileByState(unit, STATE_IDLE, false);
 }
 
 void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_timer)

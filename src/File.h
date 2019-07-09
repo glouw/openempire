@@ -26,23 +26,23 @@ File File_Load(FILE* const);
 
 #define FILE_ZERO (0)
 
-#define FILE_VILLAGER_MAX_SPEED  (130)
+#define FILE_VILLAGER_MAX_SPEED  (180)
 #define FILE_VILLAGER_ACCEL       (60)
 #define FILE_VILLAGER_HEALTH    (3000)
 #define FILE_VILLAGER_ATTACK      ( 5)
-#define FILE_VILLAGER_WIDTH     (2200)
+#define FILE_VILLAGER_WIDTH     (3000)
 
 #define FILE_KNIGHT_MAX_SPEED  (250)
 #define FILE_KNIGHT_ACCEL      (220)
 #define FILE_KNIGHT_HEALTH    (6000)
 #define FILE_KNIGHT_ATTACK      (13)
-#define FILE_KNIGHT_WIDTH     (3200)
+#define FILE_KNIGHT_WIDTH     (4000)
 
 #define FILE_TEUTONIC_KNIGHT_MAX_SPEED (100)
 #define FILE_TEUTONIC_KNIGHT_ACCEL      (80)
 #define FILE_TEUTONIC_KNIGHT_HEALTH  (18000)
 #define FILE_TEUTONIC_KNIGHT_ATTACK     (18)
-#define FILE_TEUTONIC_KNIGHT_WIDTH    (2200)
+#define FILE_TEUTONIC_KNIGHT_WIDTH    (3000)
 
 // File priority ensures the software renderer will not render the same pixel twice.
 // This is essentially a Z-Buffer stored in the alpha channel of all VRAM pixels.

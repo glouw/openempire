@@ -49,13 +49,13 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -232,8 +232,7 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        const Point cohesion = Point_Div(delta, 16); // XXX. What is a good divisor?
-        return stack.count > 0 ? cohesion : zero;
+        return Point_Div(delta, 32); // XXX. What is a good divisor?
     }
     return zero;
 }
@@ -257,7 +256,7 @@ static Point Separate(Unit* const unit, Unit* const other)
             return Nudge();
         const int32_t width = UTIL_MAX(unit->width, other->width);
         if(Point_Mag(diff) < width)
-            return Point_Normalize(diff, width);
+            return Point_Sub(Point_Normalize(diff, width), diff); // Effectively a spring force (f = k * x).
     }
     return zero;
 }
@@ -283,7 +282,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             }
         }
     }
-    out = Point_Div(out, 12);
+    out = Point_Div(out, 16);
     return out;
 }
 
@@ -358,12 +357,11 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
             SeparateBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };
-
         static Point zero;
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
-        unit->stressors = Point_Mag(stressors) < 150 ? zero : stressors;
+        unit->stressors = Point_Mag(stressors) < CONFIG_UNITS_STRESSOR_DEADZONE ? zero : stressors;
     }
 }
 
@@ -405,10 +403,7 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
             if(!State_IsDead(other->state)
             && unit->path.count == 0
             && Unit_InPlatoon(unit, other))
-            {
-                Unit_UpdateFileByState(unit, STATE_IDLE, false);
                 Unit_FreePath(other);
-            }
         }
     }
 }
