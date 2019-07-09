@@ -3,6 +3,7 @@
 #include "Points.h"
 #include "Graphics.h"
 #include "State.h"
+#include "Registrar.h"
 #include "Color.h"
 #include "Grid.h"
 #include "Direction.h"
@@ -37,10 +38,12 @@ typedef struct
     Point group_alignment;
     int32_t dir_timer;
     bool is_chasing;
+    int32_t attack_frames_per_dir;
+    int32_t fall_frames_per_dir;
 }
 Unit;
 
-Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color);
+Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color, const Registrar graphics);
 
 void Unit_UndoMove(Unit* const, const Grid);
 

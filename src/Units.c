@@ -41,7 +41,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
     }
 }
 
-static Units GenerateTestZone(Units units, const Map map, const Grid grid)
+static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
 #if 1
     const int32_t depth = 10;
@@ -49,13 +49,13 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED, graphics));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -77,13 +77,13 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid)
 #else
     const Point a = { 21, 21 };
     const Point b = { 20, 20 };
-    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
-    units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU));
+    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
 #endif
     return units;
 }
 
-Units Units_New(const int32_t max, const Map map, const Grid grid)
+Units Units_New(const int32_t max, const Map map, const Grid grid, const Registrar graphics)
 {
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
@@ -99,7 +99,7 @@ Units Units_New(const int32_t max, const Map map, const Grid grid)
     units.stack = stack;
     units.rows = grid.rows;
     units.cols = grid.cols;
-    units = GenerateTestZone(units, map, grid);
+    units = GenerateTestZone(units, map, grid, graphics);
     units.cpu_count = 1 * SDL_GetCPUCount();
     return units;
 }
@@ -444,6 +444,11 @@ static void RepathStuckBoids(const Units units, const Field field)
     }
 }
 
+static int32_t GetLastAttackTick(Unit* const unit)
+{
+    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
+}
+
 // DO NOT multithread.
 
 static void Melee(Unit* const unit, Unit* const other)
@@ -455,9 +460,13 @@ static void Melee(Unit* const unit, Unit* const other)
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
-            other->health -= unit->attack;
-            if(other->health <= 0)
-                Unit_UpdateFileByState(other, STATE_FALL, true);
+            const int32_t last_frame = GetLastAttackTick(unit);
+            if(unit->timer % last_frame == 0)
+            {
+                other->health -= unit->attack;
+                if(other->health <= 0)
+                    Unit_UpdateFileByState(other, STATE_FALL, true);
+            }
         }
     }
 }
@@ -500,7 +509,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
         {
             Unit* const other = stack.reference[i];
             if(other->color != unit->color
-                    && !State_IsDead(other->state))
+            && !State_IsDead(other->state))
             {
                 const Point diff = Point_Sub(other->cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
@@ -661,17 +670,22 @@ static void Tick(const Units units)
     }
 }
 
-static void Decay(const Units units, const Registrar graphics)
+static int32_t GetLastFallTick(Unit* const unit)
+{
+    return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
+}
+
+static void Decay(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->state == STATE_FALL)
+        const int32_t last_tick = GetLastFallTick(unit);
+        if(unit->state == STATE_FALL
+        && unit->timer == last_tick)
         {
-            const Animation animation = graphics.animation[unit->color][unit->file];
-            const int32_t frames = Animation_GetFramesPerDirection(animation);
-            if(unit->timer == frames * CONFIG_ANIMATION_DIVISOR)
-                Unit_UpdateFileByState(unit, STATE_DECAY, true);
+            Unit_UpdateFileByState(unit, STATE_DECAY, true);
+            unit->is_selected = false;
         }
     }
 }
@@ -689,7 +703,7 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     units = Select(units, overview, input, graphics);
     units = Command(units, overview, input, map, field);
     Tick(units);
-    Decay(units, graphics);
+    Decay(units);
     Delete(units, input);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed. Just sort and lower count value.
     return units;
@@ -699,8 +713,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
 {
     ManagePathFinding(units, grid, map, field);
     ManageStacks(units);
-    units = ManageAction(units, graphics, overview, input, map, field);
-    return units;
+    return ManageAction(units, graphics, overview, input, map, field);
 }
 
 bool Units_CanWalk(const Units units, const Map map, const Point point)

@@ -112,18 +112,32 @@ void Unit_Move(Unit* const unit, const Grid grid)
         Unit_UpdateFileByState(unit, STATE_IDLE, false);
 }
 
-void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_timer)
+static Graphics GetFileFromState(Unit* const unit, const State state)
 {
     const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
     const int32_t next = base + (int32_t) state;
     const Graphics file = (Graphics) next;
+    return file;
+}
+
+void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_timer)
+{
+    const Graphics file = GetFileFromState(unit, state);
     unit->state = state;
     unit->file = file;
     if(reset_timer)
         unit->timer = 0;
 }
 
-Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color)
+static int32_t GetFramesFromState(Unit* const unit, const State state, const Registrar graphics)
+{
+    const Graphics attack = GetFileFromState(unit, state);
+    const Animation animation = graphics.animation[unit->color][attack];
+    const int32_t frames = Animation_GetFramesPerDirection(animation);
+    return frames;
+}
+
+Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
 {
     static Unit zero;
     Unit unit = zero;
@@ -140,6 +154,8 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.timer = Util_Rand() % 10;
     unit.width = Graphics_GetWidth(file);
     unit.type = Graphics_GetType(file);
+    unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
+    unit.fall_frames_per_dir = GetFramesFromState(&unit, STATE_FALL, graphics);
     return unit;
 }
 
@@ -161,6 +177,7 @@ void Unit_Print(Unit* const unit)
     Util_Log("id                    :: %d\n",    unit->id);
     Util_Log("group                 :: %d\n",    unit->command_group);
     Util_Log("health                :: %d\n",    unit->health);
+    Util_Log("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
 }
 
 void ApplyStressors(Unit* const unit)

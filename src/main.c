@@ -11,7 +11,7 @@ int32_t main(int32_t argc, char* argv[])
     const Map map = Map_Make(50, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(video.xres, video.yres, grid);
-    Units units = Units_New(8, map, grid);
+    Units units = Units_New(8, map, grid, data.graphics);
     int32_t dt_hold = 0;
 
     int32_t cycles = 0;
