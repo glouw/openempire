@@ -171,7 +171,7 @@ void Unit_Print(Unit* const unit)
     Util_Log("file                  :: %d\n",    unit->file);
     Util_Log("file_name             :: %s\n",    unit->file_name);
     Util_Log("id                    :: %d\n",    unit->id);
-    Util_Log("group                 :: %d\n",    unit->command_group);
+    Util_Log("command_group         :: %d\n",    unit->command_group);
     Util_Log("health                :: %d\n",    unit->health);
     Util_Log("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
 }

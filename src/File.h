@@ -26,11 +26,11 @@ File File_Load(FILE* const);
 
 #define FILE_ZERO (0)
 
-#define FILE_VILLAGER_MAX_SPEED  (180)
+#define FILE_VILLAGER_MAX_SPEED  (120)
 #define FILE_VILLAGER_ACCEL       (60)
 #define FILE_VILLAGER_HEALTH    (3000)
 #define FILE_VILLAGER_ATTACK      ( 5)
-#define FILE_VILLAGER_WIDTH     (3000)
+#define FILE_VILLAGER_WIDTH     (2500)
 
 #define FILE_KNIGHT_MAX_SPEED  (250)
 #define FILE_KNIGHT_ACCEL      (220)

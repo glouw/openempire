@@ -77,8 +77,12 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
 #else
     const Point a = { 21, 21 };
     const Point b = { 20, 20 };
+    const Point c = { 22, 23 };
+    const Point d = { 20, 21 };
     units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
 #endif
     return units;
 }
@@ -349,16 +353,17 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
 
 static void CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
 {
+    static Point zero;
     if(!State_IsDead(unit->state))
     {
         unit->group_alignment = AlignBoids(units, unit);
+        const Point cohese = unit->type == TYPE_VILLAGER ? zero : CoheseBoids(units, unit);
         const Point point[] = {
             unit->group_alignment,
-            CoheseBoids(units, unit),
+            cohese,
             SeparateBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };
-        static Point zero;
         Point stressors = zero;
         for(int32_t j = 0; j < UTIL_LEN(point); j++)
             stressors = Point_Add(stressors, point[j]);
