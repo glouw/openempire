@@ -256,7 +256,9 @@ static Point Separate(Unit* const unit, Unit* const other)
             return Nudge();
         const int32_t width = UTIL_MAX(unit->width, other->width);
         if(Point_Mag(diff) < width)
-            return Point_Sub(Point_Normalize(diff, width), diff); // Effectively a spring force (f = k * x).
+            return unit->color == other->color
+                ? Point_Sub(Point_Normalize(diff, width), diff) // Same color units work together by force of spring (F = K * x).
+                : diff; // Units of different color harshly oppose.
     }
     return zero;
 }
@@ -282,8 +284,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             }
         }
     }
-    out = Point_Div(out, 16);
-    return out;
+    return Point_Div(out, 16);
 }
 
 static Point AlignBoids(const Units units, Unit* const unit)
@@ -534,10 +535,7 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
         if(closest != NULL)
         {
             const Point cell_diff = Point_Sub(closest->cell, unit->cell);
-
-            // The override timer is set here so that the user chaotically faces the direction of their nearest enemy.
-
-            Unit_SetDir(unit, cell_diff, true);
+            Unit_SetDir(unit, cell_diff, false);
             FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
             unit->is_chasing = true;
         }

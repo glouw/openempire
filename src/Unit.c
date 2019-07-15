@@ -45,10 +45,6 @@ static void GotoGoal(Unit* const unit, const Point delta)
     {
         const bool enough_alignment_force = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
         const Point dir = enough_alignment_force ? unit->group_alignment : accel;
-
-        // To avoid random directional jitters, the overide timer is not set.
-        // This effectively creates a low pass filter for sprite direction changes.
-
         Unit_SetDir(unit, dir, false);
     }
 }
