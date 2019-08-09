@@ -38,12 +38,13 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
         unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
         unit->command_group = units.command_group_next;
+        unit->command_group_count = units.select_count;
     }
 }
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-#if 1
+#if 0
     const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
@@ -357,7 +358,7 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     if(!State_IsDead(unit->state))
     {
         unit->group_alignment = AlignBoids(units, unit);
-        const Point cohese = unit->type == TYPE_VILLAGER ? zero : CoheseBoids(units, unit);
+        const Point cohese = unit->command_group_count > CONFIG_UNIT_COHESION_COUNT ? CoheseBoids(units, unit) : zero;
         const Point point[] = {
             unit->group_alignment,
             cohese,

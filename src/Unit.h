@@ -26,6 +26,7 @@ typedef struct
     const char* file_name;
     int32_t id;
     int32_t command_group;
+    int32_t command_group_count;
     Color color;
     Direction dir;
     Point stressors;
