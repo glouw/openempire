@@ -660,7 +660,10 @@ void Delete(const Units units, const Input input)
         {
             Unit* const unit = &units.unit[i];
             if(unit->is_selected && !State_IsDead(unit->state))
+            {
+                unit->health = 0;
                 Unit_UpdateFileByState(unit, STATE_FALL, true);
+            }
         }
 }
 

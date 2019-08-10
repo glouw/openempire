@@ -417,11 +417,20 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
 
 static void DrawHealthBar(const Vram vram, const Point top, const int32_t health, const int32_t max_health)
 {
-    for(int32_t x = top.x - 20; x < top.x + 20; x++)
-        if(!OutOfBounds(vram, x, top.y))
+    const int32_t w = 30;
+    const int32_t h = 2;
+    const int32_t percent = (w * health) / max_health;
+    const int32_t y0 = top.y - (h / 2);
+    const int32_t y1 = top.y + (h / 2);
+    const int32_t x0 = top.x - (w / 2);
+    const int32_t x1 = top.x + (w / 2);
+    for(int32_t y = y0; y < y1; y++)
+    for(int32_t x = x0; x < x1; x++)
+        if(!OutOfBounds(vram, x, y))
         {
-            const uint32_t color = 0x00FF00 | (FILE_PRIO_HIGHEST << 24);
-            Put(vram, x, top.y, color);
+            const uint32_t base = x - x0 > percent ? 0xFF0000 : 0x00FF00;
+            const uint32_t color = base | (FILE_PRIO_HIGHEST << 24);
+            Put(vram, x, y, color);
         }
 }
 
