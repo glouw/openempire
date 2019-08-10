@@ -145,7 +145,8 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.max_speed = Graphics_GetMaxSpeed(file);
     unit.accel = Graphics_GetAcceleration(file);
     unit.file_name = Graphics_GetString(file);
-    unit.health = Graphics_GetHealth(file);
+    unit.max_health = Graphics_GetHealth(file);
+    unit.health = unit.max_health;
     unit.attack = Graphics_GetAttack(file);
     unit.file = file;
     unit.timer = Util_Rand() % 10;

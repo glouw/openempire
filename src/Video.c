@@ -117,6 +117,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);
+    Vram_DrawUnitHealthBars(vram, graphics_tiles);
     Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, blend_lines, terrain_tiles);
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);

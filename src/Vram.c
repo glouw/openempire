@@ -415,8 +415,30 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
     }
 }
 
-void Vram_DrawUnitHealthBars(const Units units, const Tiles tiles)
+static void DrawHealthBar(const Vram vram, const Point top, const int32_t health, const int32_t max_health)
 {
+    for(int32_t x = top.x - 20; x < top.x + 20; x++)
+        if(!OutOfBounds(vram, x, top.y))
+        {
+            const uint32_t color = 0x00FF00 | (FILE_PRIO_HIGHEST << 24);
+            Put(vram, x, top.y, color);
+        }
+}
+
+void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
+{
+    for(int32_t i = 0; i < tiles.count; i++)
+    {
+        const Tile tile = tiles.tile[i];
+        const Point center = Tile_GetHotSpotCoords(tile);
+        const Point top = {
+            center.x,
+            center.y - tile.frame.height,
+        };
+        Unit* const unit = tile.reference;
+        if(unit->is_selected)
+            DrawHealthBar(vram, top, unit->health, unit->max_health);
+    }
 }
 
 void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Input input, const Overview overview)

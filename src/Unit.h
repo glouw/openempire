@@ -31,6 +31,7 @@ typedef struct
     Direction dir;
     Point stressors;
     State state;
+    int32_t max_health;
     int32_t health;
     int32_t attack;
     int32_t timer;
