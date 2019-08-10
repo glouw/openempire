@@ -35,10 +35,10 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
     if(!State_IsDead(unit->state))
     {
         Unit_FreePath(unit);
-        unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
         unit->command_group = units.command_group_next;
         unit->command_group_count = units.select_count;
+        unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
     }
 }
 
@@ -539,12 +539,12 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
         Unit* const closest = GetClosestBoid(units, unit);
         if(closest != NULL)
         {
-            const Point cell_diff = Point_Sub(closest->cell, unit->cell);
-            Unit_SetDir(unit, cell_diff);
-            FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
             unit->is_chasing = true;
+            unit->cell_of_interest = closest->cell;
+            Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
         }
-        else unit->is_chasing = false;
+        else
+            unit->is_chasing = false;
     }
 }
 

@@ -41,6 +41,7 @@ typedef struct
     bool is_chasing;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
+    Point cell_of_interest;
 }
 Unit;
 
@@ -61,3 +62,5 @@ void Unit_UpdateFileByState(Unit* const, const State, const bool reset_timer);
 void Unit_FreePath(Unit* const);
 
 void Unit_SetDir(Unit* const, const Point);
+
+void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal);

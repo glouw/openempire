@@ -41,11 +41,12 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
-    if(!unit->is_chasing)
+    if(unit->is_chasing)
+        Unit_SetDir(unit, Point_Sub(unit->cell_of_interest, unit->cell));
+    else
     {
-        const bool enough_alignment_force = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
-        const Point dir = enough_alignment_force ? unit->group_alignment : accel;
-        Unit_SetDir(unit, dir);
+        const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
+        Unit_SetDir(unit, align ? unit->group_alignment : accel);
     }
 }
 
@@ -200,5 +201,20 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     {
         unit->dir = Direction_CartToIso(Direction_GetCart(dir));
         unit->dir_timer = 0;
+    }
+}
+
+// A straight line path finder. Takes the unit from <cart_goal> to <cart_grid_offset_goal>. Field objects are totally ignored.
+// Use with best discretion.
+
+void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal)
+{
+    if(!State_IsDead(unit->state))
+    {
+        Unit_FreePath(unit);
+        unit->cart_grid_offset_goal = cart_grid_offset_goal;
+        unit->path = Points_New(2);
+        unit->path = Points_Append(unit->path, unit->cart);
+        unit->path = Points_Append(unit->path, cart_goal);
     }
 }
