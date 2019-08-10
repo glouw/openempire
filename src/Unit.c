@@ -45,7 +45,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
     {
         const bool enough_alignment_force = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
         const Point dir = enough_alignment_force ? unit->group_alignment : accel;
-        Unit_SetDir(unit, dir, false);
+        Unit_SetDir(unit, dir);
     }
 }
 
@@ -194,10 +194,9 @@ bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for
         && unit->color == other->color;
 }
 
-void Unit_SetDir(Unit* const unit, const Point dir, const bool override_timer)
+void Unit_SetDir(Unit* const unit, const Point dir)
 {
-    if(override_timer
-    || unit->dir_timer > CONFIG_UNIT_DIRECTION_TIMER_EXPIRE)
+    if(unit->dir_timer > CONFIG_UNIT_DIRECTION_TIMER_EXPIRE)
     {
         unit->dir = Direction_CartToIso(Direction_GetCart(dir));
         unit->dir_timer = 0;

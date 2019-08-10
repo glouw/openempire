@@ -44,7 +44,7 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-#if 0
+#if 1
     const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
@@ -387,7 +387,6 @@ static void UnifyBoids(const Units units, Unit* const unit)
         {
             Unit* const other = stack.reference[i];
             if(!State_IsDead(other->state)
-            && other->path.count > max
             && Unit_InPlatoon(unit, other))
                 other->path_index = max;
         }
@@ -541,7 +540,7 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
         if(closest != NULL)
         {
             const Point cell_diff = Point_Sub(closest->cell, unit->cell);
-            Unit_SetDir(unit, cell_diff, false);
+            Unit_SetDir(unit, cell_diff);
             FindPath(units, unit, closest->cart, closest->cart_grid_offset, field);
             unit->is_chasing = true;
         }

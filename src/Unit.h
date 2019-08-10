@@ -60,4 +60,4 @@ void Unit_UpdateFileByState(Unit* const, const State, const bool reset_timer);
 
 void Unit_FreePath(Unit* const);
 
-void Unit_SetDir(Unit* const, const Point, const bool override_timer);
+void Unit_SetDir(Unit* const, const Point);
