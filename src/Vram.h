@@ -34,13 +34,13 @@ void Vram_Clear(const Vram, const uint32_t color);
 
 void Vram_DrawTile(const Vram, const Tile);
 
-void Vram_DrawMap(const Vram, const Registrar terrain, const Map, const Overview, const Blendomatic, const Input);
+void Vram_DrawMap(const Vram, const Registrar terrain, const Map, const Overview, const Blendomatic, const Input, const Points);
 
-void Vram_DrawUnits(const Vram, const Registrar, const Units, const Overview);
+void Vram_DrawUnits(const Vram, const Registrar, const Units, const Overview, const Points);
 
 void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Input, const Overview);
 
-void Vram_DrawUnitSelections(const Vram, const Registrar, const Units, const Overview);
+void Vram_DrawUnitSelections(const Vram, const Registrar, const Units, const Overview, const Points);
 
 void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, const bool enabled);
 

@@ -111,13 +111,13 @@ static int32_t DrawBatchNeedle(void* data)
     return 0;
 }
 
-static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Points points)
+static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Points render_points)
 {
-    const Tiles tiles = Tiles_PrepTerrain(terrain, map, overview, points);
+    const Tiles tiles = Tiles_PrepTerrain(terrain, map, overview, render_points);
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
-    const int32_t width = points.count / vram.cpu_count;
-    const int32_t remainder = points.count % vram.cpu_count;
+    const int32_t width = render_points.count / vram.cpu_count;
+    const int32_t remainder = render_points.count % vram.cpu_count;
     for(int32_t i = 0; i < vram.cpu_count; i++)
     {
         needles[i].vram = vram;
@@ -317,25 +317,19 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
     Lines_Free(lines);
 }
 
-void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Input input)
+void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Input input, const Points render_points)
 {
-    const Quad quad = Overview_GetRenderBox(overview, -2 * map.tile_width); // XXX: Should this really be twice the width?
-    const Points points = Quad_GetRenderPoints(quad);
-    RenderTerrainTiles(vram, terrain, map, overview, points);
+    RenderTerrainTiles(vram, terrain, map, overview, render_points);
     if(!input.key[SDL_SCANCODE_LSHIFT])
-        BlendTerrainTiles(vram, terrain, map, overview, points, blendomatic);
-    Points_Free(points);
+        BlendTerrainTiles(vram, terrain, map, overview, render_points, blendomatic);
 }
 
-void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
+void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units, const Overview overview, const Points render_points)
 {
-    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX: Border needs to be equal to largest building size.
-    const Points points = Quad_GetRenderPoints(quad);
-    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points);
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
     for(int32_t i = 0; i < tiles.count; i++)
         Vram_DrawTile(vram, tiles.tile[i]);
     Tiles_Free(tiles);
-    Points_Free(points);
 }
 
 // XXX. Only useful for debugging the path finder and is not used in the final engine as units are not sorted by depth.
@@ -446,11 +440,9 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
-void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
+void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Units units, const Overview overview, const Points render_points)
 {
-    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX: Border needs to be equal to largest building size.
-    const Points points = Quad_GetRenderPoints(quad);
-    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points);
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
@@ -460,7 +452,10 @@ void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Un
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
     }
     Tiles_Free(tiles);
-    Points_Free(points);
+}
+
+void Vram_DrawUnitHealthBars(const Units units)
+{
 }
 
 void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Input input, const Overview overview)

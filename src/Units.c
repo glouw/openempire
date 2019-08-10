@@ -161,6 +161,7 @@ static Units UnSelectAll(Units units)
 
 static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics)
 {
+    // XXX. This cannot use render box else will desync.
     const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
     const Points points = Quad_GetRenderPoints(quad);
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
@@ -532,7 +533,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
 
 // DO NOT multithread.
 
-static void ChaseBoids(const Units units, Unit* const unit, const Field field)
+static void ChaseBoids(const Units units, Unit* const unit)
 {
     if(!State_IsDead(unit->state))
     {
@@ -550,11 +551,11 @@ static void ChaseBoids(const Units units, Unit* const unit, const Field field)
 
 // DO NOT multithread.
 
-static void RunHardBoidRules(const Units units, const Field field)
+static void RunHardBoidRules(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i], field);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
 
@@ -627,7 +628,7 @@ static void ManagePathFinding(const Units units, const Grid grid, const Map map,
     BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
     RepathStuckBoids(units, field);
-    RunHardBoidRules(units, field);
+    RunHardBoidRules(units);
 }
 
 static void SortStacks(const Units units)

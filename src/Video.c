@@ -108,23 +108,23 @@ void Video_RenderDataDemo(const Video video, const Data data, const Color color)
 
 void Video_Draw(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input)
 {
+    const Quad quad = Overview_GetRenderBox(overview, -200);
+    const Points render_points = Quad_GetRenderPoints(quad);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
     Vram_Clear(vram, 0x0);
-    Vram_DrawUnits(vram, data.graphics, units, overview);
-    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input);
+    Vram_DrawUnits(vram, data.graphics, units, overview, render_points);
+    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, render_points);
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
-    Vram_DrawUnitSelections(vram, data.graphics, units, overview);
+    Vram_DrawUnitSelections(vram, data.graphics, units, overview, render_points);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
-
+#if 0
     // XXX: Use with care, this is really heavy on pixel trasnfer as it draws
     // the same flag over and over on one location without offscreen culling,
-
-#if 0
     Vram_DrawUnitsPath(vram, data.graphics, units, overview);
 #endif
-
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
+    Points_Free(render_points);
 }
 
 void Video_CopyRenderer(const Video video)

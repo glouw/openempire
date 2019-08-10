@@ -145,7 +145,7 @@ Points Field_SearchBreadthFirst(const Field field, const Point start, const Poin
     Point current = goal;
     while(!Point_Equal(current, start))
     {
-        if(!IsInBounds(field, current)) // XXX. No path was found... Is there faster way to time out?
+        if(!IsInBounds(field, current)) // XXX. No path was found... Is there faster way to time out? I believe this tries every square on the grid.
         {
             static Points zero;
             return zero;
