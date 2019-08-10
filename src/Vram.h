@@ -2,6 +2,7 @@
 
 #include "Point.h"
 #include "Frame.h"
+#include "Lines.h"
 #include "Registrar.h"
 #include "Units.h"
 #include "Rect.h"
@@ -34,13 +35,13 @@ void Vram_Clear(const Vram, const uint32_t color);
 
 void Vram_DrawTile(const Vram, const Tile);
 
-void Vram_DrawMap(const Vram, const Registrar terrain, const Map, const Overview, const Blendomatic, const Input, const Points);
+void Vram_DrawMap(const Vram, const Registrar, const Map, const Overview, const Blendomatic, const Input, const Lines, const Tiles);
 
-void Vram_DrawUnits(const Vram, const Registrar, const Units, const Overview, const Points);
+void Vram_DrawUnits(const Vram, const Tiles);
 
 void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Input, const Overview);
 
-void Vram_DrawUnitSelections(const Vram, const Registrar, const Units, const Overview, const Points);
+void Vram_DrawUnitSelections(const Vram, const Tiles);
 
 void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, const bool enabled);
 

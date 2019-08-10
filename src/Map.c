@@ -117,3 +117,33 @@ Points Map_GetBlendBox(const Map map, const Point inner)
     }
     return points;
 }
+
+static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
+{
+    const Points box = Map_GetBlendBox(map, inner);
+    for(int32_t j = 0; j < box.count; j++)
+    {
+        // Outer tile is partially transparent blended tile.
+        // Inner tile is a solid inner tile.
+
+        const Terrain file = Map_GetTerrainFile(map, inner);
+        const Point outer = box.point[j];
+        const Line line = { inner, outer, file };
+        lines = Lines_Append(lines, line);
+    }
+    Points_Free(box);
+    return lines;
+}
+
+// Blend lines indicate tile blending by direction.
+
+Lines Map_GetBlendLines(const Map map, const Points render_points)
+{
+    Lines lines = Lines_New(8 * render_points.count);
+    for(int32_t i = 0; i < render_points.count; i++)
+    {
+        const Point inner = render_points.point[i];
+        lines = AppendBlendLines(lines, map, inner);
+    }
+    return lines;
+}

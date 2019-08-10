@@ -111,11 +111,15 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     const Quad quad = Overview_GetRenderBox(overview, -200);
     const Points render_points = Quad_GetRenderPoints(quad);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
+    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, render_points);
+    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, render_points);
+    const Lines blend_lines = Map_GetBlendLines(map, render_points);
+    Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
-    Vram_DrawUnits(vram, data.graphics, units, overview, render_points);
-    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, render_points);
+    Vram_DrawUnits(vram, graphics_tiles);
+    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, blend_lines, terrain_tiles);
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
-    Vram_DrawUnitSelections(vram, data.graphics, units, overview, render_points);
+    Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
 #if 0
     // XXX: Use with care, this is really heavy on pixel trasnfer as it draws
@@ -125,6 +129,9 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
     Points_Free(render_points);
+    Tiles_Free(graphics_tiles);
+    Tiles_Free(terrain_tiles);
+    Lines_Free(blend_lines);
 }
 
 void Video_CopyRenderer(const Video video)

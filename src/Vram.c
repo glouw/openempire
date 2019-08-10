@@ -111,17 +111,16 @@ static int32_t DrawBatchNeedle(void* data)
     return 0;
 }
 
-static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Points render_points)
+static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
 {
-    const Tiles tiles = Tiles_PrepTerrain(terrain, map, overview, render_points);
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
-    const int32_t width = render_points.count / vram.cpu_count;
-    const int32_t remainder = render_points.count % vram.cpu_count;
+    const int32_t width = terrain_tiles.count / vram.cpu_count;
+    const int32_t remainder = terrain_tiles.count % vram.cpu_count;
     for(int32_t i = 0; i < vram.cpu_count; i++)
     {
         needles[i].vram = vram;
-        needles[i].tiles = tiles.tile;
+        needles[i].tiles = terrain_tiles.tile;
         needles[i].a = (i + 0) * width;
         needles[i].b = (i + 1) * width;
     }
@@ -132,7 +131,6 @@ static void RenderTerrainTiles(const Vram vram, const Registrar terrain, const M
     for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);
     free(threads);
-    Tiles_Free(tiles);
 }
 
 // See:
@@ -237,36 +235,6 @@ static int32_t DrawBlendNeedle(void* const data)
     return 0;
 }
 
-static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
-{
-    const Points box = Map_GetBlendBox(map, inner);
-    for(int32_t j = 0; j < box.count; j++)
-    {
-        // Outer tile is partially transparent blended tile.
-        // Inner tile is a solid inner tile.
-
-        const Terrain file = Map_GetTerrainFile(map, inner);
-        const Point outer = box.point[j];
-        const Line line = { inner, outer, file };
-        lines = Lines_Append(lines, line);
-    }
-    Points_Free(box);
-    return lines;
-}
-
-// Blend lines indicate tile blending by direction.
-
-static Lines GetBlendLines(const Map map, const Points points)
-{
-    Lines lines = Lines_New(8 * points.count);
-    for(int32_t i = 0; i < points.count; i++)
-    {
-        const Point inner = points.point[i];
-        lines = AppendBlendLines(lines, map, inner);
-    }
-    return lines;
-}
-
 static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, const int32_t slices)
 {
     if(slice == 0)
@@ -291,22 +259,20 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
     return index;
 }
 
-static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Points points, const Blendomatic blendomatic)
+static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Lines blend_lines, const Blendomatic blendomatic)
 {
-    const Lines lines = GetBlendLines(map, points);
-    Lines_Sort(lines);
     BlendNeedle* const needles = UTIL_ALLOC(BlendNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
     for(int32_t i = 0; i < vram.cpu_count; i++)
     {
         needles[i].vram = vram;
-        needles[i].lines = lines;
+        needles[i].lines = blend_lines;
         needles[i].terrain = terrain;
         needles[i].map = map;
         needles[i].overview = overview;
         needles[i].blendomatic = blendomatic;
-        needles[i].a = GetNextBestBlendTile(lines, i + 0, vram.cpu_count);
-        needles[i].b = GetNextBestBlendTile(lines, i + 1, vram.cpu_count);
+        needles[i].a = GetNextBestBlendTile(blend_lines, i + 0, vram.cpu_count);
+        needles[i].b = GetNextBestBlendTile(blend_lines, i + 1, vram.cpu_count);
     }
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
     UTIL_CHECK(threads);
@@ -314,22 +280,19 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
     for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);
     free(threads);
-    Lines_Free(lines);
 }
 
-void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Input input, const Points render_points)
+void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Input input, const Lines blend_lines, const Tiles terrain_tiles)
 {
-    RenderTerrainTiles(vram, terrain, map, overview, render_points);
+    RenderTerrainTiles(vram, terrain_tiles);
     if(!input.key[SDL_SCANCODE_LSHIFT])
-        BlendTerrainTiles(vram, terrain, map, overview, render_points, blendomatic);
+        BlendTerrainTiles(vram, terrain, map, overview, blend_lines, blendomatic);
 }
 
-void Vram_DrawUnits(const Vram vram, const Registrar graphics, const Units units, const Overview overview, const Points render_points)
+void Vram_DrawUnits(const Vram vram, const Tiles tiles)
 {
-    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
     for(int32_t i = 0; i < tiles.count; i++)
         Vram_DrawTile(vram, tiles.tile[i]);
-    Tiles_Free(tiles);
 }
 
 // XXX. Only useful for debugging the path finder and is not used in the final engine as units are not sorted by depth.
@@ -440,9 +403,8 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
-void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Units units, const Overview overview, const Points render_points)
+void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
 {
-    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
@@ -451,10 +413,9 @@ void Vram_DrawUnitSelections(const Vram vram, const Registrar graphics, const Un
         if(tile.reference->is_selected)
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
     }
-    Tiles_Free(tiles);
 }
 
-void Vram_DrawUnitHealthBars(const Units units)
+void Vram_DrawUnitHealthBars(const Units units, const Tiles tiles)
 {
 }
 

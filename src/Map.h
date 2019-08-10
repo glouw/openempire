@@ -2,6 +2,7 @@
 
 #include "Point.h"
 #include "Overview.h"
+#include "Lines.h"
 #include "File.h"
 #include "Registrar.h"
 #include "Points.h"
@@ -28,3 +29,5 @@ void Map_Free(const Map);
 void Map_Edit(const Map, const Overview, const Input);
 
 Points Map_GetBlendBox(const Map, const Point inner);
+
+Lines Map_GetBlendLines(const Map, const Points);
