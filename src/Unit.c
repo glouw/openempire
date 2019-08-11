@@ -31,10 +31,7 @@ static void ReachGoal(Unit* const unit)
     unit->path_index++;
     unit->path_index_time = 0;
     if(unit->path_index >= unit->path.count)
-    {
-        Unit_UpdateFileByState(unit, STATE_IDLE, false);
         Unit_FreePath(unit);
-    }
 }
 
 static void GotoGoal(Unit* const unit, const Point delta)
@@ -104,9 +101,8 @@ void Unit_Move(Unit* const unit, const Grid grid)
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
     UpdateCart(unit, grid);
-    Unit_UpdateFileByState(unit, STATE_MOVE, false);
-    if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
-        Unit_UpdateFileByState(unit, STATE_IDLE, false);
+    const State state = Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE ? STATE_IDLE : STATE_MOVE;
+    Unit_UpdateFileByState(unit, state, false);
 }
 
 static Graphics GetFileFromState(Unit* const unit, const State state)
@@ -176,6 +172,7 @@ void Unit_Print(Unit* const unit)
     Util_Log("command_group         :: %d\n",    unit->command_group);
     Util_Log("health                :: %d\n",    unit->health);
     Util_Log("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
+    Util_Log("state                 :: %d\n",    unit->state);
 }
 
 void ApplyStressors(Unit* const unit)
