@@ -32,9 +32,9 @@ File File_Load(FILE* const);
 #define FILE_VILLAGER_ATTACK      ( 5)
 #define FILE_VILLAGER_WIDTH     (2500)
 
-#define FILE_KNIGHT_MAX_SPEED  (200)
-#define FILE_KNIGHT_ACCEL      ( 50)
-#define FILE_KNIGHT_HEALTH    (1000)
+#define FILE_KNIGHT_MAX_SPEED  (250)
+#define FILE_KNIGHT_ACCEL      (400)
+#define FILE_KNIGHT_HEALTH    (6000)
 #define FILE_KNIGHT_ATTACK      (13)
 #define FILE_KNIGHT_WIDTH     (3500)
 

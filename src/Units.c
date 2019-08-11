@@ -45,18 +45,18 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
 #if 1
-    const int32_t depth = 5;
+    const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU, graphics));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED, graphics));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -521,7 +521,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
 
 // DO NOT multithread.
 
-static void ChaseBoids(const Units units, Unit* const unit, const Field field)
+static void ChaseBoids(const Units units, Unit* const unit)
 {
     if(!State_IsDead(unit->state))
     {
@@ -600,10 +600,10 @@ static int32_t RunFlowNeedle(void* data)
 
 static void RunHardRules(const Units units, const Field field)
 {
-    for(int32_t i = 0; i < units.count; i++) RepathBoids(units, &units.unit[i], field);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i], field);
     for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) RepathBoids(units, &units.unit[i], field);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
 
