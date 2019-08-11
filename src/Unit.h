@@ -65,3 +65,5 @@ void Unit_FreePath(Unit* const);
 void Unit_SetDir(Unit* const, const Point);
 
 void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal);
+
+void Unit_Kill(Unit* const);

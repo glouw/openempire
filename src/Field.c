@@ -100,6 +100,33 @@ static void ModifyQueue(const Field field, const Queue queue, const Point point,
     queue.point[point.x + point.y * field.cols] = mod;
 }
 
+// frontier = Queue()
+// frontier.put(start)
+// came_from = {}
+// came_from[start] = None
+// while not frontier.empty():
+//    current = frontier.get()
+//    if current == goal:
+//       break
+//    for next in graph.neighbors(current):
+//       if next not in came_from:
+//          frontier.put(next)
+//          came_from[next] = current
+//
+// frontier = PriorityQueue()
+// frontier.put(start, 0)
+// came_from = {}
+// came_from[start] = None
+// while not frontier.empty():
+//    current = frontier.get()
+//    if current == goal:
+//       break
+//    for next in graph.neighbors(current):
+//       if next not in came_from:
+//          priority = heuristic(goal, next)
+//          frontier.put(next, priority)
+//          came_from[next] = current
+
 Points Field_SearchBreadthFirst(const Field field, const Point start, const Point goal) // XXX. THIS can be ASTAR and it will be so much faster!
 {
     const Point deltas[] = {

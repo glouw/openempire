@@ -219,3 +219,9 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         unit->path = Points_Append(unit->path, cart_goal);
     }
 }
+
+void Unit_Kill(Unit* const unit)
+{
+    unit->health = 0;
+    Unit_UpdateFileByState(unit, STATE_FALL, true);
+}

@@ -56,7 +56,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED, graphics));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -388,6 +388,7 @@ static void UnifyBoids(const Units units, Unit* const unit)
         {
             Unit* const other = stack.reference[i];
             if(!State_IsDead(other->state)
+            && other->path.count > max
             && Unit_InPlatoon(unit, other))
                 other->path_index = max;
         }
@@ -415,7 +416,7 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-static void Repath(const Units units, Unit* const unit, const Field field)
+static void RepathBoids(const Units units, Unit* const unit, const Field field)
 {
     if(!State_IsDead(unit->state) && unit->path_index_time > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES)
     {
@@ -436,21 +437,6 @@ static void Repath(const Units units, Unit* const unit, const Field field)
     }
 }
 
-// If any boid is stuck, chances are good a few surrounding boids
-// are stuck too. This repath function will reroute all stuck boids on one tlie
-// if one boid is stuck on that tile.
-//
-// DO NOT multithread.
-
-static void RepathStuckBoids(const Units units, const Field field)
-{
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        Repath(units, unit, field);
-    }
-}
-
 static int32_t GetLastAttackTick(Unit* const unit)
 {
     return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
@@ -467,12 +453,14 @@ static void Melee(Unit* const unit, Unit* const other)
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
+            static Point zero;
+            unit->velocity = zero;
             const int32_t last_frame = GetLastAttackTick(unit);
             if(unit->timer % last_frame == 0)
             {
                 other->health -= unit->attack;
                 if(other->health <= 0)
-                    Unit_UpdateFileByState(other, STATE_FALL, true);
+                    Unit_Kill(other);
             }
         }
     }
@@ -549,16 +537,6 @@ static void ChaseBoids(const Units units, Unit* const unit)
     }
 }
 
-// DO NOT multithread.
-
-static void RunHardBoidRules(const Units units)
-{
-    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
-}
-
 typedef struct
 {
     Units units;
@@ -620,6 +598,15 @@ static int32_t RunFlowNeedle(void* data)
     return 0;
 }
 
+static void RunHardRules(const Units units, const Field field)
+{
+    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) RepathBoids(units, &units.unit[i], field);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
+}
+
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
@@ -627,8 +614,7 @@ static void ManagePathFinding(const Units units, const Grid grid, const Map map,
 {
     BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
-    RepathStuckBoids(units, field);
-    RunHardBoidRules(units);
+    RunHardRules(units, field);
 }
 
 static void SortStacks(const Units units)
@@ -660,10 +646,7 @@ void Delete(const Units units, const Input input)
         {
             Unit* const unit = &units.unit[i];
             if(unit->is_selected && !State_IsDead(unit->state))
-            {
-                unit->health = 0;
-                Unit_UpdateFileByState(unit, STATE_FALL, true);
-            }
+                Unit_Kill(unit);
         }
 }
 
