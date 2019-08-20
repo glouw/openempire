@@ -38,14 +38,14 @@ static void FindPath(const Units units, Unit* const unit, const Point cart_goal,
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
         unit->command_group = units.command_group_next;
         unit->command_group_count = units.select_count;
-        unit->path = Field_SearchBreadthFirst(field, unit->cart, cart_goal);
+        unit->path = Field_PathGreedyBest(field, unit->cart, cart_goal);
     }
 }
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
 #if 1
-    const int32_t depth = 10;
+    const int32_t depth = 5;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
@@ -81,9 +81,9 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     const Point c = { 22, 23 };
     const Point d = { 20, 21 };
     units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    //units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    //units = Units_Append(units, Unit_Make(c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    //units = Units_Append(units, Unit_Make(d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
 #endif
     return units;
 }

@@ -22,6 +22,7 @@ SRCS += Interfac.c
 SRCS += Lines.c
 SRCS += main.c
 SRCS += Map.c
+SRCS += Meap.c
 SRCS += Mode.c
 SRCS += Outline.c
 SRCS += Overview.c

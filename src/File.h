@@ -36,7 +36,7 @@ File File_Load(FILE* const);
 #define FILE_KNIGHT_ACCEL      ( 80)
 #define FILE_KNIGHT_HEALTH     (200)
 #define FILE_KNIGHT_ATTACK      (13)
-#define FILE_KNIGHT_WIDTH     (3500)
+#define FILE_KNIGHT_WIDTH     (3700)
 
 #define FILE_TEUTONIC_KNIGHT_MAX_SPEED (100)
 #define FILE_TEUTONIC_KNIGHT_ACCEL      (80)
