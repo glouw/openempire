@@ -43,6 +43,7 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     Point current = goal;
     while(!Point_Equal(current, start))
     {
+        // XXX: There is no timeout! Implement a way to timeout!
         path = Points_Append(path, current);
         current = came_from.point[current.x + current.y * field.cols];
     }
@@ -71,7 +72,7 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
         {
             const Point next = Point_Add(current.point, deltas[i]);
             if(IsInBounds(field, next)
-                    && IsWalkable(field, next))
+            && IsWalkable(field, next))
             {
                 if(Point_Equal(came_from.point[next.x + next.y * field.cols], none))
                 {
