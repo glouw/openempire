@@ -1,3 +1,12 @@
+// This Min-Heap (Meap) implementation is brought to you by Robin Thomas
+// through the MIT license. I am not one for data structure theory.
+//
+// Meap serves as the foundation for the Field pathfinder.
+//
+// Heres the full license.
+//
+// --------------------------------------------------------------------------------
+//
 // The MIT License (MIT)
 //
 // Copyright (c) 2014 Robin Thomas
