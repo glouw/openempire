@@ -2,49 +2,58 @@
 
 #include "Util.h"
 
-#define LCHILD(x) ((2 * (x)) + 1)
-
-#define RCHILD(x) ((2 * (x)) + 2)
-
-#define PARENT(x) (((x) - 1) / 2)
-
-static void Swap(Step* const n1, Step* const n2)
+static void Swap(Step* const a, Step* const b)
 {
-    const Step temp = *n1;
-    *n1 = *n2;
-    *n2 = temp;
+    const Step temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
 static void Heapify(Meap* const meap, const int32_t index)
 {
-    int32_t smallest = (LCHILD(index) < meap->size && meap->step[LCHILD(index)].data < meap->step[index].data) ? LCHILD(index) : index;
-    if(RCHILD(index) < meap->size && meap->step[RCHILD(index)].data < meap->step[smallest].data)
-        smallest = RCHILD(index);
+    const int32_t l = 2 * index + 1;
+    const int32_t r = 2 * index + 2;
+    int32_t smallest = l < meap->size && meap->step[l].prio < meap->step[index].prio ? l : index;
+    if(r < meap->size && meap->step[r].prio < meap->step[smallest].prio)
+        smallest = r;
     if(smallest != index)
     {
-        Swap(&(meap->step[index]), &(meap->step[smallest]));
+        Step* const a = &meap->step[index];
+        Step* const b = &meap->step[smallest];
+        Swap(a, b);
         Heapify(meap, smallest);
     }
 }
 
 Meap Meap_Init(void)
 {
-    static Meap zero;
-    return zero;
+    static Meap meap;
+    meap.max = 512;
+    meap.step = UTIL_ALLOC(Step, meap.max);
+    return meap;
 }
 
-void Meap_Insert(Meap* const meap, const int32_t data, const Point point)
+static void Grow(Meap* const meap)
 {
-    if(meap->size)
-        meap->step = UTIL_REALLOC(meap->step, Step, (meap->size + 1));
-    else
-        meap->step = UTIL_ALLOC(Step, 1);
-    const Step node = { data, point };
-    int32_t index = meap->size++;
-    while(index && node.data < meap->step[PARENT(index)].data)
+    if(meap->size == meap->max)
     {
-        meap->step[index] = meap->step[PARENT(index)];
-        index = PARENT(index);
+        meap->max *= 2;
+        meap->step = UTIL_REALLOC(meap->step, Step, meap->max);
+    }
+}
+
+void Meap_Insert(Meap* const meap, const int32_t prio, const Point point)
+{
+    Grow(meap);
+    const Step node = { prio, point };
+    int32_t index = meap->size++;
+    while(index > 0)
+    {
+        const int32_t p = (index - 1) / 2;
+        if(node.prio > meap->step[p].prio)
+            break;
+        meap->step[index] = meap->step[p];
+        index = p;
     }
     meap->step[index] = node;
 }
@@ -53,18 +62,15 @@ Step Meap_Delete(Meap* const meap)
 {
     if(meap->size)
     {
-        const Step node = meap->step[0];
-        meap->step[0] = meap->step[--meap->size];
-        meap->step = UTIL_REALLOC(meap->step, Step, meap->size);
-        Heapify(meap, 0);
+        const int32_t index = 0;
+        const Step node = meap->step[index];
+        meap->step[index] = meap->step[--meap->size];
+        Heapify(meap, index);
         return node;
     }
-    else
-    {
-        static Step zero;
-        free(meap->step);
-        return zero;
-    }
+    static Step zero;
+    free(meap->step);
+    return zero;
 }
 
 void Meap_Free(Meap* const meap)

@@ -18,12 +18,6 @@ void File_Print(const File);
 
 File File_Load(FILE* const);
 
-//  Assuming:
-//      Force = Mass * Acceleration
-//  Where Mass is equal to 1, force applied from one unit to
-//  another unit is directly proportional to the difference in
-//  unit acceleration scalars configured in the following file defines.
-
 #define FILE_ZERO (0)
 
 #define FILE_VILLAGER_MAX_SPEED  (130)

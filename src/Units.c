@@ -262,9 +262,7 @@ static Point Separate(Unit* const unit, Unit* const other)
             return Nudge();
         const int32_t width = UTIL_MAX(unit->width, other->width);
         if(Point_Mag(diff) < width)
-            return unit->color == other->color
-                ? Point_Sub(Point_Normalize(diff, width), diff) // Same color units work together by force of spring (F = K * x).
-                : diff; // Units of different color harshly oppose.
+            return Point_Sub(Point_Normalize(diff, width), diff);
     }
     return zero;
 }
