@@ -30,14 +30,12 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-static void FindPath(const Units units, Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static void FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
     if(!State_IsDead(unit->state))
     {
         Unit_FreePath(unit);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->command_group = units.command_group_next;
-        unit->command_group_count = units.select_count;
         unit->path = Field_PathGreedyBest(field, unit->cart, cart_goal);
     }
 }
@@ -66,12 +64,12 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
         if(unit->color == COLOR_BLU)
         {
             const Point point = { map.cols - 1, map.rows / 2 };
-            FindPath(units, unit, point, zero, field);
+            FindPath(unit, point, zero, field);
         }
         else
         {
             const Point point = { 0, map.rows / 2 };
-            FindPath(units, unit, point, zero, field);
+            FindPath(unit, point, zero, field);
         }
     }
     Field_Free(field);
@@ -186,27 +184,32 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static Units FindPathForSelected(Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
+    units.command_group_next++;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->is_selected
         && unit->max_speed > 0)
-            FindPath(units, unit, cart_goal, cart_grid_offset_goal, field);
+        {
+            unit->command_group = units.command_group_next;
+            unit->command_group_count = units.select_count;
+            FindPath(unit, cart_goal, cart_grid_offset_goal, field);
+        }
     }
+    return units;
 }
 
 static Units Command(Units units, const Overview overview, const Input input, const Map map, const Field field)
 {
     if(input.ru)
     {
-        units.command_group_next++;
         const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
         const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
-            FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
+            units = FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
     }
     return units;
 }
@@ -238,7 +241,7 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        return Point_Div(delta, 32); // XXX. What is a good divisor?
+        return Point_Div(delta, 50); // XXX. What is a good divisor?
     }
     return zero;
 }
@@ -375,6 +378,8 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
 // try to go back to a path point if they were swept past the path point.
 // This function ensures all boids on a tile share the same path index
 // so the group acts like it guided by a single leader.
+//
+// DO NOT multithread.
 
 static void UnifyBoids(const Units units, Unit* const unit)
 {
@@ -386,9 +391,17 @@ static void UnifyBoids(const Units units, Unit* const unit)
         {
             Unit* const other = stack.reference[i];
             if(!State_IsDead(other->state)
+            && unit->id != other->id
             && other->path.count > max
             && Unit_InPlatoon(unit, other))
+            {
                 other->path_index = max;
+
+                // The path index timer is reset to zero since path_index was modified.
+                // This will prevent RepathStuckBoids from interfering with smooth boids flows.
+
+                other->path_index_timer = 0;
+            }
         }
     }
 }
@@ -397,6 +410,10 @@ static void UnifyBoids(const Units units, Unit* const unit)
 // a "mosh pit" like style to reach the final point in the grid tile.
 // A simple solution is to stop all boids from reaching their final point
 // within a grid tile by stopping all boids within the grid tile.
+// This will create a propogation effect to nearby units as units on grid borders
+// will update neighboring units on neighboring tiles.
+//
+// DO NOT multithread.
 
 static void ConditionallyStopBoids(const Units units, Unit* const unit)
 {
@@ -407,6 +424,7 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
         {
             Unit* const other = stack.reference[i];
             if(!State_IsDead(other->state)
+            && unit->id != other->id
             && unit->path.count == 0
             && Unit_InPlatoon(unit, other))
                 Unit_FreePath(other);
@@ -414,9 +432,11 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-static void RepathBoids(const Units units, Unit* const unit, const Field field)
+// DO NOT multithread.
+
+static void RepathStuckBoids(const Units units, Unit* const unit, const Field field)
 {
-    if(!State_IsDead(unit->state) && unit->path_index_time > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES)
+    if(!State_IsDead(unit->state) && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
 
@@ -427,13 +447,15 @@ static void RepathBoids(const Units units, Unit* const unit, const Field field)
             const Point cart_goal = unit->path.point[unit->path.count - 1];
             for(int32_t j = 0; j < stack.count; j++)
             {
-                Unit* const reference = stack.reference[j];
-                if(reference->color == unit->color)
-                    FindPath(units, reference, cart_goal, unit->cart_grid_offset_goal, field);
+                Unit* const other = stack.reference[j];
+                if(Unit_InPlatoon(unit, other))
+                    FindPath(other, cart_goal, unit->cart_grid_offset_goal, field);
             }
         }
     }
 }
+
+// DO NOT multithread.
 
 static int32_t GetLastAttackTick(Unit* const unit)
 {
@@ -487,6 +509,8 @@ static void FightBoids(const Units units, Unit* const unit)
     }
 }
 
+// DO NOT multithread.
+
 static Unit* GetClosestBoid(const Units units, Unit* const unit)
 {
     const int32_t width = 2;
@@ -533,6 +557,17 @@ static void ChaseBoids(const Units units, Unit* const unit)
         else
             unit->is_chasing = false;
     }
+}
+
+// DO NOT multithread.
+
+static void RunHardRules(const Units units, const Field field)
+{
+    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) RepathStuckBoids(units, &units.unit[i], field);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
 
 typedef struct
@@ -596,15 +631,6 @@ static int32_t RunFlowNeedle(void* data)
     return 0;
 }
 
-static void RunHardRules(const Units units, const Field field)
-{
-    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) RepathBoids(units, &units.unit[i], field);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
-}
-
 // See the boids pseudocode:
 //   http://www.kfish.org/boids/pseudocode.html
 
@@ -655,6 +681,7 @@ static void Tick(const Units units)
         Unit* const unit = &units.unit[i];
         unit->timer++;
         unit->dir_timer++;
+        unit->path_index_timer++;
     }
 }
 

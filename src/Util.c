@@ -13,7 +13,10 @@ void Util_Log(const char* const message, ...)
         log = fopen("log.txt", "w");
     va_list args;
     va_start(args, message);
-    vfprintf(log, message, args);
+    if(false)
+        vfprintf(log, message, args);
+    else
+        vfprintf(stdout, message, args);
     va_end(args);
 }
 

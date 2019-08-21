@@ -22,14 +22,14 @@ static Point GetDelta(Unit* const unit, const Grid grid)
 void Unit_FreePath(Unit* const unit)
 {
     unit->path_index = 0;
-    unit->path_index_time = 0;
+    unit->path_index_timer = 0;
     unit->path = Points_Free(unit->path);
 }
 
 static void ReachGoal(Unit* const unit)
 {
     unit->path_index++;
-    unit->path_index_time = 0;
+    unit->path_index_timer = 0;
     if(unit->path_index >= unit->path.count)
         Unit_FreePath(unit);
 }
@@ -50,7 +50,6 @@ static void GotoGoal(Unit* const unit, const Point delta)
 static void AccelerateAlongPath(Unit* const unit, const Grid grid)
 {
     const Point delta = GetDelta(unit, grid);
-    unit->path_index_time++;
     if(Point_Mag(delta) < CONFIG_POINT_GOAL_CLOSE_ENOUGH_MAG)
         ReachGoal(unit);
     else
@@ -163,7 +162,7 @@ void Unit_Print(Unit* const unit)
     Util_Log("max_speed             :: %d\n",    unit->max_speed);
     Util_Log("accel                 :: %d\n",    unit->accel);
     Util_Log("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
-    Util_Log("path_index_time       :: %d\n",    unit->path_index_time);
+    Util_Log("path_index_timer      :: %d\n",    unit->path_index_timer);
     Util_Log("path_index            :: %d\n",    unit->path_index);
     Util_Log("path.count            :: %d\n",    unit->path.count);
     Util_Log("selected              :: %d\n",    unit->is_selected);
