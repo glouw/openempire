@@ -62,11 +62,13 @@ static void AccelerateAlongPath(Unit* const unit, const Grid grid)
 
 static void Decelerate(Unit* const unit)
 {
-    static Point zero;
-    const Point deccel = Point_Normalize(unit->velocity, unit->accel);
-    const Point velocity = Point_Sub(unit->velocity, deccel);
-    const Point dot = Point_Dot(velocity, unit->velocity);
-    unit->velocity = (dot.x >= 0 && dot.y >= 0) ? velocity : zero; // XXX. Double check the math...
+    if(Point_Mag(unit->velocity) > 0) 
+    {
+        static Point zero;
+        const Point deccel = Point_Normalize(unit->velocity, unit->accel);
+        const Point velocity = Point_Sub(unit->velocity, deccel);
+        unit->velocity = Point_Mag(unit->velocity) <= unit->accel ? zero : velocity; // XXX. Double check the math...
+    }
 }
 
 static void FollowPath(Unit* const unit, const Grid grid)
@@ -76,7 +78,7 @@ static void FollowPath(Unit* const unit, const Grid grid)
         ConditionallySkipFirstPoint(unit);
         AccelerateAlongPath(unit, grid);
     }
-    else if(Point_Mag(unit->velocity) > 0) Decelerate(unit);
+    else Decelerate(unit);
 }
 
 static void CapSpeed(Unit* const unit)
@@ -117,13 +119,13 @@ static Graphics GetFileFromState(Unit* const unit, const State state)
     return file;
 }
 
-void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_timer)
+void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_state_timer)
 {
     const Graphics file = GetFileFromState(unit, state);
     unit->state = state;
     unit->file = file;
-    if(reset_timer)
-        unit->timer = 0;
+    if(reset_state_timer)
+        unit->state_timer = 0;
 }
 
 static int32_t GetFramesFromState(Unit* const unit, const State state, const Registrar graphics)
@@ -150,8 +152,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.health = unit.max_health;
     unit.attack = Graphics_GetAttack(file);
     unit.file = file;
-    unit.timer = Util_Rand() % 10;
-    unit.charge_power = 120;
+    unit.state_timer = Util_Rand() % 10;
     unit.width = Graphics_GetWidth(file);
     unit.type = Graphics_GetType(file);
     unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
@@ -236,25 +237,4 @@ void Unit_Kill(Unit* const unit)
 {
     unit->health = 0;
     Unit_UpdateFileByState(unit, STATE_FALL, true);
-}
-
-bool Unit_CanCharge(Unit* const unit)
-{
-    return unit->type == TYPE_KNIGHT;
-}
-
-void Unit_Charge(Unit* const unit)
-{
-    unit->charge_power--;
-    if(unit->charge_power > 0)
-    {
-        unit->is_charging = true;
-        unit->max_speed = 2 * unit->max_speed_base;
-    }
-    else
-    {
-        unit->is_charging = false;
-        unit->charge_power = 0;
-        unit->max_speed = unit->max_speed_base;
-    }
 }

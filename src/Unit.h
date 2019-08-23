@@ -38,13 +38,11 @@ typedef struct
     int32_t max_health;
     int32_t health;
     int32_t attack;
-    int32_t timer;
+    int32_t state_timer;
     int32_t width;
     int32_t dir_timer;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
-    int32_t charge_power;
-    bool is_charging;
     bool is_chasing;
     bool is_selected;
 }
@@ -64,7 +62,7 @@ void Unit_Flow(Unit* const, const Grid);
 
 bool Unit_InPlatoon(Unit* const unit, Unit* const other);
 
-void Unit_UpdateFileByState(Unit* const, const State, const bool reset_timer);
+void Unit_UpdateFileByState(Unit* const, const State, const bool reset_state_timer);
 
 void Unit_FreePath(Unit* const);
 
@@ -75,7 +73,3 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
 void Unit_Kill(Unit* const);
-
-bool Unit_CanCharge(Unit* const);
-
-void Unit_Charge(Unit* const);

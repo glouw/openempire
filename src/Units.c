@@ -447,20 +447,15 @@ static void Melee(Unit* const unit, Unit* const other)
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
-            if(unit->is_charging)
-                Unit_Kill(other);
-            else
+            Unit_UpdateFileByState(unit, STATE_ATTACK, false);
+            static Point zero;
+            unit->velocity = zero;
+            const int32_t last_frame = GetLastAttackTick(unit);
+            if(unit->state_timer % last_frame == 0)
             {
-                Unit_UpdateFileByState(unit, STATE_ATTACK, false);
-                static Point zero;
-                unit->velocity = zero;
-                const int32_t last_frame = GetLastAttackTick(unit);
-                if(unit->timer % last_frame == 0)
-                {
-                    other->health -= unit->attack;
-                    if(other->health <= 0)
-                        Unit_Kill(other);
-                }
+                other->health -= unit->attack;
+                if(other->health <= 0)
+                    Unit_Kill(other);
             }
         }
     }
@@ -654,24 +649,12 @@ void Delete(const Units units, const Input input)
         }
 }
 
-void Charge(const Units units, const Input input)
-{
-    if(input.key[SDL_SCANCODE_C])
-        for(int32_t i = 0; i < units.count; i++)
-        {
-            Unit* const unit = &units.unit[i];
-            if(Unit_CanCharge(unit)
-            && unit->is_selected)
-                Unit_Charge(unit);
-        }
-}
-
 static void Tick(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        unit->timer++;
+        unit->state_timer++;
         unit->dir_timer++;
         unit->path_index_timer++;
     }
@@ -689,7 +672,7 @@ static void Decay(const Units units)
         Unit* const unit = &units.unit[i];
         const int32_t last_tick = GetLastFallTick(unit);
         if(unit->state == STATE_FALL
-        && unit->timer == last_tick)
+        && unit->state_timer == last_tick)
         {
             Unit_UpdateFileByState(unit, STATE_DECAY, true);
             unit->is_selected = false;
@@ -711,7 +694,6 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     units = Command(units, overview, input, map, field);
     Tick(units);
     Decay(units);
-    Charge(units, input);
     Delete(units, input);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed. Just sort and lower count value.
     return units;
