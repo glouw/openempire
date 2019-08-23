@@ -430,33 +430,7 @@ static void RepathStuckBoids(const Units units, Unit* const unit, const Field fi
     }
 }
 
-// DO NOT multithread.
-
-static int32_t GetLastAttackTick(Unit* const unit)
-{
-    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
-}
-
-// DO NOT multithread.
-
-static void Melee(Unit* const unit, Unit* const other)
-{
-    if(!State_IsDead(unit->state)
-    && !State_IsDead(other->state))
-    {
-        const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
-        {
-            Unit_UpdateFileByState(unit, STATE_ATTACK, false);
-            static Point zero;
-            unit->velocity = zero;
-            const int32_t last_frame = GetLastAttackTick(unit);
-            if(unit->state_timer % last_frame == 0)
-                other->health -= unit->attack;
-        }
-    }
-}
-
+// MAYBE multithread.
 
 static void Kill(const Units units)
 {
@@ -486,7 +460,7 @@ static void FightBoids(const Units units, Unit* const unit)
             {
                 Unit* const other = stack.reference[i];
                 if(unit->color != other->color)
-                    Melee(unit, other);
+                    Unit_Melee(unit, other);
             }
         }
     }
@@ -668,17 +642,12 @@ static void Tick(const Units units)
     }
 }
 
-static int32_t GetLastFallTick(Unit* const unit)
-{
-    return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
-}
-
 static void Decay(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        const int32_t last_tick = GetLastFallTick(unit);
+        const int32_t last_tick = Unit_GetLastFallTick(unit);
         if(unit->state == STATE_FALL
         && unit->state_timer == last_tick)
         {
@@ -696,6 +665,52 @@ static void ManageStacks(const Units units)
     CalculateCenters(units);
 }
 
+static int32_t CompareByFullyDecayed(const void* a, const void* b)
+{
+    Unit* const aa = (Unit*) a;
+    Unit* const bb = (Unit*) b;
+    return aa->is_fully_decayed > bb->is_fully_decayed;
+}
+
+static void SortByFullyDecayed(const Units units)
+{
+    qsort(units.unit, units.count, sizeof(*units.unit), CompareByFullyDecayed);
+}
+
+static void FlagDecayed(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        const int32_t last_tick = Unit_GetLastDecayTick(unit);
+        if(unit->state == STATE_DECAY
+        && unit->state_timer == last_tick)
+            unit->is_fully_decayed = true;
+    }
+}
+
+static Units ResizeDecayed(Units units)
+{
+    int32_t i = 0;
+    for(i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_fully_decayed)
+        {
+            units.count = i;
+            break;
+        }
+    }
+    return units;
+}
+
+static Units RemoveTheDecayed(const Units units)
+{
+    FlagDecayed(units);
+    SortByFullyDecayed(units);
+    return ResizeDecayed(units);
+}
+
 static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field)
 {
     units = Select(units, overview, input, graphics);
@@ -704,13 +719,13 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     Decay(units);
     Delete(units, input);
     Kill(units);
-    // XXX. Need a unit Remove() function to take unit off map when they are fully decayed. Just sort and lower count value.
     return units;
 }
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
 {
     ManagePathFinding(units, grid, map, field);
+    units = RemoveTheDecayed(units);
     ManageStacks(units);
     return ManageAction(units, graphics, overview, input, map, field);
 }

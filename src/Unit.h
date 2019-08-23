@@ -43,8 +43,10 @@ typedef struct
     int32_t dir_timer;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
+    int32_t decay_frames_per_dir;
     bool is_chasing;
     bool is_selected;
+    bool is_fully_decayed;
 }
 Unit;
 
@@ -73,3 +75,11 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
 void Unit_Kill(Unit* const);
+
+int32_t Unit_GetLastAttackTick(Unit* const);
+
+int32_t Unit_GetLastDecayTick(Unit* const);
+
+int32_t Unit_GetLastFallTick(Unit* const);
+
+void Unit_Melee(Unit* const, Unit* const);

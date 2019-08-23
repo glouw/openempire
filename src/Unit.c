@@ -130,8 +130,8 @@ void Unit_UpdateFileByState(Unit* const unit, const State state, const bool rese
 
 static int32_t GetFramesFromState(Unit* const unit, const State state, const Registrar graphics)
 {
-    const Graphics attack = GetFileFromState(unit, state);
-    const Animation animation = graphics.animation[unit->color][attack];
+    const Graphics file = GetFileFromState(unit, state);
+    const Animation animation = graphics.animation[unit->color][file];
     const int32_t frames = Animation_GetFramesPerDirection(animation);
     return frames;
 }
@@ -157,6 +157,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.type = Graphics_GetType(file);
     unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
     unit.fall_frames_per_dir = GetFramesFromState(&unit, STATE_FALL, graphics);
+    unit.decay_frames_per_dir = GetFramesFromState(&unit, STATE_DECAY, graphics);
     return unit;
 }
 
@@ -179,6 +180,8 @@ void Unit_Print(Unit* const unit)
     Util_Log("command_group         :: %d\n",    unit->command_group);
     Util_Log("health                :: %d\n",    unit->health);
     Util_Log("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
+    Util_Log("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
+    Util_Log("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
 }
 
 void ApplyStressors(Unit* const unit)
@@ -237,4 +240,37 @@ void Unit_Kill(Unit* const unit)
 {
     unit->health = 0;
     Unit_UpdateFileByState(unit, STATE_FALL, true);
+}
+
+int32_t Unit_GetLastAttackTick(Unit* const unit)
+{
+    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;  // Do not subtract one as attack ticks are calculated with modulus.
+}
+
+int32_t Unit_GetLastDecayTick(Unit* const unit)
+{
+    return unit->decay_frames_per_dir * CONFIG_ANIMATION_DECAY_DIVISOR - 1; // Do subtract one as decay ticks are calculated with comparisons.
+}
+
+int32_t Unit_GetLastFallTick(Unit* const unit)
+{
+    return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1; // Do subtract one as fall ticks are calculated with comparisons.
+}
+
+void Unit_Melee(Unit* const unit, Unit* const other)
+{
+    if(!State_IsDead(unit->state)
+    && !State_IsDead(other->state))
+    {
+        const Point diff = Point_Sub(other->cell, unit->cell);
+        if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
+        {
+            Unit_UpdateFileByState(unit, STATE_ATTACK, false);
+            static Point zero;
+            unit->velocity = zero;
+            const int32_t last_tick = Unit_GetLastAttackTick(unit);
+            if(unit->state_timer % last_tick == 0)
+                other->health -= unit->attack;
+        }
+    }
 }
