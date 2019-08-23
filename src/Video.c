@@ -106,8 +106,35 @@ void Video_RenderDataDemo(const Video video, const Data data, const Color color)
     RenderBlendomaticDemo(video, data.blendomatic);
 }
 
-void Video_Draw(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input)
+static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt)
 {
+    int32_t kb = (units.count * sizeof(Unit)) / 1000;
+    int32_t l1 = 0;
+    int32_t l2 = 0;
+    int32_t l3 = 0;
+    while(kb > 0 && l1 <   32) { l1++; kb--; }
+    while(kb > 0 && l2 <  256) { l2++; kb--; }
+    while(kb > 0 && l3 < 3072) { l3++; kb--; }
+    Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
+            "DT : %2d ms\n"
+            "L1 : %4dK ::   32K\n"
+            "L2 : %4dK ::  256K\n"
+            "L3 : %4dK :: 3072K\n", dt, l1, l2, l3);
+}
+
+static void CopyCanvas(const Video video)
+{
+    SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
+}
+
+static void Present(const Video video)
+{
+    SDL_RenderPresent(video.renderer);
+}
+
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const int32_t cycles)
+{
+    const int32_t t0 = SDL_GetTicks();
     const Quad quad = Overview_GetRenderBox(overview, -200);
     const Points render_points = Quad_GetRenderPoints(quad);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
@@ -122,25 +149,18 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
-#if 0
-    // XXX: Use with care, this is really heavy on pixel trasnfer as it draws
-    // the same flag over and over on one location without offscreen culling,
-    Vram_DrawUnitsPath(vram, data.graphics, units, overview);
-#endif
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
     Points_Free(render_points);
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);
-}
-
-void Video_CopyRenderer(const Video video)
-{
-    SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
-}
-
-void Video_Present(const Video video)
-{
-    SDL_RenderPresent(video.renderer);
+    const int32_t t1 = SDL_GetTicks();
+    const int32_t dt = t1 - t0;
+    static int32_t dt_hold;
+    if(cycles % 10 == 0)
+        dt_hold = dt;
+    CopyCanvas(video);
+    PrintPerformanceMonitor(video, units, dt_hold);
+    Present(video);
 }
