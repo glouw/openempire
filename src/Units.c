@@ -327,29 +327,21 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
     Point out = zero;
     if(!State_IsDead(unit->state))
     {
-        const Point n = {  0, -1 }; // XXX. Rewrite this all with loops.
+        const Point n = {  0, -1 };
         const Point e = { +1,  0 };
         const Point s = {  0, +1 };
         const Point w = { -1,  0 };
-        const Point n_point = Point_Add(unit->cart, n);
-        const Point e_point = Point_Add(unit->cart, e);
-        const Point s_point = Point_Add(unit->cart, s);
-        const Point w_point = Point_Add(unit->cart, w);
-        const bool n_walk = Units_CanWalk(units, map, n_point); // XXX. This is very heavy duty. Is there another way to nicely slide off walks eg. dot product?
-        const bool e_walk = Units_CanWalk(units, map, e_point);
-        const bool s_walk = Units_CanWalk(units, map, s_point);
-        const bool w_walk = Units_CanWalk(units, map, w_point);
+        const bool can_walk_n = Units_CanWalk(units, map, Point_Add(unit->cart, n));
+        const bool can_walk_e = Units_CanWalk(units, map, Point_Add(unit->cart, e));
+        const bool can_walk_s = Units_CanWalk(units, map, Point_Add(unit->cart, s));
+        const bool can_walk_w = Units_CanWalk(units, map, Point_Add(unit->cart, w));
         const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
         const int32_t repulsion = 10 * unit->accel; // XXX. How strong should this be?
-        const Point n_force = Point_Mul(n, repulsion);
-        const Point e_force = Point_Mul(e, repulsion);
-        const Point s_force = Point_Mul(s, repulsion);
-        const Point w_force = Point_Mul(w, repulsion); // XXX. Boids are still jumping out of walls - need some sort of reset to put them back in their last good spot.
         const int32_t border = 10;
-        if(!n_walk && offset.y < border) out = Point_Add(out, s_force);
-        if(!w_walk && offset.x < border) out = Point_Add(out, e_force);
-        if(!s_walk && offset.y > grid.tile_cart_height - border) out = Point_Add(out, n_force);
-        if(!e_walk && offset.x > grid.tile_cart_width  - border) out = Point_Add(out, w_force);
+        if(!can_walk_n && offset.y < border) out = Point_Add(out, Point_Mul(s, repulsion));
+        if(!can_walk_w && offset.x < border) out = Point_Add(out, Point_Mul(e, repulsion));
+        if(!can_walk_s && offset.y > grid.tile_cart_height - border) out = Point_Add(out, Point_Mul(n, repulsion));
+        if(!can_walk_e && offset.x > grid.tile_cart_width  - border) out = Point_Add(out, Point_Mul(w, repulsion));
     }
     return out;
 }
