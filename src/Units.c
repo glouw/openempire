@@ -376,7 +376,7 @@ static void UnifyBoids(const Units units, Unit* const unit)
             && unit->id != other->id
             && other->path.count > max
             && Unit_InPlatoon(unit, other))
-                Unit_UpdatePathIndex(other, max);
+                Unit_UpdatePathIndex(other, max, false); // Do not reset path index timer else RepathStuckBoids() will break.
         }
     }
 }
@@ -724,10 +724,15 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
 {
-    ManagePathFinding(units, grid, map, field);
+    // Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
+
     units = RemoveTheDecayed(units);
+    units = ManageAction(units, graphics, overview, input, map, field);
+
+    ManagePathFinding(units, grid, map, field);
     ManageStacks(units);
-    return ManageAction(units, graphics, overview, input, map, field);
+
+    return units;
 }
 
 bool Units_CanWalk(const Units units, const Map map, const Point point)

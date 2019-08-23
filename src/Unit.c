@@ -19,21 +19,22 @@ static Point GetDelta(Unit* const unit, const Grid grid)
     return Point_Sub(goal_grid_coords, unit_grid_coords);
 }
 
-void Unit_UpdatePathIndex(Unit* const unit, const int32_t index)
+void Unit_UpdatePathIndex(Unit* const unit, const int32_t index, const bool reset_path_index_timer)
 {
     unit->path_index = index;
-    unit->path_index_timer = 0;
+    if(reset_path_index_timer)
+        unit->path_index_timer = 0;
 }
 
 void Unit_FreePath(Unit* const unit)
 {
-    Unit_UpdatePathIndex(unit, 0);
+    Unit_UpdatePathIndex(unit, 0, true);
     unit->path = Points_Free(unit->path);
 }
 
 static void ReachGoal(Unit* const unit)
 {
-    Unit_UpdatePathIndex(unit, unit->path_index + 1);
+    Unit_UpdatePathIndex(unit, unit->path_index + 1, true);
     if(unit->path_index >= unit->path.count)
         Unit_FreePath(unit);
 }
