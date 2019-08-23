@@ -452,12 +452,20 @@ static void Melee(Unit* const unit, Unit* const other)
             unit->velocity = zero;
             const int32_t last_frame = GetLastAttackTick(unit);
             if(unit->state_timer % last_frame == 0)
-            {
                 other->health -= unit->attack;
-                if(other->health <= 0)
-                    Unit_Kill(other);
-            }
         }
+    }
+}
+
+
+static void Kill(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(!State_IsDead(unit->state))
+            if(unit->health <= 0)
+                Unit_Kill(unit);
     }
 }
 
@@ -695,6 +703,7 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     Tick(units);
     Decay(units);
     Delete(units, input);
+    Kill(units);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed. Just sort and lower count value.
     return units;
 }
