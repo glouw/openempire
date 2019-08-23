@@ -26,7 +26,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.canvas = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
     video.title = title;
     video.text = Text_Build("art/blood_and_blade.ttf", 50, 0x00FF0000);
-    video.text_small = Text_Build("art/blood_and_blade.ttf", 25, 0x00FFFF00);
+    video.text_small = Text_Build("art/blood_and_blade.ttf", 15, 0x00FFFF00);
     video.xres = xres;
     video.yres = yres;
     video.cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -116,6 +116,7 @@ static void PrintPerformanceMonitor(const Video video, const Units units, const 
     while(kb > 0 && l2 <  256) { l2++; kb--; }
     while(kb > 0 && l3 < 3072) { l3++; kb--; }
     Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
+            "Assuming i5-3320M\n"
             "DT : %2d ms\n"
             "L1 : %4dK ::   32K\n"
             "L2 : %4dK ::  256K\n"

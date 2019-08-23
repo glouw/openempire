@@ -30,13 +30,14 @@ simply run the compiled executable with the path flag pointing to the data folde
     [x] Multi-threaded assest loading
     [x] Multi-threaded terrain software rendering and blending
     [x] Multi-threaded macro level pathfinding (breadth first search)
+    [x] Multi-threaded macro level pathfinding (Gready best search)
     [x] Multi-threaded micro level pathfinding (boids)
     [x] Multi-threaded unit software rendering
     [x] Unit state switching
     [x] Melee combat
     [ ] Ranged combat
     [ ] Multiplayer networking
-    [x] Fast compile times with link time optimization (full build: 5.157 seconds on a Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz)
+    [x] Fast compile times with link time optimization (full build: 5.803 seconds on a Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz)
 
 ## Development Blog
 
@@ -48,6 +49,6 @@ Thanks to the SFTech OpenAge team for their fantastic reverse engineering docume
 
 https://github.com/SFTtech/openage
 
-Thanks to Ensemble Studios for many hours of gifted childhood memories.
+Thanks to Ensemble Studios for many gifted childhood memories.
 
-Thanks to Forgotten Empires for keeping the spirit of Age of Empires alive.
+Thanks to Forgotten Empires for keeping the spirit of Age of Empires II alive.
