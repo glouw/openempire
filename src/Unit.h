@@ -3,6 +3,7 @@
 #include "Points.h"
 #include "Graphics.h"
 #include "State.h"
+#include "Field.h"
 #include "Registrar.h"
 #include "Color.h"
 #include "Grid.h"
@@ -48,6 +49,8 @@ Unit;
 
 Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color, const Registrar graphics);
 
+void Unit_UpdatePathIndex(Unit* const, const int32_t index);
+
 void Unit_UndoMove(Unit* const, const Grid);
 
 void Unit_Move(Unit* const, const Grid);
@@ -65,5 +68,7 @@ void Unit_FreePath(Unit* const);
 void Unit_SetDir(Unit* const, const Point);
 
 void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal);
+
+void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
 void Unit_Kill(Unit* const);

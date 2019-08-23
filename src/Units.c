@@ -30,16 +30,6 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-static void FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
-{
-    if(!State_IsDead(unit->state))
-    {
-        Unit_FreePath(unit);
-        unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->path = Field_PathGreedyBest(field, unit->cart, cart_goal);
-    }
-}
-
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
 #if 1
@@ -64,12 +54,12 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
         if(unit->color == COLOR_BLU)
         {
             const Point point = { map.cols - 1, map.rows / 2 };
-            FindPath(unit, point, zero, field);
+            Unit_FindPath(unit, point, zero, field);
         }
         else
         {
             const Point point = { 0, map.rows / 2 };
-            FindPath(unit, point, zero, field);
+            Unit_FindPath(unit, point, zero, field);
         }
     }
     Field_Free(field);
@@ -195,7 +185,7 @@ static Units FindPathForSelected(Units units, const Point cart_goal, const Point
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
-            FindPath(unit, cart_goal, cart_grid_offset_goal, field);
+            Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, field);
         }
     }
     return units;
@@ -386,14 +376,7 @@ static void UnifyBoids(const Units units, Unit* const unit)
             && unit->id != other->id
             && other->path.count > max
             && Unit_InPlatoon(unit, other))
-            {
-                other->path_index = max;
-
-                // The path index timer is reset to zero since path_index was modified.
-                // This will prevent RepathStuckBoids from interfering with smooth boids flows.
-
-                other->path_index_timer = 0;
-            }
+                Unit_UpdatePathIndex(other, max);
         }
     }
 }
@@ -441,7 +424,7 @@ static void RepathStuckBoids(const Units units, Unit* const unit, const Field fi
             {
                 Unit* const other = stack.reference[j];
                 if(Unit_InPlatoon(unit, other))
-                    FindPath(other, cart_goal, unit->cart_grid_offset_goal, field);
+                   Unit_FindPath(other, cart_goal, unit->cart_grid_offset_goal, field);
             }
         }
     }

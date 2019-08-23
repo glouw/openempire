@@ -19,17 +19,21 @@ static Point GetDelta(Unit* const unit, const Grid grid)
     return Point_Sub(goal_grid_coords, unit_grid_coords);
 }
 
+void Unit_UpdatePathIndex(Unit* const unit, const int32_t index)
+{
+    unit->path_index = index;
+    unit->path_index_timer = 0;
+}
+
 void Unit_FreePath(Unit* const unit)
 {
-    unit->path_index = 0;
-    unit->path_index_timer = 0;
+    Unit_UpdatePathIndex(unit, 0);
     unit->path = Points_Free(unit->path);
 }
 
 static void ReachGoal(Unit* const unit)
 {
-    unit->path_index++;
-    unit->path_index_timer = 0;
+    Unit_UpdatePathIndex(unit, unit->path_index + 1);
     if(unit->path_index >= unit->path.count)
         Unit_FreePath(unit);
 }
@@ -198,6 +202,16 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     {
         unit->dir = Direction_CartToIso(Direction_GetCart(dir));
         unit->dir_timer = 0;
+    }
+}
+
+void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+{
+    if(!State_IsDead(unit->state))
+    {
+        Unit_FreePath(unit);
+        unit->cart_grid_offset_goal = cart_grid_offset_goal;
+        unit->path = Field_PathGreedyBest(field, unit->cart, cart_goal);
     }
 }
 
