@@ -34,7 +34,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
 {
 #if 1
     const int32_t depth = 5;
-    for(int32_t x = 0; x < depth; x++)
+    for(int32_t x = 0; x < 3 * depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
@@ -447,15 +447,20 @@ static void Melee(Unit* const unit, Unit* const other)
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
-            Unit_UpdateFileByState(unit, STATE_ATTACK, false);
-            static Point zero;
-            unit->velocity = zero;
-            const int32_t last_frame = GetLastAttackTick(unit);
-            if(unit->timer % last_frame == 0)
+            if(unit->is_charging)
+                Unit_Kill(other);
+            else
             {
-                other->health -= unit->attack;
-                if(other->health <= 0)
-                    Unit_Kill(other);
+                Unit_UpdateFileByState(unit, STATE_ATTACK, false);
+                static Point zero;
+                unit->velocity = zero;
+                const int32_t last_frame = GetLastAttackTick(unit);
+                if(unit->timer % last_frame == 0)
+                {
+                    other->health -= unit->attack;
+                    if(other->health <= 0)
+                        Unit_Kill(other);
+                }
             }
         }
     }
@@ -649,6 +654,18 @@ void Delete(const Units units, const Input input)
         }
 }
 
+void Charge(const Units units, const Input input)
+{
+    if(input.key[SDL_SCANCODE_C])
+        for(int32_t i = 0; i < units.count; i++)
+        {
+            Unit* const unit = &units.unit[i];
+            if(Unit_CanCharge(unit)
+            && unit->is_selected)
+                Unit_Charge(unit);
+        }
+}
+
 static void Tick(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -694,6 +711,7 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     units = Command(units, overview, input, map, field);
     Tick(units);
     Decay(units);
+    Charge(units, input);
     Delete(units, input);
     // XXX. Need a unit Remove() function to take unit off map when they are fully decayed. Just sort and lower count value.
     return units;

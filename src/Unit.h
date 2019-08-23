@@ -11,39 +11,42 @@
 
 typedef struct
 {
+    const char* file_name;
     Point cart;
     Point cart_grid_offset;
     Point cart_grid_offset_goal;
     Point cell;
     Point cell_last;
-    int32_t max_speed;
-    int32_t accel;
     Point velocity;
+    Point group_alignment;
+    Point cell_of_interest;
+    Point stressors;
     Points path;
-    int32_t path_index;
-    int32_t path_index_timer;
-    bool is_selected;
-    Graphics file;
-    const char* file_name;
-    int32_t id;
-    int32_t command_group;
-    int32_t command_group_count;
     Color color;
     Direction dir;
-    Point stressors;
     State state;
+    Graphics file;
+    Type type;
+    int32_t id;
+    int32_t path_index;
+    int32_t path_index_timer;
+    int32_t command_group;
+    int32_t command_group_count;
+    int32_t max_speed;
+    int32_t max_speed_base;
+    int32_t accel;
     int32_t max_health;
     int32_t health;
     int32_t attack;
     int32_t timer;
     int32_t width;
-    Type type;
-    Point group_alignment;
     int32_t dir_timer;
-    bool is_chasing;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
-    Point cell_of_interest;
+    int32_t charge_power;
+    bool is_charging;
+    bool is_chasing;
+    bool is_selected;
 }
 Unit;
 
@@ -72,3 +75,7 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
 void Unit_Kill(Unit* const);
+
+bool Unit_CanCharge(Unit* const);
+
+void Unit_Charge(Unit* const);

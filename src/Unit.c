@@ -141,8 +141,9 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
-    unit.state = STATE_IDLE; // This is the base state, and is required for all new units as UpdateFileByState() references this base state.
+    unit.state = STATE_IDLE;
     unit.max_speed = Graphics_GetMaxSpeed(file);
+    unit.max_speed_base = unit.max_speed;
     unit.accel = Graphics_GetAcceleration(file);
     unit.file_name = Graphics_GetString(file);
     unit.max_health = Graphics_GetHealth(file);
@@ -150,6 +151,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.attack = Graphics_GetAttack(file);
     unit.file = file;
     unit.timer = Util_Rand() % 10;
+    unit.charge_power = 120;
     unit.width = Graphics_GetWidth(file);
     unit.type = Graphics_GetType(file);
     unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
@@ -234,4 +236,25 @@ void Unit_Kill(Unit* const unit)
 {
     unit->health = 0;
     Unit_UpdateFileByState(unit, STATE_FALL, true);
+}
+
+bool Unit_CanCharge(Unit* const unit)
+{
+    return unit->type == TYPE_KNIGHT;
+}
+
+void Unit_Charge(Unit* const unit)
+{
+    unit->charge_power--;
+    if(unit->charge_power > 0)
+    {
+        unit->is_charging = true;
+        unit->max_speed = 2 * unit->max_speed_base;
+    }
+    else
+    {
+        unit->is_charging = false;
+        unit->charge_power = 0;
+        unit->max_speed = unit->max_speed_base;
+    }
 }
