@@ -283,6 +283,9 @@ void Unit_Repath(Unit* const unit, const Field field)
     && unit->path.count > 0)
     {
         const Point cart_goal = unit->path.point[unit->path.count - 1];
-        Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field);
+        if(unit->path.count < 3)
+            Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
+        else
+            Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field);
     }
 }

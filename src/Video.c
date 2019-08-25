@@ -116,8 +116,9 @@ void Video_Present(const Video video)
     SDL_RenderPresent(video.renderer);
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input)
+int32_t Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input)
 {
+    const int32_t t0 = SDL_GetTicks();
     const Quad quad = Overview_GetRenderBox(overview, -200);
     const Points render_points = Quad_GetRenderPoints(quad);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
@@ -138,5 +139,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);
+    const int32_t t1 = SDL_GetTicks();
     CopyCanvas(video);
+    return t1 - t0;
 }

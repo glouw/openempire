@@ -36,34 +36,22 @@ int32_t main(int32_t argc, char* argv[])
     else
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
-        const Field field = Units_Field(units, map);
         const int32_t t0 = SDL_GetTicks();
-
+        const Field field = Units_Field(units, map);
         Map_Edit(map, overview, input);
-
         overview = Overview_Update(overview, input);
-
         const int32_t ta = SDL_GetTicks();
         units = Units_Caretake(units, data.graphics, overview, grid, input, map, field);
         const int32_t tb = SDL_GetTicks();
-
-        const int32_t tc = SDL_GetTicks();
-        Video_Render(video, data, map, units, overview, input);
-        const int32_t td = SDL_GetTicks();
-
+        const int32_t dtd = Video_Render(video, data, map, units, overview, input);
         Field_Free(field);
-
         const int32_t dtb = tb - ta;
-        const int32_t dtd = td - tc;
-
-        PrintPerformanceMonitor(video, units, dtd, dtb, cycles);
+        PrintPerformanceMonitor(video, units, dtb, dtd, cycles);
         Video_Present(video);
-
         const int32_t t1 = SDL_GetTicks();
-
         const int32_t ms = 1000 / 60 - (t1 - t0);
-        SDL_Delay(ms < 0 ? 0 : ms);
-
+        if(ms > 0)
+            SDL_Delay(ms);
         cycles++;
         if(args.measure)
             if(cycles > 10) // NOTE: Measure performance with valgrind --tool=cachegrind.

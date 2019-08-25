@@ -33,7 +33,7 @@ Field Units_Field(const Units units, const Map map)
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
 #if 1
-    const int32_t depth = 10;
+    const int32_t depth = 5;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
@@ -44,7 +44,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED, graphics));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
