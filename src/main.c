@@ -15,10 +15,10 @@ static void PrintPerformanceMonitor(const Video video, const Units units, const 
     }
 
     Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
-            "units: %d\n"
-            "dtb : %2d ms\n"
-            "dtd : %2d ms\n"
-            "cycle: %4d", units.count, dtb_hold, dtd_hold, cycles);
+            "units.count   : %4d\n"
+            "dt (ms) unit  : %2d\n"
+            "dt (ms) video : %2d\n"
+            "cycles        : %4d", units.count, dtb_hold, dtd_hold, cycles);
 }
 
 int32_t main(int32_t argc, char* argv[])
