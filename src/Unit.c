@@ -245,17 +245,20 @@ void Unit_Kill(Unit* const unit)
 
 int32_t Unit_GetLastAttackTick(Unit* const unit)
 {
-    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;  // Do not subtract one as attack ticks are calculated with modulus.
+    // Do not subtract one as attack ticks are calculated with modulus.
+    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
 }
 
 int32_t Unit_GetLastDecayTick(Unit* const unit)
 {
-    return unit->decay_frames_per_dir * CONFIG_ANIMATION_DECAY_DIVISOR - 1; // Do subtract one as decay ticks are calculated with comparisons.
+    // Do subtract one as decay ticks are calculated with comparisons.
+    return unit->decay_frames_per_dir * CONFIG_ANIMATION_DECAY_DIVISOR - 1;
 }
 
 int32_t Unit_GetLastFallTick(Unit* const unit)
 {
-    return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1; // Do subtract one as fall ticks are calculated with comparisons.
+    // Do subtract one as fall ticks are calculated with comparisons.
+    return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
 void Unit_Melee(Unit* const unit, Unit* const other)
@@ -267,11 +270,11 @@ void Unit_Melee(Unit* const unit, Unit* const other)
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
-            static Point zero;
-            unit->velocity = zero;
             const int32_t last_tick = Unit_GetLastAttackTick(unit);
             if(unit->state_timer % last_tick == 0)
                 other->health -= unit->attack;
+            static Point zero;
+            unit->velocity = zero;
         }
     }
 }

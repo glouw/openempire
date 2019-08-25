@@ -68,16 +68,15 @@ void Stack_UpdateCenterOfMass(Stack* const stack)
     stack->center_of_mass = (count > 0) ? Point_Div(out, count) : out;
 }
 
-int32_t Stack_GetMaxPathIndex(const Stack stack, const Color color, const int32_t command_group)
+int32_t Stack_GetMaxPathIndex(const Stack stack, Unit* const unit)
 {
     int32_t max = 0;
     for(int32_t i = 0; i < stack.count; i++)
     {
-        Unit* const unit = stack.reference[i];
-        if(unit->path_index > max
-        && unit->color == color
-        && unit->command_group == command_group) // XXX. Needs check for unit type too.
-            max = unit->path_index;
+        Unit* const other = stack.reference[i];
+        if(Unit_InPlatoon(unit, other)
+        && other->path_index > max)
+            max = other->path_index;
     }
     return max;
 }

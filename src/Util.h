@@ -19,6 +19,8 @@
 
 #define UTIL_MAX(a, b) ((a) > (b) ? (a) : (b))
 
+#define UTIL_ACTIVITY(message) { static int _index_; printf("%s %d\n", message, _index_++); }
+
 void Util_Bomb(const char* const message, ...);
 
 char* Util_StringJoin(const char* const a, const char* const b);

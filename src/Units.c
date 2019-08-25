@@ -34,7 +34,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
 {
 #if 1
     const int32_t depth = 5;
-    for(int32_t x = 0; x < 3 * depth; x++)
+    for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
@@ -368,7 +368,7 @@ static void UnifyBoids(const Units units, Unit* const unit)
     if(!State_IsDead(unit->state))
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
-        const int32_t max = Stack_GetMaxPathIndex(stack, unit->color, unit->command_group);
+        const int32_t max = Stack_GetMaxPathIndex(stack, unit);
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
@@ -411,21 +411,18 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
 
 static void RepathStuckBoids(const Units units, Unit* const unit, const Field field)
 {
-    if(!State_IsDead(unit->state) && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES)
+    if(!State_IsDead(unit->state)
+    && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
+    && unit->path.count > 0)
     {
+        UTIL_ACTIVITY("repath")
         const Stack stack = Units_GetStackCart(units, unit->cart);
-
-        // Unit must have a goal already.
-
-        if(unit->path.count > 0)
+        const Point cart_goal = unit->path.point[unit->path.count - 1];
+        for(int32_t j = 0; j < stack.count; j++)
         {
-            const Point cart_goal = unit->path.point[unit->path.count - 1];
-            for(int32_t j = 0; j < stack.count; j++)
-            {
-                Unit* const other = stack.reference[j];
-                if(Unit_InPlatoon(unit, other))
-                   Unit_FindPath(other, cart_goal, unit->cart_grid_offset_goal, field);
-            }
+            Unit* const other = stack.reference[j];
+            if(Unit_InPlatoon(unit, other))
+               Unit_FindPath(other, cart_goal, unit->cart_grid_offset_goal, field);
         }
     }
 }
@@ -522,7 +519,7 @@ static void RunHardRules(const Units units, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) RepathStuckBoids(units, &units.unit[i], field);
+    //for(int32_t i = 0; i < units.count; i++) RepathStuckBoids(units, &units.unit[i], field);
     for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
 }
@@ -726,12 +723,10 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
 {
     // Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
 
-    units = RemoveTheDecayed(units);
-    units = ManageAction(units, graphics, overview, input, map, field);
-
     ManagePathFinding(units, grid, map, field);
+    units = RemoveTheDecayed(units);
     ManageStacks(units);
-
+    units = ManageAction(units, graphics, overview, input, map, field);
     return units;
 }
 

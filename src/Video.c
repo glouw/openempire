@@ -106,7 +106,7 @@ void Video_RenderDataDemo(const Video video, const Data data, const Color color)
     RenderBlendomaticDemo(video, data.blendomatic);
 }
 
-static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt)
+static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycle)
 {
     int32_t kb = (units.count * sizeof(Unit)) / 1000;
     int32_t l1 = 0;
@@ -120,7 +120,8 @@ static void PrintPerformanceMonitor(const Video video, const Units units, const 
             "DT : %2d ms\n"
             "L1 : %4dK ::   32K\n"
             "L2 : %4dK ::  256K\n"
-            "L3 : %4dK :: 3072K\n", dt, l1, l2, l3);
+            "L3 : %4dK :: 3072K\n"
+            "cycle: %4d", dt, l1, l2, l3, cycle);
 }
 
 static void CopyCanvas(const Video video)
@@ -162,6 +163,6 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     if(cycles % 10 == 0)
         dt_hold = dt;
     CopyCanvas(video);
-    PrintPerformanceMonitor(video, units, dt_hold);
+    PrintPerformanceMonitor(video, units, dt_hold, cycles);
     Present(video);
 }

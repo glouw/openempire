@@ -12,4 +12,4 @@ typedef enum
 }
 State;
 
-bool State_IsDead(const State state);
+bool State_IsDead(const State);
