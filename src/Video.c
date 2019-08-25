@@ -106,37 +106,18 @@ void Video_RenderDataDemo(const Video video, const Data data, const Color color)
     RenderBlendomaticDemo(video, data.blendomatic);
 }
 
-static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycle)
-{
-    int32_t kb = (units.count * sizeof(Unit)) / 1000;
-    int32_t l1 = 0;
-    int32_t l2 = 0;
-    int32_t l3 = 0;
-    while(kb > 0 && l1 <   32) { l1++; kb--; }
-    while(kb > 0 && l2 <  256) { l2++; kb--; }
-    while(kb > 0 && l3 < 3072) { l3++; kb--; }
-    Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
-            "Assuming i5-3320M\n"
-            "DT : %2d ms\n"
-            "L1 : %4dK ::   32K\n"
-            "L2 : %4dK ::  256K\n"
-            "L3 : %4dK :: 3072K\n"
-            "cycle: %4d", dt, l1, l2, l3, cycle);
-}
-
 static void CopyCanvas(const Video video)
 {
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
 }
 
-static void Present(const Video video)
+void Video_Present(const Video video)
 {
     SDL_RenderPresent(video.renderer);
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const int32_t cycles)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input)
 {
-    const int32_t t0 = SDL_GetTicks();
     const Quad quad = Overview_GetRenderBox(overview, -200);
     const Points render_points = Quad_GetRenderPoints(quad);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
@@ -157,12 +138,5 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);
-    const int32_t t1 = SDL_GetTicks();
-    const int32_t dt = t1 - t0;
-    static int32_t dt_hold;
-    if(cycles % 10 == 0)
-        dt_hold = dt;
     CopyCanvas(video);
-    PrintPerformanceMonitor(video, units, dt_hold, cycles);
-    Present(video);
 }

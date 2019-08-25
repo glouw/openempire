@@ -3,6 +3,24 @@
 #include "Units.h"
 #include "Args.h"
 
+static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dtb, const int32_t dtd, const int32_t cycles)
+{
+    static int dtb_hold;
+    static int dtd_hold;
+
+    if(cycles % 10 == 0)
+    {
+        dtb_hold = dtb;
+        dtd_hold = dtd;
+    }
+
+    Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
+            "units: %d\n"
+            "dtb : %2d ms\n"
+            "dtd : %2d ms\n"
+            "cycle: %4d", units.count, dtb_hold, dtd_hold, cycles);
+}
+
 int32_t main(int32_t argc, char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
@@ -20,15 +38,32 @@ int32_t main(int32_t argc, char* argv[])
     {
         const Field field = Units_Field(units, map);
         const int32_t t0 = SDL_GetTicks();
+
         Map_Edit(map, overview, input);
+
         overview = Overview_Update(overview, input);
+
+        const int32_t ta = SDL_GetTicks();
         units = Units_Caretake(units, data.graphics, overview, grid, input, map, field);
-        Video_Render(video, data, map, units, overview, input, cycles);
+        const int32_t tb = SDL_GetTicks();
+
+        const int32_t tc = SDL_GetTicks();
+        Video_Render(video, data, map, units, overview, input);
+        const int32_t td = SDL_GetTicks();
+
         Field_Free(field);
+
+        const int32_t dtb = tb - ta;
+        const int32_t dtd = td - tc;
+
+        PrintPerformanceMonitor(video, units, dtd, dtb, cycles);
+        Video_Present(video);
+
         const int32_t t1 = SDL_GetTicks();
-        const int32_t dt = t1 - t0;
-        const int32_t ms = 1000 / 60 - dt;
+
+        const int32_t ms = 1000 / 60 - (t1 - t0);
         SDL_Delay(ms < 0 ? 0 : ms);
+
         cycles++;
         if(args.measure)
             if(cycles > 10) // NOTE: Measure performance with valgrind --tool=cachegrind.

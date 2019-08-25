@@ -245,19 +245,16 @@ void Unit_Kill(Unit* const unit)
 
 int32_t Unit_GetLastAttackTick(Unit* const unit)
 {
-    // Do not subtract one as attack ticks are calculated with modulus.
-    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR;
+    return unit->attack_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
 int32_t Unit_GetLastDecayTick(Unit* const unit)
 {
-    // Do subtract one as decay ticks are calculated with comparisons.
     return unit->decay_frames_per_dir * CONFIG_ANIMATION_DECAY_DIVISOR - 1;
 }
 
 int32_t Unit_GetLastFallTick(Unit* const unit)
 {
-    // Do subtract one as fall ticks are calculated with comparisons.
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
@@ -271,10 +268,21 @@ void Unit_Melee(Unit* const unit, Unit* const other)
         {
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             const int32_t last_tick = Unit_GetLastAttackTick(unit);
-            if(unit->state_timer % last_tick == 0)
+            if(unit->state_timer % (last_tick + 1) == 0)
                 other->health -= unit->attack;
             static Point zero;
             unit->velocity = zero;
         }
+    }
+}
+
+void Unit_Repath(Unit* const unit, const Field field)
+{
+    if(!State_IsDead(unit->state)
+    && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
+    && unit->path.count > 0)
+    {
+        const Point cart_goal = unit->path.point[unit->path.count - 1];
+        Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field);
     }
 }

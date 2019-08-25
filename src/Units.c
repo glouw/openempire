@@ -33,7 +33,7 @@ Field Units_Field(const Units units, const Map map)
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
 #if 1
-    const int32_t depth = 5;
+    const int32_t depth = 10;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
@@ -44,7 +44,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics));
+        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_RED, graphics));
     }
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
@@ -231,7 +231,7 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        return Point_Div(delta, 50); // XXX. What is a good divisor?
+        return Point_Div(delta, 32); // XXX. What is a good divisor?
     }
     return zero;
 }
@@ -356,31 +356,6 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     }
 }
 
-// Boids, when swept up in a current of other boids, will
-// try to go back to a path point if they were swept past the path point.
-// This function ensures all boids on a tile share the same path index
-// so the group acts like it guided by a single leader.
-//
-// DO NOT multithread.
-
-static void UnifyBoids(const Units units, Unit* const unit)
-{
-    if(!State_IsDead(unit->state))
-    {
-        const Stack stack = Units_GetStackCart(units, unit->cart);
-        const int32_t max = Stack_GetMaxPathIndex(stack, unit);
-        for(int32_t i = 0; i < stack.count; i++)
-        {
-            Unit* const other = stack.reference[i];
-            if(!State_IsDead(other->state)
-            && unit->id != other->id
-            && other->path.count > max
-            && Unit_InPlatoon(unit, other))
-                Unit_UpdatePathIndex(other, max, false); // Do not reset path index timer else RepathStuckBoids() will break.
-        }
-    }
-}
-
 // Boids, when reaching their final destination, will struggle in
 // a "mosh pit" like style to reach the final point in the grid tile.
 // A simple solution is to stop all boids from reaching their final point
@@ -407,28 +382,6 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-// DO NOT multithread.
-
-static void RepathStuckBoids(const Units units, Unit* const unit, const Field field)
-{
-    if(!State_IsDead(unit->state)
-    && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
-    && unit->path.count > 0)
-    {
-        UTIL_ACTIVITY("repath")
-        const Stack stack = Units_GetStackCart(units, unit->cart);
-        const Point cart_goal = unit->path.point[unit->path.count - 1];
-        for(int32_t j = 0; j < stack.count; j++)
-        {
-            Unit* const other = stack.reference[j];
-            if(Unit_InPlatoon(unit, other))
-               Unit_FindPath(other, cart_goal, unit->cart_grid_offset_goal, field);
-        }
-    }
-}
-
-// MAYBE multithread.
-
 static void Kill(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -439,8 +392,6 @@ static void Kill(const Units units)
                 Unit_Kill(unit);
     }
 }
-
-// DO NOT multithread.
 
 static void FightBoids(const Units units, Unit* const unit)
 {
@@ -462,8 +413,6 @@ static void FightBoids(const Units units, Unit* const unit)
         }
     }
 }
-
-// DO NOT multithread.
 
 static Unit* GetClosestBoid(const Units units, Unit* const unit)
 {
@@ -495,8 +444,6 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
     return closest;
 }
 
-// DO NOT multithread.
-
 static void ChaseBoids(const Units units, Unit* const unit)
 {
     if(!State_IsDead(unit->state))
@@ -513,15 +460,57 @@ static void ChaseBoids(const Units units, Unit* const unit)
     }
 }
 
-// DO NOT multithread.
+typedef struct
+{
+    Units units;
+    Field field;
+    int32_t a;
+    int32_t b;
+}
+RepathNeedle;
+
+static int32_t RunRepathNeedle(void* const data)
+{
+    RepathNeedle* needle = (RepathNeedle*) data;
+    for(int32_t i = needle->a; i < needle->b; i++)
+        Unit_Repath(&needle->units.unit[i], needle->field);
+    return 0;
+}
+
+static void Repath(const Units units, const Field field)
+{
+    RepathNeedle* const needles = UTIL_ALLOC(RepathNeedle, units.cpu_count);
+    SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, units.cpu_count);
+    UTIL_CHECK(needles);
+    UTIL_CHECK(threads);
+    const int32_t width = units.count / units.cpu_count;
+    const int32_t remainder = units.count % units.cpu_count;
+    for(int32_t i = 0; i < units.cpu_count; i++)
+    {
+        needles[i].units = units;
+        needles[i].field = field;
+        needles[i].a = (i + 0) * width;
+        needles[i].b = (i + 1) * width;
+    }
+    needles[units.cpu_count - 1].b += remainder;
+    for(int32_t i = 0; i < units.cpu_count; i++) threads[i] = SDL_CreateThread(RunRepathNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < units.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
+    free(needles);
+    free(threads);
+}
 
 static void RunHardRules(const Units units, const Field field)
 {
-    for(int32_t i = 0; i < units.count; i++) UnifyBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
-    //for(int32_t i = 0; i < units.count; i++) RepathStuckBoids(units, &units.unit[i], field);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) FightBoids(units, &units.unit[i]);
+    Repath(units, field);
+
+    for(int32_t i = 0; i < units.count; i++)
+        ConditionallyStopBoids(units, &units.unit[i]);
+
+    for(int32_t i = 0; i < units.count; i++)
+        ChaseBoids(units, &units.unit[i]);
+
+    for(int32_t i = 0; i < units.count; i++)
+        FightBoids(units, &units.unit[i]);
 }
 
 typedef struct

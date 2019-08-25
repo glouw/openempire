@@ -83,3 +83,5 @@ int32_t Unit_GetLastDecayTick(Unit* const);
 int32_t Unit_GetLastFallTick(Unit* const);
 
 void Unit_Melee(Unit* const, Unit* const);
+
+void Unit_Repath(Unit* const, const Field);
