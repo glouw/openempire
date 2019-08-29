@@ -174,9 +174,8 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static Units FindPathForSelected(Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static void FindPathForSelected(const Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
-    units.command_group_next++;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -188,7 +187,6 @@ static Units FindPathForSelected(Units units, const Point cart_goal, const Point
             Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, field);
         }
     }
-    return units;
 }
 
 static Units Command(Units units, const Overview overview, const Input input, const Map map, const Field field)
@@ -199,7 +197,10 @@ static Units Command(Units units, const Overview overview, const Input input, co
         const Point cart = Overview_IsoToCart(overview, input.point, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(Units_CanWalk(units, map, cart_goal))
-            units = FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
+        {
+            units.command_group_next++;
+            FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
+        }
     }
     return units;
 }
@@ -455,8 +456,7 @@ static void ChaseBoids(const Units units, Unit* const unit)
             unit->cell_of_interest = closest->cell;
             Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
         }
-        else
-            unit->is_chasing = false;
+        else unit->is_chasing = false;
     }
 }
 
@@ -502,13 +502,10 @@ static void Repath(const Units units, const Field field)
 static void RunHardRules(const Units units, const Field field)
 {
     Repath(units, field);
-
     for(int32_t i = 0; i < units.count; i++)
         ConditionallyStopBoids(units, &units.unit[i]);
-
     for(int32_t i = 0; i < units.count; i++)
         ChaseBoids(units, &units.unit[i]);
-
     for(int32_t i = 0; i < units.count; i++)
         FightBoids(units, &units.unit[i]);
 }

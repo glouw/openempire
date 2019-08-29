@@ -1,7 +1,3 @@
-# Dependencies:
-#   SDL2-devel
-#   SDL2-devel-ttf
-
 BIN = ../openempires
 
 SRCS  = Animation.c
@@ -48,6 +44,9 @@ SRCS += Util.c
 SRCS += Video.c
 SRCS += Vram.c
 
+LIBS  = -lSDL2
+LIBS += -lSDL2_ttf
+
 # 0: Compile with gcc.
 # 1: Compile with clang.
 
@@ -86,8 +85,6 @@ FLAGS += -fsanitize=address -g -Og
 else
 FLAGS += -flto -O3 -march=native
 endif
-
-LIBS = -lSDL2 -lSDL2_ttf
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
