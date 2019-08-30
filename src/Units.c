@@ -38,7 +38,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
+        units = Units_Append(units, Unit_Make(cart, grid, y < 20 ? FILE_KNIGHT_IDLE : FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
