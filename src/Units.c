@@ -232,7 +232,7 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        return Point_Div(delta, 32); // XXX. What is a good divisor?
+        return Point_Div(delta, 64); // XXX. What is a good divisor?
     }
     return zero;
 }
