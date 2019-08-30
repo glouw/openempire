@@ -9,8 +9,11 @@
 #include "Grid.h"
 #include "Direction.h"
 
-typedef struct
+typedef struct unit Unit;
+
+struct unit
 {
+    Unit* unit_of_interest;
     const char* file_name;
     Point cart;
     Point cart_grid_offset;
@@ -19,7 +22,6 @@ typedef struct
     Point cell_last;
     Point velocity;
     Point group_alignment;
-    Point cell_of_interest;
     Point stressors;
     Points path;
     Color color;
@@ -47,8 +49,7 @@ typedef struct
     bool is_chasing;
     bool is_selected;
     bool is_fully_decayed;
-}
-Unit;
+};
 
 Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color, const Registrar graphics);
 
@@ -82,6 +83,6 @@ int32_t Unit_GetLastDecayTick(Unit* const);
 
 int32_t Unit_GetLastFallTick(Unit* const);
 
-void Unit_Melee(Unit* const, Unit* const);
+void Unit_Melee(Unit* const);
 
 void Unit_Repath(Unit* const, const Field);

@@ -44,7 +44,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
     if(unit->is_chasing)
-        Unit_SetDir(unit, Point_Sub(unit->cell_of_interest, unit->cell));
+        Unit_SetDir(unit, Point_Sub(unit->unit_of_interest->cell, unit->cell));
     else
     {
         const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
@@ -258,18 +258,19 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
-void Unit_Melee(Unit* const unit, Unit* const other)
+void Unit_Melee(Unit* const unit)
 {
-    if(!State_IsDead(unit->state)
-    && !State_IsDead(other->state))
+    if(unit->unit_of_interest != NULL
+    && !State_IsDead(unit->state)
+    && !State_IsDead(unit->unit_of_interest->state))
     {
-        const Point diff = Point_Sub(other->cell, unit->cell);
+        const Point diff = Point_Sub(unit->unit_of_interest->cell, unit->cell);
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             const int32_t last_tick = Unit_GetLastAttackTick(unit);
             if(unit->state_timer % (last_tick + 1) == 0)
-                other->health -= unit->attack;
+                unit->unit_of_interest->health -= unit->attack;
             static Point zero;
             unit->velocity = zero;
         }
