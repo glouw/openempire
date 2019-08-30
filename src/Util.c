@@ -8,15 +8,16 @@
 void Util_Log(const char* const message, ...)
 {
     static FILE* log;
+#if 1
+    log = stdout;
+#else
     static int log_count = 0;
     if(log_count++ == 0)
         log = fopen("log.txt", "w");
+#endif
     va_list args;
     va_start(args, message);
-    if(false)
-        vfprintf(log, message, args);
-    else
-        vfprintf(stdout, message, args);
+    vfprintf(log, message, args);
     va_end(args);
 }
 
