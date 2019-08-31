@@ -2,8 +2,6 @@
 
 This is a custom game engine for Age of Empires II written in pure C99 and SDL2 built for fast network play.
 
-The inspiration for this engine draws from combining core Age II mechanics and Rome Total War style battles.
-
 Data, art, and sound files are not supplied - to play Open Empires you must either own the original boxed-set
 of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on Steam.
 
@@ -45,10 +43,7 @@ http://glouw.com/2019/04/10/Reverse-Engineering-Age-of-Empires-2-Part-0.html
 
 ## Credits
 
-Thanks to the SFTech OpenAge team for their fantastic reverse engineering documentation.
-
-https://github.com/SFTtech/openage
-
-Thanks to Ensemble Studios for many gifted childhood memories.
-
-Thanks to Forgotten Empires for keeping the spirit of Age of Empires II alive.
+Thanks to:
+* SFTech OpenAge team for their fantastic reverse engineering documentation (https://github.com/SFTtech/openage)
+* Ensemble Studios for many gifted childhood memories
+* Forgotten Empires for keeping the spirit of Age of Empires II alive
