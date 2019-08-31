@@ -10,7 +10,6 @@
 // |         |
 // |         |
 // +---------+ (w/2, h/2)
-
 Rect Rect_GetGridCenter(const Grid grid)
 {
     const int32_t half_width = grid.tile_cart_width / 2;
@@ -44,7 +43,6 @@ int32_t Rect_GetArea(const Rect rect)
 // +---b   |
 // | C | --+
 // a---+
-
 Rect Rect_CorrectOrientation(const Rect rect)
 {
     const Rect a = {

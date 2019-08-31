@@ -54,7 +54,6 @@ static uint8_t Feed(uint8_t* const data, uint32_t* index)
 }
 
 // XXX. Sometimes scanlines have large streaks of black lines in them.
-
 Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, const Color color)
 {
     const int32_t player_palette_index = 16 * ((int32_t) color + 1);

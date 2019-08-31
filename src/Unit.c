@@ -4,9 +4,12 @@
 #include "Util.h"
 #include "Config.h"
 
+#define MOCK_PATH_POINTS (2)
+
 static void ConditionallySkipFirstPoint(Unit* const unit)
 {
-    if(unit->path.count > 1 && unit->path_index == 0)
+    if(unit->path.count > 1
+    && unit->path_index == 0)
         unit->path_index++;
 }
 
@@ -44,7 +47,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
     const Point accel = Point_Normalize(delta, unit->accel);
     unit->velocity = Point_Add(unit->velocity, accel);
     if(unit->is_chasing)
-        Unit_SetDir(unit, Point_Sub(unit->unit_of_interest->cell, unit->cell));
+        Unit_SetDir(unit, Point_Sub(unit->interest->cell, unit->cell));
     else
     {
         const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
@@ -222,16 +225,13 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     }
 }
 
-// A straight line path finder. Takes the unit from <cart_goal> to <cart_grid_offset_goal>. Field objects are totally ignored.
-// Use with best discretion.
-
 void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     if(!State_IsDead(unit->state))
     {
         Unit_FreePath(unit);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->path = Points_New(2);
+        unit->path = Points_New(MOCK_PATH_POINTS);
         unit->path = Points_Append(unit->path, unit->cart);
         unit->path = Points_Append(unit->path, cart_goal);
     }
@@ -260,17 +260,17 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
 
 void Unit_Melee(Unit* const unit)
 {
-    if(unit->unit_of_interest != NULL
+    if(unit->interest != NULL
     && !State_IsDead(unit->state)
-    && !State_IsDead(unit->unit_of_interest->state))
+    && !State_IsDead(unit->interest->state))
     {
-        const Point diff = Point_Sub(unit->unit_of_interest->cell, unit->cell);
+        const Point diff = Point_Sub(unit->interest->cell, unit->cell);
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
             Unit_UpdateFileByState(unit, STATE_ATTACK, false);
             const int32_t last_tick = Unit_GetLastAttackTick(unit);
             if(unit->state_timer % (last_tick + 1) == 0)
-                unit->unit_of_interest->health -= unit->attack;
+                unit->interest->health -= unit->attack;
             static Point zero;
             unit->velocity = zero;
         }
@@ -284,9 +284,9 @@ void Unit_Repath(Unit* const unit, const Field field)
     && unit->path.count > 0)
     {
         const Point cart_goal = unit->path.point[unit->path.count - 1];
-        if(unit->path.count < 3)
-            Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
-        else
+        if(unit->path.count > MOCK_PATH_POINTS)
             Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field);
+        else
+            Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
     }
 }

@@ -3,6 +3,7 @@
 #include "Surface.h"
 #include "Point.h"
 #include "Tile.h"
+#include "Config.h"
 #include "Vram.h"
 
 #include "Util.h"
@@ -119,7 +120,7 @@ void Video_Present(const Video video)
 int32_t Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input)
 {
     const int32_t t0 = SDL_GetTicks();
-    const Quad quad = Overview_GetRenderBox(overview, -200);
+    const Quad quad = Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET);
     const Points render_points = Quad_GetRenderPoints(quad);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
     const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, render_points);
@@ -143,3 +144,27 @@ int32_t Video_Render(const Video video, const Data data, const Map map, const Un
     CopyCanvas(video);
     return t1 - t0;
 }
+
+void Video_PrintPerformanceMonitor(const Video video, const Units units, const int32_t dtb, const int32_t dtd, const int32_t cycles)
+{
+    static int dtb_hold;
+    static int dtd_hold;
+    if(cycles % 10 == 0)
+    {
+        dtb_hold = dtb;
+        dtd_hold = dtd;
+    }
+    Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
+            "units.count   : %6d\n"
+            "dt (ms) unit  : %6d\n"
+            "dt (ms) video : %6d\n"
+            "dt (ms) total : %6d\n"
+            "cycles        : %6d\n"
+            ,
+            units.count,
+            dtb_hold,
+            dtd_hold,
+            dtb_hold + dtd_hold,
+            cycles);
+}
+

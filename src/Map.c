@@ -93,10 +93,6 @@ void Map_Edit(const Map map, const Overview overview, const Input input)
     }
 }
 
-// Before a point is appended, ensure that:
-//   1. A tile is not out of bounds.
-//   2. The priority of the inner tile is greater than that of the outer tile.
-
 Points Map_GetBlendBox(const Map map, const Point inner)
 {
     const int32_t width = 1;
@@ -123,9 +119,6 @@ static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
     const Points box = Map_GetBlendBox(map, inner);
     for(int32_t j = 0; j < box.count; j++)
     {
-        // Outer tile is partially transparent blended tile.
-        // Inner tile is a solid inner tile.
-
         const Terrain file = Map_GetTerrainFile(map, inner);
         const Point outer = box.point[j];
         const Line line = { inner, outer, file };
@@ -134,8 +127,6 @@ static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
     Points_Free(box);
     return lines;
 }
-
-// Blend lines indicate tile blending by direction.
 
 Lines Map_GetBlendLines(const Map map, const Points render_points)
 {

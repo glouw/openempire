@@ -37,3 +37,5 @@ int32_t Video_Render(const Video, const Data, const Map, const Units, const Over
 void Video_RenderDataDemo(const Video, const Data, const Color);
 
 void Video_Present(const Video);
+
+void Video_PrintPerformanceMonitor(const Video, const Units, const int32_t dtb, const int32_t dtd, const int32_t cycles);

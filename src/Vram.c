@@ -133,9 +133,7 @@ static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
     free(threads);
 }
 
-// See:
-//   https://gist.github.com/XProger/96253e93baccfbf338de
-
+// See: https://gist.github.com/XProger/96253e93baccfbf338de
 static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
 {
     uint32_t rb = top_pixel & 0xFF00FF;
@@ -199,13 +197,10 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
     const Point inner = line.inner;
     const Point outer = line.outer;
     const Terrain file = Map_GetTerrainFile(map, inner);
-
     // The outer tile uses the outer tile animation,
     // but with the inner file so that the correct surface can be looked up.
-
     const Animation outer_animation = terrain.animation[COLOR_BLU][file];
     const Tile outer_tile = Tile_GetTerrain(overview, outer, outer_animation, file);
-
     const Mode blend_mode = blendomatic.mode[0]; // XXX: Which mode? How to choose?
     const int32_t blend_id = Mode_GetBlendIndex(inner, outer);
     DrawTileMask(vram, outer_tile, blend_mode.mask_real[blend_id]);
@@ -246,7 +241,6 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
         // Since lines are sorted by outer tiles, an outer tile may get shared
         // across threads. To counteract that, advance the index of the end of the slice
         // to a new outer blend tile.
-
         const Point prev = lines.line[index - 1].outer;
         const Point curr = lines.line[index - 0].outer;
         if(Point_Equal(prev, curr))
@@ -296,7 +290,6 @@ void Vram_DrawUnits(const Vram vram, const Tiles tiles)
 }
 
 // XXX. Only useful for debugging the path finder and is not used in the final engine as units are not sorted by depth.
-
 void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -324,10 +317,8 @@ static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_
             Put(vram, point.x, point.y, color);
 }
 
-// See:
-//    https://gist.github.com/bert/1085538
-
-static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color)
+// See: https://gist.github.com/bert/1085538
+static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color) // XXX. PLEASE CLEANUP. THERE ARE NEATER ALGOS OUT THERE.
 {
     int32_t x0 = rect.a.x;
     int32_t y0 = rect.a.y;

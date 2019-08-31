@@ -1,9 +1,6 @@
 #include "Quad.h"
 
-// See:
-//   https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
-// Maybe there is a faster and cleaner way?
-
+// See: https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
 static bool Inside(Point s, const Point a, const Point b, const Point c)
 {
     const int32_t as_x = s.x - a.x;

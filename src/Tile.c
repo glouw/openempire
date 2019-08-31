@@ -17,7 +17,6 @@ bool Tile_IsHotspotInRect(const Tile tile, const Rect rect)
 // |         |
 // |         |
 // +---------b
-
 Rect Tile_GetFrameOutline(const Tile tile)
 {
     const Point dimensions = { tile.frame.width, tile.frame.height };
@@ -34,7 +33,6 @@ Rect Tile_GetFrameOutline(const Tile tile)
 // |     *   |
 // |         |
 // +---------b
-
 bool Tile_ContainsPoint(const Tile tile, const Point point)
 {
     const Rect rect = Tile_GetFrameOutline(tile);
@@ -49,7 +47,6 @@ bool Tile_ContainsPoint(const Tile tile, const Point point)
 // |       +------b    |
 // |                   |
 // +-------------------+ (xres, yres)
-
 static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
 {
     const Rect rect = Tile_GetFrameOutline(tile);
@@ -63,9 +60,7 @@ static Tile Clip(Tile tile, const Overview overview)
 {
     if(!OnScreen(tile, overview.xres, overview.yres))
         tile.needs_clipping = true;
-
     // XXX: Need a totally out of bounds one to ease render time.
-
     return tile;
 }
 
@@ -101,10 +96,8 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
     const int32_t ticks = reference->state_timer / (reference->state == STATE_DECAY ? CONFIG_ANIMATION_DECAY_DIVISOR : CONFIG_ANIMATION_DIVISOR);
     const int32_t frame = ticks % frames_per_direction;
     const int32_t index = frames_per_direction * fixed_dir + frame;
-
     // A little unfortunate, but the hot spots for the terrain tiles are not centered.
     // Units must therefor be forced to the terrain tile positions.
-
     const Point south = { 0, 1 };
     const Point shifted = Point_Add(cart, south);
     const uint8_t height = Graphics_GetHeight(reference->file);
@@ -136,5 +129,5 @@ Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_
 void Tile_Select(const Tile tile)
 {
     if(!State_IsDead(tile.reference->state))
-        tile.reference->is_selected = true; // XXX. How will the work over multiplayer without md5sum screwups?
+        tile.reference->is_selected = true;
 }

@@ -9,11 +9,9 @@
 #include "Grid.h"
 #include "Direction.h"
 
-typedef struct unit Unit;
-
-struct unit
+typedef struct Unit
 {
-    Unit* unit_of_interest;
+    struct Unit* interest;
     const char* file_name;
     Point cart;
     Point cart_grid_offset;
@@ -49,7 +47,8 @@ struct unit
     bool is_chasing;
     bool is_selected;
     bool is_fully_decayed;
-};
+}
+Unit;
 
 Unit Unit_Make(const Point cart, const Grid, const Graphics file, const Color, const Registrar graphics);
 

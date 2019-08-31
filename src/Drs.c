@@ -31,17 +31,10 @@ Drs Drs_Load(const char* const path)
     UTIL_FREAD(drs.ftype, sizeof(drs.ftype) - 1, drs.fp);
     UTIL_FREAD(&drs.table_count, 1, drs.fp);
     UTIL_FREAD(&drs.file_offset, 1, drs.fp);
-
     drs.table = UTIL_ALLOC(Table, drs.table_count);
     UTIL_CHECK(drs.table);
-
-    // Order of operations matter; tables are packed together.
-
     for(int32_t i = 0; i < drs.table_count; i++)
         drs.table[i] = Table_Load(drs.fp);
-
-    // Files are packed together.
-
     for(int32_t i = 0; i < drs.table_count; i++)
     for(int32_t j = 0; j < drs.table[i].num_files; j++)
         drs.table[i].file[j] = File_Load(drs.fp);

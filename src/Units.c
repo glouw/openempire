@@ -130,13 +130,14 @@ static bool OutOfBounds(const Units units, const Point point)
 
 static Stack* GetStack(const Units units, const Point p)
 {
-    return &units.stack[p.x + p.y * units.cols]; // Implies cartesian.
+    return &units.stack[p.x + p.y * units.cols];
 }
 
+// Returns a shallow copy of the stack to prevent write access.
 Stack Units_GetStackCart(const Units units, const Point p)
 {
     static Stack zero;
-    return OutOfBounds(units, p) ? zero : *GetStack(units, p); // Return a shallow copy of the stack to prevent write access.
+    return OutOfBounds(units, p) ? zero : *GetStack(units, p);
 }
 
 static Units UnSelectAll(Units units)
@@ -357,15 +358,6 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     }
 }
 
-// Boids, when reaching their final destination, will struggle in
-// a "mosh pit" like style to reach the final point in the grid tile.
-// A simple solution is to stop all boids from reaching their final point
-// within a grid tile by stopping all boids within the grid tile.
-// This will create a propogation effect to nearby units as units on grid borders
-// will update neighboring units on neighboring tiles.
-//
-// DO NOT multithread.
-
 static void ConditionallyStopBoids(const Units units, Unit* const unit)
 {
     if(!State_IsDead(unit->state))
@@ -432,10 +424,14 @@ static void ChaseBoids(const Units units, Unit* const unit)
         if(closest != NULL)
         {
             unit->is_chasing = true;
-            unit->unit_of_interest = closest;
+            unit->interest = closest;
             Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
         }
-        else unit->is_chasing = false;
+        else
+        {
+            unit->is_chasing = false;
+            unit->interest = NULL;
+        }
     }
 }
 
@@ -550,9 +546,7 @@ static int32_t RunFlowNeedle(void* data)
     return 0;
 }
 
-// See the boids pseudocode:
-//   http://www.kfish.org/boids/pseudocode.html
-
+// See the boids pseudocode: http://www.kfish.org/boids/pseudocode.html
 static void ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
 {
     BulkProcess(units, map, grid, RunStressorNeedle);
@@ -684,10 +678,9 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     return units;
 }
 
+// Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
 {
-    // Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
-
     ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
@@ -699,7 +692,7 @@ bool Units_CanWalk(const Units units, const Map map, const Point point)
 {
     const Terrain terrain = Map_GetTerrainFile(map, point);
     const Stack stack = Units_GetStackCart(units, point);
-    return stack.reference != NULL // Out of bounds check.
+    return stack.reference != NULL
         && Terrain_IsWalkable(terrain)
         && Stack_IsWalkable(stack);
 }

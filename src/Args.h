@@ -14,4 +14,4 @@ typedef struct
 }
 Args;
 
-Args Args_Parse(int32_t argc, char* argv[]);
+Args Args_Parse(const int32_t argc, const char* argv[]);

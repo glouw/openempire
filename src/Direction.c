@@ -2,7 +2,6 @@
 
 // Unit sprites are only packed with 5 directions in the SLP files.
 // The remaining 3 directions are improvised by flipping 3 of the 5 directions.
-
 Direction Direction_Fix(const Direction dir, bool* const flip_vert)
 {
     if(dir > DIRECTION_N)

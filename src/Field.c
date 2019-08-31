@@ -6,10 +6,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-// Fields are one long string representing walkable tiles on the map.
-// A walkable tile, like grass, dirt, or snow, are marked by a space character.
-// An unwalkable tile is any other character.
-
 static bool IsInBounds(const Field field, const Point point)
 {
     return point.x < field.cols && point.x >= 0
