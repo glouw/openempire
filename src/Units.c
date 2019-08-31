@@ -148,12 +148,9 @@ static Units UnSelectAll(Units units)
     return units;
 }
 
-static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics)
+static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics, const Points render_points)
 {
-    // XXX. This cannot use render box else will desync.
-    const Quad quad = Overview_GetRenderBox(overview, -200); // XXX, Border needs to be equal to largest building size.
-    const Points points = Quad_GetRenderPoints(quad);
-    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, points); // XXX. A little excessive, as this is done in the renderer, but its gets the job done.
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
     if(input.lu)
     {
         units = UnSelectAll(units);
@@ -170,7 +167,6 @@ static Units Select(Units units, const Overview overview, const Input input, con
                 units.select_count = 1;
         }
     }
-    Points_Free(points);
     Tiles_Free(tiles);
     return units;
 }
@@ -667,9 +663,9 @@ static Units RemoveTheDecayed(const Units units)
     return ResizeDecayed(units);
 }
 
-static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field)
+static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
 {
-    units = Select(units, overview, input, graphics);
+    units = Select(units, overview, input, graphics, render_points);
     units = Command(units, overview, input, map, field);
     Tick(units);
     Decay(units);
@@ -679,12 +675,12 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
 }
 
 // Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
     ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
-    units = ManageAction(units, graphics, overview, input, map, field);
+    units = ManageAction(units, graphics, overview, input, map, field, render_points);
     return units;
 }
 

@@ -1,5 +1,6 @@
 #include "Video.h"
 #include "Input.h"
+#include "Config.h"
 #include "Units.h"
 #include "Args.h"
 
@@ -20,15 +21,15 @@ int main(const int argc, const char* argv[])
         {
             const int32_t t0 = SDL_GetTicks();
             const Field field = Units_Field(units, map);
+            const Quad quad = Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET);
+            const Points render_points = Quad_GetRenderPoints(quad);
             Map_Edit(map, overview, input);
             overview = Overview_Update(overview, input);
-            const int32_t ta = SDL_GetTicks();
-            units = Units_Caretake(units, data.graphics, overview, grid, input, map, field);
-            const int32_t tb = SDL_GetTicks();
-            const int32_t dtd = Video_Render(video, data, map, units, overview, input);
+            units = Units_Caretake(units, data.graphics, overview, grid, input, map, field, render_points);
+            const int32_t dt = Video_Render(video, data, map, units, overview, input, render_points);
+            Video_PrintPerformanceMonitor(video, units, dt, cycles);
             Field_Free(field);
-            const int32_t dtb = tb - ta;
-            Video_PrintPerformanceMonitor(video, units, dtb, dtd, cycles);
+            Points_Free(render_points);
             Video_Present(video);
             const int32_t t1 = SDL_GetTicks();
             const int32_t ms = 1000 / 60 - (t1 - t0);
