@@ -7,47 +7,28 @@
 
 typedef struct
 {
-    // Keyboard state.
-
     const uint8_t* key;
-
-    // User closed window.
-
     bool done;
-
-    // Mouse position.
-
     Point point;
-
-    // Mouse deltas.
-
     int32_t dx;
     int32_t dy;
-
-    // Mouse button is pushed (Left, Middle, Right):
-
+    // State held.
     int32_t l;
     int32_t m;
     int32_t r;
-
-    // Mouse button was up last frame (Left, Middle, Right).
-
+    // State up.
     int32_t lu;
     int32_t mu;
     int32_t ru;
-
-    // Mouse button was down last frame (Left, Middle, Right).
-
+    // State down.
     int32_t ld;
     int32_t md;
     int32_t rd;
-
-    // Last states (Left, middle, right).
-
+    // State last.
     int32_t ll;
     int32_t lm;
     int32_t lr;
-
+    // Point of last left and right down state.
     Point ld_point;
     Point rd_point;
 }

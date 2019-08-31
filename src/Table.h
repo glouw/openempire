@@ -4,10 +4,10 @@
 
 typedef struct
 {
-    char file_extension[5];
+    File* file;
     int32_t file_info_offset;
     int32_t num_files;
-    File* file;
+    char file_extension[5];
 }
 Table;
 

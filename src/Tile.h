@@ -16,13 +16,13 @@
 
 typedef struct
 {
+    Unit* reference;
+    SDL_Surface* surface;
     Frame frame;
     Point iso_pixel;
     Point iso_pixel_offset;
-    SDL_Surface* surface;
-    bool needs_clipping;
     uint8_t height;
-    Unit* reference;
+    bool needs_clipping;
     bool flip_vert;
 }
 Tile;

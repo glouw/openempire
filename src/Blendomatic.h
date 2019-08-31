@@ -7,9 +7,9 @@
 
 typedef struct
 {
+    Mode* mode;
     uint32_t nr_blending_modes;
     uint32_t nr_tiles;
-    Mode* mode;
 }
 Blendomatic;
 

@@ -12,10 +12,10 @@
 
 typedef struct
 {
-    uint32_t tile_size;
     uint8_t* tile_flags;
     uint8_t* tile_bit_mask;
     uint8_t* tile_byte_mask;
+    uint32_t tile_size;
     SDL_Surface** mask_demo;
     SDL_Surface** mask_real;
     Frame frame;

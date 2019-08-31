@@ -6,16 +6,16 @@
 
 typedef struct
 {
-    int32_t prio;
     Point point;
+    int32_t prio;
 }
 Step;
 
 typedef struct
 {
+    Step* step;
     int32_t size;
     int32_t max;
-    Step* step;
 }
 Meap;
 

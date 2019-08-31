@@ -9,16 +9,14 @@
 
 // Units are arranged in a linear array, but also referenced with
 // a 2D tile array for quick point lookups.
-//
 // Given multiple units occupy the same tile, a unit stack
 // can reference multiple units per tile.
-
 typedef struct
 {
     Unit* unit;
+    Stack* stack;
     int32_t count;
     int32_t max;
-    Stack* stack;
     int32_t rows;
     int32_t cols;
     int32_t id_next;

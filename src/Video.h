@@ -13,15 +13,15 @@
 
 typedef struct
 {
+    const char* title;
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* canvas;
-    const char* title;
+    SDL_Cursor* cursor;
     Text text;
     Text text_small;
     int32_t xres;
     int32_t yres;
-    SDL_Cursor* cursor;
     Point middle;
     Point bot_rite;
     Point top_left;

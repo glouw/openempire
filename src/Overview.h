@@ -10,9 +10,9 @@ typedef struct
 {
     Point point;
     Grid grid;
+    Rect selection_box;
     int32_t xres;
     int32_t yres;
-    Rect selection_box;
 }
 Overview;
 

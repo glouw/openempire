@@ -10,9 +10,9 @@
 typedef struct
 {
     Unit** reference;
+    Point center_of_mass;
     int32_t count;
     int32_t max;
-    Point center_of_mass;
 }
 Stack;
 

@@ -7,7 +7,7 @@ Stack Stack_Build(const int32_t max)
     static Point zero;
     Unit** const reference = UTIL_ALLOC(Unit*, max);
     UTIL_CHECK(reference);
-    const Stack stack = { reference, 0, max, zero };
+    const Stack stack = { reference, zero, 0, max };
     return stack;
 }
 

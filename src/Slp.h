@@ -8,11 +8,11 @@
 
 typedef struct
 {
-    char version[5];
-    uint32_t num_frames;
-    char comment[25];
     Frame* frame;
     Image* image;
+    char version[5];
+    char comment[25];
+    uint32_t num_frames;
 }
 Slp;
 

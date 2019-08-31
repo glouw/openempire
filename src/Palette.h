@@ -6,10 +6,10 @@
 
 typedef struct
 {
-    char label[16];
-    char version[8];
     uint32_t* color;
     int32_t count;
+    char label[16];
+    char version[8];
 }
 Palette;
 

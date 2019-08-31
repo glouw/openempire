@@ -45,17 +45,17 @@ static void Grow(Meap* const meap)
 void Meap_Insert(Meap* const meap, const int32_t prio, const Point point)
 {
     Grow(meap);
-    const Step node = { prio, point };
+    const Step step = { point, prio };
     int32_t index = meap->size++;
     while(index > 0)
     {
         const int32_t p = (index - 1) / 2;
-        if(node.prio > meap->step[p].prio)
+        if(step.prio > meap->step[p].prio)
             break;
         meap->step[index] = meap->step[p];
         index = p;
     }
-    meap->step[index] = node;
+    meap->step[index] = step;
 }
 
 Step Meap_Delete(Meap* const meap)
@@ -63,10 +63,10 @@ Step Meap_Delete(Meap* const meap)
     if(meap->size)
     {
         const int32_t index = 0;
-        const Step node = meap->step[index];
+        const Step step = meap->step[index];
         meap->step[index] = meap->step[--meap->size];
         Heapify(meap, index);
-        return node;
+        return step;
     }
     static Step zero;
     free(meap->step);

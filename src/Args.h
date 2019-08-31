@@ -7,10 +7,10 @@
 
 typedef struct
 {
-    bool demo;
-    bool measure;
     const char* path;
     Color color;
+    bool demo;
+    bool measure;
 }
 Args;
 
