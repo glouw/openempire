@@ -110,9 +110,9 @@ void Unit_Move(Unit* const unit, const Grid grid)
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
     UpdateCart(unit, grid);
-    Unit_UpdateFileByState(unit, STATE_MOVE, false);
+    Unit_SetState(unit, STATE_MOVE, false, false);
     if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
-        Unit_UpdateFileByState(unit, STATE_IDLE, false);
+        Unit_SetState(unit, STATE_IDLE, false, false);
 }
 
 static Graphics GetFileFromState(Unit* const unit, const State state)
@@ -123,13 +123,30 @@ static Graphics GetFileFromState(Unit* const unit, const State state)
     return file;
 }
 
-void Unit_UpdateFileByState(Unit* const unit, const State state, const bool reset_state_timer)
+void Unit_Lock(Unit* const unit)
 {
-    const Graphics file = GetFileFromState(unit, state);
-    unit->state = state;
-    unit->file = file;
-    if(reset_state_timer)
-        unit->state_timer = 0;
+    unit->is_state_locked = true;
+}
+
+void Unit_Unlock(Unit* const unit)
+{
+    unit->is_state_locked = false;
+}
+
+void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer, const bool lock)
+{
+    if(!unit->is_state_locked)
+    {
+        if(lock)
+            Unit_Lock(unit);
+        else
+            Unit_Unlock(unit);
+        const Graphics file = GetFileFromState(unit, state);
+        unit->state = state;
+        unit->file = file;
+        if(reset_state_timer)
+            unit->state_timer = 0;
+    }
 }
 
 static int32_t GetFramesFromState(Unit* const unit, const State state, const Registrar graphics)
@@ -239,8 +256,9 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
 
 void Unit_Kill(Unit* const unit)
 {
+    Unit_Unlock(unit);
     unit->health = 0;
-    Unit_UpdateFileByState(unit, STATE_FALL, true);
+    Unit_SetState(unit, STATE_FALL, true, false);
 }
 
 int32_t Unit_GetLastAttackTick(Unit* const unit)
@@ -267,14 +285,18 @@ void Unit_Melee(Unit* const unit)
         const Point diff = Point_Sub(unit->interest->cell, unit->cell);
         if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
         {
-            Unit_UpdateFileByState(unit, STATE_ATTACK, false);
-            const int32_t last_tick = Unit_GetLastAttackTick(unit);
-            if(unit->state_timer % (last_tick + 1) == 0)
+            Unit_SetState(unit, STATE_ATTACK, true, true);
+            if(unit->state_timer == Unit_GetLastAttackTick(unit))
+            {
+                // Unit_Kill() is purposely not used so that all units of all colors get an equal chance to make a hit.
                 unit->interest->health -= unit->attack;
+                Unit_Unlock(unit);
+            }
             static Point zero;
             unit->velocity = zero;
         }
     }
+    else Unit_Unlock(unit);
 }
 
 void Unit_Repath(Unit* const unit, const Field field)

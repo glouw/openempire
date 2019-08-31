@@ -47,6 +47,7 @@ typedef struct Unit
     bool is_chasing;
     bool is_selected;
     bool is_fully_decayed;
+    bool is_state_locked;
 }
 Unit;
 
@@ -62,9 +63,13 @@ void Unit_Print(Unit* const);
 
 void Unit_Flow(Unit* const, const Grid);
 
-bool Unit_InPlatoon(Unit* const unit, Unit* const other);
+bool Unit_InPlatoon(Unit* const, Unit* const other);
 
-void Unit_UpdateFileByState(Unit* const, const State, const bool reset_state_timer);
+void Unit_Lock(Unit* const);
+
+void Unit_Unlock(Unit* const);
+
+void Unit_SetState(Unit* const, const State, const bool reset_state_timer, const bool lock);
 
 void Unit_FreePath(Unit* const);
 

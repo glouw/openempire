@@ -30,15 +30,15 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
+static Units GenerateBattleZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-#if 1
     const int32_t depth = 5;
     for(int32_t x = 0; x < depth; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, y < 20 ? FILE_KNIGHT_IDLE : FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
+        const Graphics file = y < map.rows / 3 ? FILE_KNIGHT_IDLE : FILE_TEUTONIC_KNIGHT_IDLE;
+        units = Units_Append(units, Unit_Make(cart, grid, file, COLOR_BLU, graphics));
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
@@ -63,17 +63,30 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
         }
     }
     Field_Free(field);
-#else
-    const Point a = { 21, 21 };
-    const Point b = { 20, 20 };
-    const Point c = { 22, 23 };
-    const Point d = { 20, 21 };
-    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    //units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    //units = Units_Append(units, Unit_Make(c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    //units = Units_Append(units, Unit_Make(d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-#endif
     return units;
+}
+
+static Units GenerateVillieZone(Units units, const Grid grid, const Registrar graphics)
+{
+    const Point a = { 0, 0 };
+    const Point b = { 0, 2 };
+    const Point c = { 2, 0 };
+    const Point d = { 2, 2 };
+    const Point e = { 1, 1 };
+    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(e, grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics));
+    return units;
+}
+
+static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
+{
+    if(1)
+        return GenerateBattleZone(units, map, grid, graphics);
+    else
+        return GenerateVillieZone(units, grid, graphics);
 }
 
 Units Units_New(const int32_t max, const Map map, const Grid grid, const Registrar graphics)
@@ -603,7 +616,7 @@ static void Decay(const Units units)
         if(unit->state == STATE_FALL
         && unit->state_timer == last_tick)
         {
-            Unit_UpdateFileByState(unit, STATE_DECAY, true);
+            Unit_SetState(unit, STATE_DECAY, true, true);
             unit->is_selected = false;
         }
     }
