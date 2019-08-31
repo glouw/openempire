@@ -38,7 +38,9 @@ static void Grow(Meap* const meap)
     if(meap->size == meap->max)
     {
         meap->max *= 2;
-        meap->step = UTIL_REALLOC(meap->step, Step, meap->max);
+        Step* const step = UTIL_REALLOC(meap->step, Step, meap->max);
+        UTIL_CHECK(step);
+        meap->step = step;
     }
 }
 
