@@ -14,7 +14,7 @@ File File_Load(FILE* const fp)
 
 void File_Print(const File file)
 {
-    Util_Log("\t\t\tid          : %d\n", file.id);
-    Util_Log("\t\t\tdata offset : %d\n", file.data_offset);
-    Util_Log("\t\t\tsize        : %d\n", file.size);
+    fprintf(stderr, "\t\t\tid          : %d\n", file.id);
+    fprintf(stderr, "\t\t\tdata offset : %d\n", file.data_offset);
+    fprintf(stderr, "\t\t\tsize        : %d\n", file.size);
 }

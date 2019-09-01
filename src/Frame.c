@@ -22,12 +22,12 @@ Frame Frame_Load(FILE* const fp)
 
 void Frame_Print(const Frame frame)
 {
-    Util_Log("\t\tcmd_table_offset     : %d\n", frame.cmd_table_offset);
-    Util_Log("\t\toutline_table_offset : %d\n", frame.outline_table_offset);
-    Util_Log("\t\tpalette_offset       : %d\n", frame.palette_offset);
-    Util_Log("\t\tproperties           : %d\n", frame.properties);
-    Util_Log("\t\twidth                : %d\n", frame.width);
-    Util_Log("\t\theight               : %d\n", frame.height);
-    Util_Log("\t\thotspot_x            : %d\n", frame.hotspot_x);
-    Util_Log("\t\thotspot_y            : %d\n", frame.hotspot_y);
+    fprintf(stderr, "\t\tcmd_table_offset     : %d\n", frame.cmd_table_offset);
+    fprintf(stderr, "\t\toutline_table_offset : %d\n", frame.outline_table_offset);
+    fprintf(stderr, "\t\tpalette_offset       : %d\n", frame.palette_offset);
+    fprintf(stderr, "\t\tproperties           : %d\n", frame.properties);
+    fprintf(stderr, "\t\twidth                : %d\n", frame.width);
+    fprintf(stderr, "\t\theight               : %d\n", frame.height);
+    fprintf(stderr, "\t\thotspot_x            : %d\n", frame.hotspot_x);
+    fprintf(stderr, "\t\thotspot_y            : %d\n", frame.hotspot_y);
 }

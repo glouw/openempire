@@ -53,7 +53,7 @@ void Points_Print(const Points points)
 {
     for(int32_t i = 0; i < points.count; i++)
         Point_Print(points.point[i]);
-    Util_Log("\n");
+    fprintf(stderr, "\n");
 }
 
 static Points Drop(Points points, Point* point)

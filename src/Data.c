@@ -12,7 +12,7 @@ Data Data_Load(const char* const path)
     data.interfac = Registrar_LoadInterfac(path);
     data.blendomatic = Blendomatic_Load(path, data.terrain);
     const int32_t t1 = SDL_GetTicks();
-    Util_Log("Data load time: %d ms\n", t1 - t0);
+    fprintf(stderr, "Data load time: %d ms\n", t1 - t0);
     return data;
 }
 

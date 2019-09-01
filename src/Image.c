@@ -49,18 +49,18 @@ Image Image_Load(const int32_t height, const int32_t size, FILE* const fp)
 
 void Image_Print(const Image image)
 {
-    Util_Log("\t\t\tpadding:\n");
+    fprintf(stderr, "\t\t\tpadding:\n");
     for(int32_t i = 0; i < image.height; i++)
     {
         const bool transparent = Outline_IsTransparent(image.outline_table[i]);
-        Util_Log("\t\t\t\t%3d: transparent = %d\n", i, transparent);
+        fprintf(stderr, "\t\t\t\t%3d: transparent = %d\n", i, transparent);
     }
-    Util_Log("\t\t\tcmd_table:\n");
+    fprintf(stderr, "\t\t\tcmd_table:\n");
     for(int32_t i = 0; i < image.height; i++)
     {
         const uint32_t address = image.cmd_table[i];
         const uint8_t cmd = image.data[address];
-        Util_Log("\t\t\t\t%3d: 0x%08X -> 0x%02X\n", i, address, cmd);
+        fprintf(stderr, "\t\t\t\t%3d: 0x%08X -> 0x%02X\n", i, address, cmd);
     }
 }
 

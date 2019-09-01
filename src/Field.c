@@ -47,7 +47,7 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     return Points_Append(path, start);
 }
 
-Points Field_PathGreedyBest(const Field field, const Point start, const Point goal)
+Points Field_PathGreedyBest(const Field field, const Point start, const Point goal) // XXX: May get stuck in place if greedy best as the path finder runs every half a second or so (two best paths can be found).
 {
     Meap frontier = Meap_Init();
     Meap_Insert(&frontier, 0, start);

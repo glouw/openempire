@@ -4,14 +4,14 @@
 
 void Palette_Print(const Palette palette)
 {
-    Util_Log("label   : %s\n", palette.label);
-    Util_Log("version : %s\n", palette.version);
+    fprintf(stderr, "label   : %s\n", palette.label);
+    fprintf(stderr, "version : %s\n", palette.version);
     for(int32_t i = 0; i < palette.count; i++)
     {
         const uint32_t color = palette.color[i];
-        Util_Log("%3d : %3d %3d %3d\n", i, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+        fprintf(stderr, "%3d : %3d %3d %3d\n", i, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
     }
-    Util_Log("count   : %d\n", palette.count);
+    fprintf(stderr, "count   : %d\n", palette.count);
 }
 
 Palette Palette_Load(const Drs interfac, const int32_t palette_offset)

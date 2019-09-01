@@ -57,6 +57,6 @@ void Lines_Print(const Lines lines)
     for(int32_t i = 0; i < lines.count; i++)
     {
         const Line line = lines.line[i];
-        Util_Log("%4d :: %4ld %4ld %4ld %4ld\n", i, line.inner.x, line.inner.y, line.outer.x, line.outer.y);
+        fprintf(stderr, "%4d :: %4d %4d %4d %4d\n", i, line.inner.x, line.inner.y, line.outer.x, line.outer.y);
     }
 }

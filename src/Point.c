@@ -13,7 +13,7 @@ bool Point_Equal(const Point a, const Point b)
 
 void Point_Print(const Point a)
 {
-    Util_Log("%d %d\n", a.x, a.y);
+    fprintf(stderr, "%d %d\n", a.x, a.y);
 }
 
 Point Point_Add(const Point a, const Point b)

@@ -2,6 +2,7 @@
 
 #include "Rect.h"
 #include "Util.h"
+#include "Log.h"
 #include "Config.h"
 
 #define MOCK_PATH_POINTS (2)
@@ -184,25 +185,26 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
 
 void Unit_Print(Unit* const unit)
 {
-    Util_Log("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
-    Util_Log("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
-    Util_Log("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
-    Util_Log("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
-    Util_Log("max_speed             :: %d\n",    unit->max_speed);
-    Util_Log("accel                 :: %d\n",    unit->accel);
-    Util_Log("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
-    Util_Log("path_index_timer      :: %d\n",    unit->path_index_timer);
-    Util_Log("path_index            :: %d\n",    unit->path_index);
-    Util_Log("path.count            :: %d\n",    unit->path.count);
-    Util_Log("selected              :: %d\n",    unit->is_selected);
-    Util_Log("file                  :: %d\n",    unit->file);
-    Util_Log("file_name             :: %s\n",    unit->file_name);
-    Util_Log("id                    :: %d\n",    unit->id);
-    Util_Log("command_group         :: %d\n",    unit->command_group);
-    Util_Log("health                :: %d\n",    unit->health);
-    Util_Log("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
-    Util_Log("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
-    Util_Log("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
+    Log_Append("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
+    Log_Append("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+    Log_Append("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
+    Log_Append("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
+    Log_Append("max_speed             :: %d\n",    unit->max_speed);
+    Log_Append("accel                 :: %d\n",    unit->accel);
+    Log_Append("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
+    Log_Append("path_index_timer      :: %d\n",    unit->path_index_timer);
+    Log_Append("path_index            :: %d\n",    unit->path_index);
+    Log_Append("path.count            :: %d\n",    unit->path.count);
+    Log_Append("selected              :: %d\n",    unit->is_selected);
+    Log_Append("file                  :: %d\n",    unit->file);
+    Log_Append("file_name             :: %s\n",    unit->file_name);
+    Log_Append("id                    :: %d\n",    unit->id);
+    Log_Append("command_group         :: %d\n",    unit->command_group);
+    Log_Append("health                :: %d\n",    unit->health);
+    Log_Append("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
+    Log_Append("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
+    Log_Append("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
+    Log_Append("\n");
 }
 
 void ApplyStressors(Unit* const unit)

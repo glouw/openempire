@@ -7,15 +7,15 @@
 
 void Drs_Print(const Drs drs)
 {
-    Util_Log("path        : %s\n", drs.path);
-    Util_Log("copyright   : %s\n", drs.copyright);
-    Util_Log("version     : %s\n", drs.version);
-    Util_Log("ftype       : %s\n", drs.ftype);
-    Util_Log("table_count : %d\n", drs.table_count);
-    Util_Log("file_offset : %d\n", drs.file_offset);
+    fprintf(stderr, "path        : %s\n", drs.path);
+    fprintf(stderr, "copyright   : %s\n", drs.copyright);
+    fprintf(stderr, "version     : %s\n", drs.version);
+    fprintf(stderr, "ftype       : %s\n", drs.ftype);
+    fprintf(stderr, "table_count : %d\n", drs.table_count);
+    fprintf(stderr, "file_offset : %d\n", drs.file_offset);
     for(int32_t i = 0; i < drs.table_count; i++)
     {
-        Util_Log("\tTable %d\n", i);
+        fprintf(stderr, "\tTable %d\n", i);
         Table_Print(drs.table[i]);
     }
 }
