@@ -2,6 +2,7 @@
 
 #include "Meap.h"
 #include "Util.h"
+#include "Config.h"
 
 #include <string.h>
 #include <stdbool.h>
@@ -54,11 +55,18 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
     const Point none = { -1, -1 };
     for(int32_t i = 0; i < field.rows * field.cols; i++)
         came_from = Points_Append(came_from, none);
-    while(frontier.size > 0)
+    for(int32_t tries = 0; frontier.size > 0; tries++)
     {
         Step current = Meap_Delete(&frontier);
+        // Early exit - goal reached.
         if(Point_Equal(current.point, goal))
             break;
+        // Early exit - impossible goal.
+        if(tries > CONFIG_FIELD_MAX_PATHING_TRIES)
+        {
+            static Points zero;
+            return zero;
+        }
         const Point deltas[] = {
             { -1, +1 }, { 0, +1 }, { 1, +1 },
             { -1,  0 }, /* ---- */ { 1,  0 },

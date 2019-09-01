@@ -397,7 +397,7 @@ static void Kill(const Units units)
 
 static Unit* GetClosestBoid(const Units units, Unit* const unit)
 {
-    const int32_t width = 2;
+    const int32_t width = 1;
     Unit* closest = NULL;
     int32_t max = INT32_MAX;
     for(int32_t x = -width; x <= width; x++)

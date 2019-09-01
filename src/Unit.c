@@ -288,8 +288,7 @@ void Unit_Melee(Unit* const unit)
             Unit_SetState(unit, STATE_ATTACK, true, true);
             if(unit->state_timer == Unit_GetLastAttackTick(unit))
             {
-                // Unit_Kill() is purposely not used so that all units of all colors get an equal chance to make a hit.
-                unit->interest->health -= unit->attack;
+                unit->interest->health -= unit->attack; // Unit_Kill() is purposely not used so that all units of all colors get an equal chance to make a hit.
                 Unit_Unlock(unit);
             }
             static Point zero;
