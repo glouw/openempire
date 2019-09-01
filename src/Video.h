@@ -25,6 +25,7 @@ typedef struct
     Point middle;
     Point bot_rite;
     Point top_left;
+    Point top_rite;
 }
 Video;
 

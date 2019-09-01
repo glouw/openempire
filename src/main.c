@@ -30,6 +30,7 @@ int main(const int argc, const char* argv[])
             units = Units_Caretake(units, data.graphics, overview, grid, input, map, field, render_points);
             const int32_t dt = Video_Render(video, data, map, units, overview, input, render_points);
             Log_Dump();
+            Video_PrintPerformanceMonitor(video, units, dt, cycles);
             Field_Free(field);
             Points_Free(render_points);
             Video_Present(video);

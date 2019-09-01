@@ -17,6 +17,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
 {
     const Point middle = { xres / 2, yres / 2 };
     const Point bot_rite = { xres, yres };
+    const Point top_rite = { xres, 0 };
     const Point top_left = { 0, 0 };
     SDL_Init(SDL_INIT_VIDEO);
     static Video zero;
@@ -33,6 +34,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.middle = middle;
     video.bot_rite = bot_rite;
     video.top_left = top_left;
+    video.top_rite = top_rite;
     PrintTitle(video);
     SDL_SetCursor(video.cursor);
     return video;
@@ -146,7 +148,7 @@ void Video_PrintPerformanceMonitor(const Video video, const Units units, const i
     static int dt_hold;
     if(cycles % 10 == 0)
         dt_hold = dt;
-    Text_Printf(video.text_small, video.renderer, video.top_left, POSITION_TOP_LEFT, 0xFF, 0,
+    Text_Printf(video.text_small, video.renderer, video.top_rite, POSITION_TOP_RITE, 0xFF, 0,
             "units.count   : %6d\n"
             "dt (ms) video : %6d\n"
             "cycles        : %6d\n"
