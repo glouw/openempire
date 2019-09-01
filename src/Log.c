@@ -4,7 +4,7 @@
 
 #include <stdarg.h>
 
-#define MAX (32)
+#define MAX (48)
 
 #define CAP(index) (index % MAX)
 
