@@ -2,6 +2,7 @@
 
 #include "Surface.h"
 #include "Lines.h"
+#include "Config.h"
 #include "Util.h"
 #include "Rect.h"
 #include "Quad.h"
@@ -400,7 +401,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
     {
         const Tile tile = tiles.tile[i];
         const Point center = Tile_GetHotSpotCoords(tile);
-        const Rect rect = Rect_GetEllipse(center, 20);
+        const Rect rect = Rect_GetEllipse(center, tile.reference->width / CONFIG_GRID_CELL_SIZE);
         if(tile.reference->is_selected)
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
     }

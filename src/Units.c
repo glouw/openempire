@@ -242,7 +242,7 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        return Point_Div(delta, 64); // XXX. What is a good divisor?
+        return Point_Div(delta, CONFIG_UNITS_COHESE_DIVISOR);
     }
     return zero;
 }
@@ -292,7 +292,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             }
         }
     }
-    return Point_Div(out, 16);
+    return Point_Div(out, CONFIG_UNITS_SEPARATION_DIVISOR);
 }
 
 static Point AlignBoids(const Units units, Unit* const unit)
@@ -317,7 +317,7 @@ static Point AlignBoids(const Units units, Unit* const unit)
                     out = Point_Add(out, other->velocity);
             }
         }
-        return Point_Div(out, 32);
+        return Point_Div(out, CONFIG_UNITS_ALIGN_DIVISOR);
     }
     return zero;
 }

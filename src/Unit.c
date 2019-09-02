@@ -285,7 +285,7 @@ void Unit_Melee(Unit* const unit)
     && !State_IsDead(unit->interest->state))
     {
         const Point diff = Point_Sub(unit->interest->cell, unit->cell);
-        if(Point_Mag(diff) < CONFIG_UNIT_MELEE_DISTANCE)
+        if(Point_Mag(diff) < unit->width)
         {
             Unit_SetState(unit, STATE_ATTACK, true, true);
             if(unit->state_timer == Unit_GetLastAttackTick(unit))
