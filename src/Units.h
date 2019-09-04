@@ -20,7 +20,6 @@ typedef struct
     int32_t max;
     int32_t rows;
     int32_t cols;
-    int32_t id_next;
     int32_t command_group_next;
     int32_t select_count;
     int32_t cpu_count;

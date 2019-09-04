@@ -120,8 +120,7 @@ static Graphics GetFileFromState(Unit* const unit, const State state)
 {
     const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
     const int32_t next = base + (int32_t) state;
-    const Graphics file = (Graphics) next;
-    return file;
+    return (Graphics) next;
 }
 
 void Unit_Lock(Unit* const unit)
@@ -154,14 +153,15 @@ static int32_t GetFramesFromState(Unit* const unit, const State state, const Reg
 {
     const Graphics file = GetFileFromState(unit, state);
     const Animation animation = graphics.animation[unit->color][file];
-    const int32_t frames = Animation_GetFramesPerDirection(animation);
-    return frames;
+    return Animation_GetFramesPerDirection(animation);
 }
 
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
 {
+    static int32_t id;
     static Unit zero;
     Unit unit = zero;
+    unit.id = id++;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
@@ -173,13 +173,19 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.max_health = Graphics_GetHealth(file);
     unit.health = unit.max_health;
     unit.attack = Graphics_GetAttack(file);
+    unit.is_rotatable = Graphics_GetRotatable(file);
+    unit.is_single_frame = Graphics_GetSingleFrame(file);
     unit.file = file;
     unit.state_timer = Util_Rand() % 10;
     unit.width = Graphics_GetWidth(file);
     unit.type = Graphics_GetType(file);
-    unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
-    unit.fall_frames_per_dir = GetFramesFromState(&unit, STATE_FALL, graphics);
-    unit.decay_frames_per_dir = GetFramesFromState(&unit, STATE_DECAY, graphics);
+    unit.is_multi_state = Graphics_GetMultiState(file);
+    if(unit.is_multi_state)
+    {
+        unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
+        unit.fall_frames_per_dir = GetFramesFromState(&unit, STATE_FALL, graphics);
+        unit.decay_frames_per_dir = GetFramesFromState(&unit, STATE_DECAY, graphics);
+    }
     return unit;
 }
 
@@ -285,7 +291,7 @@ void Unit_Melee(Unit* const unit)
     && !State_IsDead(unit->interest->state))
     {
         const Point diff = Point_Sub(unit->interest->cell, unit->cell);
-        if(Point_Mag(diff) < unit->width + 300)
+        if(Point_Mag(diff) < unit->width + CONFIG_UNIT_SWORD_LENGTH)
         {
             Unit_SetState(unit, STATE_ATTACK, true, true);
             if(unit->state_timer == Unit_GetLastAttackTick(unit))

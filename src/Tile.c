@@ -90,12 +90,29 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 
 Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
 {
-    const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
+    int32_t index = 0;
     bool flip_vert = false;
-    const Direction fixed_dir = Direction_Fix(reference->dir, &flip_vert);
-    const int32_t ticks = reference->state_timer / (reference->state == STATE_DECAY ? CONFIG_ANIMATION_DECAY_DIVISOR : CONFIG_ANIMATION_DIVISOR);
-    const int32_t frame = ticks % frames_per_direction;
-    const int32_t index = frames_per_direction * fixed_dir + frame;
+    if(reference->is_single_frame)
+    {
+        index = reference->id % animation.count;
+        if(index == 0)
+            index = 1;
+    }
+    else
+    if(reference->is_rotatable)
+    {
+        const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
+        const Direction fixed_dir = Direction_Fix(reference->dir, &flip_vert);
+        const int32_t divisor = reference->state == STATE_DECAY ? CONFIG_ANIMATION_DECAY_DIVISOR : CONFIG_ANIMATION_DIVISOR;
+        const int32_t ticks = reference->state_timer / divisor;
+        const int32_t frame = ticks % frames_per_direction;
+        index = frames_per_direction * fixed_dir + frame;
+    }
+    else
+    {
+        const int32_t ticks = reference->state_timer / CONFIG_ANIMATION_DIVISOR;
+        index = ticks % animation.count;
+    }
     // A little unfortunate, but the hot spots for the terrain tiles are not centered.
     // Units must therefor be forced to the terrain tile positions.
     const Point south = { 0, 1 };

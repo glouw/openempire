@@ -1,1 +1,1 @@
-make && cd .. && ./openempires && cd -
+make && cd .. && startx ./openempires && cd -

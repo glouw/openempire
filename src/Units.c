@@ -81,12 +81,42 @@ static Units GenerateVillieZone(Units units, const Grid grid, const Registrar gr
     return units;
 }
 
+static Units GenerateBerryZone(Units units, const Grid grid, const Registrar graphics)
+{
+    const Point a = { grid.cols / 2 + 0, grid.cols / 2 - 1};
+    const Point b = { grid.cols / 2 - 1, grid.cols / 2 + 1};
+    const Point c = { grid.cols / 2 - 0, grid.cols / 2 + 1};
+    const Point d = { grid.cols / 2 - 0, grid.cols / 2 - 2};
+    const Point e = { grid.cols / 2 - 0, grid.cols / 2 - 4};
+    const Point f = { grid.cols / 2 - 2, grid.cols / 2 - 4};
+    units = Units_Append(units, Unit_Make(a, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(b, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(c, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(d, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(e, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(f, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    return units;
+}
+
+static Units GenerateRandomZone(Units units, const Grid grid, const Registrar graphics)
+{
+    const Point a = { grid.cols / 2 + 0, grid.cols / 2 - 1};
+    const Point b = { grid.cols / 2 - 1, grid.cols / 2 + 1};
+    units = Units_Append(units, Unit_Make(a, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(b, grid, FILE_WAYPOINT_FLAG, COLOR_BLU, graphics));
+    return units;
+}
+
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    if(1)
-        return GenerateBattleZone(units, map, grid, graphics);
-    else
-        return GenerateVillieZone(units, grid, graphics);
+    switch(0)
+    {
+    default:
+    case 0: return GenerateBattleZone(units, map, grid, graphics);
+    case 1: return GenerateBerryZone(units, grid, graphics);
+    case 2: return GenerateVillieZone(units, grid, graphics);
+    case 3: return GenerateRandomZone(units, grid, graphics);
+    }
 }
 
 Units Units_New(const int32_t max, const Map map, const Grid grid, const Registrar graphics)
@@ -119,7 +149,6 @@ Units Units_Append(Units units, Unit unit)
         UTIL_CHECK(temp);
         units.unit = temp;
     }
-    unit.id = units.id_next++;
     units.unit[units.count++] = unit;
     return units;
 }

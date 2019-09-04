@@ -48,6 +48,9 @@ typedef struct Unit
     bool is_selected;
     bool is_fully_decayed;
     bool is_state_locked;
+    bool is_rotatable;
+    bool is_single_frame;
+    bool is_multi_state;
 }
 Unit;
 
