@@ -109,7 +109,7 @@ static Units GenerateRandomZone(Units units, const Grid grid, const Registrar gr
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(0)
+    switch(3)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);

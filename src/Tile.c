@@ -60,19 +60,25 @@ static Tile Clip(Tile tile, const Overview overview)
 {
     if(!OnScreen(tile, overview.xres, overview.yres))
         tile.needs_clipping = true;
-    // XXX: Need a totally out of bounds one to ease render time.
-    return tile;
+    return tile; // XXX: Need a totally out of bounds one to ease render time.
 }
 
-static Tile Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const int32_t index, const bool flip_vert, const uint8_t height, Unit* const reference)
+typedef struct
+{
+    int32_t index;
+    bool flip_vert;
+}
+Rotation;
+
+static Tile Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Rotation rotation, const uint8_t height, Unit* const reference)
 {
     static Tile zero;
     Tile tile = zero;
-    tile.frame = animation.frame[index];
-    tile.surface = animation.surface[index];
+    tile.frame = animation.frame[rotation.index];
+    tile.surface = animation.surface[rotation.index];
     tile.iso_pixel = Overview_CartToIso(overview, cart);
     tile.iso_pixel_offset = Point_ToIso(cart_grid_offset);
-    tile.flip_vert = flip_vert;
+    tile.flip_vert = rotation.flip_vert;
     tile.height = height;
     tile.reference = reference;
     return Clip(tile, overview);
@@ -82,43 +88,42 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 {
     const int32_t bound = Util_Sqrt(animation.count);
     const int32_t index = (cart_point.x % bound) + ((cart_point.y % bound) * bound);
-    static Point zero;
-    const Point cart_grid_offset = zero;
+    const Point cart_grid_offset = { 0,0 };
     const uint8_t height = Terrain_GetHeight(file);
-    return Construct(overview, cart_point, cart_grid_offset, animation, index, false, height, NULL);
+    const Rotation rotation = { index, false };
+    return Construct(overview, cart_point, cart_grid_offset, animation, rotation, height, NULL);
 }
 
-Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
+static Rotation GetRotation(const Animation animation, Unit* const reference)
 {
-    int32_t index = 0;
-    bool flip_vert = false;
+    Rotation rotation = { 0, false };
     if(reference->is_single_frame)
-    {
-        index = reference->id % animation.count;
-        if(index == 0)
-            index = 1;
-    }
+        rotation.index = reference->id % animation.count;
     else
     if(reference->is_rotatable)
     {
         const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
-        const Direction fixed_dir = Direction_Fix(reference->dir, &flip_vert);
+        const Direction fixed_dir = Direction_Fix(reference->dir, &rotation.flip_vert);
         const int32_t divisor = reference->state == STATE_DECAY ? CONFIG_ANIMATION_DECAY_DIVISOR : CONFIG_ANIMATION_DIVISOR;
         const int32_t ticks = reference->state_timer / divisor;
         const int32_t frame = ticks % frames_per_direction;
-        index = frames_per_direction * fixed_dir + frame;
+        rotation.index = frames_per_direction * fixed_dir + frame;
     }
-    else
+    else // Many frames, but not rotatable.
     {
         const int32_t ticks = reference->state_timer / CONFIG_ANIMATION_DIVISOR;
-        index = ticks % animation.count;
+        rotation.index = ticks % animation.count;
     }
-    // A little unfortunate, but the hot spots for the terrain tiles are not centered.
-    // Units must therefor be forced to the terrain tile positions.
-    const Point south = { 0, 1 };
+    return rotation;
+}
+
+Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
+{
+    const Rotation rotation = GetRotation(animation, reference);
+    const Point south = { 0, 1 }; // A little unfortunate, but the hot spots for the terrain tiles are not centered. Units must therefor be forced to the terrain tile positions.
     const Point shifted = Point_Add(cart, south);
     const uint8_t height = Graphics_GetHeight(reference->file);
-    return Construct(overview, shifted, cart_grid_offset, animation, index, flip_vert, height, reference);
+    return Construct(overview, shifted, cart_grid_offset, animation, rotation, height, reference);
 }
 
 Point Tile_GetHotSpotCoords(const Tile tile)
