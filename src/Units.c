@@ -138,7 +138,7 @@ Units Units_New(const int32_t max, const Map map, const Grid grid, const Registr
     units.rows = grid.rows;
     units.cols = grid.cols;
     units = GenerateTestZone(units, map, grid, graphics);
-    units.cpu_count = 1 * SDL_GetCPUCount();
+    units.cpu_count = 2 * SDL_GetCPUCount();
     return units;
 }
 
@@ -230,9 +230,10 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     }
 }
 
-static Units PlaceRedArrows(Units units, const Overview overview, const Registrar graphics, const Point cart)
+static Units PlaceRedArrows(Units units, const Overview overview, const Registrar graphics, const Point cart, const Point cart_grid_offset)
 {
-    const Unit unit = Unit_Make(cart, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
+    Unit unit = Unit_Make(cart, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
+    unit.cell = Point_Add(unit.cell, Point_Mul(cart_grid_offset, CONFIG_GRID_CELL_SIZE));
     return Units_Append(units, unit);
 }
 
@@ -247,7 +248,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
-            units = PlaceRedArrows(units, overview, graphics, cart_goal);
+            units = PlaceRedArrows(units, overview, graphics, cart_goal, cart_grid_offset_goal);
         }
     }
     return units;
