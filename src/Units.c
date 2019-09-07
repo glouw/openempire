@@ -109,7 +109,7 @@ static Units GenerateRandomZone(Units units, const Grid grid, const Registrar gr
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(3)
+    switch(0)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
@@ -473,43 +473,10 @@ static void ChaseBoids(const Units units, Unit* const unit)
     }
 }
 
-typedef struct
-{
-    Units units;
-    Field field;
-    int32_t a;
-    int32_t b;
-}
-RepathNeedle;
-
-static int32_t RunRepathNeedle(void* const data)
-{
-    RepathNeedle* needle = (RepathNeedle*) data;
-    for(int32_t i = needle->a; i < needle->b; i++)
-        Unit_Repath(&needle->units.unit[i], needle->field);
-    return 0;
-}
-
 static void Repath(const Units units, const Field field)
 {
-    RepathNeedle* const needles = UTIL_ALLOC(RepathNeedle, units.cpu_count);
-    SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, units.cpu_count);
-    UTIL_CHECK(needles);
-    UTIL_CHECK(threads);
-    const int32_t width = units.count / units.cpu_count;
-    const int32_t remainder = units.count % units.cpu_count;
-    for(int32_t i = 0; i < units.cpu_count; i++)
-    {
-        needles[i].units = units;
-        needles[i].field = field;
-        needles[i].a = (i + 0) * width;
-        needles[i].b = (i + 1) * width;
-    }
-    needles[units.cpu_count - 1].b += remainder;
-    for(int32_t i = 0; i < units.cpu_count; i++) threads[i] = SDL_CreateThread(RunRepathNeedle, "N/A", &needles[i]);
-    for(int32_t i = 0; i < units.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
-    free(needles);
-    free(threads);
+    for(int32_t i = 0; i < units.count; i++) // XXX. This can be time sliced so that large spikes of repathing is not happening.
+        Unit_Repath(&units.unit[i], field);
 }
 
 static void RunHardRules(const Units units, const Field field)

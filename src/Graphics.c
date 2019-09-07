@@ -22,7 +22,7 @@ uint8_t Graphics_GetHeight(const Graphics graphics)
     return 0;
 }
 
-bool Graphics_IsWalkable(const Graphics graphics)
+bool Graphics_GetWalkable(const Graphics graphics)
 {
     switch(graphics)
     {

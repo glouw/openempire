@@ -17,7 +17,7 @@ const char* Graphics_GetString(const Graphics);
 
 uint8_t Graphics_GetHeight(const Graphics);
 
-bool Graphics_IsWalkable(const Graphics);
+bool Graphics_GetWalkable(const Graphics);
 
 Type Graphics_GetType(const Graphics);
 

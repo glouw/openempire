@@ -51,6 +51,7 @@ typedef struct Unit
     bool is_rotatable;
     bool is_single_frame;
     bool is_multi_state;
+    bool is_walkable;
 }
 Unit;
 

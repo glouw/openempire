@@ -175,6 +175,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.attack = Graphics_GetAttack(file);
     unit.is_rotatable = Graphics_GetRotatable(file);
     unit.is_single_frame = Graphics_GetSingleFrame(file);
+    unit.is_walkable = Graphics_GetWalkable(file);
     unit.file = file;
     unit.state_timer = Util_Rand() % 10;
     unit.width = Graphics_GetWidth(file);

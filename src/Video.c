@@ -129,7 +129,14 @@ int32_t Video_Render(const Video video, const Data data, const Map map, const Un
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
+
+#if SANITIZE_THREAD == 0
+    // When the thread sanitizer is enabled from the makefile, map drawing needs to be disabled else race conditions
+    // will be caught when terrain tiles are drawn due to their single pixel overlapping nature.
+    // This is fine, as peer to peer simulation determinism is not dependent on the renderer.
     Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, blend_lines, terrain_tiles);
+#endif
+
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);

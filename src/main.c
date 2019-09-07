@@ -22,17 +22,15 @@ int main(const int argc, const char* argv[])
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
             const int32_t t0 = SDL_GetTicks();
+            Map_Edit(map, overview, input);
+            overview = Overview_Update(overview, input);
             const Field field = Units_Field(units, map);
             const Quad quad = Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET);
             const Points render_points = Quad_GetRenderPoints(quad);
-            Map_Edit(map, overview, input);
-            overview = Overview_Update(overview, input);
             units = Units_Caretake(units, data.graphics, overview, grid, input, map, field, render_points);
             const int32_t dt = Video_Render(video, data, map, units, overview, input, render_points);
             Log_Dump();
             Video_PrintPerformanceMonitor(video, units, dt, cycles);
-            Field_Free(field);
-            Points_Free(render_points);
             Video_Present(video);
             const int32_t t1 = SDL_GetTicks();
             const int32_t ms = 1000 / 60 - (t1 - t0);
@@ -42,6 +40,8 @@ int main(const int argc, const char* argv[])
             if(args.measure)
                 if(cycles > 10) // Measure performance with valgrind --tool=cachegrind ./openempires.
                     break;
+            Field_Free(field);
+            Points_Free(render_points);
         }
     Units_Free(units);
     Map_Free(map);

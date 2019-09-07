@@ -1,5 +1,8 @@
 BIN = ../openempires
 
+LIBS  = -lSDL2
+LIBS += -lSDL2_ttf
+
 SRCS  = Animation.c
 SRCS += Args.c
 SRCS += Blendomatic.c
@@ -45,9 +48,6 @@ SRCS += Util.c
 SRCS += Video.c
 SRCS += Vram.c
 
-LIBS  = -lSDL2
-LIBS += -lSDL2_ttf
-
 # 0: Compile with gcc.
 # 1: Compile with clang.
 
@@ -61,9 +61,24 @@ CPP = 0
 # 0: Do not use address sanitizer.
 # 1: Use address sanitizer.
 
-SANITIZE = 0
+SANITIZE_ADDRESS = 0
 
-FLAGS = -Wall -Wextra -Wshadow -Wpedantic
+# 0: Do not use thread sanitizer.
+# 1: Use thread sanitizer.
+
+SANITIZE_THREAD = 0
+
+FLAGS = -O3 -march=native -flto
+
+ifeq (1, $(SANITIZE_ADDRESS))
+FLAGS = -Og -g -fsanitize=address
+endif
+
+ifeq (1, $(SANITIZE_THREAD))
+FLAGS = -Og -g -fsanitize=thread
+endif
+
+FLAGS += -Wall -Wextra -Wshadow -Wpedantic
 
 ifeq (00, $(CLANG)$(CPP))
 COMPILER = gcc -std=c99
@@ -81,12 +96,6 @@ ifeq (11, $(CLANG)$(CPP))
 COMPILER = clang++ -std=c++11
 endif
 
-ifeq (1, $(SANITIZE))
-FLAGS += -fsanitize=address -g -Og
-else
-FLAGS += -flto -O3 -march=native
-endif
-
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 
@@ -94,7 +103,7 @@ $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
 
 %.o : %.c %.d Makefile
-	$(COMPILER) $(FLAGS) -MMD -MP -MT $@ -MF $*.d -c $<
+	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -MMD -MP -MT $@ -MF $*.d -c $<
 
 -include *.d
 
