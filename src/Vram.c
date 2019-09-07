@@ -319,67 +319,62 @@ static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_
 }
 
 // See: https://gist.github.com/bert/1085538
-static void DrawEllipse(const Vram vram, const Rect rect, const uint32_t color) // XXX. PLEASE CLEANUP. THERE ARE NEATER ALGOS OUT THERE.
+static void DrawEllipse(const Vram vram, Rect rect, const uint32_t color)
 {
-    int32_t x0 = rect.a.x;
-    int32_t y0 = rect.a.y;
-    int32_t x1 = rect.b.x;
-    int32_t y1 = rect.b.y;
-    int32_t a = abs(x1 - x0);
-    int32_t b = abs(y1 - y0);
-    int32_t b1 = b & 1;
-    int32_t dx = 4 * (1 - a ) * b * b;
-    int32_t dy = 4 * (1 + b1) * a * a;
-    int32_t err = dx + dy + b1 * a * a;
-    int32_t e2 = 0;
-    if(x0 > x1)
+    int32_t a = abs(rect.b.x - rect.a.x);
+    int32_t b = abs(rect.b.y - rect.a.y);
+    int32_t c = b & 1;
+    int32_t dx = 4 * (1 - a) * b * b;
+    int32_t dy = 4 * (1 + c) * a * a;
+    int32_t err = dx + dy + c * a * a;
+    if(rect.a.x > rect.b.x)
     {
-        x0 = x1;
-        x1 += a;
+        rect.a.x = rect.b.x;
+        rect.b.x += a;
     }
-    if(y0 > y1)
-        y0 = y1;
-    y0 += (b + 1) / 2;
-    y1 = y0 - b1;
+    if(rect.a.y > rect.b.y)
+        rect.a.y = rect.b.y;
+    rect.a.y += (b + 1) / 2;
+    rect.b.y = rect.a.y - c;
     a *= 8 * a;
-    b1 = 8 * b * b;
+    c = 8 * b * b;
     do
     {
         const Point point[] = {
-            { x1, y0 },
-            { x0, y0 },
-            { x0, y1 },
-            { x1, y1 },
+            { rect.b.x, rect.a.y },
+            { rect.a.x, rect.a.y },
+            { rect.a.x, rect.b.y },
+            { rect.b.x, rect.b.y },
         };
         for(int32_t i = 0; i < UTIL_LEN(point); i++)
             DrawSelectionPixel(vram, point[i], color);
-        e2 = 2 * err;
+        const int32_t e2 = 2 * err;
         if(e2 >= dx)
         {
-            x0++;
-            x1--;
-            err += dx += b1;
+            rect.a.x++;
+            rect.b.x--;
+            err += dx += c;
         }
         if(e2 <= dy)
         {
-            y0++;
-            y1--;
+            rect.a.y++;
+            rect.b.y--;
             err += dy += a;
         }
     }
-    while(x0 <= x1);
-    while(y0 - y1 < b)
+    while(rect.a.x <= rect.b.x);
+    while(rect.a.y - rect.b.y < b)
     {
         const Point point[] = {
-            { x0 - 1, y0 },
-            { x1 + 1, y0 },
-            { x0 - 1, y1 },
-            { x1 + 1, y1 },
+            { rect.a.x - 1, rect.a.y },
+            { rect.b.x + 1, rect.a.y },
+            { rect.a.x - 1, rect.b.y },
+            { rect.b.x + 1, rect.b.y },
         };
         for(int32_t i = 0; i < UTIL_LEN(point); i++)
             DrawSelectionPixel(vram, point[i], color);
-        y0++;
-        y1--;
+        rect.a.y++;
+        rect.b.y--;
     }
 }
 
