@@ -230,7 +230,7 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     }
 }
 
-static Units Command(Units units, const Overview overview, const Input input, const Map map, const Field field)
+static Units Command(Units units, const Overview overview, const Input input, const Registrar graphics, const Map map, const Field field)
 {
     if(input.ru)
     {
@@ -241,6 +241,8 @@ static Units Command(Units units, const Overview overview, const Input input, co
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
+
+            units = Units_Append(units, Unit_Make(cart_goal, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics));
         }
     }
     return units;
@@ -423,6 +425,17 @@ static void Kill(const Units units)
         if(!State_IsDead(unit->state))
             if(unit->health <= 0)
                 Unit_Kill(unit);
+    }
+}
+
+static void Expire(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->can_expire
+        && unit->state_timer == Unit_GetLastExpireTick(unit))
+            unit->is_fully_decayed = true;
     }
 }
 
@@ -688,11 +701,12 @@ static Units RemoveTheDecayed(const Units units)
 static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
 {
     units = Select(units, overview, input, graphics, render_points);
-    units = Command(units, overview, input, map, field);
+    units = Command(units, overview, input, graphics, map, field);
     Tick(units);
     Decay(units);
     Delete(units, input);
     Kill(units);
+    Expire(units);
     return units;
 }
 

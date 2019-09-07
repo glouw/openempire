@@ -149,11 +149,17 @@ void Unit_SetState(Unit* const unit, const State state, const bool reset_state_t
     }
 }
 
-static int32_t GetFramesFromState(Unit* const unit, const State state, const Registrar graphics)
+static int32_t GetFramesFromState(Unit* const unit, const Registrar graphics, const State state)
 {
     const Graphics file = GetFileFromState(unit, state);
     const Animation animation = graphics.animation[unit->color][file];
     return Animation_GetFramesPerDirection(animation);
+}
+
+static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
+{
+    const Animation animation = graphics.animation[unit->color][unit->file];
+    return animation.count;
 }
 
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
@@ -177,41 +183,47 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.is_single_frame = Graphics_GetSingleFrame(file);
     unit.is_walkable = Graphics_GetWalkable(file);
     unit.file = file;
-    unit.state_timer = Util_Rand() % 10;
     unit.width = Graphics_GetWidth(file);
     unit.type = Graphics_GetType(file);
     unit.is_multi_state = Graphics_GetMultiState(file);
+    unit.can_expire = Graphics_GetExpire(file);
+    if(unit.can_expire)
+        unit.expire_frames = GetExpireFrames(&unit, graphics);
     if(unit.is_multi_state)
     {
-        unit.attack_frames_per_dir = GetFramesFromState(&unit, STATE_ATTACK, graphics);
-        unit.fall_frames_per_dir = GetFramesFromState(&unit, STATE_FALL, graphics);
-        unit.decay_frames_per_dir = GetFramesFromState(&unit, STATE_DECAY, graphics);
+        unit.attack_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_ATTACK);
+        unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
+        unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
     return unit;
 }
 
 void Unit_Print(Unit* const unit)
 {
-    Log_Append("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
-    Log_Append("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
-    Log_Append("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
-    Log_Append("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
-    Log_Append("max_speed             :: %d\n",    unit->max_speed);
-    Log_Append("accel                 :: %d\n",    unit->accel);
-    Log_Append("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
-    Log_Append("path_index_timer      :: %d\n",    unit->path_index_timer);
-    Log_Append("path_index            :: %d\n",    unit->path_index);
-    Log_Append("path.count            :: %d\n",    unit->path.count);
-    Log_Append("selected              :: %d\n",    unit->is_selected);
-    Log_Append("file                  :: %d\n",    unit->file);
-    Log_Append("file_name             :: %s\n",    unit->file_name);
-    Log_Append("id                    :: %d\n",    unit->id);
-    Log_Append("command_group         :: %d\n",    unit->command_group);
-    Log_Append("health                :: %d\n",    unit->health);
-    Log_Append("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
-    Log_Append("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
-    Log_Append("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
-    Log_Append("\n");
+    Log_Append("cart                  :: %d %d", unit->cart.x, unit->cart.y);
+    Log_Append("cart_grid_offset      :: %d %d", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+    Log_Append("cart_grid_offset_goal :: %d %d", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
+    Log_Append("cell                  :: %d %d", unit->cell.x, unit->cell.y);
+    Log_Append("max_speed             :: %d",    unit->max_speed);
+    Log_Append("accel                 :: %d",    unit->accel);
+    Log_Append("velocity              :: %d %d", unit->velocity.x, unit->velocity.y);
+    Log_Append("path_index_timer      :: %d",    unit->path_index_timer);
+    Log_Append("path_index            :: %d",    unit->path_index);
+    Log_Append("path.count            :: %d",    unit->path.count);
+    Log_Append("selected              :: %d",    unit->is_selected);
+    Log_Append("file                  :: %d",    unit->file);
+    Log_Append("file_name             :: %s",    unit->file_name);
+    Log_Append("id                    :: %d",    unit->id);
+    Log_Append("command_group         :: %d",    unit->command_group);
+    Log_Append("health                :: %d",    unit->health);
+    Log_Append("attack_frames_per_dir :: %d",    unit->attack_frames_per_dir);
+    Log_Append("fall_frames_per_dir   :: %d",    unit->fall_frames_per_dir);
+    Log_Append("decay_frames_per_dir  :: %d",    unit->decay_frames_per_dir);
+    Log_Append("can_expire            :: %d",    unit->can_expire);
+    Log_Append("expire_frames         :: %d",    unit->expire_frames);
+    Log_Append("state_timer           :: %d",    unit->state_timer);
+    Log_Append("is_fully_decayed      :: %d",    unit->is_fully_decayed);
+    Log_Append("");
 }
 
 void ApplyStressors(Unit* const unit)
@@ -268,6 +280,11 @@ void Unit_Kill(Unit* const unit)
     Unit_Unlock(unit);
     unit->health = 0;
     Unit_SetState(unit, STATE_FALL, true, false);
+}
+
+int32_t Unit_GetLastExpireTick(Unit* const unit)
+{
+    return unit->expire_frames * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
 int32_t Unit_GetLastAttackTick(Unit* const unit)

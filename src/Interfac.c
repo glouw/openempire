@@ -4,7 +4,7 @@ const char* Interfac_GetString(const Interfac interfac)
 {
     switch(interfac)
     {
-#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state) case name: return #name;
+#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire) case name: return #name;
         FILE_X_INTERFAC
 #undef FILE_X
     }
@@ -15,7 +15,7 @@ uint8_t Interfac_GetHeight(const Interfac interfac)
 {
     switch(interfac)
     {
-#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state) case name: return prio;
+#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire) case name: return prio;
         FILE_X_INTERFAC
 #undef FILE_X
     }

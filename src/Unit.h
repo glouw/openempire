@@ -44,6 +44,7 @@ typedef struct Unit
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
     int32_t decay_frames_per_dir;
+    int32_t expire_frames;
     bool is_chasing;
     bool is_selected;
     bool is_fully_decayed;
@@ -52,6 +53,7 @@ typedef struct Unit
     bool is_single_frame;
     bool is_multi_state;
     bool is_walkable;
+    bool can_expire;
 }
 Unit;
 
@@ -84,6 +86,8 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
 void Unit_Kill(Unit* const);
+
+int32_t Unit_GetLastExpireTick(Unit* const);
 
 int32_t Unit_GetLastAttackTick(Unit* const);
 
