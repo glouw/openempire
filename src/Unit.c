@@ -337,3 +337,27 @@ void Unit_Repath(Unit* const unit, const Field field)
             Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
     }
 }
+
+static Point Nudge(void)
+{
+    const Point nudge = {
+        1000 * ((Util_Rand() % 1000) - 500),
+        1000 * ((Util_Rand() % 1000) - 500),
+    };
+    return nudge;
+}
+
+Point Unit_Separate(Unit* const unit, Unit* const other)
+{
+    static Point zero;
+    if(!State_IsDead(other->state) && unit->id != other->id)
+    {
+        const Point diff = Point_Sub(other->cell, unit->cell);
+        if(Point_IsZero(diff))
+            return Nudge();
+        const int32_t width = UTIL_MAX(unit->width, other->width);
+        if(Point_Mag(diff) < width)
+            return Point_Sub(Point_Normalize(diff, width), diff);
+    }
+    return zero;
+}

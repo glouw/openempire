@@ -230,6 +230,12 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     }
 }
 
+static Units PlaceRedArrows(Units units, const Overview overview, const Registrar graphics, const Point cart)
+{
+    const Unit unit = Unit_Make(cart, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
+    return Units_Append(units, unit);
+}
+
 static Units Command(Units units, const Overview overview, const Input input, const Registrar graphics, const Map map, const Field field)
 {
     if(input.ru)
@@ -241,8 +247,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
-
-            units = Units_Append(units, Unit_Make(cart_goal, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics));
+            units = PlaceRedArrows(units, overview, graphics, cart_goal);
         }
     }
     return units;
@@ -280,30 +285,6 @@ static Point CoheseBoids(const Units units, Unit* const unit)
     return zero;
 }
 
-static Point Nudge(void)
-{
-    const Point nudge = {
-        1000 * ((Util_Rand() % 1000) - 500),
-        1000 * ((Util_Rand() % 1000) - 500),
-    };
-    return nudge;
-}
-
-static Point Separate(Unit* const unit, Unit* const other)
-{
-    static Point zero;
-    if(!State_IsDead(other->state) && unit->id != other->id)
-    {
-        const Point diff = Point_Sub(other->cell, unit->cell);
-        if(Point_IsZero(diff))
-            return Nudge();
-        const int32_t width = UTIL_MAX(unit->width, other->width);
-        if(Point_Mag(diff) < width)
-            return Point_Sub(Point_Normalize(diff, width), diff);
-    }
-    return zero;
-}
-
 static Point SeparateBoids(const Units units, Unit* const unit)
 {
     const int32_t width = 1;
@@ -320,7 +301,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
-                const Point force = Separate(unit, other);
+                const Point force = Unit_Separate(unit, other);
                 out = Point_Sub(out, force);
             }
         }
