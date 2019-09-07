@@ -46,6 +46,8 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
         const Point cart = { x, y };
         units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics));
     }
+    const Point cart = { map.cols / 2, map.rows / 2 };
+    units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU, graphics));
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -473,21 +475,32 @@ static void ChaseBoids(const Units units, Unit* const unit)
     }
 }
 
-static void Repath(const Units units, const Field field)
+static Units Repath(Units units, const Field field)
 {
-    for(int32_t i = 0; i < units.count; i++) // XXX. This can be time sliced so that large spikes of repathing is not happening.
+    int32_t slice = units.count / CONFIG_UNITS_REPATH_SLICE_SIZE;
+    if(slice == 0)
+        slice = units.count;
+    int32_t end = slice + units.repath_index;
+    if(end > units.count)
+        end = units.count;
+    for(int32_t i = units.repath_index; i < end; i++)
         Unit_Repath(&units.unit[i], field);
+    units.repath_index += slice;
+    if(units.repath_index >= units.count)
+        units.repath_index = 0;
+    return units;
 }
 
-static void RunHardRules(const Units units, const Field field)
+static Units RunHardRules(Units units, const Field field)
 {
-    Repath(units, field);
+    units = Repath(units, field);
     for(int32_t i = 0; i < units.count; i++)
         ConditionallyStopBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++)
         ChaseBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++)
         Unit_Melee(&units.unit[i]);
+    return units;
 }
 
 typedef struct
@@ -552,11 +565,11 @@ static int32_t RunFlowNeedle(void* data)
 }
 
 // See the boids pseudocode: http://www.kfish.org/boids/pseudocode.html
-static void ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
+static Units ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
 {
     BulkProcess(units, map, grid, RunStressorNeedle);
     BulkProcess(units, map, grid, RunFlowNeedle);
-    RunHardRules(units, field);
+    return RunHardRules(units, field);
 }
 
 static void SortStacks(const Units units)
@@ -686,7 +699,7 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
 // Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
-    ManagePathFinding(units, grid, map, field);
+    units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
     units = ManageAction(units, graphics, overview, input, map, field, render_points);

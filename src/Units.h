@@ -23,6 +23,7 @@ typedef struct
     int32_t command_group_next;
     int32_t select_count;
     int32_t cpu_count;
+    int32_t repath_index;
 }
 Units;
 
