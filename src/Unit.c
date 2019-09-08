@@ -255,7 +255,7 @@ void Unit_SetDir(Unit* const unit, const Point dir)
 
 void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         Unit_FreePath(unit);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
@@ -265,7 +265,7 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
 
 void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal)
 {
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         Unit_FreePath(unit);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
@@ -305,8 +305,8 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
 void Unit_Melee(Unit* const unit)
 {
     if(unit->interest != NULL
-    && !State_IsDead(unit->state)
-    && !State_IsDead(unit->interest->state))
+    && !Unit_IsExempt(unit)
+    && !Unit_IsExempt(unit->interest))
     {
         const Point diff = Point_Sub(unit->interest->cell, unit->cell);
         if(Point_Mag(diff) < unit->width + CONFIG_UNIT_SWORD_LENGTH)
@@ -326,7 +326,7 @@ void Unit_Melee(Unit* const unit)
 
 void Unit_Repath(Unit* const unit, const Field field)
 {
-    if(!State_IsDead(unit->state)
+    if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && unit->path.count > 0)
     {
@@ -350,7 +350,8 @@ static Point Nudge(void)
 Point Unit_Separate(Unit* const unit, Unit* const other)
 {
     static Point zero;
-    if(!State_IsDead(other->state) && unit->id != other->id)
+    if(!Unit_IsExempt(other)
+    && unit->id != other->id)
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_IsZero(diff))
@@ -360,4 +361,9 @@ Point Unit_Separate(Unit* const unit, Unit* const other)
             return Point_Sub(Point_Normalize(diff, width), diff);
     }
     return zero;
+}
+
+bool Unit_IsExempt(Unit* const unit)
+{
+    return State_IsDead(unit->state) || unit->can_expire;
 }

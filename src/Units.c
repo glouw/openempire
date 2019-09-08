@@ -204,7 +204,7 @@ static Units Select(Units units, const Overview overview, const Input input, con
         {
             const Tile tile = Tiles_SelectOne(tiles, input.point);
             if(tile.reference
-            && !State_IsDead(tile.reference->state)
+            && !Unit_IsExempt(tile.reference)
             && input.key[SDL_SCANCODE_LCTRL])
                 units.select_count = Tiles_SelectSimilar(tiles, tile);
             else
@@ -277,7 +277,7 @@ static void StackStacks(const Units units)
 static Point CoheseBoids(const Units units, Unit* const unit)
 {
     static Point zero;
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
@@ -291,7 +291,7 @@ static Point SeparateBoids(const Units units, Unit* const unit)
     const int32_t width = 1;
     static Point zero;
     Point out = zero;
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         for(int32_t x = -width; x <= width; x++)
         for(int32_t y = -width; y <= width; y++)
@@ -315,7 +315,7 @@ static Point AlignBoids(const Units units, Unit* const unit)
     const int32_t width = 1;
     static Point zero;
     Point out = zero;
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         for(int32_t x = -width; x <= width; x++)
         for(int32_t y = -width; y <= width; y++)
@@ -326,7 +326,7 @@ static Point AlignBoids(const Units units, Unit* const unit)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
-                if(!State_IsDead(other->state)
+                if(!Unit_IsExempt(other)
                 && unit->id != other->id
                 && Unit_InPlatoon(unit, other))
                     out = Point_Add(out, other->velocity);
@@ -341,7 +341,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
 {
     static Point zero;
     Point out = zero;
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         const Point n = {  0, -1 };
         const Point e = { +1,  0 };
@@ -365,7 +365,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
 static void CalculateBoidStressors(const Units units, Unit* const unit, const Map map, const Grid grid)
 {
     static Point zero;
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         unit->group_alignment = AlignBoids(units, unit);
         const Point cohese = unit->command_group_count > CONFIG_UNIT_COHESION_COUNT ? CoheseBoids(units, unit) : zero;
@@ -384,13 +384,13 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
 
 static void ConditionallyStopBoids(const Units units, Unit* const unit)
 {
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         const Stack stack = Units_GetStackCart(units, unit->cart);
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(!State_IsDead(other->state)
+            if(!Unit_IsExempt(other)
             && unit->id != other->id
             && unit->path.count == 0
             && Unit_InPlatoon(unit, other))
@@ -404,7 +404,7 @@ static void Kill(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(!State_IsDead(unit->state))
+        if(!Unit_IsExempt(unit))
             if(unit->health <= 0)
                 Unit_Kill(unit);
     }
@@ -436,7 +436,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
         {
             Unit* const other = stack.reference[i];
             if(other->color != unit->color
-            && !State_IsDead(other->state))
+            && !Unit_IsExempt(other))
             {
                 const Point diff = Point_Sub(other->cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
@@ -453,7 +453,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
 
 static void ChaseBoids(const Units units, Unit* const unit)
 {
-    if(!State_IsDead(unit->state))
+    if(!Unit_IsExempt(unit))
     {
         Unit* const closest = GetClosestBoid(units, unit);
         if(closest != NULL)
@@ -595,7 +595,7 @@ void Delete(const Units units, const Input input)
         for(int32_t i = 0; i < units.count; i++)
         {
             Unit* const unit = &units.unit[i];
-            if(unit->is_selected && !State_IsDead(unit->state))
+            if(unit->is_selected && !Unit_IsExempt(unit))
                 Unit_Kill(unit);
         }
 }

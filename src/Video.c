@@ -108,7 +108,7 @@ void Video_RenderDataDemo(const Video video, const Data data, const Color color)
     RenderBlendomaticDemo(video, data.blendomatic);
 }
 
-static void CopyCanvas(const Video video)
+void Video_CopyCanvas(const Video video)
 {
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
 }
@@ -118,9 +118,8 @@ void Video_Present(const Video video)
     SDL_RenderPresent(video.renderer);
 }
 
-int32_t Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Points render_points)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Points render_points)
 {
-    const int32_t t0 = SDL_GetTicks();
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
     const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, render_points);
     const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, render_points);
@@ -145,9 +144,6 @@ int32_t Video_Render(const Video video, const Data data, const Map map, const Un
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);
-    const int32_t t1 = SDL_GetTicks();
-    CopyCanvas(video);
-    return t1 - t0;
 }
 
 void Video_PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles)

@@ -100,3 +100,5 @@ void Unit_Melee(Unit* const);
 void Unit_Repath(Unit* const, const Field);
 
 Point Unit_Separate(Unit* const, Unit* const);
+
+bool Unit_IsExempt(Unit* const);

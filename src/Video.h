@@ -33,10 +33,12 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
 
 void Video_Free(const Video);
 
-int32_t Video_Render(const Video, const Data, const Map, const Units, const Overview, const Input, const Points);
+void Video_Render(const Video, const Data, const Map, const Units, const Overview, const Input, const Points);
 
 void Video_RenderDataDemo(const Video, const Data, const Color);
 
 void Video_Present(const Video);
 
 void Video_PrintPerformanceMonitor(const Video, const Units, const int32_t dt, const int32_t cycles);
+
+void Video_CopyCanvas(const Video);
