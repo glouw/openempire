@@ -45,7 +45,7 @@ static void ReachGoal(Unit* const unit)
 
 static void GotoGoal(Unit* const unit, const Point delta)
 {
-    const Point accel = Point_Normalize(delta, unit->accel);
+    const Point accel = Point_Normalize(delta, unit->trait.accel);
     unit->velocity = Point_Add(unit->velocity, accel);
     if(unit->is_chasing)
         Unit_SetDir(unit, Point_Sub(unit->interest->cell, unit->cell));
@@ -70,9 +70,9 @@ static void Decelerate(Unit* const unit)
     if(Point_Mag(unit->velocity) > 0) 
     {
         static Point zero;
-        const Point deccel = Point_Normalize(unit->velocity, unit->accel);
+        const Point deccel = Point_Normalize(unit->velocity, unit->trait.accel);
         const Point velocity = Point_Sub(unit->velocity, deccel);
-        unit->velocity = Point_Mag(unit->velocity) <= unit->accel ? zero : velocity; // XXX. Double check the math...
+        unit->velocity = Point_Mag(unit->velocity) <= unit->trait.accel ? zero : velocity; // XXX. Double check the math...
     }
 }
 
@@ -88,8 +88,8 @@ static void FollowPath(Unit* const unit, const Grid grid)
 
 static void CapSpeed(Unit* const unit)
 {
-    if(Point_Mag(unit->velocity) > unit->max_speed)
-        unit->velocity = Point_Normalize(unit->velocity, unit->max_speed);
+    if(Point_Mag(unit->velocity) > unit->trait.max_speed)
+        unit->velocity = Point_Normalize(unit->velocity, unit->trait.max_speed);
 }
 
 static void UpdateCart(Unit* const unit, const Grid grid)
@@ -167,29 +167,17 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     static int32_t id;
     static Unit zero;
     Unit unit = zero;
+    unit.trait = Trait_Build(file);
+    unit.file = file;
     unit.id = id++;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
     unit.state = STATE_IDLE;
-    unit.max_speed = Graphics_GetMaxSpeed(file);
-    unit.max_speed_base = unit.max_speed;
-    unit.accel = Graphics_GetAcceleration(file);
-    unit.file_name = Graphics_GetString(file);
-    unit.max_health = Graphics_GetHealth(file);
-    unit.health = unit.max_health;
-    unit.attack = Graphics_GetAttack(file);
-    unit.is_rotatable = Graphics_GetRotatable(file);
-    unit.is_single_frame = Graphics_GetSingleFrame(file);
-    unit.is_walkable = Graphics_GetWalkable(file);
-    unit.file = file;
-    unit.width = Graphics_GetWidth(file);
-    unit.type = Graphics_GetType(file);
-    unit.is_multi_state = Graphics_GetMultiState(file);
-    unit.can_expire = Graphics_GetExpire(file);
-    if(unit.can_expire)
+    unit.health = unit.trait.max_health;
+    if(unit.trait.can_expire)
         unit.expire_frames = GetExpireFrames(&unit, graphics);
-    if(unit.is_multi_state)
+    if(unit.trait.is_multi_state)
     {
         unit.attack_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_ATTACK);
         unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
@@ -204,22 +192,22 @@ void Unit_Print(Unit* const unit)
     Log_Append("cart_grid_offset      :: %d %d", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
     Log_Append("cart_grid_offset_goal :: %d %d", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
     Log_Append("cell                  :: %d %d", unit->cell.x, unit->cell.y);
-    Log_Append("max_speed             :: %d",    unit->max_speed);
-    Log_Append("accel                 :: %d",    unit->accel);
+    Log_Append("max_speed             :: %d",    unit->trait.max_speed);
+    Log_Append("accel                 :: %d",    unit->trait.accel);
     Log_Append("velocity              :: %d %d", unit->velocity.x, unit->velocity.y);
     Log_Append("path_index_timer      :: %d",    unit->path_index_timer);
     Log_Append("path_index            :: %d",    unit->path_index);
     Log_Append("path.count            :: %d",    unit->path.count);
     Log_Append("selected              :: %d",    unit->is_selected);
     Log_Append("file                  :: %d",    unit->file);
-    Log_Append("file_name             :: %s",    unit->file_name);
+    Log_Append("file_name             :: %s",    unit->trait.file_name);
     Log_Append("id                    :: %d",    unit->id);
     Log_Append("command_group         :: %d",    unit->command_group);
     Log_Append("health                :: %d",    unit->health);
     Log_Append("attack_frames_per_dir :: %d",    unit->attack_frames_per_dir);
     Log_Append("fall_frames_per_dir   :: %d",    unit->fall_frames_per_dir);
     Log_Append("decay_frames_per_dir  :: %d",    unit->decay_frames_per_dir);
-    Log_Append("can_expire            :: %d",    unit->can_expire);
+    Log_Append("can_expire            :: %d",    unit->trait.can_expire);
     Log_Append("expire_frames         :: %d",    unit->expire_frames);
     Log_Append("state_timer           :: %d",    unit->state_timer);
     Log_Append("is_fully_decayed      :: %d",    unit->is_fully_decayed);
@@ -309,12 +297,12 @@ void Unit_Melee(Unit* const unit)
     && !Unit_IsExempt(unit->interest))
     {
         const Point diff = Point_Sub(unit->interest->cell, unit->cell);
-        if(Point_Mag(diff) < unit->width + CONFIG_UNIT_SWORD_LENGTH)
+        if(Point_Mag(diff) < unit->trait.width + CONFIG_UNIT_SWORD_LENGTH)
         {
             Unit_SetState(unit, STATE_ATTACK, true, true);
             if(unit->state_timer == Unit_GetLastAttackTick(unit))
             {
-                unit->interest->health -= unit->attack; // Unit_Kill() is purposely not used so that all units of all colors get an equal chance to make a hit.
+                unit->interest->health -= unit->trait.attack; // Unit_Kill() is purposely not used so that all units of all colors get an equal chance to make a hit.
                 Unit_Unlock(unit);
             }
             static Point zero;
@@ -356,7 +344,7 @@ Point Unit_Separate(Unit* const unit, Unit* const other)
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_IsZero(diff))
             return Nudge();
-        const int32_t width = UTIL_MAX(unit->width, other->width);
+        const int32_t width = UTIL_MAX(unit->trait.width, other->trait.width);
         if(Point_Mag(diff) < width)
             return Point_Sub(Point_Normalize(diff, width), diff);
     }
@@ -365,5 +353,5 @@ Point Unit_Separate(Unit* const unit, Unit* const other)
 
 bool Unit_IsExempt(Unit* const unit)
 {
-    return State_IsDead(unit->state) || unit->can_expire;
+    return State_IsDead(unit->state) || unit->trait.can_expire;
 }

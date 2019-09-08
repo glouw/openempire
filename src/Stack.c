@@ -46,7 +46,7 @@ void Stack_Sort(const Stack stack)
 bool Stack_IsWalkable(const Stack stack)
 {
     for(int32_t i = 0; i < stack.count; i++)
-        if(!stack.reference[i]->is_walkable)
+        if(!stack.reference[i]->trait.is_walkable)
             return false;
     return true;
 }

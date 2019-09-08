@@ -38,6 +38,7 @@ SRCS += Slp.c
 SRCS += Stack.c
 SRCS += Surface.c
 SRCS += Table.c
+SRCS += Trait.c
 SRCS += Terrain.c
 SRCS += Text.c
 SRCS += Tile.c

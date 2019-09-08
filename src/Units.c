@@ -221,7 +221,7 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     {
         Unit* const unit = &units.unit[i];
         if(unit->is_selected
-        && unit->max_speed > 0)
+        && unit->trait.max_speed > 0)
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
@@ -352,7 +352,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         const bool can_walk_s = Units_CanWalk(units, map, Point_Add(unit->cart, s));
         const bool can_walk_w = Units_CanWalk(units, map, Point_Add(unit->cart, w));
         const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
-        const int32_t repulsion = 10 * unit->accel; // XXX. How strong should this be?
+        const int32_t repulsion = 10 * unit->trait.accel; // XXX. How strong should this be?
         const int32_t border = 10;
         if(!can_walk_n && offset.y < border) out = Point_Add(out, Point_Mul(s, repulsion));
         if(!can_walk_w && offset.x < border) out = Point_Add(out, Point_Mul(e, repulsion));
@@ -415,7 +415,7 @@ static void Expire(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->can_expire
+        if(unit->trait.can_expire
         && unit->state_timer == Unit_GetLastExpireTick(unit))
             unit->is_fully_decayed = true;
     }

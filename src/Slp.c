@@ -15,6 +15,23 @@ void Slp_Print(const Slp slp)
     }
 }
 
+// ---------------------- outline_table_offset
+// |         0          |
+// ---------------------- cmd_table_offset
+// |         0          |
+// ---------------------- data_offset
+// |                    |
+// |         0          |
+// |     data_size      |
+// ---------------------- outline_table_offset
+// |         1          |
+// ---------------------- cmd_table_offset
+// |         1          |
+// ---------------------- data_offset
+// |                    |
+// |         1          |
+// |     data_size      |
+// ---------------------- file.size
 Slp Slp_Load(const Drs drs, const int32_t table_index, const int32_t file_index)
 {
     const Table table = Drs_GetSlpTable(drs, table_index);
@@ -33,23 +50,6 @@ Slp Slp_Load(const Drs drs, const int32_t table_index, const int32_t file_index)
     UTIL_CHECK(slp.image);
     for(uint32_t i = 0; i < slp.num_frames; i++)
     {
-        // ---------------------- outline_table_offset
-        // |         0          |
-        // ---------------------- cmd_table_offset
-        // |         0          |
-        // ---------------------- data_offset
-        // |                    |
-        // |         0          |
-        // |     data_size      |
-        // ---------------------- outline_table_offset
-        // |         1          |
-        // ---------------------- cmd_table_offset
-        // |         1          |
-        // ---------------------- data_offset
-        // |                    |
-        // |         1          |
-        // |     data_size      |
-        // ---------------------- file.size
         static Image dummy;
         const int32_t image_height = slp.frame[i].height;
         const uint32_t data_offset = slp.frame[i].cmd_table_offset + image_height * sizeof(*dummy.cmd_table);

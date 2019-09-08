@@ -396,7 +396,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
     {
         const Tile tile = tiles.tile[i];
         const Point center = Tile_GetHotSpotCoords(tile);
-        const Rect rect = Rect_GetEllipse(center, tile.reference->width / CONFIG_GRID_CELL_SIZE);
+        const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(tile.reference->is_selected)
             DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
     }
@@ -433,7 +433,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
         };
         Unit* const unit = tile.reference;
         if(unit->is_selected)
-            DrawHealthBar(vram, top, unit->health, unit->max_health);
+            DrawHealthBar(vram, top, unit->health, unit->trait.max_health);
     }
 }
 

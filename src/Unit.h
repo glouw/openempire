@@ -7,12 +7,13 @@
 #include "Registrar.h"
 #include "Color.h"
 #include "Grid.h"
+#include "Trait.h"
 #include "Direction.h"
 
 typedef struct Unit
 {
     struct Unit* interest;
-    const char* file_name;
+    Trait trait;
     Point cart;
     Point cart_grid_offset;
     Point cart_grid_offset_goal;
@@ -26,20 +27,13 @@ typedef struct Unit
     Direction dir;
     State state;
     Graphics file;
-    Type type;
     int32_t id;
     int32_t path_index;
     int32_t path_index_timer;
     int32_t command_group;
     int32_t command_group_count;
-    int32_t max_speed;
-    int32_t max_speed_base;
-    int32_t accel;
-    int32_t max_health;
     int32_t health;
-    int32_t attack;
     int32_t state_timer;
-    int32_t width;
     int32_t dir_timer;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
@@ -49,11 +43,6 @@ typedef struct Unit
     bool is_selected;
     bool is_fully_decayed;
     bool is_state_locked;
-    bool is_rotatable;
-    bool is_single_frame;
-    bool is_multi_state;
-    bool is_walkable;
-    bool can_expire;
 }
 Unit;
 

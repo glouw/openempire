@@ -97,10 +97,10 @@ Tile Tile_GetTerrain(const Overview overview, const Point cart_point, const Anim
 static Rotation GetRotation(const Animation animation, Unit* const reference)
 {
     Rotation rotation = { 0, false };
-    if(reference->is_single_frame)
+    if(reference->trait.is_single_frame)
         rotation.index = reference->id % animation.count;
     else
-    if(reference->is_rotatable)
+    if(reference->trait.is_rotatable)
     {
         const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
         const Direction fixed_dir = Direction_Fix(reference->dir, &rotation.flip_vert);
