@@ -177,7 +177,6 @@ static Stack* GetStack(const Units units, const Point p)
     return &units.stack[p.x + p.y * units.cols];
 }
 
-// Returns a shallow copy of the stack to prevent write access.
 Stack Units_GetStackCart(const Units units, const Point p)
 {
     static Stack zero;
@@ -486,7 +485,7 @@ static Units Repath(Units units, const Field field)
     return units;
 }
 
-static Units RunHardRules(Units units, const Field field)
+static Units ProcessHardRules(Units units, const Field field)
 {
     units = Repath(units, field);
     for(int32_t i = 0; i < units.count; i++)
@@ -508,7 +507,7 @@ typedef struct
 }
 Needle;
 
-static int32_t RunStressorNeedle(void* data)
+static int32_t StressorThread(void* data)
 {
     Needle* const needle = (Needle*) data;
     for(int32_t i = needle->a; i < needle->b; i++)
@@ -519,7 +518,7 @@ static int32_t RunStressorNeedle(void* data)
     return 0;
 }
 
-static void BulkProcess(const Units units, const Map map, const Grid grid, int32_t Run(void* data))
+static void Process(const Units units, const Map map, const Grid grid, int32_t Run(void* data))
 {
     Needle* const needles = UTIL_ALLOC(Needle, units.cpu_count);
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, units.cpu_count);
@@ -542,7 +541,7 @@ static void BulkProcess(const Units units, const Map map, const Grid grid, int32
     free(threads);
 }
 
-static int32_t RunFlowNeedle(void* data)
+static int32_t FlowThread(void* data)
 {
     Needle* const needle = (Needle*) data;
     for(int32_t i = needle->a; i < needle->b; i++)
@@ -559,12 +558,11 @@ static int32_t RunFlowNeedle(void* data)
     return 0;
 }
 
-// See the boids pseudocode: http://www.kfish.org/boids/pseudocode.html
 static Units ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
 {
-    BulkProcess(units, map, grid, RunStressorNeedle);
-    BulkProcess(units, map, grid, RunFlowNeedle);
-    return RunHardRules(units, field);
+    Process(units, map, grid, StressorThread);
+    Process(units, map, grid, FlowThread);
+    return ProcessHardRules(units, field);
 }
 
 static void SortStacks(const Units units)

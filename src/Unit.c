@@ -133,11 +133,11 @@ void Unit_Unlock(Unit* const unit)
     unit->is_state_locked = false;
 }
 
-void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer, const bool lock)
+void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer, const bool must_lock)
 {
     if(!unit->is_state_locked)
     {
-        if(lock)
+        if(must_lock)
             Unit_Lock(unit);
         else
             Unit_Unlock(unit);
@@ -164,11 +164,11 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
 
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
 {
-    static int32_t id;
     static Unit zero;
     Unit unit = zero;
     unit.trait = Trait_Build(file);
     unit.file = file;
+    static int32_t id;
     unit.id = id++;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);

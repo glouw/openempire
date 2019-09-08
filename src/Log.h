@@ -15,6 +15,6 @@ Log;
 
 void Log_Init(const Video);
 
-void Log_Append(char* const format, ...);
+void Log_Append(const char* const format, ...);
 
 void Log_Dump(void);

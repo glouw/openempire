@@ -18,7 +18,7 @@ void Log_Init(const Video video)
     logger.message = message;
 }
 
-void Log_Append(char* const format, ...)
+void Log_Append(const char* const format, ...)
 {
     va_list args;
     va_start(args, format);
