@@ -29,16 +29,35 @@ Buildings Buildings_New(const Grid grid)
     return GenerateTestZone(builds);
 }
 
+static bool OutOfBounds(const Buildings builds, const Point point)
+{
+    return point.x < 0
+        || point.y < 0
+        || point.x >= builds.cols
+        || point.y >= builds.rows;
+}
+
+static bool IsFreeSpace(const Buildings builds, const Point p)
+{
+    return builds.reference[p.x + p.y * builds.cols] == NULL; // XXX. Iterate for building size. // XXX. Check map for unwalkable tiles.
+}
+
 Buildings Buildings_Append(Buildings builds, const Building build)
 {
-    if(builds.count == builds.max)
+    if(!OutOfBounds(builds, build.cart)
+    && IsFreeSpace(builds, build.cart))
     {
-        builds.max *= 2;
-        Building* const temp = UTIL_REALLOC(builds.build, Building, builds.max);
-        UTIL_CHECK(temp);
-        builds.build = temp;
+        if(builds.count == builds.max)
+        {
+            builds.max *= 2;
+            Building* const temp = UTIL_REALLOC(builds.build, Building, builds.max);
+            UTIL_CHECK(temp);
+            builds.build = temp;
+        }
+        builds.build[builds.count] = build;
+        builds.reference[build.cart.x + build.cart.y * builds.cols] = &builds.build[builds.count]; // XXX. Iterate for building size.
+        builds.count++;
     }
-    builds.build[builds.count++] = build;
     return builds;
 }
 

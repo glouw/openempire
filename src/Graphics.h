@@ -2,12 +2,13 @@
 
 #include "File.h"
 #include "Type.h"
+#include "Point.h"
 
 #include <stdbool.h>
 
 typedef enum
 {
-#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire) name = file,
+#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire, dimensions) name = file,
     FILE_X_GRAPHICS
 #undef FILE_X
 }
@@ -38,3 +39,5 @@ bool Graphics_GetSingleFrame(const Graphics);
 bool Graphics_GetMultiState(const Graphics);
 
 bool Graphics_GetExpire(const Graphics);
+
+Point Graphics_GetDimensions(const Graphics);
