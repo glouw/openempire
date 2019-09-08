@@ -121,8 +121,9 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     }
 }
 
-Units Units_New(const int32_t max, const Map map, const Grid grid, const Registrar graphics)
+Units Units_New(const Map map, const Grid grid, const Registrar graphics)
 {
+    const int32_t max = 64;
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
@@ -142,7 +143,7 @@ Units Units_New(const int32_t max, const Map map, const Grid grid, const Registr
     return units;
 }
 
-Units Units_Append(Units units, Unit unit)
+Units Units_Append(Units units, const Unit unit)
 {
     if(units.count == units.max)
     {
@@ -696,8 +697,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
-    units = ManageAction(units, graphics, overview, input, map, field, render_points);
-    return units;
+    return ManageAction(units, graphics, overview, input, map, field, render_points);
 }
 
 bool Units_CanWalk(const Units units, const Map map, const Point point)

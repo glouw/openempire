@@ -1,6 +1,7 @@
 #include "Video.h"
 #include "Input.h"
 #include "Config.h"
+#include "Buildings.h"
 #include "Log.h"
 #include "Units.h"
 #include "Args.h"
@@ -14,7 +15,8 @@ int main(const int argc, const char* argv[])
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(video.xres, video.yres, grid);
-    Units units = Units_New(8, map, grid, data.graphics);
+    Units units = Units_New(map, grid, data.graphics);
+    Buildings buildings = Buildings_New(grid);
     int32_t cycles = 0;
     if(args.demo)
         Video_RenderDataDemo(video, data, args.color);
@@ -45,6 +47,7 @@ int main(const int argc, const char* argv[])
             SDL_Delay(ms);
     }
     Units_Free(units);
+    Buildings_Free(buildings);
     Map_Free(map);
     Data_Free(data);
     Video_Free(video);

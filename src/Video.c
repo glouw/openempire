@@ -62,7 +62,7 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
         Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
         Vram_Unlock(video.canvas);
         SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
-        Text_Printf(video.text, video.renderer, video.bot_rite, POSITION_BOT_RITE, 0xFF, 0, "%d / %d", index, count);
+        Text_Printf(video.text_small, video.renderer, video.bot_rite, POSITION_BOT_RITE, 0xFF, 0, "%d / %d", index, count);
         SDL_RenderPresent(video.renderer);
         SDL_Delay(20);
     }

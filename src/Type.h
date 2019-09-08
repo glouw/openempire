@@ -10,6 +10,7 @@ typedef enum
     TYPE_GOLD_MINE,
     TYPE_STONE_MINE,
     TYPE_TREE_CHOPPED_DOWN,
+    TYPE_BARRACKS,
     TYPE_TREE,
 }
 Type;
