@@ -31,7 +31,7 @@ Rect Rect_GetEllipse(const Point center, const int32_t width)
 
 int32_t Rect_GetArea(const Rect rect)
 {
-    return llabs(rect.b.x - rect.a.x) * llabs(rect.b.y - rect.a.y);
+    return labs(rect.b.x - rect.a.x) * labs(rect.b.y - rect.a.y);
 }
 
 // +---a
