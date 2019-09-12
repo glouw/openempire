@@ -314,7 +314,7 @@ void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units u
 static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
     if(!OutOfBounds(vram, point.x, point.y))
-        if((Get(vram, point.x, point.y) >> 24) < FILE_PRIO_GRAPHICS)
+        if((Get(vram, point.x, point.y) >> 24) < FILE_PRIO_UNIT)
             Put(vram, point.x, point.y, color);
 }
 

@@ -111,7 +111,7 @@ static Units GenerateRandomZone(Units units, const Grid grid, const Registrar gr
 
 static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar graphics)
 {
-    const Point a = { grid.cols / 2, grid.cols / 2 };
+    const Point a = { grid.cols / 2, grid.cols / 2 }; // XXX. THIS BUILDING POINT needs to be bottom left corner of building.
     const Point b = { grid.cols / 2 - 4, grid.cols / 2 };
     const Point c = { grid.cols / 2 + 2, grid.cols / 2  + 3};
     units = Units_Append(units, Unit_Make(a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics));
@@ -591,7 +591,7 @@ static Units ManagePathFinding(const Units units, const Grid grid, const Map map
     return ProcessHardRules(units, field);
 }
 
-static void SortStacks(const Units units)
+static void SortStacks(const Units units) // XXX. No longer needed because of buildings.
 {
     for(int32_t y = 0; y < units.rows; y++)
     for(int32_t x = 0; x < units.cols; x++)
@@ -660,7 +660,7 @@ static void ManageStacks(const Units units)
 {
     ResetStacks(units);
     StackStacks(units);
-    SortStacks(units);
+    SortStacks(units); // XXX. REMOVE.
     CalculateCenters(units);
 }
 

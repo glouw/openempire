@@ -37,7 +37,7 @@ static int32_t CompareByY(const void* a, const void* b)
     return pa.y < pb.y;
 }
 
-void Stack_Sort(const Stack stack)
+void Stack_Sort(const Stack stack) // XXX. This is no longer needed since buildings are being used.
 {
     if(stack.count > 1)
         qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
