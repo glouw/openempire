@@ -28,21 +28,6 @@ void Stack_Free(const Stack stack)
     free(stack.reference);
 }
 
-static int32_t CompareByY(const void* a, const void* b)
-{
-    Unit* const aa = *((Unit**) a);
-    Unit* const bb = *((Unit**) b);
-    const Point pa = Point_ToIso(aa->cart_grid_offset);
-    const Point pb = Point_ToIso(bb->cart_grid_offset);
-    return pa.y < pb.y;
-}
-
-void Stack_Sort(const Stack stack) // XXX. This is no longer needed since buildings are being used.
-{
-    if(stack.count > 1)
-        qsort(stack.reference, stack.count, sizeof(*stack.reference), CompareByY);
-}
-
 bool Stack_IsWalkable(const Stack stack)
 {
     for(int32_t i = 0; i < stack.count; i++)

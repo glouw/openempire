@@ -591,17 +591,6 @@ static Units ManagePathFinding(const Units units, const Grid grid, const Map map
     return ProcessHardRules(units, field);
 }
 
-static void SortStacks(const Units units) // XXX. No longer needed because of buildings.
-{
-    for(int32_t y = 0; y < units.rows; y++)
-    for(int32_t x = 0; x < units.cols; x++)
-    {
-        const Point point = { x, y };
-        const Stack stack = Units_GetStackCart(units, point);
-        Stack_Sort(stack);
-    }
-}
-
 static void CalculateCenters(const Units units)
 {
     for(int32_t y = 0; y < units.rows; y++)
@@ -660,7 +649,6 @@ static void ManageStacks(const Units units)
 {
     ResetStacks(units);
     StackStacks(units);
-    SortStacks(units); // XXX. REMOVE.
     CalculateCenters(units);
 }
 

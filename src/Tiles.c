@@ -4,16 +4,18 @@
 #include "Rect.h"
 #include "Surface.h"
 
-static int32_t CompareByCartY(const void* a, const void* b)
+static int32_t CompareByY(const void* a, const void* b)
 {
     Tile* const aa = (Tile*) a;
     Tile* const bb = (Tile*) b;
-    return aa->reference->cart.y < bb->reference->cart.y;
+    const Point pa = Point_ToIso(aa->reference->cell);
+    const Point pb = Point_ToIso(bb->reference->cell);
+    return pa.y < pb.y;
 }
 
-static void SortByCartY(const Tiles tiles)
+static void SortByY(const Tiles tiles)
 {
-    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByCartY);
+    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByY);
 }
 
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Units units, const Points points)
@@ -38,9 +40,9 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             }
         }
     }
-    const Tiles tiles = { tile, unit_count };
-    SortByCartY(tiles); // XXX. ALSO POINTLESS? MAYBE SORT ALL BY ISO_PIXEL?
     Units_ResetTiled(units);
+    const Tiles tiles = { tile, unit_count };
+    SortByY(tiles);
     return tiles;
 }
 
