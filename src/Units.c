@@ -710,7 +710,7 @@ static Units RemoveTheDecayed(const Units units)
     return ResizeDecayed(units);
 }
 
-static void Reset(const Units units)
+void Units_ResetTiled(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i].already_tiled = false;
@@ -718,9 +718,7 @@ static void Reset(const Units units)
 
 static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
 {
-    Reset(units);
     units = Select(units, overview, input, graphics, render_points);
-    Reset(units);
     units = Command(units, overview, input, graphics, map, field);
     Tick(units);
     Decay(units);

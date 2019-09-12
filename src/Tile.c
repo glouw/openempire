@@ -120,17 +120,7 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
 Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
 {
     const Dynamics dynamics = GetDynamics(animation, reference);
-    Point shifted = { 0,0 };
-    if(reference->trait.is_building)
-    {
-        const Point shift = { 1, 2 };
-        shifted = Point_Add(cart, shift);
-    }
-    else
-    {
-        const Point shift = { 0, 1 };
-        shifted = Point_Add(cart, shift);
-    }
+    const Point shifted = Unit_GetShift(reference, cart);
     const uint8_t height = Graphics_GetHeight(reference->file);
     return Construct(overview, shifted, cart_grid_offset, animation, dynamics, height, reference);
 }

@@ -40,6 +40,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
     }
     const Tiles tiles = { tile, unit_count };
     SortByCartY(tiles);
+    Units_ResetTiled(units);
     return tiles;
 }
 

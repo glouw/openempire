@@ -40,3 +40,5 @@ Units Units_Caretake(Units, const Registrar, const Overview, const Grid, const I
 bool Units_CanWalk(const Units, const Map, const Point);
 
 Field Units_Field(const Units, const Map);
+
+void Units_ResetTiled(const Units);
