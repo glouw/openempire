@@ -296,7 +296,7 @@ void Unit_Melee(Unit* const unit)
     && !Unit_IsExempt(unit)
     && !Unit_IsExempt(unit->interest))
     {
-        const Point diff = Point_Sub(unit->interest->cell, unit->cell);
+        const Point diff = Point_Sub(unit->interest->cell, unit->cell); // XXX. If the cell of interest is a building, make this diff calc a little different (using squares somehow).
         if(Point_Mag(diff) < unit->trait.width + CONFIG_UNIT_SWORD_LENGTH)
         {
             Unit_SetState(unit, STATE_ATTACK, true, true);

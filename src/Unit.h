@@ -43,6 +43,7 @@ typedef struct Unit
     bool is_selected;
     bool is_fully_decayed;
     bool is_state_locked;
+    bool already_tiled;
 }
 Unit;
 

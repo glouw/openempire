@@ -8,7 +8,7 @@
 
 typedef enum
 {
-#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire, dimensions) name = file,
+#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions) name = file,
     FILE_X_GRAPHICS
 #undef FILE_X
 }
@@ -41,3 +41,5 @@ bool Graphics_GetMultiState(const Graphics);
 bool Graphics_GetExpire(const Graphics);
 
 Point Graphics_GetDimensions(const Graphics);
+
+bool Graphics_GetBuilding(const Graphics);

@@ -109,15 +109,28 @@ static Units GenerateRandomZone(Units units, const Grid grid, const Registrar gr
     return units;
 }
 
+static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar graphics)
+{
+    const Point a = { grid.cols / 2, grid.cols / 2 };
+    const Point b = { grid.cols / 2 - 4, grid.cols / 2 };
+    const Point c = { grid.cols / 2 + 2, grid.cols / 2  + 3};
+    units = Units_Append(units, Unit_Make(a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
+    for(int32_t i = 0; i < 100; i++)
+        units = Units_Append(units, Unit_Make(b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
+    return units;
+}
+
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(0)
+    switch(4)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
     case 1: return GenerateBerryZone(units, grid, graphics);
     case 2: return GenerateVillieZone(units, grid, graphics);
     case 3: return GenerateRandomZone(units, grid, graphics);
+    case 4: return GenerateBuildingZone(units, grid, graphics);
     }
 }
 
@@ -194,9 +207,9 @@ static Units UnSelectAll(Units units)
 
 static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics, const Points render_points)
 {
-    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
     if(input.lu)
     {
+        const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
@@ -210,8 +223,8 @@ static Units Select(Units units, const Overview overview, const Input input, con
             else
                 units.select_count = 1;
         }
+        Tiles_Free(tiles);
     }
-    Tiles_Free(tiles);
     return units;
 }
 
@@ -269,8 +282,20 @@ static void StackStacks(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        Stack* const stack = GetStack(units, unit->cart);
-        Stack_Append(stack, unit);
+        if(unit->trait.is_building)
+            for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+            for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+            {
+                const Point point = { x, y };
+                const Point cart = Point_Add(point, unit->cart);
+                Stack* const stack = GetStack(units, cart);
+                Stack_Append(stack, unit);
+            }
+        else
+        {
+            Stack* const stack = GetStack(units, unit->cart);
+            Stack_Append(stack, unit);
+        }
     }
 }
 
@@ -406,7 +431,7 @@ static void Kill(const Units units)
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
             if(unit->health <= 0)
-                Unit_Kill(unit);
+                Unit_Kill(unit); // XXX. If building, do not kill as it changes state...
     }
 }
 
@@ -679,9 +704,17 @@ static Units RemoveTheDecayed(const Units units)
     return ResizeDecayed(units);
 }
 
+static void Reset(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+        units.unit[i].already_tiled = false;
+}
+
 static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
 {
+    Reset(units);
     units = Select(units, overview, input, graphics, render_points);
+    Reset(units);
     units = Command(units, overview, input, graphics, map, field);
     Tick(units);
     Decay(units);
@@ -691,7 +724,6 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     return units;
 }
 
-// Stacks need to be updated after the pathfinder runs, else the video renderer will use stale stack data and create tile jumping artifacts.
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
     units = ManagePathFinding(units, grid, map, field);

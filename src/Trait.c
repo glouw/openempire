@@ -18,6 +18,7 @@ Trait Trait_Build(const Graphics file)
     trait.is_single_frame = Graphics_GetSingleFrame(file);
     trait.is_walkable = Graphics_GetWalkable(file);
     trait.is_multi_state = Graphics_GetMultiState(file);
+    trait.is_building = Graphics_GetBuilding(file);
     trait.can_expire = Graphics_GetExpire(file);
     return trait;
 }

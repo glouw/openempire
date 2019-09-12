@@ -21,6 +21,7 @@ typedef struct
     bool is_single_frame;
     bool is_walkable;
     bool is_multi_state;
+    bool is_building;
     bool can_expire;
 }
 Trait;
