@@ -114,8 +114,10 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     const Point a = { grid.cols / 2, grid.cols / 2 }; // XXX. THIS BUILDING POINT needs to be bottom left corner of building.
     const Point b = { grid.cols / 2 - 4, grid.cols / 2 };
     const Point c = { grid.cols / 2 + 2, grid.cols / 2  + 3};
+    const Point d = { grid.cols / 2 + 6, grid.cols / 2  + 6};
     units = Units_Append(units, Unit_Make(a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
     for(int32_t i = 0; i < 100; i++)
         units = Units_Append(units, Unit_Make(b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
     return units;
