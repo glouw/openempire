@@ -619,8 +619,14 @@ void Delete(const Units units, const Input input)
         for(int32_t i = 0; i < units.count; i++)
         {
             Unit* const unit = &units.unit[i];
-            if(unit->is_selected && !Unit_IsExempt(unit))
-                Unit_Kill(unit);
+            if(unit->is_selected)
+            {
+                if(unit->trait.is_building)
+                    unit->is_fully_decayed = true;
+                else
+                if(!Unit_IsExempt(unit))
+                    Unit_Kill(unit);
+            }
         }
 }
 
