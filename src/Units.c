@@ -254,7 +254,8 @@ static Units PlaceRedArrows(Units units, const Overview overview, const Registra
 
 static Units Command(Units units, const Overview overview, const Input input, const Registrar graphics, const Map map, const Field field)
 {
-    if(input.ru)
+    if(input.ru
+    && units.select_count > 0)
     {
         const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
         const Point cart = Overview_IsoToCart(overview, input.point, true);

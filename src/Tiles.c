@@ -130,6 +130,8 @@ int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
+        if(tile.reference->trait.is_building)
+            continue;
         if(Tile_IsHotspotInRect(tile, box))
         {
             Tile_Select(tile);
