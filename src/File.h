@@ -56,6 +56,9 @@ File File_Load(FILE* const);
 #define FILE_FEUDAL_HOUSE_HEALTH (500)
 #define FILE_DIMENSIONS_HOUSE {3,2}
 
+#define FILE_WONDER_HEALTH (500)
+#define FILE_DIMENSIONS_WONDER {5,5}
+
 // For more details about X-Macros:
 //   https://en.wikipedia.org/wiki/X_Macro
 //
@@ -117,5 +120,6 @@ File File_Load(FILE* const);
     FILE_X(FILE_BERRY_BUSH,                               ( 698),   FILE_PRIO_GRAPHICS, (false),    TYPE_BERRY_BUSH,        FILE_ZERO,                      FILE_BERRY_BUSH_HEALTH,      FILE_ZERO,                   FILE_BERRY_BUSH_WIDTH,      (false),     (true ),       (false),       (false),  (false),   FILE_DIMENSIONS_ZERO) \
     FILE_X(FILE_WAYPOINT_FLAG,                            ( 795),   FILE_PRIO_GRAPHICS, (true ),    TYPE_NONE,              FILE_ZERO,                      FILE_ONE, /* else crash? */  FILE_ZERO,                   FILE_ZERO,                  (false),     (false),       (false),       (false),  (false),   FILE_DIMENSIONS_ZERO) \
     FILE_X(FILE_RIGHT_CLICK_RED_ARROWS,                   ( 796),   FILE_PRIO_GRAPHICS, (true ),    TYPE_NONE,              FILE_ZERO,                      FILE_ONE,                    FILE_ZERO,                   FILE_ZERO,                  (false),     (false),       (false),       (true),   (false),   FILE_DIMENSIONS_ZERO) \
+    FILE_X(FILE_WONDER_BRITONS,                           ( 832),   FILE_PRIO_GRAPHICS, (false),    TYPE_WONDER,            FILE_ZERO,                      FILE_WONDER_HEALTH,          FILE_ZERO,                   FILE_ZERO,                  (false),     (true),        (false),       (false),  (true),    FILE_DIMENSIONS_WONDER) \
     FILE_X(FILE_GOLD_MINE,                                (1297),   FILE_PRIO_GRAPHICS, (false),    TYPE_GOLD_MINE,         FILE_ZERO,                      FILE_ZERO,                   FILE_ZERO,                   FILE_ZERO,                  (false),     (false),       (false),       (false),  (false),   FILE_DIMENSIONS_ZERO) \
     FILE_X(FILE_FOREST_TREE,                              (1410),   FILE_PRIO_GRAPHICS, (false),    TYPE_TREE,              FILE_ZERO,                      FILE_ZERO,                   FILE_ZERO,                   FILE_ZERO,                  (false),     (false),       (false),       (false),  (false),   FILE_DIMENSIONS_ZERO)
