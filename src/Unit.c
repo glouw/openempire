@@ -132,6 +132,8 @@ void Unit_Unlock(Unit* const unit)
 
 void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer, const bool must_lock)
 {
+    if(unit->was_wall_pushed)
+        return;
     if(!unit->is_state_locked)
     {
         if(must_lock)

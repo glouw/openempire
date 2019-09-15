@@ -387,6 +387,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         if(!can_walk_s && offset.y > grid.tile_cart_height - border) out = Point_Add(out, Point_Mul(n, repulsion));
         if(!can_walk_e && offset.x > grid.tile_cart_width  - border) out = Point_Add(out, Point_Mul(w, repulsion));
     }
+    unit->was_wall_pushed = Point_Mag(out) > 0;
     return out;
 }
 
