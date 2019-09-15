@@ -63,7 +63,8 @@ static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, co
         const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
         if(surface_pixel != SURFACE_COLOR_KEY)
         {
-            const uint32_t pixel = (tile.height << 24) | surface_pixel;
+            const uint32_t prio = (surface_pixel == 0x0 ? FILE_PRIO_SHADOW : tile.height) << 24;
+            const uint32_t pixel = prio | surface_pixel;
             Put(vram, coords.x, coords.y, pixel);
         }
     }
