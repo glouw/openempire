@@ -369,7 +369,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
 {
     static Point zero;
     Point out = zero;
-    if(!Unit_IsExempt(unit))
+    if(!Unit_IsExempt(unit)) // XXX. How to use normal vectors to run along walls?
     {
         const Point n = {  0, -1 };
         const Point e = { +1,  0 };
@@ -643,7 +643,7 @@ static void Decay(const Units units)
         if(unit->state == STATE_FALL
         && unit->state_timer == last_tick)
         {
-            Unit_SetState(unit, STATE_DECAY, true, true);
+            Unit_SetState(unit, STATE_DECAY, true, false);
             unit->is_selected = false;
         }
     }
