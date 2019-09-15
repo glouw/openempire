@@ -53,7 +53,6 @@ static uint8_t Feed(uint8_t* const data, uint32_t* index)
     return get;
 }
 
-// XXX. Sometimes scanlines have large streaks of black lines in them.
 Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, const Color color)
 {
     const int32_t player_palette_index = 16 * ((int32_t) color + 1);
@@ -130,9 +129,9 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
         {
             const int32_t shift = command >> 4;
             const int32_t count = (shift == 0) ? Feed(image.data, &index) : shift;
-            Feed(image.data, &index);
+            const uint8_t palette_index = Feed(image.data, &index);
             for(int32_t i = 0; i < count; i++)
-                scanline = Append(scanline, 0); // Needs to be player color?
+                scanline = Append(scanline, palette_index);
             break;
         }
 
