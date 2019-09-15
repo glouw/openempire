@@ -10,7 +10,6 @@ Trait Trait_Build(const Graphics file)
     trait.dimensions = Graphics_GetDimensions(file);
     trait.type = Graphics_GetType(file);
     trait.max_speed = Graphics_GetMaxSpeed(file);
-    trait.accel = Graphics_GetAcceleration(file);
     trait.max_health = Graphics_GetHealth(file);
     trait.attack = Graphics_GetAttack(file);
     trait.width = Graphics_GetWidth(file);

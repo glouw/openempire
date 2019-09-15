@@ -8,7 +8,7 @@
 
 typedef enum
 {
-#define FILE_X(name, file, prio, walkable, type, max_speed, accel, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions) name = file,
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions) name = file,
     FILE_X_GRAPHICS
 #undef FILE_X
 }
@@ -23,8 +23,6 @@ bool Graphics_GetWalkable(const Graphics);
 Type Graphics_GetType(const Graphics);
 
 int32_t Graphics_GetMaxSpeed(const Graphics);
-
-int32_t Graphics_GetAcceleration(const Graphics);
 
 int32_t Graphics_GetHealth(const Graphics);
 

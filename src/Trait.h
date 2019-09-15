@@ -13,7 +13,6 @@ typedef struct
     Point dimensions;
     Type type;
     int32_t max_speed;
-    int32_t accel;
     int32_t max_health;
     int32_t attack;
     int32_t width;

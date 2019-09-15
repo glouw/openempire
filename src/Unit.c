@@ -45,18 +45,17 @@ static void ReachGoal(Unit* const unit)
 
 static void GotoGoal(Unit* const unit, const Point delta)
 {
-    const Point accel = Point_Normalize(delta, unit->trait.accel);
-    unit->velocity = Point_Add(unit->velocity, accel);
+    unit->velocity = Point_Normalize(delta, unit->trait.max_speed);
     if(unit->is_chasing)
         Unit_SetDir(unit, Point_Sub(unit->interest->cell, unit->cell));
     else
     {
         const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
-        Unit_SetDir(unit, align ? unit->group_alignment : accel);
+        Unit_SetDir(unit, align ? unit->group_alignment : unit->velocity);
     }
 }
 
-static void AccelerateAlongPath(Unit* const unit, const Grid grid)
+static void MoveAlongPath(Unit* const unit, const Grid grid)
 {
     const Point delta = GetDelta(unit, grid);
     if(Point_Mag(delta) < CONFIG_POINT_GOAL_CLOSE_ENOUGH_MAG)
@@ -70,9 +69,7 @@ static void Decelerate(Unit* const unit)
     if(Point_Mag(unit->velocity) > 0) 
     {
         static Point zero;
-        const Point deccel = Point_Normalize(unit->velocity, unit->trait.accel);
-        const Point velocity = Point_Sub(unit->velocity, deccel);
-        unit->velocity = Point_Mag(unit->velocity) <= unit->trait.accel ? zero : velocity; // XXX. Double check the math...
+        unit->velocity = zero;
     }
 }
 
@@ -81,7 +78,7 @@ static void FollowPath(Unit* const unit, const Grid grid)
     if(unit->path.count > 0)
     {
         ConditionallySkipFirstPoint(unit);
-        AccelerateAlongPath(unit, grid);
+        MoveAlongPath(unit, grid);
     }
     else Decelerate(unit);
 }
@@ -193,7 +190,6 @@ void Unit_Print(Unit* const unit)
     Log_Append("cart_grid_offset_goal :: %d %d", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
     Log_Append("cell                  :: %d %d", unit->cell.x, unit->cell.y);
     Log_Append("max_speed             :: %d",    unit->trait.max_speed);
-    Log_Append("accel                 :: %d",    unit->trait.accel);
     Log_Append("velocity              :: %d %d", unit->velocity.x, unit->velocity.y);
     Log_Append("path_index_timer      :: %d",    unit->path_index_timer);
     Log_Append("path_index            :: %d",    unit->path_index);

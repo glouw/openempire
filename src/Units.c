@@ -380,7 +380,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         const bool can_walk_s = Units_CanWalk(units, map, Point_Add(unit->cart, s));
         const bool can_walk_w = Units_CanWalk(units, map, Point_Add(unit->cart, w));
         const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
-        const int32_t repulsion = 10 * unit->trait.accel; // XXX. How strong should this be?
+        const int32_t repulsion = 1000; // XXX. How strong should this be?
         const int32_t border = 10;
         if(!can_walk_n && offset.y < border) out = Point_Add(out, Point_Mul(s, repulsion));
         if(!can_walk_w && offset.x < border) out = Point_Add(out, Point_Mul(e, repulsion));
