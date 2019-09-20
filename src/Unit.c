@@ -137,7 +137,7 @@ void Unit_SetState(Unit* const unit, const State state, const bool reset_state_t
     if(!unit->is_state_locked)
     {
         if(must_lock)
-            Unit_Lock(unit);
+            Unit_Lock(unit); // XXX. REVIEW THE LOCKING MECHANISM.
         else
             Unit_Unlock(unit);
         const Graphics file = GetFileFromState(unit, state);
@@ -288,19 +288,32 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
-void Unit_Melee(Unit* const unit)
+static bool ShouldEngage(Unit* const unit, const Grid grid)
+{
+    const Point diff = Point_Sub(unit->interest->cell, unit->cell);
+    const int32_t reach = unit->trait.width + CONFIG_UNIT_SWORD_LENGTH;
+    if(unit->interest->trait.is_building)
+    {
+        const Point feeler = Point_Normalize(diff, reach);
+        const Point cell = Point_Add(unit->cell, feeler);
+        const Point cart = Grid_CellToCart(grid, cell);
+        return Point_Equal(cart, unit->interest->cart);
+    }
+    else return Point_Mag(diff) < reach;
+}
+
+void Unit_Melee(Unit* const unit, const Grid grid)
 {
     if(unit->interest != NULL
     && !Unit_IsExempt(unit)
     && !Unit_IsExempt(unit->interest))
     {
-        const Point diff = Point_Sub(unit->interest->cell, unit->cell); // XXX. If the cell of interest is a building, make this diff calc a little different (using squares somehow).
-        if(Point_Mag(diff) < unit->trait.width + CONFIG_UNIT_SWORD_LENGTH)
+        if(ShouldEngage(unit, grid))
         {
             Unit_SetState(unit, STATE_ATTACK, true, true);
             if(unit->state_timer == Unit_GetLastAttackTick(unit))
             {
-                unit->interest->health -= unit->trait.attack; // Unit_Kill() is purposely not used so that all units of all colors get an equal chance to make a hit.
+                unit->interest->health -= unit->trait.attack;
                 Unit_Unlock(unit);
             }
             static Point zero;
@@ -328,7 +341,7 @@ static Point Nudge(void)
 {
     const Point nudge = {
         1000 * ((Util_Rand() % 1000) - 500), // XXX. Each thread requires its own rand() seed tracker.
-        1000 * ((Util_Rand() % 1000) - 500),
+        1000 * ((Util_Rand() % 1000) - 500), // XXX. MAYBE a better idea is putting a mutex on rand().
     };
     return nudge;
 }

@@ -116,10 +116,12 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     const Point c = { grid.cols / 2 + 2, grid.cols / 2 + 3};
     const Point d = { grid.cols / 2 + 6, grid.cols / 2 + 6};
     const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8};
+    const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9};
     units = Units_Append(units, Unit_Make(a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics));
     for(int32_t i = 0; i < 300; i++)
         units = Units_Append(units, Unit_Make(b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
     return units;
@@ -469,7 +471,16 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
             if(other->color != unit->color
             && !Unit_IsExempt(other))
             {
-                const Point diff = Point_Sub(other->cell, unit->cell);
+                Point cell = other->cell;
+                if(other->trait.is_building)
+                {
+                    const Point mid = {
+                        CONFIG_GRID_CELL_SIZE / 2,
+                        CONFIG_GRID_CELL_SIZE / 2,
+                    };
+                    cell = Point_Add(cell, mid);
+                }
+                const Point diff = Point_Sub(cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
                 if(mag < max)
                 {
@@ -517,7 +528,7 @@ static Units Repath(Units units, const Field field)
     return units;
 }
 
-static Units ProcessHardRules(Units units, const Field field)
+static Units ProcessHardRules(Units units, const Field field, const Grid grid)
 {
     units = Repath(units, field);
     for(int32_t i = 0; i < units.count; i++)
@@ -525,7 +536,7 @@ static Units ProcessHardRules(Units units, const Field field)
     for(int32_t i = 0; i < units.count; i++)
         ChaseBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++)
-        Unit_Melee(&units.unit[i]);
+        Unit_Melee(&units.unit[i], grid);
     return units;
 }
 
@@ -594,7 +605,7 @@ static Units ManagePathFinding(const Units units, const Grid grid, const Map map
 {
     Process(units, map, grid, StressorThread);
     Process(units, map, grid, FlowThread);
-    return ProcessHardRules(units, field);
+    return ProcessHardRules(units, field, grid);
 }
 
 static void CalculateCenters(const Units units)
