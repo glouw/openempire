@@ -40,7 +40,6 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     Point current = goal;
     while(!Point_Equal(current, start))
     {
-        // XXX: There is no timeout! Implement a way to timeout!
         path = Points_Append(path, current);
         current = came_from.point[current.x + current.y * field.cols];
     }
