@@ -327,7 +327,7 @@ void Unit_Repath(Unit* const unit, const Field field)
 static Point Nudge(void)
 {
     const Point nudge = {
-        1000 * ((Util_Rand() % 1000) - 500),
+        1000 * ((Util_Rand() % 1000) - 500), // XXX. Each thread requires its own rand() seed tracker.
         1000 * ((Util_Rand() % 1000) - 500),
     };
     return nudge;

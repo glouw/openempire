@@ -13,26 +13,6 @@ static void GenerateTestZone(const Map map)
         const Point point = { x, y };
         Map_SetTerrainFile(map, point, FILE_DIRT);
     }
-    for(int32_t i = 0; i < 50; i++)
-    {
-        const Point point = {
-            Util_Rand() % map.cols,
-            Util_Rand() % map.rows,
-        };
-        switch(Util_Rand() % 3)
-        {
-        default:
-        case 0:
-            Map_SetTerrainFile(map, point, FILE_GRASS);
-            break;
-        case 1:
-            Map_SetTerrainFile(map, point, FILE_WATER);
-            break;
-        case 2:
-            Map_SetTerrainFile(map, point, FILE_FARM);
-            break;
-        }
-    }
 }
 
 Map Map_Make(const int32_t size, const Registrar terrain)
