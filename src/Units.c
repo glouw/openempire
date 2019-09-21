@@ -432,15 +432,60 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-static void Kill(const Units units)
+static bool EqualDimension(Unit* const unit, const Graphics file)
+{
+    Point dimensions = unit->trait.dimensions;
+    const int32_t min = UTIL_MIN(dimensions.x, dimensions.y);
+    dimensions.x = min;
+    dimensions.y = min;
+    const Point points[] = {
+        FILE_DIMENSIONS_1X1,
+        FILE_DIMENSIONS_2X2,
+        FILE_DIMENSIONS_3X3,
+        FILE_DIMENSIONS_4X4,
+        FILE_DIMENSIONS_5X5,
+    };
+    int32_t index = 0;
+    switch(file)
+    {
+        default:
+        case FILE_RUBBLE_1X1: index = 0; break;
+        case FILE_RUBBLE_2X2: index = 1; break;
+        case FILE_RUBBLE_3X3: index = 2; break;
+        case FILE_RUBBLE_4X4: index = 3; break;
+        case FILE_RUBBLE_5X5: index = 4; break;
+    }
+    return Point_Equal(points[index], dimensions);
+}
+
+Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Registrar graphics)
+{
+    if(unit->trait.is_building)
+    {
+        if(EqualDimension(unit, FILE_RUBBLE_1X1)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_1X1, COLOR_BLU, graphics));
+        if(EqualDimension(unit, FILE_RUBBLE_2X2)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_2X2, COLOR_BLU, graphics));
+        if(EqualDimension(unit, FILE_RUBBLE_3X3)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_3X3, COLOR_BLU, graphics));
+        if(EqualDimension(unit, FILE_RUBBLE_4X4)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_4X4, COLOR_BLU, graphics));
+        if(EqualDimension(unit, FILE_RUBBLE_5X5)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_5X5, COLOR_BLU, graphics));
+    }
+    return units;
+}
+
+static Units Kill(Units units, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
+        {
             if(unit->health <= 0)
-                Unit_Kill(unit); // XXX. If building, do not kill as it changes state...
+            {
+                Unit_Kill(unit);
+                units = PlaceRubble(units, unit, grid, graphics);
+            }
+        }
     }
+    return units;
 }
 
 static void Expire(const Units units)
@@ -590,7 +635,7 @@ static int32_t FlowThread(void* data)
     for(int32_t i = needle->a; i < needle->b; i++)
     {
         Unit* const unit = &needle->units.unit[i];
-        if(!State_IsDead(unit->state))
+        if(!State_IsDead(unit->state)) // Not using EXEMPT else fractional cart is discarded for right click red arrows.
         {
             Unit_Flow(unit, needle->grid);
             Unit_Move(unit, needle->grid);
@@ -619,20 +664,15 @@ static void CalculateCenters(const Units units)
     }
 }
 
-void Delete(const Units units, const Input input)
+static void Delete(const Units units, const Input input)
 {
     if(input.key[SDL_SCANCODE_DELETE])
         for(int32_t i = 0; i < units.count; i++)
         {
             Unit* const unit = &units.unit[i];
             if(unit->is_selected)
-            {
-                if(unit->trait.is_building)
-                    unit->is_fully_decayed = true;
-                else
                 if(!Unit_IsExempt(unit))
                     Unit_Kill(unit);
-            }
         }
 }
 
@@ -695,13 +735,13 @@ static void FlagDecayed(const Units units)
 
 static Units ResizeDecayed(Units units)
 {
-    int32_t i = 0;
-    for(i = 0; i < units.count; i++)
+    int32_t index = 0;
+    for(index = 0; index < units.count; index++)
     {
-        Unit* const unit = &units.unit[i];
+        Unit* const unit = &units.unit[index];
         if(unit->is_fully_decayed)
         {
-            units.count = i;
+            units.count = index;
             break;
         }
     }
@@ -725,11 +765,6 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
 {
     units = Select(units, overview, input, graphics, render_points);
     units = Command(units, overview, input, graphics, map, field);
-    Tick(units);
-    Decay(units);
-    Delete(units, input);
-    Kill(units);
-    Expire(units);
     return units;
 }
 
@@ -738,6 +773,11 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
+    Delete(units, input);
+    units = Kill(units, overview.grid, graphics);
+    Tick(units);
+    Decay(units);
+    Expire(units);
     return ManageAction(units, graphics, overview, input, map, field, render_points);
 }
 

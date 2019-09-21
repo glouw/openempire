@@ -149,6 +149,6 @@ Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_
 
 void Tile_Select(const Tile tile)
 {
-    if(!State_IsDead(tile.reference->state))
+    if(!Unit_IsExempt(tile.reference))
         tile.reference->is_selected = true;
 }

@@ -44,7 +44,7 @@ void Stack_UpdateCenterOfMass(Stack* const stack)
     for(int32_t i = 0; i < stack->count; i++)
     {
         Unit* const unit = stack->reference[i];
-        if(!State_IsDead(unit->state))
+        if(!Unit_IsExempt(unit))
         {
             out = Point_Add(out, unit->cell);
             count++;
