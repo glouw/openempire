@@ -66,7 +66,7 @@ void Unit_Lock(Unit* const);
 
 void Unit_Unlock(Unit* const);
 
-void Unit_SetState(Unit* const, const State, const bool reset_state_timer, const bool lock);
+void Unit_SetState(Unit* const, const State, const bool reset_state_timer);
 
 void Unit_FreePath(Unit* const);
 

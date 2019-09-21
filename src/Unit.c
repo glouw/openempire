@@ -108,9 +108,9 @@ void Unit_Move(Unit* const unit, const Grid grid)
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
     UpdateCart(unit, grid);
-    Unit_SetState(unit, STATE_MOVE, false, false);
+    Unit_SetState(unit, STATE_MOVE, false);
     if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
-        Unit_SetState(unit, STATE_IDLE, false, false);
+        Unit_SetState(unit, STATE_IDLE, false);
 }
 
 static Graphics GetFileFromState(Unit* const unit, const State state)
@@ -130,22 +130,17 @@ void Unit_Unlock(Unit* const unit)
     unit->is_state_locked = false;
 }
 
-void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer, const bool must_lock)
+void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer)
 {
     if(unit->was_wall_pushed)
         return;
-    if(!unit->is_state_locked)
-    {
-        if(must_lock)
-            Unit_Lock(unit); // XXX. REVIEW THE LOCKING MECHANISM.
-        else
-            Unit_Unlock(unit);
-        const Graphics file = GetFileFromState(unit, state);
-        unit->state = state;
-        unit->file = file;
-        if(reset_state_timer)
-            unit->state_timer = 0;
-    }
+    if(unit->is_state_locked)
+        return;
+    const Graphics file = GetFileFromState(unit, state);
+    unit->state = state;
+    unit->file = file;
+    if(reset_state_timer)
+        unit->state_timer = 0;
 }
 
 static int32_t GetFramesFromState(Unit* const unit, const Registrar graphics, const State state)
@@ -265,7 +260,7 @@ void Unit_Kill(Unit* const unit)
 {
     Unit_Unlock(unit);
     unit->health = 0;
-    Unit_SetState(unit, STATE_FALL, true, false);
+    Unit_SetState(unit, STATE_FALL, true);
 }
 
 int32_t Unit_GetLastExpireTick(Unit* const unit)
@@ -310,7 +305,8 @@ void Unit_Melee(Unit* const unit, const Grid grid)
     {
         if(ShouldEngage(unit, grid))
         {
-            Unit_SetState(unit, STATE_ATTACK, true, true);
+            Unit_SetState(unit, STATE_ATTACK, true);
+            Unit_Lock(unit);
             if(unit->state_timer == Unit_GetLastAttackTick(unit))
             {
                 unit->interest->health -= unit->trait.attack;

@@ -656,7 +656,7 @@ static void Decay(const Units units)
         if(unit->state == STATE_FALL
         && unit->state_timer == last_tick)
         {
-            Unit_SetState(unit, STATE_DECAY, true, false);
+            Unit_SetState(unit, STATE_DECAY, true);
             unit->is_selected = false;
         }
     }
