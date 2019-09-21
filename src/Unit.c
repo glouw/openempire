@@ -258,9 +258,12 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
 
 void Unit_Kill(Unit* const unit)
 {
-    Unit_Unlock(unit);
+    Unit_Unlock(unit); // XXX. IS THIS NEEDED?
     unit->health = 0;
-    Unit_SetState(unit, STATE_FALL, true);
+    if(unit->trait.is_building)
+        unit->is_fully_decayed = true;
+    else
+        Unit_SetState(unit, STATE_FALL, true);
 }
 
 int32_t Unit_GetLastExpireTick(Unit* const unit)
@@ -292,7 +295,10 @@ static bool ShouldEngage(Unit* const unit, const Grid grid)
         const Point feeler = Point_Normalize(diff, reach);
         const Point cell = Point_Add(unit->cell, feeler);
         const Point cart = Grid_CellToCart(grid, cell);
-        return Point_Equal(cart, unit->interest->cart);
+        const Point a = unit->interest->cart;
+        const Point b = Point_Add(a, unit->interest->trait.dimensions);
+        const Rect rect = { a, b };
+        return Rect_ContainsPoint(rect, cart);
     }
     else return Point_Mag(diff) < reach;
 }
