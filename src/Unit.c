@@ -371,14 +371,9 @@ bool Unit_IsExempt(Unit* const unit)
 
 Point Unit_GetShift(Unit* const reference, const Point cart)
 {
-    if(reference->trait.is_building)
-    {
-        const Point shift = {
-            reference->trait.dimensions.x / 2 + 0,
-            reference->trait.dimensions.y / 2 + 1, // XXX. Is this right?
-        };
-        return Point_Add(cart, shift);
-    }
-    const Point shift = { 0, 1 };
+    const Point shift = {
+        reference->trait.dimensions.x / 2 + 0,
+        reference->trait.dimensions.y / 2 + 1,
+    };
     return Point_Add(cart, shift);
 }

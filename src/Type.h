@@ -13,6 +13,7 @@ typedef enum
     TYPE_BARRACKS,
     TYPE_WONDER,
     TYPE_HOUSE,
+    TYPE_RUBBLE,
     TYPE_TREE,
 }
 Type;
