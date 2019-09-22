@@ -22,6 +22,7 @@ typedef struct Unit
     Point velocity;
     Point group_alignment;
     Point stressors;
+    Point entropy;
     Points path;
     Color color;
     Direction dir;
@@ -95,3 +96,5 @@ Point Unit_Separate(Unit* const, Unit* const);
 bool Unit_IsExempt(Unit* const);
 
 Point Unit_GetShift(Unit* const, const Point);
+
+void Unit_UpdateEntropy(Unit* const);

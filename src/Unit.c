@@ -177,6 +177,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
         unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
+    Unit_UpdateEntropy(&unit);
     return unit;
 }
 
@@ -340,13 +341,11 @@ void Unit_Repath(Unit* const unit, const Field field)
     }
 }
 
-static Point Nudge(void)
+static Point Nudge(Unit* const unit)
 {
-    const Point nudge = {
-        1000 * ((Util_Rand() % 1000) - 500), // XXX. Each thread requires its own rand() seed tracker.
-        1000 * ((Util_Rand() % 1000) - 500), // XXX. MAYBE a better idea is putting a mutex on rand().
-    };
-    return nudge;
+    const uint32_t mag = UINT16_MAX;
+    const Point half = { mag / 2, mag / 2 };
+    return Point_Mul(Point_Sub(unit->entropy, half), mag);
 }
 
 Point Unit_Separate(Unit* const unit, Unit* const other)
@@ -357,7 +356,7 @@ Point Unit_Separate(Unit* const unit, Unit* const other)
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_IsZero(diff))
-            return Nudge();
+            return Nudge(unit);
         const int32_t width = UTIL_MAX(unit->trait.width, other->trait.width);
         if(Point_Mag(diff) < width)
             return Point_Sub(Point_Normalize(diff, width), diff);
@@ -379,4 +378,10 @@ Point Unit_GetShift(Unit* const reference, const Point cart)
         reference->trait.dimensions.y / 2 + 1,
     };
     return Point_Add(cart, shift);
+}
+
+void Unit_UpdateEntropy(Unit* const unit)
+{
+    unit->entropy.x = Util_Rand() % UINT16_MAX;
+    unit->entropy.y = Util_Rand() % UINT16_MAX;
 }

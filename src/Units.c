@@ -768,8 +768,18 @@ static Units ManageAction(Units units, const Registrar graphics, const Overview 
     return units;
 }
 
+void UpdateEntropy(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        Unit_UpdateEntropy(unit);
+    }
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
+    UpdateEntropy(units);
     units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
