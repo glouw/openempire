@@ -98,7 +98,7 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
 {
     Dynamics dynamics = { 0, false };
     if(reference->trait.is_single_frame)
-        dynamics.index = reference->id % animation.count;
+        dynamics.index = reference->entropy_static % animation.count;
     else
     if(reference->trait.is_rotatable)
     {

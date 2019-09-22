@@ -178,6 +178,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
         unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
     Unit_UpdateEntropy(&unit);
+    unit.entropy_static = Util_Rand();
     return unit;
 }
 
@@ -368,7 +369,7 @@ bool Unit_IsExempt(Unit* const unit)
 {
     return State_IsDead(unit->state)
         || unit->trait.can_expire
-        || unit->trait.type == TYPE_RUBBLE;
+        || unit->trait.type == TYPE_RUBBLE; // XXX. WHAT about resources? These should be exempt too. Have exempt field in File.h. Do not consume ||, too heavy duty.
 }
 
 Point Unit_GetShift(Unit* const unit, const Point cart)

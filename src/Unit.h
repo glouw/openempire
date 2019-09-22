@@ -28,6 +28,7 @@ typedef struct Unit
     Direction dir;
     State state;
     Graphics file;
+    int32_t entropy_static;
     int32_t id;
     int32_t path_index;
     int32_t path_index_timer;
