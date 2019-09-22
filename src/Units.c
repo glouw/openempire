@@ -131,6 +131,9 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
         units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics)); // XXX. TREES SHOULD NOT HAVE A TEAM COLOR.
         units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
     }
+    const Point h = { grid.cols / 2 - 12, grid.cols / 2 - 12};
+    units = Units_Append(units, Unit_Make(h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(h, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
     return units;
 }
 

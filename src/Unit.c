@@ -369,7 +369,8 @@ bool Unit_IsExempt(Unit* const unit)
 {
     return State_IsDead(unit->state)
         || unit->trait.can_expire
-        || unit->trait.type == TYPE_RUBBLE; // XXX. WHAT about resources? These should be exempt too. Have exempt field in File.h. Do not consume ||, too heavy duty.
+        || unit->trait.type == TYPE_RUBBLE
+        || unit->trait.type == TYPE_SHADOW;
 }
 
 Point Unit_GetShift(Unit* const unit, const Point cart)
