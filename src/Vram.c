@@ -55,14 +55,27 @@ static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
     return x < 0 || y < 0 || x >= vram.xres || y >= vram.yres;
 }
 
+// See: https://gist.github.com/XProger/96253e93baccfbf338de
+static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
+{
+    uint32_t rb = top_pixel & 0xFF00FF;
+    uint32_t g  = top_pixel & 0x00FF00;
+    rb += ((bot_pixel & 0xFF00FF) - rb) * alpha >> 8;
+    g  += ((bot_pixel & 0x00FF00) -  g) * alpha >> 8;
+    return (rb & 0xFF00FF) | (g & 0xFF00);
+}
+
 static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)
 {
-    const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
+    const uint32_t vram_pixel = Get(vram, coords.x, coords.y);
+    const uint8_t height = vram_pixel >> 24;
     if(tile.height > height)
     {
-        const uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
+        uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
         if(surface_pixel != SURFACE_COLOR_KEY)
         {
+            if(height == FILE_PRIO_BUILDING)
+                surface_pixel = Blend(surface_pixel, vram_pixel, 100);
             const uint32_t pixel = (tile.height << 24) | surface_pixel;
             Put(vram, coords.x, coords.y, pixel);
         }
@@ -132,16 +145,6 @@ static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
     for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);
     free(threads);
-}
-
-// See: https://gist.github.com/XProger/96253e93baccfbf338de
-static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
-{
-    uint32_t rb = top_pixel & 0xFF00FF;
-    uint32_t g  = top_pixel & 0x00FF00;
-    rb += ((bot_pixel & 0xFF00FF) - rb) * alpha >> 8;
-    g  += ((bot_pixel & 0x00FF00) -  g) * alpha >> 8;
-    return (rb & 0xFF00FF) | (g & 0xFF00);
 }
 
 static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int32_t yy, SDL_Surface* const mask, const int32_t x, const int32_t y, const uint32_t top_pixel)
@@ -314,7 +317,7 @@ void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units u
 static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
     if(!OutOfBounds(vram, point.x, point.y))
-        if((Get(vram, point.x, point.y) >> 24) < FILE_PRIO_GRAPHICS)
+        if((Get(vram, point.x, point.y) >> 24) < FILE_PRIO_DECAY)
             Put(vram, point.x, point.y, color);
 }
 
@@ -398,7 +401,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Point center = Tile_GetHotSpotCoords(tile);
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(tile.reference->is_selected)
-            DrawEllipse(vram, rect, 0x00FFFFFF); // XXX: Make color and circle width change with player / unit size?
+            DrawEllipse(vram, rect, 0x00FFFFFF);
     }
 }
 
