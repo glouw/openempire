@@ -25,8 +25,8 @@ int main(const int argc, const char* argv[])
         Map_Edit(map, overview, input);
         overview = Overview_Update(overview, input);
         const Field field = Units_Field(units, map);
-        const Points render_points_units = Quad_GetRenderPoints(Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_UNITS));
-        const Points render_points_terrain = Quad_GetRenderPoints(Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN));
+        const Points render_points_units = Quad_GetRenderPoints(Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_UNITS)); // XXX. Put into one type.
+        const Points render_points_terrain = Quad_GetRenderPoints(Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN)); // XXX. Put into one type.
         units = Units_Caretake(units, data.graphics, overview, grid, input, map, field, render_points_units);
         Video_Render(video, data, map, units, overview, input, render_points_units, render_points_terrain);
         const int32_t t1 = SDL_GetTicks();

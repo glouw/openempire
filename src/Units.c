@@ -124,6 +124,13 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     units = Units_Append(units, Unit_Make(f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics));
     for(int32_t i = 0; i < 300; i++)
         units = Units_Append(units, Unit_Make(b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
+    for(int32_t j = 0; j < 10; j++)
+    for(int32_t i = 0; i < 10; i++)
+    {
+        const Point g = { i, j };
+        units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics)); // XXX. TREES SHOULD NOT HAVE A TEAM COLOR.
+        units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
+    }
     return units;
 }
 
