@@ -104,3 +104,12 @@ int32_t Point_Slope(const Point point)
 {
     return point.y / (point.x == 0 ? 1 : point.x);
 }
+
+Point Point_Rand(void)
+{
+    const Point point = {
+        Util_Rand() % UINT16_MAX,
+        Util_Rand() % UINT16_MAX,
+    };
+    return point;
+}

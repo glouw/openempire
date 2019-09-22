@@ -118,12 +118,12 @@ void Video_Present(const Video video)
     SDL_RenderPresent(video.renderer);
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Points render_points)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Points render_points_units, const Points render_points_terrain)
 {
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
-    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, render_points);
-    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, render_points);
-    const Lines blend_lines = Map_GetBlendLines(map, render_points);
+    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, render_points_units);
+    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, render_points_terrain);
+    const Lines blend_lines = Map_GetBlendLines(map, render_points_terrain);
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);

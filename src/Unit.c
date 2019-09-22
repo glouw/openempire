@@ -371,17 +371,14 @@ bool Unit_IsExempt(Unit* const unit)
         || unit->trait.type == TYPE_RUBBLE;
 }
 
-Point Unit_GetShift(Unit* const reference, const Point cart)
+Point Unit_GetShift(Unit* const unit, const Point cart)
 {
-    const Point shift = {
-        reference->trait.dimensions.x / 2 + 0,
-        reference->trait.dimensions.y / 2 + 1,
-    };
-    return Point_Add(cart, shift);
+    const Point shift = { 0, 1 };
+    const Point half = Point_Div(unit->trait.dimensions, 2);
+    return Point_Add(cart, Point_Add(shift, half));
 }
 
 void Unit_UpdateEntropy(Unit* const unit)
 {
-    unit->entropy.x = Util_Rand() % UINT16_MAX;
-    unit->entropy.y = Util_Rand() % UINT16_MAX;
+    unit->entropy = Point_Rand();
 }
