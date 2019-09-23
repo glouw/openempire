@@ -74,7 +74,7 @@ static void RenderAnimationDemo(const Video video, const Animation animation, co
     for(int32_t j = 0; j < UTIL_LEN(flips); j++)
     for(int32_t i = 0; i < animation.count; i++)
     {
-        const Tile tile = { NULL, animation.surface[i], animation.frame[i], point, {0,0}, 255, true, flips[j] };
+        const Tile tile = { NULL, animation.surface[i], animation.frame[i], point, {0,0}, 255, true, flips[j], false };
         RenderDemoTile(video, tile, i, animation.count);
     }
 }
@@ -95,7 +95,7 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
     for(int32_t j = 0; j < (int32_t) blendomatic.nr_tiles; j++)
     {
         const Mode mode = blendomatic.mode[i];
-        const Tile tile = { NULL, mode.mask_demo[j], mode.frame, video.middle, {0,0}, 255, true, false };
+        const Tile tile = { NULL, mode.mask_demo[j], mode.frame, video.middle, {0,0}, 255, true, false, false };
         RenderDemoTile(video, tile, j, blendomatic.nr_tiles);
     }
 }

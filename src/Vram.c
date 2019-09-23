@@ -106,7 +106,8 @@ static void DrawTileClip(const Vram vram, const Tile tile)
 
 void Vram_DrawTile(const Vram vram, const Tile tile)
 {
-    tile.needs_clipping ? DrawTileClip(vram, tile) : DrawTileNoClip(vram, tile);
+    if(!tile.totally_offscreen)
+        tile.needs_clipping ? DrawTileClip(vram, tile) : DrawTileNoClip(vram, tile);
 }
 
 typedef struct

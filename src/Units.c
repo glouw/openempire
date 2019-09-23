@@ -137,6 +137,18 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     return units;
 }
 
+static Units GenerateTreeZone(Units units, const Grid grid, const Registrar graphics)
+{
+    for(int32_t j = 0; j < units.rows; j++)
+    for(int32_t i = 0; i < units.cols; i++)
+    {
+        const Point a = { i, j };
+        units = Units_Append(units, Unit_Make(a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics));
+        units = Units_Append(units, Unit_Make(a, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
+    }
+    return units;
+}
+
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
     switch(4)
@@ -147,6 +159,7 @@ static Units GenerateTestZone(Units units, const Map map, const Grid grid, const
     case 2: return GenerateVillieZone(units, grid, graphics);
     case 3: return GenerateRandomZone(units, grid, graphics);
     case 4: return GenerateBuildingZone(units, grid, graphics);
+    case 5: return GenerateTreeZone(units, grid, graphics);
     }
 }
 

@@ -56,11 +56,20 @@ static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
         && rect.b.y < yres;
 }
 
+static bool TotallyOffScreen(const Tile tile, const int32_t xres, const int32_t yres)
+{
+    const Rect rect = Tile_GetFrameOutline(tile);
+    return rect.a.x >= xres || rect.b.x < 0
+        || rect.a.y >= yres || rect.b.y < 0;
+}
+
 static Tile Clip(Tile tile, const Overview overview)
 {
     if(!OnScreen(tile, overview.xres, overview.yres))
         tile.needs_clipping = true;
-    return tile; // XXX: Need a totally out of bounds one to ease render time.
+    if(TotallyOffScreen(tile, overview.xres, overview.yres))
+        tile.totally_offscreen = true;
+    return tile;
 }
 
 typedef struct

@@ -24,6 +24,7 @@ typedef struct
     uint8_t height;
     bool needs_clipping;
     bool flip_vert;
+    bool totally_offscreen;
 }
 Tile;
 
