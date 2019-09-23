@@ -814,8 +814,9 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     UpdateEntropy(units);
     units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
+    units = ManageAction(units, graphics, overview, input, map, field, render_points);
     ManageStacks(units);
-    return ManageAction(units, graphics, overview, input, map, field, render_points);
+    return units;
 }
 
 bool Units_CanWalk(const Units units, const Map map, const Point point)
