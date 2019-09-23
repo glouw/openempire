@@ -113,15 +113,15 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
 {
     const Point a = { grid.cols / 2, grid.cols / 2 }; // XXX. THIS BUILDING POINT needs to be bottom left corner of building.
     const Point b = { grid.cols / 2 - 4, grid.cols / 2 };
-    const Point c = { grid.cols / 2 + 2, grid.cols / 2 + 3};
-    const Point d = { grid.cols / 2 + 6, grid.cols / 2 + 6};
-    const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8};
-    const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9};
+    const Point c = { grid.cols / 2 + 2, grid.cols / 2 + 3 };
+    const Point d = { grid.cols / 2 + 6, grid.cols / 2 + 6 };
+    const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8 };
+    const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9 };
     units = Units_Append(units, Unit_Make(a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics));
+    units = Units_Append(units, Unit_Make(f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
     for(int32_t i = 0; i < 300; i++)
         units = Units_Append(units, Unit_Make(b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
     for(int32_t j = 0; j < 10; j++)
@@ -131,9 +131,13 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
         units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics)); // XXX. TREES SHOULD NOT HAVE A TEAM COLOR.
         units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
     }
-    const Point h = { grid.cols / 2 - 12, grid.cols / 2 - 12};
+    const Point h = { grid.cols / 2 - 12, grid.cols / 2 - 12 };
     units = Units_Append(units, Unit_Make(h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics));
     units = Units_Append(units, Unit_Make(h, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
+    const Point y = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
+    const Point z = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
+    units = Units_Append(units, Unit_Make(y, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics));
+    units = Units_Append(units, Unit_Make(z, grid, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, COLOR_BLU, graphics));
     return units;
 }
 
@@ -802,15 +806,15 @@ void UpdateEntropy(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
+    Delete(units, input);
+    Decay(units);
+    Tick(units);
+    Expire(units);
+    units = Kill(units, overview.grid, graphics);
     UpdateEntropy(units);
     units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);
     ManageStacks(units);
-    Delete(units, input);
-    units = Kill(units, overview.grid, graphics);
-    Tick(units);
-    Decay(units);
-    Expire(units);
     return ManageAction(units, graphics, overview, input, map, field, render_points);
 }
 

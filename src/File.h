@@ -49,6 +49,7 @@ File File_Load(FILE* const);
 #define FILE_FEUDAL_BARRACKS_HEALTH (500)
 #define FILE_FEUDAL_HOUSE_HEALTH (500)
 #define FILE_WONDER_HEALTH (500)
+#define FILE_CASTLE_HEALTH (500)
 
 // For more details about X-Macros:
 //   https://en.wikipedia.org/wiki/X_Macro
@@ -90,6 +91,8 @@ File File_Load(FILE* const);
 #define FILE_X_GRAPHICS \
     FILE_X(FILE_GRAPHICS_NONE,                       (FILE_NONE),   FILE_PRIO_HIGHEST,  (true ),    TYPE_NONE,              FILE_ZERO,                      FILE_ONE,                    FILE_ZERO,                   FILE_ONE,                   (false),     (false),       (false),       (false),  (false),   FILE_DIMENSIONS_1X1) \
     FILE_X(FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN,           (  38),   FILE_PRIO_BUILDING, (false),    TYPE_BARRACKS,          FILE_ZERO,                      FILE_FEUDAL_BARRACKS_HEALTH, FILE_ZERO,                   FILE_ONE,                   (false),     (true),        (false),       (false),  (true),    FILE_DIMENSIONS_3X3) \
+    FILE_X(FILE_NORTH_EUROPEAN_CASTLE_SHADOW,             (  96),   FILE_PRIO_SHADOW,   (true ),    TYPE_SHADOW,            FILE_ZERO,                      FILE_ONE,                    FILE_ZERO,                   FILE_ONE,                   (false),     (true),        (false),       (false),  (false),   FILE_DIMENSIONS_4X4) \
+    FILE_X(FILE_NORTH_EUROPEAN_CASTLE,                    ( 100),   FILE_PRIO_BUILDING, (false),    TYPE_CASTLE,            FILE_ZERO,                      FILE_CASTLE_HEALTH,          FILE_ZERO,                   FILE_ONE,                   (false),     (true),        (false),       (false),  (true),    FILE_DIMENSIONS_4X4) \
     FILE_X(FILE_KNIGHT_FIGHTING,                          ( 190),   FILE_PRIO_GRAPHICS, (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK,          FILE_KNIGHT_WIDTH,          (true),      (false),       (true),        (false),  (false),   FILE_DIMENSIONS_1X1) \
     FILE_X(FILE_KNIGHT_FALLING,                           ( 191),   FILE_PRIO_GRAPHICS, (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK,          FILE_KNIGHT_WIDTH,          (true),      (false),       (true),        (false),  (false),   FILE_DIMENSIONS_1X1) \
     FILE_X(FILE_KNIGHT_IDLE,                              ( 192),   FILE_PRIO_GRAPHICS, (true ),    TYPE_KNIGHT,            FILE_KNIGHT_MAX_SPEED,          FILE_KNIGHT_HEALTH,          FILE_KNIGHT_ATTACK,          FILE_KNIGHT_WIDTH,          (true),      (false),       (true),        (false),  (false),   FILE_DIMENSIONS_1X1) \
