@@ -44,7 +44,7 @@ typedef struct Unit
     int32_t expire_frames;
     bool is_chasing;
     bool is_selected;
-    bool is_fully_decayed;
+    bool must_garbage_collect;
     bool is_state_locked;
     bool already_tiled;
     bool was_wall_pushed;

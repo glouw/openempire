@@ -558,7 +558,7 @@ static void Expire(const Units units)
         Unit* const unit = &units.unit[i];
         if(unit->trait.can_expire
         && unit->state_timer == Unit_GetLastExpireTick(unit))
-            unit->is_fully_decayed = true;
+            unit->must_garbage_collect = true;
     }
 }
 
@@ -760,16 +760,16 @@ static void ManageStacks(const Units units)
     CalculateCenters(units);
 }
 
-static int32_t CompareByFullyDecayed(const void* a, const void* b)
+static int32_t CompareGarbage(const void* a, const void* b)
 {
     Unit* const aa = (Unit*) a;
     Unit* const bb = (Unit*) b;
-    return aa->is_fully_decayed > bb->is_fully_decayed;
+    return aa->must_garbage_collect > bb->must_garbage_collect;
 }
 
-static void SortByFullyDecayed(const Units units)
+static void SortGarbage(const Units units)
 {
-    qsort(units.unit, units.count, sizeof(*units.unit), CompareByFullyDecayed);
+    qsort(units.unit, units.count, sizeof(*units.unit), CompareGarbage);
 }
 
 static void FlagDecayed(const Units units)
@@ -780,17 +780,17 @@ static void FlagDecayed(const Units units)
         const int32_t last_tick = Unit_GetLastDecayTick(unit);
         if(unit->state == STATE_DECAY
         && unit->state_timer == last_tick)
-            unit->is_fully_decayed = true;
+            unit->must_garbage_collect = true;
     }
 }
 
-static Units ResizeDecayed(Units units)
+static Units Resize(Units units)
 {
     int32_t index = 0;
     for(index = 0; index < units.count; index++)
     {
         Unit* const unit = &units.unit[index];
-        if(unit->is_fully_decayed)
+        if(unit->must_garbage_collect)
         {
             units.count = index;
             break;
@@ -799,11 +799,11 @@ static Units ResizeDecayed(Units units)
     return units;
 }
 
-static Units RemoveTheDecayed(const Units units)
+static Units RemoveGarbage(const Units units)
 {
     FlagDecayed(units);
-    SortByFullyDecayed(units);
-    return ResizeDecayed(units);
+    SortGarbage(units);
+    return Resize(units);
 }
 
 void Units_ResetTiled(const Units units)
@@ -836,7 +836,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Kill(units, overview.grid, graphics, input);
     UpdateEntropy(units);
     units = ManagePathFinding(units, grid, map, field);
-    units = RemoveTheDecayed(units);
+    units = RemoveGarbage(units);
     units = ManageAction(units, graphics, overview, input, map, field, render_points);
     ManageStacks(units);
     return units;

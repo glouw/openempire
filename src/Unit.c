@@ -208,7 +208,7 @@ void Unit_Print(Unit* const unit)
     Log_Append("can_expire            :: %d",    unit->trait.can_expire);
     Log_Append("expire_frames         :: %d",    unit->expire_frames);
     Log_Append("state_timer           :: %d",    unit->state_timer);
-    Log_Append("is_fully_decayed      :: %d",    unit->is_fully_decayed);
+    Log_Append("must_garbage_collect  :: %d",    unit->must_garbage_collect);
     Log_Append("");
 }
 
@@ -267,7 +267,7 @@ int32_t Unit_Kill(Unit* const unit)
     unit->health = 0;
     if(unit->trait.is_building || unit->trait.type == TYPE_SHADOW)
     {
-        unit->is_fully_decayed = true;
+        unit->must_garbage_collect = true;
         if(unit->has_shadow)
             return unit->shadow_id;
     }
