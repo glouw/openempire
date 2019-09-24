@@ -34,8 +34,10 @@ static Units Slink(Units units, const Point cart, const Grid grid, const Graphic
 {
     units = Spawn(units, cart, grid, file, color, graphics);
     units = Spawn(units, cart, grid, shadow, color, graphics);
-    Unit* const shadow_link = &units.unit[units.count - 1];
-    units.unit[units.count - 2].shadow_link = shadow_link;
+    const int32_t a = units.count - 1;
+    const int32_t b = units.count - 2;
+    units.unit[b].shadow_id = units.unit[a].id;
+    units.unit[b].has_shadow = true;
     return units;
 }
 
@@ -250,6 +252,7 @@ static Units Select(Units units, const Overview overview, const Input input, con
     if(input.lu)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
+        Tiles_SortByHeight(tiles);
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
@@ -508,16 +511,39 @@ Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Re
     return units;
 }
 
-static Units Kill(Units units, const Grid grid, const Registrar graphics)
+static Unit* GetByShadow(const Units units, const int32_t shadow_id)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->id == shadow_id)
+            return unit;
+    }
+    return NULL;
+}
+
+static void KillShadow(const Units units, const int32_t shadow_id)
+{
+    if(shadow_id != -1)
+        Unit_Kill(GetByShadow(units, shadow_id));
+}
+
+static bool ShouldDelete(Unit* const unit, const Input input)
+{
+    return unit->is_selected && input.key[SDL_SCANCODE_DELETE];
+}
+
+static Units Kill(Units units, const Grid grid, const Registrar graphics, const Input input)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
         {
-            if(unit->health <= 0)
+            if(unit->health <= 0
+            || ShouldDelete(unit, input))
             {
-                Unit_Kill(unit);
+                KillShadow(units, Unit_Kill(unit));
                 units = PlaceRubble(units, unit, grid, graphics);
             }
         }
@@ -701,18 +727,6 @@ static void CalculateCenters(const Units units)
     }
 }
 
-static void Delete(const Units units, const Input input)
-{
-    if(input.key[SDL_SCANCODE_DELETE])
-        for(int32_t i = 0; i < units.count; i++)
-        {
-            Unit* const unit = &units.unit[i];
-            if(unit->is_selected)
-                if(!Unit_IsExempt(unit))
-                    Unit_Kill(unit);
-        }
-}
-
 static void Tick(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -816,11 +830,10 @@ void UpdateEntropy(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
-    Delete(units, input);
     Decay(units);
     Tick(units);
     Expire(units);
-    units = Kill(units, overview.grid, graphics);
+    units = Kill(units, overview.grid, graphics, input);
     UpdateEntropy(units);
     units = ManagePathFinding(units, grid, map, field);
     units = RemoveTheDecayed(units);

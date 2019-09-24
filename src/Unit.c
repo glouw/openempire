@@ -164,6 +164,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.file = file;
     static int32_t id;
     unit.id = id++;
+    unit.shadow_id = -1;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
@@ -198,6 +199,7 @@ void Unit_Print(Unit* const unit)
     Log_Append("file                  :: %d",    unit->file);
     Log_Append("file_name             :: %s",    unit->trait.file_name);
     Log_Append("id                    :: %d",    unit->id);
+    Log_Append("shadow_id             :: %d",    unit->shadow_id);
     Log_Append("command_group         :: %d",    unit->command_group);
     Log_Append("health                :: %d",    unit->health);
     Log_Append("attack_frames_per_dir :: %d",    unit->attack_frames_per_dir);
@@ -259,18 +261,19 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     }
 }
 
-void Unit_Kill(Unit* const unit)
+int32_t Unit_Kill(Unit* const unit)
 {
     Unit_Unlock(unit); // XXX. IS THIS NEEDED?
     unit->health = 0;
-    if(unit->trait.is_building)
+    if(unit->trait.is_building || unit->trait.type == TYPE_SHADOW)
     {
         unit->is_fully_decayed = true;
-        if(unit->shadow_link)
-            unit->shadow_link->is_fully_decayed = true;
+        if(unit->has_shadow)
+            return unit->shadow_id;
     }
     else
         Unit_SetState(unit, STATE_FALL, true);
+    return -1;
 }
 
 int32_t Unit_GetLastExpireTick(Unit* const unit)

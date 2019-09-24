@@ -13,7 +13,6 @@
 typedef struct Unit
 {
     struct Unit* interest;
-    struct Unit* shadow_link;
     Trait trait;
     Point cart;
     Point cart_grid_offset;
@@ -31,6 +30,7 @@ typedef struct Unit
     Graphics file;
     int32_t entropy_static;
     int32_t id;
+    int32_t shadow_id;
     int32_t path_index;
     int32_t path_index_timer;
     int32_t command_group;
@@ -48,6 +48,7 @@ typedef struct Unit
     bool is_state_locked;
     bool already_tiled;
     bool was_wall_pushed;
+    bool has_shadow;
 }
 Unit;
 
@@ -79,7 +80,7 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
-void Unit_Kill(Unit* const);
+int32_t Unit_Kill(Unit* const);
 
 int32_t Unit_GetLastExpireTick(Unit* const);
 

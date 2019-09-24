@@ -22,10 +22,24 @@ static int32_t CompareBySurface(const void* a, const void* b)
     return sa < sb;
 }
 
+static int32_t CompareByHeight(const void* a, const void* b)
+{
+    Tile* const aa = (Tile*) a;
+    Tile* const bb = (Tile*) b;
+    const uint8_t ha = aa->height;
+    const uint8_t hb = bb->height;
+    return ha < hb;
+}
+
 static void SortByY(const Tiles tiles)
 {
-    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareBySurface);
+    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareBySurface); // XXX. NEEDED? HOW ABOUT X INSTEAD? FIDDLE WITH MANY TREES.
     qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByY);
+}
+
+void Tiles_SortByHeight(const Tiles tiles)
+{
+    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByHeight);
 }
 
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Units units, const Points points)
