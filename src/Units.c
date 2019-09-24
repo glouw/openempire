@@ -144,23 +144,21 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     const Point d = { grid.cols / 2 + 6, grid.cols / 2 + 6 };
     const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8 };
     const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9 };
+    const Point g = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
     units = Spawn(units, a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics);
     units = Spawn(units, c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
     units = Spawn(units, d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
     units = Spawn(units, e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics);
     units = Spawn(units, f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
+    units = Slink(units, g, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW);
     for(int32_t i = 0; i < 300; i++)
         units = Spawn(units, b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics);
     for(int32_t j = 0; j < 10; j++)
     for(int32_t i = 0; i < 10; i++)
     {
-        const Point g = { i, j };
-        units = Slink(units, g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
+        const Point h = { i, j };
+        units = Slink(units, h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
     }
-    const Point h = { grid.cols / 2 - 12, grid.cols / 2 - 12 };
-    units = Slink(units, h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
-    const Point y = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
-    units = Slink(units, y, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW);
     return units;
 }
 
