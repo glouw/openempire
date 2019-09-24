@@ -459,9 +459,8 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-static bool EqualDimension(Unit* const unit, const Graphics file)
+static bool EqualDimension(Point dimensions, const Graphics file)
 {
-    Point dimensions = unit->trait.dimensions;
     const int32_t min = UTIL_MIN(dimensions.x, dimensions.y);
     dimensions.x = min;
     dimensions.y = min;
@@ -472,29 +471,34 @@ static bool EqualDimension(Unit* const unit, const Graphics file)
         FILE_DIMENSIONS_4X4,
         FILE_DIMENSIONS_5X5,
     };
-    int32_t index = 0;
     switch(file)
     {
         default:
-        case FILE_RUBBLE_1X1: index = 0; break;
-        case FILE_RUBBLE_2X2: index = 1; break;
-        case FILE_RUBBLE_3X3: index = 2; break;
-        case FILE_RUBBLE_4X4: index = 3; break;
-        case FILE_RUBBLE_5X5: index = 4; break;
+        case FILE_RUBBLE_1X1: return Point_Equal(points[0], dimensions);
+        case FILE_RUBBLE_2X2: return Point_Equal(points[1], dimensions);
+        case FILE_RUBBLE_3X3: return Point_Equal(points[2], dimensions);
+        case FILE_RUBBLE_4X4: return Point_Equal(points[3], dimensions);
+        case FILE_RUBBLE_5X5: return Point_Equal(points[4], dimensions);
     }
-    return Point_Equal(points[index], dimensions);
 }
 
 Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Registrar graphics)
 {
+    const Graphics rubbles[] = {
+        FILE_RUBBLE_1X1,
+        FILE_RUBBLE_2X2,
+        FILE_RUBBLE_3X3,
+        FILE_RUBBLE_4X4,
+        FILE_RUBBLE_5X5,
+    };
     if(unit->trait.is_building)
-    {
-        if(EqualDimension(unit, FILE_RUBBLE_1X1)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_1X1, COLOR_BLU, graphics));
-        if(EqualDimension(unit, FILE_RUBBLE_2X2)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_2X2, COLOR_BLU, graphics));
-        if(EqualDimension(unit, FILE_RUBBLE_3X3)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_3X3, COLOR_BLU, graphics));
-        if(EqualDimension(unit, FILE_RUBBLE_4X4)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_4X4, COLOR_BLU, graphics));
-        if(EqualDimension(unit, FILE_RUBBLE_5X5)) return Units_Append(units, Unit_Make(unit->cart, grid, FILE_RUBBLE_5X5, COLOR_BLU, graphics));
-    }
+        for(int i = 0; i < UTIL_LEN(rubbles); i++)
+        {
+            const Graphics rubble = rubbles[i];
+            const Point dimensions = unit->trait.dimensions;
+            if(EqualDimension(dimensions, rubble))
+                return Units_Append(units, Unit_Make(unit->cart, grid, rubble, COLOR_BLU, graphics));
+        }
     return units;
 }
 
