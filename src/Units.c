@@ -29,6 +29,16 @@ static Units Spawn(Units units, const Point cart, const Grid grid, const Graphic
     return Append(units, Unit_Make(cart, grid, file, color, graphics));
 }
 
+// Slink: (S)hadow (Link)er
+static Units Slink(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow)
+{
+    units = Spawn(units, cart, grid, file, color, graphics);
+    units = Spawn(units, cart, grid, shadow, color, graphics);
+    Unit* const shadow_link = &units.unit[units.count - 1];
+    units.unit[units.count - 2].shadow_link = shadow_link;
+    return units;
+}
+
 Field Units_Field(const Units units, const Map map)
 {
     static Field zero;
@@ -145,16 +155,12 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     for(int32_t i = 0; i < 10; i++)
     {
         const Point g = { i, j };
-        units = Spawn(units, g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics); // XXX. TREES SHOULD NOT HAVE A TEAM COLOR.
-        units = Spawn(units, g, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics);
+        units = Slink(units, g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
     }
     const Point h = { grid.cols / 2 - 12, grid.cols / 2 - 12 };
-    units = Spawn(units, h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics);
-    units = Spawn(units, h, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics);
+    units = Slink(units, h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
     const Point y = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
-    const Point z = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
-    units = Spawn(units, y, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics);
-    units = Spawn(units, z, grid, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, COLOR_BLU, graphics);
+    units = Slink(units, y, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW);
     return units;
 }
 
@@ -164,8 +170,7 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
     for(int32_t i = 0; i < units.cols; i++)
     {
         const Point a = { i, j };
-        units = Spawn(units, a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics);
-        units = Spawn(units, a, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics);
+        units = Slink(units, a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
     }
     return units;
 }

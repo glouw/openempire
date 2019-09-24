@@ -264,7 +264,11 @@ void Unit_Kill(Unit* const unit)
     Unit_Unlock(unit); // XXX. IS THIS NEEDED?
     unit->health = 0;
     if(unit->trait.is_building)
+    {
         unit->is_fully_decayed = true;
+        if(unit->shadow_link)
+            unit->shadow_link->is_fully_decayed = true;
+    }
     else
         Unit_SetState(unit, STATE_FALL, true);
 }

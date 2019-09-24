@@ -13,6 +13,7 @@
 typedef struct Unit
 {
     struct Unit* interest;
+    struct Unit* shadow_link;
     Trait trait;
     Point cart;
     Point cart_grid_offset;
