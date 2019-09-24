@@ -29,8 +29,6 @@ Units;
 
 Units Units_New(const Map map, const Grid grid, const Registrar graphics);
 
-Units Units_Append(Units, const Unit);
-
 void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);

@@ -81,3 +81,8 @@ Point Grid_GetCornerOffset(const Grid grid, const Point offset)
 {
     return Point_Add(offset, grid.tile_cart_mid);
 }
+
+Point Grid_OffsetToCell(const Point offset)
+{
+    return Point_Mul(offset, CONFIG_GRID_CELL_SIZE);
+}

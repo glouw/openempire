@@ -11,6 +11,24 @@
 
 #include <stdlib.h>
 
+static Units Append(Units units, const Unit unit)
+{
+    if(units.count == units.max)
+    {
+        units.max *= 2;
+        Unit* const temp = UTIL_REALLOC(units.unit, Unit, units.max);
+        UTIL_CHECK(temp);
+        units.unit = temp;
+    }
+    units.unit[units.count++] = unit;
+    return units;
+}
+
+static Units Spawn(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
+{
+    return Append(units, Unit_Make(cart, grid, file, color, graphics));
+}
+
 Field Units_Field(const Units units, const Map map)
 {
     static Field zero;
@@ -22,10 +40,9 @@ Field Units_Field(const Units units, const Map map)
     for(int32_t col = 0; col < field.cols; col++)
     {
         const Point point = { col, row };
-        if(Units_CanWalk(units, map, point))
-            Field_Set(field, point, FIELD_WALKABLE_SPACE);
-        else
-            Field_Set(field, point, FIELD_OBSTRUCT_SPACE);
+        Units_CanWalk(units, map, point)
+          ? Field_Set(field, point, FIELD_WALKABLE_SPACE)
+          : Field_Set(field, point, FIELD_OBSTRUCT_SPACE);
     }
     return field;
 }
@@ -38,16 +55,16 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
     {
         const Point cart = { x, y };
         const Graphics file = y < map.rows / 3 ? FILE_KNIGHT_IDLE : FILE_TEUTONIC_KNIGHT_IDLE;
-        units = Units_Append(units, Unit_Make(cart, grid, file, COLOR_BLU, graphics));
+        units = Spawn(units, cart, grid, file, COLOR_BLU, graphics);
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics));
+        units = Spawn(units, cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics);
     }
     const Point cart = { map.cols / 2, map.rows / 2 };
-    units = Units_Append(units, Unit_Make(cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU, graphics));
+    units = Spawn(units, cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU, graphics);
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -75,11 +92,11 @@ static Units GenerateVillieZone(Units units, const Grid grid, const Registrar gr
     const Point c = { 2, 0 };
     const Point d = { 2, 2 };
     const Point e = { 1, 1 };
-    units = Units_Append(units, Unit_Make(a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(e, grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics));
+    units = Spawn(units, a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+    units = Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+    units = Spawn(units, c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+    units = Spawn(units, d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+    units = Spawn(units, e, grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics);
     return units;
 }
 
@@ -91,12 +108,12 @@ static Units GenerateBerryZone(Units units, const Grid grid, const Registrar gra
     const Point d = { grid.cols / 2 - 0, grid.cols / 2 - 2};
     const Point e = { grid.cols / 2 - 0, grid.cols / 2 - 4};
     const Point f = { grid.cols / 2 - 2, grid.cols / 2 - 4};
-    units = Units_Append(units, Unit_Make(a, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(b, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(c, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(d, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(e, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(f, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics));
+    units = Spawn(units, a, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
+    units = Spawn(units, b, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
+    units = Spawn(units, c, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
+    units = Spawn(units, d, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
+    units = Spawn(units, e, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
+    units = Spawn(units, f, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
     return units;
 }
 
@@ -104,8 +121,8 @@ static Units GenerateRandomZone(Units units, const Grid grid, const Registrar gr
 {
     const Point a = { grid.cols / 2 + 0, grid.cols / 2 - 1};
     const Point b = { grid.cols / 2 - 1, grid.cols / 2 + 1};
-    units = Units_Append(units, Unit_Make(a, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(b, grid, FILE_WAYPOINT_FLAG, COLOR_BLU, graphics));
+    units = Spawn(units, a, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
+    units = Spawn(units, b, grid, FILE_WAYPOINT_FLAG, COLOR_BLU, graphics);
     return units;
 }
 
@@ -117,27 +134,27 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     const Point d = { grid.cols / 2 + 6, grid.cols / 2 + 6 };
     const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8 };
     const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9 };
-    units = Units_Append(units, Unit_Make(a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics));
+    units = Spawn(units, a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics);
+    units = Spawn(units, c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
+    units = Spawn(units, d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
+    units = Spawn(units, e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics);
+    units = Spawn(units, f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
     for(int32_t i = 0; i < 300; i++)
-        units = Units_Append(units, Unit_Make(b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics));
+        units = Spawn(units, b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics);
     for(int32_t j = 0; j < 10; j++)
     for(int32_t i = 0; i < 10; i++)
     {
         const Point g = { i, j };
-        units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics)); // XXX. TREES SHOULD NOT HAVE A TEAM COLOR.
-        units = Units_Append(units, Unit_Make(g, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
+        units = Spawn(units, g, grid, FILE_FOREST_TREE, COLOR_BLU, graphics); // XXX. TREES SHOULD NOT HAVE A TEAM COLOR.
+        units = Spawn(units, g, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics);
     }
     const Point h = { grid.cols / 2 - 12, grid.cols / 2 - 12 };
-    units = Units_Append(units, Unit_Make(h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(h, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
+    units = Spawn(units, h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics);
+    units = Spawn(units, h, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics);
     const Point y = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
     const Point z = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
-    units = Units_Append(units, Unit_Make(y, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics));
-    units = Units_Append(units, Unit_Make(z, grid, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, COLOR_BLU, graphics));
+    units = Spawn(units, y, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics);
+    units = Spawn(units, z, grid, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, COLOR_BLU, graphics);
     return units;
 }
 
@@ -147,8 +164,8 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
     for(int32_t i = 0; i < units.cols; i++)
     {
         const Point a = { i, j };
-        units = Units_Append(units, Unit_Make(a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics));
-        units = Units_Append(units, Unit_Make(a, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics));
+        units = Spawn(units, a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics);
+        units = Spawn(units, a, grid, FILE_FOREST_TREE_SHADOW, COLOR_BLU, graphics);
     }
     return units;
 }
@@ -186,19 +203,6 @@ Units Units_New(const Map map, const Grid grid, const Registrar graphics)
     units.cols = grid.cols;
     units = GenerateTestZone(units, map, grid, graphics);
     units.cpu_count = 2 * SDL_GetCPUCount();
-    return units;
-}
-
-Units Units_Append(Units units, const Unit unit)
-{
-    if(units.count == units.max)
-    {
-        units.max *= 2;
-        Unit* const temp = UTIL_REALLOC(units.unit, Unit, units.max);
-        UTIL_CHECK(temp);
-        units.unit = temp;
-    }
-    units.unit[units.count++] = unit;
     return units;
 }
 
@@ -279,14 +283,13 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
 static Units PlaceRedArrows(Units units, const Overview overview, const Registrar graphics, const Point cart, const Point cart_grid_offset)
 {
     Unit unit = Unit_Make(cart, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
-    unit.cell = Point_Add(unit.cell, Point_Mul(cart_grid_offset, CONFIG_GRID_CELL_SIZE));
-    return Units_Append(units, unit);
+    unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(cart_grid_offset));
+    return Append(units, unit);
 }
 
 static Units Command(Units units, const Overview overview, const Input input, const Registrar graphics, const Map map, const Field field)
 {
-    if(input.ru
-    && units.select_count > 0)
+    if(input.ru && units.select_count > 0)
     {
         const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
         const Point cart = Overview_IsoToCart(overview, input.point, true);
@@ -497,7 +500,7 @@ Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Re
             const Graphics rubble = rubbles[i];
             const Point dimensions = unit->trait.dimensions;
             if(EqualDimension(dimensions, rubble))
-                return Units_Append(units, Unit_Make(unit->cart, grid, rubble, COLOR_BLU, graphics));
+                return Spawn(units, unit->cart, grid, rubble, COLOR_BLU, graphics);
         }
     return units;
 }
