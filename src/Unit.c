@@ -185,7 +185,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
 
 void Unit_Print(Unit* const unit)
 {
-    Log_Append("type                  :: %d", unit->trait.type);
+    Log_Append("type                  :: %d",    unit->trait.type);
     Log_Append("cart                  :: %d %d", unit->cart.x, unit->cart.y);
     Log_Append("cart_grid_offset      :: %d %d", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
     Log_Append("cart_grid_offset_goal :: %d %d", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
@@ -271,8 +271,7 @@ int32_t Unit_Kill(Unit* const unit)
         if(unit->has_shadow)
             return unit->shadow_id;
     }
-    else
-        Unit_SetState(unit, STATE_FALL, true);
+    else Unit_SetState(unit, STATE_FALL, true);
     return -1;
 }
 

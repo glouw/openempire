@@ -148,7 +148,7 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9 };
     const Point g = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
     units = Spawn(units, a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics);
-    units = Spawn(units, c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
+    units = Spawn(units, c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics);
     units = Spawn(units, d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
     units = Spawn(units, e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics);
     units = Spawn(units, f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
@@ -166,8 +166,8 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
 
 static Units GenerateTreeZone(Units units, const Grid grid, const Registrar graphics)
 {
-    for(int32_t j = 0; j < units.rows; j++)
-    for(int32_t i = 0; i < units.cols; i++)
+    for(int32_t j = units.rows / 2; j < units.rows / 2 + 10; j++)
+    for(int32_t i = units.cols / 2; i < units.cols / 2 + 10; i++)
     {
         const Point a = { i, j };
         units = Slink(units, a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
@@ -252,7 +252,7 @@ static Units Select(Units units, const Overview overview, const Input input, con
     if(input.lu)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
-        Tiles_SortByHeight(tiles);
+        Tiles_SortByHeight(tiles); // For selecting transparent units behind buildings or trees.
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
@@ -493,21 +493,25 @@ static bool EqualDimension(Point dimensions, const Graphics file)
 
 Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Registrar graphics)
 {
-    const Graphics rubbles[] = {
-        FILE_RUBBLE_1X1,
-        FILE_RUBBLE_2X2,
-        FILE_RUBBLE_3X3,
-        FILE_RUBBLE_4X4,
-        FILE_RUBBLE_5X5,
-    };
     if(unit->trait.is_building)
-        for(int i = 0; i < UTIL_LEN(rubbles); i++)
+    {
+        const Graphics rubbles[] = {
+            FILE_RUBBLE_1X1,
+            FILE_RUBBLE_2X2,
+            FILE_RUBBLE_3X3,
+            FILE_RUBBLE_4X4,
+            FILE_RUBBLE_5X5,
+        };
+        if(unit->trait.type == TYPE_TREE)
+            return Spawn(units, unit->cart, grid, FILE_TREE_STUMPS, COLOR_BLU, graphics);
+        else for(int i = 0; i < UTIL_LEN(rubbles); i++)
         {
-            const Graphics rubble = rubbles[i];
+            const Graphics file = rubbles[i];
             const Point dimensions = unit->trait.dimensions;
-            if(EqualDimension(dimensions, rubble))
-                return Spawn(units, unit->cart, grid, rubble, COLOR_BLU, graphics);
+            if(EqualDimension(dimensions, file))
+                return Spawn(units, unit->cart, grid, file, COLOR_BLU, graphics);
         }
+    }
     return units;
 }
 
@@ -709,11 +713,12 @@ static int32_t FlowThread(void* data)
     return 0;
 }
 
-static Units ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
+static Units ManagePathFinding(Units units, const Grid grid, const Map map, const Field field)
 {
+    units = ProcessHardRules(units, field, grid);
     Process(units, map, grid, StressorThread);
     Process(units, map, grid, FlowThread);
-    return ProcessHardRules(units, field, grid);
+    return units;
 }
 
 static void CalculateCenters(const Units units)
@@ -772,7 +777,7 @@ static void SortGarbage(const Units units)
     qsort(units.unit, units.count, sizeof(*units.unit), CompareGarbage);
 }
 
-static void FlagDecayed(const Units units)
+static void FlagGarbage(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -801,7 +806,7 @@ static Units Resize(Units units)
 
 static Units RemoveGarbage(const Units units)
 {
-    FlagDecayed(units);
+    FlagGarbage(units);
     SortGarbage(units);
     return Resize(units);
 }
@@ -830,15 +835,15 @@ void UpdateEntropy(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
 {
-    Decay(units);
-    Tick(units);
-    Expire(units);
-    units = Kill(units, overview.grid, graphics, input);
-    UpdateEntropy(units);
     units = ManagePathFinding(units, grid, map, field);
-    units = RemoveGarbage(units);
     units = ManageAction(units, graphics, overview, input, map, field, render_points);
+    units = Kill(units, overview.grid, graphics, input);
+    units = RemoveGarbage(units);
     ManageStacks(units);
+    Decay(units);
+    Expire(units);
+    Tick(units);
+    UpdateEntropy(units);
     return units;
 }
 

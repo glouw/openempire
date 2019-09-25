@@ -67,7 +67,7 @@ static Registrar LoadColoredAnimations(const Drs drs, const int32_t table_index,
     for(int32_t i = 0; i < file_count; i++)
     {
         const int32_t file = files[i];
-        if(file != -1)
+        if(file != FILE_NONE)
         {
             const Slp slp = Slp_Load(drs, table_index, file);
             LoadColors(registrar, slp, palette, file);
@@ -88,10 +88,9 @@ void Registrar_Free(const Registrar registrar)
     for(int32_t i = 0; i < registrar.file_count; i++)
     {
         const int32_t file = registrar.files[i];
-        if(file != -1)
+        if(file != FILE_NONE)
             FreeColors(registrar, file);
     }
-
     for(int32_t i = 0; i < (int32_t) COLOR_COUNT; i++)
         free(registrar.animation[i]);
 }
