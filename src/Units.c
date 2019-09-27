@@ -159,15 +159,15 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     for(int32_t i = 0; i < 10; i++)
     {
         const Point h = { i, j };
-        units = Slink(units, h, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
+        units = Slink(units, h, grid, FILE_FOREST_TREE, COLOR_RED, graphics, FILE_FOREST_TREE_SHADOW);
     }
     return units;
 }
 
 static Units GenerateTreeZone(Units units, const Grid grid, const Registrar graphics)
 {
-    for(int32_t j = units.rows / 2; j < units.rows / 2 + 10; j++)
-    for(int32_t i = units.cols / 2; i < units.cols / 2 + 10; i++)
+    for(int32_t j = 0; j < units.rows; j++)
+    for(int32_t i = 0; i < units.cols; i++)
     {
         const Point a = { i, j };
         units = Slink(units, a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
@@ -817,13 +817,6 @@ void Units_ResetTiled(const Units units)
         units.unit[i].already_tiled = false;
 }
 
-static Units ManageAction(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
-{
-    units = Select(units, overview, input, graphics, render_points);
-    units = Command(units, overview, input, graphics, map, field);
-    return units;
-}
-
 void UpdateEntropy(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -833,10 +826,11 @@ void UpdateEntropy(const Units units)
     }
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Input input, const Map map, const Field field, const Points render_points)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
 {
-    units = ManagePathFinding(units, grid, map, field);
-    units = ManageAction(units, graphics, overview, input, map, field, render_points);
+    units = ManagePathFinding(units, overview.grid, map, field);
+    units = Select(units, overview, input, graphics, render_points);
+    units = Command(units, overview, input, graphics, map, field);
     units = Kill(units, overview.grid, graphics, input);
     units = RemoveGarbage(units);
     ManageStacks(units);
