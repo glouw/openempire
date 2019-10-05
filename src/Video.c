@@ -51,6 +51,7 @@ void Video_Free(const Video video)
     SDL_Quit();
 }
 
+// XXX. TO BE DEPRECATED.
 static void RenderDemoTile(const Video video, const Tile tile, const int32_t index, const int32_t count)
 {
     const Input input = Input_Ready();
@@ -68,6 +69,7 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
     }
 }
 
+// XXX. TO BE DEPRECATED.
 static void RenderAnimationDemo(const Video video, const Animation animation, const Point point)
 {
     const bool flips[] = { false, true };
@@ -79,6 +81,7 @@ static void RenderAnimationDemo(const Video video, const Animation animation, co
     }
 }
 
+// XXX. TO BE DEPRECATED.
 static void RenderRegistrarDemo(const Video video, const Registrar registrar, const Color color, const Point point)
 {
     for(int32_t i = 0; i < registrar.file_count; i++)
@@ -89,6 +92,7 @@ static void RenderRegistrarDemo(const Video video, const Registrar registrar, co
     }
 }
 
+// XXX. TO BE DEPRECATED.
 static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomatic)
 {
     for(int32_t i = 0; i < (int32_t) blendomatic.nr_blending_modes; i++)
@@ -100,6 +104,7 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
     }
 }
 
+// XXX. TO BE DEPRECATED.
 void Video_RenderDataDemo(const Video video, const Data data, const Color color)
 {
     RenderRegistrarDemo(video, data.interfac, color, video.top_left);
@@ -118,12 +123,12 @@ void Video_Present(const Video video)
     SDL_RenderPresent(video.renderer);
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Points render_points_units, const Points render_points_terrain)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Window window)
 {
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
-    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, render_points_units);
-    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, render_points_terrain);
-    const Lines blend_lines = Map_GetBlendLines(map, render_points_terrain);
+    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, window.units);
+    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, window.terrain);
+    const Lines blend_lines = Map_GetBlendLines(map, window.terrain);
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);

@@ -9,7 +9,7 @@
 int main(const int argc, const char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
-    const Video video = Video_Setup(1300, 700, args.demo ? "Render Demo" : "Open Empires");
+    const Video video = Video_Setup(800, 600, args.demo ? "Render Demo" : "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
@@ -25,18 +25,16 @@ int main(const int argc, const char* argv[])
         Map_Edit(map, overview, input);
         overview = Overview_Update(overview, input);
         const Field field = Units_Field(units, map);
-        const Points render_points_units = Quad_GetRenderPoints(Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_UNITS)); // XXX. Put into one type.
-        const Points render_points_terrain = Quad_GetRenderPoints(Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN)); // XXX. Put into one type.
-        units = Units_Caretake(units, data.graphics, overview, input, map, field, render_points_units);
-        Video_Render(video, data, map, units, overview, input, render_points_units, render_points_terrain);
+        const Window window = Window_Make(overview);
+        units = Units_Caretake(units, data.graphics, overview, input, map, field, window);
+        Video_Render(video, data, map, units, overview, input, window);
         const int32_t t1 = SDL_GetTicks();
         Video_CopyCanvas(video);
         Log_Dump();
         Video_PrintPerformanceMonitor(video, units, t1 - t0, cycles);
         Video_Present(video);
         Field_Free(field);
-        Points_Free(render_points_units);
-        Points_Free(render_points_terrain);
+        Window_Free(window);
         cycles++;
         if(args.measure)
             if(cycles > 10) // Measure performance with valgrind --tool=cachegrind ./openempires.

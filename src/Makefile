@@ -26,6 +26,7 @@ SRCS += Meap.c
 SRCS += Mode.c
 SRCS += Outline.c
 SRCS += Overview.c
+SRCS += Window.c
 SRCS += Palette.c
 SRCS += Point.c
 SRCS += Points.c

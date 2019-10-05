@@ -836,11 +836,11 @@ void UpdateEntropy(const Units units)
     }
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Window window)
 {
     Tick(units);
     units = ManagePathFinding(units, overview.grid, map, field);
-    units = Select(units, overview, input, graphics, render_points);
+    units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
     units = Kill(units, overview.grid, graphics, input);
     units = RemoveGarbage(units);

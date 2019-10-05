@@ -4,6 +4,7 @@
 #include "Overview.h"
 #include "Color.h"
 #include "Map.h"
+#include "Window.h"
 #include "Units.h"
 #include "Blendomatic.h"
 #include "Data.h"
@@ -33,7 +34,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
 
 void Video_Free(const Video);
 
-void Video_Render(const Video, const Data, const Map, const Units, const Overview, const Input, const Points, const Points);
+void Video_Render(const Video, const Data, const Map, const Units, const Overview, const Input, const Window);
 
 void Video_RenderDataDemo(const Video, const Data, const Color);
 

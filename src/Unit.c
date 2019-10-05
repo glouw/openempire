@@ -202,6 +202,7 @@ void Unit_Print(Unit* const unit)
     Log_Append("shadow_id             :: %d",    unit->shadow_id);
     Log_Append("command_group         :: %d",    unit->command_group);
     Log_Append("health                :: %d",    unit->health);
+    Log_Append("has_shadow            :: %d",    unit->has_shadow);
     Log_Append("attack_frames_per_dir :: %d",    unit->attack_frames_per_dir);
     Log_Append("fall_frames_per_dir   :: %d",    unit->fall_frames_per_dir);
     Log_Append("decay_frames_per_dir  :: %d",    unit->decay_frames_per_dir);
