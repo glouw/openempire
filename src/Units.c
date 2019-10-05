@@ -99,16 +99,10 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
 
 static Units GenerateVillieZone(Units units, const Grid grid, const Registrar graphics)
 {
-    const Point a = { 0, 0 };
-    const Point b = { 0, 2 };
-    const Point c = { 2, 0 };
-    const Point d = { 2, 2 };
-    const Point e = { 1, 1 };
+    const Point a = { units.cols / 2 + 0, units.rows / 2 + 0 };
+    const Point b = { units.cols / 2 + 0, units.rows / 2 + 1 };
     units = Spawn(units, a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
     units = Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
-    units = Spawn(units, c, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
-    units = Spawn(units, d, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
-    units = Spawn(units, e, grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics);
     return units;
 }
 
@@ -177,7 +171,7 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(4)
+    switch(2)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
