@@ -1,6 +1,7 @@
 #include "Trait.h"
 
 #include "Graphics.h"
+#include "Interfac.h"
 
 Trait Trait_Build(const Graphics file)
 {
@@ -13,6 +14,7 @@ Trait Trait_Build(const Graphics file)
     trait.max_health = Graphics_GetHealth(file);
     trait.attack = Graphics_GetAttack(file);
     trait.width = Graphics_GetWidth(file);
+    trait.action = Interfac_GetAction(file);
     trait.is_rotatable = Graphics_GetRotatable(file);
     trait.is_single_frame = Graphics_GetSingleFrame(file);
     trait.is_walkable = Graphics_GetWalkable(file);

@@ -3,6 +3,7 @@
 #include "Type.h"
 #include "Graphics.h"
 #include "Point.h"
+#include "Action.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -16,6 +17,7 @@ typedef struct
     int32_t max_health;
     int32_t attack;
     int32_t width;
+    Action action;
     bool is_rotatable;
     bool is_single_frame;
     bool is_walkable;
