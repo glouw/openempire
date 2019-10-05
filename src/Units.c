@@ -473,28 +473,28 @@ static bool EqualDimension(Point dimensions, const Graphics file)
     const int32_t min = UTIL_MIN(dimensions.x, dimensions.y);
     dimensions.x = min;
     dimensions.y = min;
-    const Point points[] = {
-        FILE_DIMENSIONS_1X1,
-        FILE_DIMENSIONS_2X2,
-        FILE_DIMENSIONS_3X3,
-        FILE_DIMENSIONS_4X4,
-        FILE_DIMENSIONS_5X5,
-    };
+    const Point _1x1_ = FILE_DIMENSIONS_1X1;
+    const Point _2x2_ = FILE_DIMENSIONS_2X2;
+    const Point _3x3_ = FILE_DIMENSIONS_3X3;
+    const Point _4x4_ = FILE_DIMENSIONS_4X4;
+    const Point _5x5_ = FILE_DIMENSIONS_5X5;
     switch(file)
     {
         default:
-        case FILE_RUBBLE_1X1: return Point_Equal(points[0], dimensions);
-        case FILE_RUBBLE_2X2: return Point_Equal(points[1], dimensions);
-        case FILE_RUBBLE_3X3: return Point_Equal(points[2], dimensions);
-        case FILE_RUBBLE_4X4: return Point_Equal(points[3], dimensions);
-        case FILE_RUBBLE_5X5: return Point_Equal(points[4], dimensions);
+        case FILE_RUBBLE_1X1: return Point_Equal(_1x1_, dimensions);
+        case FILE_RUBBLE_2X2: return Point_Equal(_2x2_, dimensions);
+        case FILE_RUBBLE_3X3: return Point_Equal(_3x3_, dimensions);
+        case FILE_RUBBLE_4X4: return Point_Equal(_4x4_, dimensions);
+        case FILE_RUBBLE_5X5: return Point_Equal(_5x5_, dimensions);
     }
 }
 
-Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Registrar graphics)
+Units PlaceRubble(Units units, Unit* const unit, const Grid grid, const Registrar graphics)
 {
     if(unit->trait.is_building)
     {
+        if(unit->trait.type == TYPE_TREE)
+            return Spawn(units, unit->cart, grid, FILE_TREE_STUMPS, COLOR_BLU, graphics);
         const Graphics rubbles[] = {
             FILE_RUBBLE_1X1,
             FILE_RUBBLE_2X2,
@@ -502,14 +502,24 @@ Units PlaceRubble(const Units units, Unit* const unit, const Grid grid, const Re
             FILE_RUBBLE_4X4,
             FILE_RUBBLE_5X5,
         };
-        if(unit->trait.type == TYPE_TREE)
-            return Spawn(units, unit->cart, grid, FILE_TREE_STUMPS, COLOR_BLU, graphics);
-        else for(int i = 0; i < UTIL_LEN(rubbles); i++)
+        const Graphics dusts[] = {
+            FILE_SMALLER_EXPLOSION_SMOKE,
+            FILE_BIGGER_EXPLOSION_SMOKE,
+            FILE_BIGGER_EXPLOSION_SMOKE,
+            FILE_BIGGER_EXPLOSION_SMOKE,
+            FILE_BIGGER_EXPLOSION_SMOKE,
+        };
+        for(int i = 0; i < UTIL_LEN(rubbles); i++)
         {
             const Graphics file = rubbles[i];
             const Point dimensions = unit->trait.dimensions;
             if(EqualDimension(dimensions, file))
-                return Spawn(units, unit->cart, grid, file, COLOR_BLU, graphics);
+            {
+                const Graphics dust = dusts[i];
+                units = Spawn(units, unit->cart, grid, file, COLOR_BLU, graphics);
+                units = Spawn(units, unit->cart, grid, dust, COLOR_BLU, graphics);
+                return units;
+            }
         }
     }
     return units;
@@ -828,6 +838,7 @@ void UpdateEntropy(const Units units)
 
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Points render_points)
 {
+    Tick(units);
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, render_points);
     units = Command(units, overview, input, graphics, map, field);
@@ -836,7 +847,6 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     ManageStacks(units);
     Decay(units);
     Expire(units);
-    Tick(units);
     UpdateEntropy(units);
     return units;
 }
