@@ -45,7 +45,8 @@ static void ReachGoal(Unit* const unit)
 
 static void GotoGoal(Unit* const unit, const Point delta)
 {
-    unit->velocity = Point_Normalize(delta, unit->trait.max_speed);
+    static Point zero;
+    unit->velocity = (unit->state == STATE_ATTACK) ? zero : Point_Normalize(delta, unit->trait.max_speed);
     if(unit->is_chasing)
         Unit_SetDir(unit, Point_Sub(unit->interest->cell, unit->cell));
     else
@@ -328,8 +329,6 @@ void Unit_Melee(Unit* const unit, const Grid grid)
                 unit->interest->health -= unit->trait.attack;
                 Unit_Unlock(unit);
             }
-            static Point zero;
-            unit->velocity = zero;
         }
     }
     else Unit_Unlock(unit);

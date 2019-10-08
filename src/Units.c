@@ -171,7 +171,7 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(2)
+    switch(0)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
@@ -647,12 +647,9 @@ static Units Repath(Units units, const Field field)
 static Units ProcessHardRules(Units units, const Field field, const Grid grid)
 {
     units = Repath(units, field);
-    for(int32_t i = 0; i < units.count; i++)
-        ConditionallyStopBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++)
-        ChaseBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++)
-        Unit_Melee(&units.unit[i], grid);
+    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++) Unit_Melee(&units.unit[i], grid);
     return units;
 }
 
