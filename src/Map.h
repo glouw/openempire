@@ -3,7 +3,6 @@
 #include "Point.h"
 #include "Overview.h"
 #include "Lines.h"
-#include "File.h"
 #include "Registrar.h"
 #include "Points.h"
 #include "Terrain.h"

@@ -21,7 +21,7 @@ File File_Load(FILE* const);
 
 #define FILE_NONE (-1)
 
-#define FILE_VILLAGER_MAX_SPEED (130)
+#define FILE_VILLAGER_MAX_SPEED (120)
 #define FILE_VILLAGER_HEALTH (50)
 #define FILE_VILLAGER_ATTACK (5)
 #define FILE_VILLAGER_WIDTH (2200)

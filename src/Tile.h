@@ -3,12 +3,10 @@
 #include "Frame.h"
 #include "Point.h"
 #include "Rect.h"
-#include "File.h"
 #include "Map.h"
 #include "Overview.h"
 #include "Animation.h"
 #include "Unit.h"
-#include "Graphics.h"
 #include "Direction.h"
 
 #include <stdbool.h>

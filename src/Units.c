@@ -171,7 +171,7 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
 
 static Units GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(0)
+    switch(2)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
