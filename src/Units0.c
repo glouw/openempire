@@ -513,12 +513,11 @@ static int32_t FlowThread(void* data)
     return 0;
 }
 
-static Units ManagePathFinding(Units units, const Grid grid, const Map map, const Field field)
+static Units ManagePathFinding(const Units units, const Grid grid, const Map map, const Field field)
 {
-    units = ProcessHardRules(units, field, grid);
     Process(units, map, grid, StressorThread);
     Process(units, map, grid, FlowThread);
-    return units;
+    return ProcessHardRules(units, field, grid);
 }
 
 static void Tick(const Units units)

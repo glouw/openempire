@@ -265,7 +265,6 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
 
 int32_t Unit_Kill(Unit* const unit)
 {
-    Unit_Unlock(unit); // XXX. IS THIS NEEDED?
     unit->health = 0;
     if(unit->trait.is_building || unit->trait.type == TYPE_SHADOW)
     {
@@ -273,7 +272,8 @@ int32_t Unit_Kill(Unit* const unit)
         if(unit->has_shadow)
             return unit->shadow_id;
     }
-    else Unit_SetState(unit, STATE_FALL, true);
+    else
+        Unit_SetState(unit, STATE_FALL, true);
     return -1;
 }
 
@@ -311,7 +311,8 @@ static bool ShouldEngage(Unit* const unit, const Grid grid)
         const Rect rect = { a, b };
         return Rect_ContainsPoint(rect, cart);
     }
-    else return Point_Mag(diff) < reach;
+    else
+        return Point_Mag(diff) < reach;
 }
 
 void Unit_Melee(Unit* const unit, const Grid grid)
@@ -324,14 +325,15 @@ void Unit_Melee(Unit* const unit, const Grid grid)
         {
             Unit_SetState(unit, STATE_ATTACK, true);
             Unit_Lock(unit);
-            if(unit->state_timer == Unit_GetLastAttackTick(unit))
-            {
-                unit->interest->health -= unit->trait.attack;
-                Unit_Unlock(unit);
-            }
+        }
+        if(unit->state_timer == Unit_GetLastAttackTick(unit))
+        {
+            unit->interest->health -= unit->trait.attack;
+            Unit_Unlock(unit);
         }
     }
-    else Unit_Unlock(unit);
+    else
+        Unit_Unlock(unit);
 }
 
 void Unit_Repath(Unit* const unit, const Field field)
