@@ -6,6 +6,7 @@
 #include "Util.h"
 #include "Rect.h"
 #include "Quad.h"
+#include "Interfac.h"
 
 Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yres)
 {
@@ -463,6 +464,67 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
             };
             for(int32_t k = 0; k < UTIL_LEN(point); k++)
                 DrawSelectionPixel(vram, point[k], color);
+        }
+    }
+}
+
+void Vram_DrawAction(const Vram vram, SDL_Surface* surface, const Point offset)
+{
+    for(int32_t y = 0; y < surface->h; y++)
+    for(int32_t x = 0; x < surface->w; x++)
+    {
+        const uint32_t pixel = Surface_GetPixel(surface, x, y);
+        const int32_t xx = offset.x + x;
+        const int32_t yy = offset.y + y;
+        if(pixel != SURFACE_COLOR_KEY)
+            if(!OutOfBounds(vram, xx, yy))
+                Put(vram, xx, yy, pixel);
+    }
+}
+
+typedef struct
+{
+    Animation animations[2];
+}
+Pack;
+
+static Pack GetPackFromAction(const Registrar interfac, const Action action, const Color color)
+{
+    static Pack zero;
+    Pack pack = zero;
+    Animation* const base = interfac.animation[color];
+    switch(action)
+    {
+    default:
+    case ACTION_NONE:
+        break;
+    case ACTION_BUILD:
+        pack.animations[0] = base[FILE_INTERFAC_BUILDING_ICONS];
+        break;
+    case ACTION_COMMAND:
+        pack.animations[0] = base[FILE_INTERFAC_COMMAND_ICONS];
+        break;
+    case ACTION_UNIT_AND_TECH:
+        pack.animations[0] = base[FILE_INTERFAC_UNIT_ICONS];
+        pack.animations[1] = base[FILE_INTERFAC_TECH_ICONS];
+        break;
+    }
+    return pack;
+}
+
+void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action action)
+{
+    const Pack pack = GetPackFromAction(interfac, action, COLOR_BLU);
+    for(int32_t j = 0; j < UTIL_LEN(pack.animations); j++)
+    {
+        const Animation animation = pack.animations[j];
+        int32_t x = 0;
+        for(int i = 0; i < animation.count; i++)
+        {
+            const Point offset = { x, j * 32 };
+            SDL_Surface* const surface = animation.surface[i];
+            Vram_DrawAction(vram, surface, offset);
+            x += surface->w;
         }
     }
 }

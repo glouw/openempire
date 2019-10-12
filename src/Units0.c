@@ -651,7 +651,6 @@ static Action GetAction(const Units units)
 static Units UpdateAction(Units units)
 {
     units.action = GetAction(units);
-    printf("%d\n", units.action);
     return units;
 }
 

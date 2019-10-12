@@ -145,6 +145,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
+    Vram_DrawActionRow(vram, data.interfac, units.action);
     Vram_Unlock(video.canvas);
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);

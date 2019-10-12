@@ -4,6 +4,7 @@
 #include "Frame.h"
 #include "Lines.h"
 #include "Registrar.h"
+#include "Action.h"
 #include "Units.h"
 #include "Rect.h"
 #include "Map.h"
@@ -48,3 +49,5 @@ void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, con
 void Vram_DrawUnitsPath(const Vram, const Registrar, const Units, const Overview);
 
 void Vram_DrawUnitHealthBars(const Vram, const Tiles);
+
+void Vram_DrawActionRow(const Vram, const Registrar, const Action);

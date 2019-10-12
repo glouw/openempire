@@ -100,6 +100,7 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
         const Point h = { i, j };
         units = Units_SpawnWithShadow(units, h, grid, FILE_FOREST_TREE, COLOR_RED, graphics, FILE_FOREST_TREE_SHADOW);
     }
+    units = Units_Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
     return units;
 }
 
