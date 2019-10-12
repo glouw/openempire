@@ -1,5 +1,7 @@
 #include "Graphics.h"
 
+#include "Interfac.h"
+
 const char* Graphics_GetString(const Graphics graphics)
 {
     switch(graphics)
@@ -153,4 +155,15 @@ bool Graphics_GetBuilding(const Graphics graphics)
 #undef FILE_X
     }
     return false;
+}
+
+Action Graphics_GetAction(const Graphics graphics)
+{
+    switch(graphics)
+    {
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action) case name: return action;
+        FILE_X_GRAPHICS
+#undef FILE_X
+    }
+    return ACTION_NONE;
 }

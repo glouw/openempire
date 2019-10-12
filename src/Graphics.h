@@ -3,6 +3,7 @@
 #include "File.h"
 #include "Type.h"
 #include "Point.h"
+#include "Action.h"
 
 #include <stdbool.h>
 
@@ -41,3 +42,5 @@ bool Graphics_GetExpire(const Graphics);
 Point Graphics_GetDimensions(const Graphics);
 
 bool Graphics_GetBuilding(const Graphics);
+
+Action Graphics_GetAction(const Graphics);

@@ -13,5 +13,3 @@ Interfac;
 const char* Interfac_GetString(const Interfac);
 
 uint8_t Interfac_GetHeight(const Interfac);
-
-Action Interfac_GetAction(const Interfac);
