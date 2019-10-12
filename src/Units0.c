@@ -42,7 +42,7 @@ Field Units_Field(const Units units, const Map map)
 
 Units Units_New(const Map map, const Grid grid, const Registrar graphics)
 {
-    const int32_t max = 64;
+    const int32_t max = 65536;
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
@@ -704,11 +704,11 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
     units = UpdateAction(units);
+    Decay(units);
+    Expire(units);
     units = Kill(units, overview, graphics, input);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
-    Decay(units);
-    Expire(units);
     UpdateEntropy(units);
     return units;
 }

@@ -7,12 +7,7 @@
 static Units Append(Units units, const Unit unit)
 {
     if(units.count == units.max)
-    {
-        units.max *= 2;
-        Unit* const temp = UTIL_REALLOC(units.unit, Unit, units.max);
-        UTIL_CHECK(temp);
-        units.unit = temp;
-    }
+        Util_Bomb("OUT OF MEMORY\n");
     units.unit[units.count++] = unit;
     return units;
 }
