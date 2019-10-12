@@ -4,13 +4,14 @@
 
 #include <SDL2/SDL.h>
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
+Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid, const Color color)
 {
     static Overview zero;
     Overview overview = zero;
     overview.grid = grid;
     overview.xres = xres;
     overview.yres = yres;
+    overview.color = color;
     return overview;
 }
 

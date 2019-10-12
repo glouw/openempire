@@ -42,7 +42,7 @@ Field Units_Field(const Units units, const Map map)
 
 Units Units_New(const Map map, const Grid grid, const Registrar graphics)
 {
-    const int32_t max = 65536;
+    const int32_t max = CONFIG_UNITS_MAX;
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
@@ -103,12 +103,15 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static void FindPathForSelected(const Units units, const Overview overview, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->is_selected
+#if CONFIG_UNITS_GOD_MODE == 0
+        && unit->color == overview.color
+#endif
         && unit->trait.max_speed > 0)
         {
             unit->command_group = units.command_group_next;
@@ -128,7 +131,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         if(CanWalk(units, map, cart_goal))
         {
             units.command_group_next++;
-            FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
+            FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
             units = Units_SpawnWithOffset(units, cart_goal, cart_grid_offset_goal, overview, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
         }
     }
@@ -371,9 +374,13 @@ static void KillShadow(const Units units, const int32_t shadow_id)
         Unit_Kill(GetByShadow(units, shadow_id));
 }
 
-static bool ShouldDelete(Unit* const unit, const Input input)
+static bool ShouldDelete(Unit* const unit, const Input input, const Overview overview)
 {
-    return unit->is_selected && input.key[SDL_SCANCODE_DELETE];
+    return
+#if CONFIG_UNITS_GOD_MODE == 0
+        unit->color == overview.color &&
+#endif
+        unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
 // Trees are treated as buildings to avoid the intermediatery "logs on the ground" state.
@@ -391,7 +398,7 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
         {
-            if(unit->health <= 0 || ShouldDelete(unit, input))
+            if(unit->health <= 0 || ShouldDelete(unit, input, overview))
             {
                 KillShadow(units, Unit_Kill(unit));
                 units = PlaceBuildingRemains(units, unit, overview, graphics);

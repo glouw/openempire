@@ -3,6 +3,7 @@
 #include "Point.h"
 #include "Frame.h"
 #include "Lines.h"
+#include "Color.h"
 #include "Registrar.h"
 #include "Action.h"
 #include "Units.h"
@@ -46,8 +47,6 @@ void Vram_DrawUnitSelections(const Vram, const Tiles);
 
 void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, const bool enabled);
 
-void Vram_DrawUnitsPath(const Vram, const Registrar, const Units, const Overview);
-
 void Vram_DrawUnitHealthBars(const Vram, const Tiles);
 
-void Vram_DrawActionRow(const Vram, const Registrar, const Action);
+void Vram_DrawActionRow(const Vram, const Registrar, const Action, const Color);

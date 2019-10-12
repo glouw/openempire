@@ -153,8 +153,7 @@ static int32_t GetFramesFromState(Unit* const unit, const Registrar graphics, co
 
 static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
 {
-    const Animation animation = graphics.animation[unit->color][unit->file];
-    return animation.count;
+    return graphics.animation[unit->color][unit->file].count;
 }
 
 Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
@@ -229,8 +228,7 @@ void Unit_Flow(Unit* const unit, const Grid grid)
 
 bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for same unit type as well.
 {
-    return unit->command_group == other->command_group
-        && unit->color == other->color;
+    return unit->command_group == other->command_group && unit->color == other->color;
 }
 
 void Unit_SetDir(Unit* const unit, const Point dir)

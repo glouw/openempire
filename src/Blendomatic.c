@@ -9,9 +9,8 @@
 
 Blendomatic Blendomatic_Load(const char* const path, const Registrar terrain)
 {
-    const Terrain file = FILE_DIRT;
-    const Image image = terrain.animation[COLOR_BLU][file].image[0];
-    const Frame frame = terrain.animation[COLOR_BLU][file].frame[0];
+    const Image image = terrain.animation[COLOR_BLU][FILE_DIRT].image[0];
+    const Frame frame = terrain.animation[COLOR_BLU][FILE_DIRT].frame[0];
     char* const dat_path = Util_StringJoin(path, "blendomatic.dat");
     FILE* const fp = fopen(dat_path, "r");
     static Blendomatic zero;

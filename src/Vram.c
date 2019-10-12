@@ -296,27 +296,6 @@ void Vram_DrawUnits(const Vram vram, const Tiles tiles)
         Vram_DrawTile(vram, tiles.tile[i]);
 }
 
-// XXX. Only useful for debugging the path finder and is not used in the final engine as units are not sorted by depth.
-void Vram_DrawUnitsPath(const Vram vram, const Registrar graphics, const Units units, const Overview overview)
-{
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        const Unit unit = units.unit[i];
-        for(int32_t j = 0; j < unit.path.count; j++)
-        {
-            static Point zero;
-            const Point cart = unit.path.point[j];
-            const Graphics file = FILE_WAYPOINT_FLAG;
-            static Unit none;
-            Unit flag = none;
-            flag.file = file;
-            flag.dir = DIRECTION_S;
-            const Tile tile = Tile_GetGraphics(overview, cart, zero, graphics.animation[COLOR_BLU][file], &flag);
-            Vram_DrawTile(vram, tile);
-        }
-    }
-}
-
 static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
     if(!OutOfBounds(vram, point.x, point.y))
@@ -512,9 +491,9 @@ static Pack GetPackFromAction(const Registrar interfac, const Action action, con
     return pack;
 }
 
-void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action action)
+void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action action, const Color color)
 {
-    const Pack pack = GetPackFromAction(interfac, action, COLOR_BLU);
+    const Pack pack = GetPackFromAction(interfac, action, color);
     for(int32_t j = 0; j < UTIL_LEN(pack.animations); j++)
     {
         const Animation animation = pack.animations[j];

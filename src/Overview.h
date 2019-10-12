@@ -2,6 +2,7 @@
 
 #include "Input.h"
 #include "Point.h"
+#include "Color.h"
 #include "Rect.h"
 #include "Grid.h"
 #include "Quad.h"
@@ -13,10 +14,11 @@ typedef struct
     Rect selection_box;
     int32_t xres;
     int32_t yres;
+    Color color;
 }
 Overview;
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid);
+Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid, const Color);
 
 Overview Overview_Update(Overview, const Input);
 

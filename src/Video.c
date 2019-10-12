@@ -107,7 +107,7 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
 // XXX. TO BE DEPRECATED.
 void Video_RenderDataDemo(const Video video, const Data data, const Color color)
 {
-    RenderRegistrarDemo(video, data.interfac, color, video.top_left);
+    RenderRegistrarDemo(video, data.interfac, color, video.middle);
     RenderRegistrarDemo(video, data.graphics, color, video.middle);
     RenderRegistrarDemo(video, data.terrain, color, video.middle);
     RenderBlendomaticDemo(video, data.blendomatic);
@@ -144,8 +144,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
-    Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
-    Vram_DrawActionRow(vram, data.interfac, units.action);
+    Vram_DrawActionRow(vram, data.interfac, units.action, overview.color);
     Vram_Unlock(video.canvas);
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
