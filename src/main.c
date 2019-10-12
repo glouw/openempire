@@ -15,17 +15,17 @@ int main(const int argc, const char* argv[])
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Units units = Units_New(map, grid, data.graphics);
-    Overview overview = Overview_Init(video.xres, video.yres, grid, COLOR_RED); // TO BE SENT VIA P2P.
+    Overview overview = Overview_Init(video.xres, video.yres, grid, COLOR_BLU);
     int32_t cycles = 0;
     if(!args.demo)
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
             const int32_t t0 = SDL_GetTicks();
-            overview = Overview_Update(overview, input); // TO BE SENT VIA P2P.
+            overview = Overview_Update(overview, input); // TO BE SENT VIA P2P (ALONG WITH INPUT).
             Map_Edit(map, overview, input);
             const Field field = Units_Field(units, map);
             const Window window = Window_Make(overview);
-            units = Units_Caretake(units, data.graphics, overview, input, map, field, window);
+            units = Units_Caretake(units, data.graphics, overview, input, map, field, window); // TO BE MODIFIED BY ALL P2P CLIENTS.
             Video_Render(video, data, map, units, overview, input, window);
             const int32_t t1 = SDL_GetTicks();
             Video_CopyCanvas(video);

@@ -433,8 +433,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(other->color != unit->color
-            && !Unit_IsExempt(other))
+            if(other->color != unit->color && !Unit_IsExempt(other)) // XXX. USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
             {
                 Point cell = other->cell;
                 if(other->trait.is_building)
