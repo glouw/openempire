@@ -282,12 +282,43 @@ static bool EqualDimension(Point dimensions, const Graphics file)
     }
 }
 
-Units PlaceRubble(Units units, Unit* const unit, const Grid grid, const Registrar graphics)
+static Units SpamFire(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
+{
+    for(int x = 0; x < unit->trait.dimensions.x; x++)
+    for(int y = 0; y < unit->trait.dimensions.y; y++)
+    {
+        const Point offset = { x, y };
+        const Point cart = Point_Add(unit->cart, offset);
+        const Graphics fires[] = {
+            FILE_FIRE_SMALL_A,
+            FILE_FIRE_SMALL_B,
+            FILE_FIRE_SMALL_C,
+            FILE_FIRE_MEDIUM_A,
+            FILE_FIRE_MEDIUM_B,
+        };
+        const int32_t index = Util_Rand() % UTIL_LEN(fires);
+        const Graphics fire = fires[index];
+        const bool should_spawn = Util_Rand() % 2;
+        if(should_spawn)
+        {
+            const int32_t w = overview.grid.tile_cart_width;
+            const int32_t h = overview.grid.tile_cart_height;
+            const Point grid_offset = {
+                Util_Rand() % w - w / 2,
+                Util_Rand() % h - h / 2,
+            };
+            units = Units_SpawnWithOffset(units, cart, grid_offset, overview, fire, COLOR_BLU, graphics);
+        }
+    }
+    return units;
+}
+
+Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
     if(unit->trait.is_building)
     {
         if(unit->trait.type == TYPE_TREE)
-            return Units_Spawn(units, unit->cart, grid, FILE_TREE_STUMPS, COLOR_BLU, graphics);
+            return Units_Spawn(units, unit->cart, overview.grid, FILE_TREE_STUMPS, COLOR_BLU, graphics);
         const Graphics rubbles[] = {
             FILE_RUBBLE_1X1,
             FILE_RUBBLE_2X2,
@@ -305,12 +336,12 @@ Units PlaceRubble(Units units, Unit* const unit, const Grid grid, const Registra
         for(int i = 0; i < UTIL_LEN(rubbles); i++)
         {
             const Graphics file = rubbles[i];
-            const Point dimensions = unit->trait.dimensions;
-            if(EqualDimension(dimensions, file))
+            if(EqualDimension(unit->trait.dimensions, file))
             {
                 const Graphics dust = dusts[i];
-                units = Units_Spawn(units, unit->cart, grid, file, COLOR_BLU, graphics);
-                units = Units_Spawn(units, unit->cart, grid, dust, COLOR_BLU, graphics);
+                units = Units_Spawn(units, unit->cart, overview.grid, file, COLOR_BLU, graphics);
+                units = Units_Spawn(units, unit->cart, overview.grid, dust, COLOR_BLU, graphics);
+                units = SpamFire(units, unit, overview, graphics);
                 return units;
             }
         }
@@ -340,7 +371,7 @@ static bool ShouldDelete(Unit* const unit, const Input input)
     return unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
-static Units Kill(Units units, const Grid grid, const Registrar graphics, const Input input)
+static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -351,7 +382,7 @@ static Units Kill(Units units, const Grid grid, const Registrar graphics, const 
             || ShouldDelete(unit, input))
             {
                 KillShadow(units, Unit_Kill(unit));
-                units = PlaceRubble(units, unit, grid, graphics);
+                units = PlaceRubble(units, unit, overview, graphics);
             }
         }
     }
@@ -661,7 +692,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
     units = UpdateAction(units);
-    units = Kill(units, overview.grid, graphics, input);
+    units = Kill(units, overview, graphics, input);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     Decay(units);
