@@ -3,6 +3,7 @@
 #include "Unit.h"
 #include "Overview.h"
 #include "Window.h"
+#include "Action.h"
 #include "Field.h"
 #include "Map.h"
 #include "Points.h"
@@ -25,6 +26,7 @@ typedef struct
     int32_t select_count;
     int32_t cpu_count;
     int32_t repath_index;
+    Action action;
 }
 Units;
 

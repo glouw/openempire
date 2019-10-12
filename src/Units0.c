@@ -592,7 +592,7 @@ static Units RemoveGarbage(const Units units)
     return Resize(units);
 }
 
-void UpdateEntropy(const Units units)
+static void UpdateEntropy(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -601,12 +601,67 @@ void UpdateEntropy(const Units units)
     }
 }
 
+static Action GetAction(const Units units)
+{
+    int32_t counts[] = { 0, 0, 0, 0 };
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_selected)
+        {
+            switch(unit->trait.action)
+            {
+            default:
+            case ACTION_NONE:
+                counts[0]++;
+                break;
+            case ACTION_BUILD:
+                counts[1]++;
+                break;
+            case ACTION_COMMAND:
+                counts[2]++;
+                break;
+            case ACTION_UNIT_AND_TECH:
+                counts[3]++;
+                break;
+            }
+        }
+    }
+    int32_t max = 0;
+    int32_t index = 0;
+    for(int32_t i = 0; i < UTIL_LEN(counts); i++)
+        if(counts[i] > max)
+        {
+            max = counts[i];
+            index = i;
+        }
+    switch(index)
+    {
+    default:
+        return ACTION_NONE;
+    case 1:
+        return ACTION_BUILD;
+    case 2:
+        return ACTION_COMMAND;
+    case 3:
+        return ACTION_UNIT_AND_TECH;
+    }
+}
+
+static Units UpdateAction(Units units)
+{
+    units.action = GetAction(units);
+    printf("%d\n", units.action);
+    return units;
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Window window)
 {
     Tick(units);
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
+    units = UpdateAction(units);
     units = Kill(units, overview.grid, graphics, input);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
