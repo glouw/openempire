@@ -291,23 +291,19 @@ static Units SpamFire(Units units, Unit* const unit, const Overview overview, co
         FILE_FIRE_MEDIUM_A,
         FILE_FIRE_MEDIUM_B,
     };
-    for(int x = 0; x < unit->trait.dimensions.x; x++)
-    for(int y = 0; y < unit->trait.dimensions.y; y++)
+    for(int x = 1; x < unit->trait.dimensions.x - 1; x++)
+    for(int y = 1; y < unit->trait.dimensions.y - 1; y++)
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(unit->cart, offset);
         const int32_t index = Util_Rand() % UTIL_LEN(fires);
-        const bool should_spawn = Util_Rand() % 2; // XXX. CHANCE TO SPAWN NOTHING.
-        if(should_spawn)
-        {
-            const int32_t w = overview.grid.tile_cart_width;
-            const int32_t h = overview.grid.tile_cart_height;
-            const Point grid_offset = {
-                Util_Rand() % w - w / 2,
-                Util_Rand() % h - h / 2,
-            };
-            units = Units_SpawnWithOffset(units, cart, grid_offset, overview, fires[index], COLOR_BLU, graphics);
-        }
+        const int32_t w = overview.grid.tile_cart_width;
+        const int32_t h = overview.grid.tile_cart_height;
+        const Point grid_offset = {
+            Util_Rand() % w - w / 2,
+            Util_Rand() % h - h / 2,
+        };
+        units = Units_SpawnWithOffset(units, cart, grid_offset, overview, fires[index], COLOR_BLU, graphics);
     }
     return units;
 }
@@ -321,15 +317,10 @@ static Units SpamDust(Units units, Unit* const unit, const Overview overview, co
     for(int x = 0; x < unit->trait.dimensions.x; x++)
     for(int y = 0; y < unit->trait.dimensions.y; y++)
     {
-        const Point offset = {
-            x - 1,
-            y - 1,
-        };
+        const Point offset = { x - 1, y - 1 };
         const Point cart = Point_Add(unit->cart, offset);
         const int32_t index = Util_Rand() % UTIL_LEN(dusts);
-        const bool should_spawn = Util_Rand() % 2; // XXX. CHANCE TO SPAWN NOTHING.
-        if(should_spawn)
-            units = Units_Spawn(units, cart, overview.grid, dusts[index], COLOR_BLU, graphics);
+        units = Units_Spawn(units, cart, overview.grid, dusts[index], COLOR_BLU, graphics);
     }
     return units;
 }
@@ -352,12 +343,12 @@ Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const 
     };
     for(int i = 0; i < UTIL_LEN(rubbles); i++)
     {
-        const Graphics file = rubbles[i];
-        if(EqualDimension(unit->trait.dimensions, file))
+        const Graphics rubble = rubbles[i];
+        if(EqualDimension(unit->trait.dimensions, rubble))
         {
             units = SpamFire(units, unit, overview, graphics);
             units = SpamDust(units, unit, overview, graphics);
-            return Units_Spawn(units, unit->cart, overview.grid, file, COLOR_BLU, graphics); // XXX. Should paint ground with broken rock texture?
+            return Units_Spawn(units, unit->cart, overview.grid, rubble, COLOR_BLU, graphics); // XXX. Should paint ground with broken rock texture?
         }
     }
     return units;
@@ -385,6 +376,7 @@ static bool ShouldDelete(Unit* const unit, const Input input)
     return unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
+// Trees are treated as buildings to avoid the intermediatery "logs on the ground" state.
 static Units PlaceBuildingRemains(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
     if(unit->trait.is_building)
@@ -399,8 +391,7 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
         {
-            if(unit->health <= 0
-            || ShouldDelete(unit, input))
+            if(unit->health <= 0 || ShouldDelete(unit, input))
             {
                 KillShadow(units, Unit_Kill(unit));
                 units = PlaceBuildingRemains(units, unit, overview, graphics);
