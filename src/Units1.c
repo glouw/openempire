@@ -136,12 +136,12 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     const Point zero = { 0,0 };
     const Layout layouts[] = {
         { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
-        { {middle.x - 2, middle.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
-        { {middle.x - 2, middle.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {middle.x - 1, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {middle.x - 2, middle.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
-        { {middle.x - 2, middle.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {middle.x - 1, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {middle.x - 3, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
+        { {middle.x - 3, middle.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+        { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+        { {middle.x - 3, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
+        { {middle.x - 3, middle.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+        { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
         { {middle.x + 0, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
     };
     for(int i = 0; i < UTIL_LEN(layouts); i++)
