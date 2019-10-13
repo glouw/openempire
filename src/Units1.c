@@ -117,43 +117,13 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
 
 static Units GenerateGameZone(Units units, const Overview overview, const Registrar graphics)
 {
-    const Color color = COLOR_BLU;
-    typedef struct
-    {
-        Point point;
-        Point offset;
-        Graphics file;
-    }
-    Layout;
-    const Point offset = {
-        +overview.grid.tile_cart_width / 2,
-        -overview.grid.tile_cart_height / 2,
-    };
-    const Point middle = {
-        overview.grid.cols / 2,
-        overview.grid.cols / 2,
-    };
-    const Point zero = { 0,0 };
-    const Layout layouts[] = {
-        { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
-        { {middle.x - 3, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
-        { {middle.x - 3, middle.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {middle.x - 3, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
-        { {middle.x - 3, middle.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-        { {middle.x + 0, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
-    };
-    for(int i = 0; i < UTIL_LEN(layouts); i++)
-    {
-        const Layout layout = layouts[i];
-        units = Units_SpawnWithOffset(units, layout.point, layout.offset, overview, layout.file, color, graphics);
-    }
+    const Point middle = { overview.grid.cols / 2, overview.grid.cols / 2 };
+    units = Units_SpawnTownCenter(units, overview, graphics, middle, COLOR_BLU);
     for(int i = 0; i < 5; i++)
     {
         const Point gg = { -2, +3 };
         const Point g = Point_Add(middle, gg);
-        units = Units_Spawn(units, g, overview.grid, FILE_MALE_VILLAGER_IDLE, color, graphics);
+        units = Units_Spawn(units, g, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
     }
     return units;
 }

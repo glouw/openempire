@@ -35,6 +35,35 @@ Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, c
     return Append(units, unit);
 }
 
+Units Units_SpawnTownCenter(Units units, const Overview overview, const Registrar graphics, const Point cart, const Color color)
+{
+    typedef struct
+    {
+        Point point;
+        Point offset;
+        Graphics file;
+    }
+    Layout;
+    const Point offset = { overview.grid.tile_cart_width / 2, -overview.grid.tile_cart_height / 2 };
+    const Point zero = { 0,0 };
+    const Layout layouts[] = {
+        { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
+        { {cart.x - 3, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
+        { {cart.x - 3, cart.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+        { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+        { {cart.x - 3, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
+        { {cart.x - 3, cart.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+        { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {cart.x + 0, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
+    };
+    for(int i = 0; i < UTIL_LEN(layouts); i++)
+    {
+        const Layout layout = layouts[i];
+        units = Units_SpawnWithOffset(units, layout.point, layout.offset, overview, layout.file, color, graphics);
+    }
+    return units;
+}
+
 void Units_ResetTiled(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
