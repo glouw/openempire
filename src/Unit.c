@@ -374,7 +374,7 @@ Point Unit_Separate(Unit* const unit, Unit* const other)
 
 bool Unit_IsExempt(Unit* const unit)
 {
-    return State_IsDead(unit->state) || unit->trait.can_expire || unit->trait.is_floored;
+    return State_IsDead(unit->state) || unit->trait.can_expire || unit->trait.is_detail;
 }
 
 Point Unit_GetShift(Unit* const unit, const Point cart)

@@ -24,7 +24,7 @@ typedef struct
     bool is_multi_state;
     bool is_building;
     bool can_expire;
-    bool is_floored;
+    bool is_detail;
 }
 Trait;
 

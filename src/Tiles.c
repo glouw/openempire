@@ -108,7 +108,6 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
             if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
             {
                 Tile_Select(tile);
-                Unit_Print(tile.reference);
                 return tile;
             }
         }

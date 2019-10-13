@@ -21,6 +21,6 @@ Trait Trait_Build(const Graphics file)
     trait.is_multi_state = Graphics_GetMultiState(file);
     trait.is_building = Graphics_GetBuilding(file);
     trait.can_expire = Graphics_GetExpire(file);
-    trait.is_floored = Graphics_GetFloored(file);
+    trait.is_detail = Graphics_GetDetail(file);
     return trait;
 }

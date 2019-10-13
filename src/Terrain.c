@@ -4,7 +4,7 @@ const char* Terrain_GetString(const Terrain terrain)
 {
     switch(terrain)
     {
-#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, floored) case name: return #name;
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, detail) case name: return #name;
         FILE_X_TERRAIN
 #undef FILE_X
     }
@@ -15,7 +15,7 @@ uint8_t Terrain_GetHeight(const Terrain terrain)
 {
     switch(terrain)
     {
-#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, floored) case name: return prio;
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, detail) case name: return prio;
         FILE_X_TERRAIN
 #undef FILE_X
     }
@@ -26,7 +26,7 @@ bool Terrain_IsWalkable(const Terrain terrain)
 {
     switch(terrain)
     {
-#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, floored) case name: return walkable;
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, detail) case name: return walkable;
         FILE_X_TERRAIN
 #undef FILE_X
     }

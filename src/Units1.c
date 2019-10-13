@@ -132,15 +132,18 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     const Point offset = { overview.grid.tile_cart_width / 2, -overview.grid.tile_cart_height / 2 };
     units = Units_Spawn(units, a, overview.grid, FILE_DARK_AGE_TOWN_CENTER_TOP, color, graphics);
     units = Units_Spawn(units, b, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT, color, graphics);
-    //units = Units_Spawn(units, c, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics);
+    units = Units_Spawn(units, c, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics);
     units = Units_Spawn(units, c, overview.grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW, color, graphics);
     units = Units_Spawn(units, d, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE, color, graphics);
     units = Units_Spawn(units, f, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics);
     units = Units_SpawnWithOffset(units, b, offset, overview, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics);
     units = Units_SpawnWithOffset(units, e, offset, overview, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics);
-    const Point gg = { -5, -5 };
-    const Point g = Point_Add(a, gg);
-    units = Units_Spawn(units, g, overview.grid, FILE_MALE_VILLAGER_IDLE, color, graphics);
+    for(int i = 0; i < 10; i++)
+    {
+        const Point gg = { -5, -5 };
+        const Point g = Point_Add(a, gg);
+        units = Units_Spawn(units, g, overview.grid, FILE_MALE_VILLAGER_IDLE, color, graphics);
+    }
     return units;
 }
 
@@ -148,13 +151,13 @@ Units Units_GenerateTestZone(const Units units, const Map map, const Overview ov
 {
     switch(6)
     {
-        default:
-        case 0: return GenerateBattleZone(units, map, overview.grid, graphics);
-        case 1: return GenerateBerryZone(units, overview.grid, graphics);
-        case 2: return GenerateVillieZone(units, overview.grid, graphics);
-        case 3: return GenerateRandomZone(units, overview.grid, graphics);
-        case 4: return GenerateBuildingZone(units, overview.grid, graphics);
-        case 5: return GenerateTreeZone(units, overview.grid, graphics);
-        case 6: return GenerateGameZone(units, overview, graphics);
+    default:
+    case 0: return GenerateBattleZone(units, map, overview.grid, graphics);
+    case 1: return GenerateBerryZone(units, overview.grid, graphics);
+    case 2: return GenerateVillieZone(units, overview.grid, graphics);
+    case 3: return GenerateRandomZone(units, overview.grid, graphics);
+    case 4: return GenerateBuildingZone(units, overview.grid, graphics);
+    case 5: return GenerateTreeZone(units, overview.grid, graphics);
+    case 6: return GenerateGameZone(units, overview, graphics);
     }
 }
