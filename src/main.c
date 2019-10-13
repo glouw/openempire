@@ -14,8 +14,8 @@ int main(const int argc, const char* argv[])
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
-    Units units = Units_New(map, grid, data.graphics);
     Overview overview = Overview_Init(video.xres, video.yres, grid, COLOR_BLU);
+    Units units = Units_New(map, overview, data.graphics);
     int32_t cycles = 0;
     if(!args.demo)
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))

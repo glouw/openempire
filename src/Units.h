@@ -30,7 +30,7 @@ typedef struct
 }
 Units;
 
-Units Units_New(const Map map, const Grid grid, const Registrar graphics);
+Units Units_New(const Map map, const Overview, const Registrar graphics);
 
 void Units_Free(const Units);
 
@@ -42,7 +42,7 @@ Field Units_Field(const Units, const Map);
 
 void Units_ResetTiled(const Units);
 
-Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar);
+Units Units_GenerateTestZone(Units, const Map, const Overview, const Registrar);
 
 Units Units_Spawn(Units, const Point, const Grid, const Graphics, const Color, const Registrar);
 
