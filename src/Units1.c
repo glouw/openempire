@@ -98,7 +98,7 @@ static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar 
     for(int32_t i = 0; i < 10; i++)
     {
         const Point h = { i, j };
-        units = Units_SpawnWithShadow(units, h, grid, FILE_FOREST_TREE, COLOR_RED, graphics, FILE_FOREST_TREE_SHADOW);
+        units = Units_SpawnWithShadow(units, h, grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
     }
     units = Units_Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
     return units;
@@ -110,7 +110,7 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
     for(int32_t i = 0; i < units.cols; i++)
     {
         const Point a = { i, j };
-        units = Units_SpawnWithShadow(units, a, grid, FILE_FOREST_TREE, COLOR_BLU, graphics, FILE_FOREST_TREE_SHADOW);
+        units = Units_SpawnWithShadow(units, a, grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
     }
     return units;
 }
