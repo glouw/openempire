@@ -153,7 +153,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
 
 void Video_PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles)
 {
-    static int dt_hold;
+    static int32_t dt_hold;
     if(cycles % 10 == 0)
         dt_hold = dt;
     Text_Printf(video.text_small, video.renderer, video.top_rite, POSITION_TOP_RITE, 0xFF, 0,

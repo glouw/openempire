@@ -91,12 +91,11 @@ static Units Select(Units units, const Overview overview, const Input input, con
         else
         {
             const Tile tile = Tiles_SelectOne(tiles, input.point);
-            if(tile.reference
-            && !Unit_IsExempt(tile.reference)
-            && input.key[SDL_SCANCODE_LCTRL])
-                units.select_count = Tiles_SelectSimilar(tiles, tile);
-            else
-                units.select_count = 1;
+            if(tile.reference)
+            {
+                const bool select_more = !Unit_IsExempt(tile.reference) && input.key[SDL_SCANCODE_LCTRL];
+                units.select_count = select_more ? Tiles_SelectSimilar(tiles, tile) : 1;
+            }
         }
         Tiles_Free(tiles);
     }
