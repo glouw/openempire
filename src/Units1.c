@@ -118,30 +118,41 @@ static Units GenerateTreeZone(Units units, const Grid grid, const Registrar grap
 static Units GenerateGameZone(Units units, const Overview overview, const Registrar graphics)
 {
     const Color color = COLOR_BLU;
-    const Point bb = { -3, 1 };
-    const Point cc = { -2, 0 };
-    const Point dd = { -3, 1 };
-    const Point ee = { -3, 1 };
-    const Point ff = { -2, 0 };
-    const Point a = { overview.grid.cols / 2, overview.grid.cols / 2, };
-    const Point b = Point_Add(a, bb);
-    const Point c = Point_Add(a, cc);
-    const Point d = Point_Add(a, dd);
-    const Point e = Point_Add(a, ee);
-    const Point f = Point_Add(a, ff);
-    const Point offset = { overview.grid.tile_cart_width / 2, -overview.grid.tile_cart_height / 2 };
-    units = Units_Spawn(units, a, overview.grid, FILE_DARK_AGE_TOWN_CENTER_TOP, color, graphics);
-    units = Units_Spawn(units, b, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT, color, graphics);
-    units = Units_Spawn(units, c, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics);
-    units = Units_Spawn(units, c, overview.grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW, color, graphics);
-    units = Units_Spawn(units, d, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE, color, graphics);
-    units = Units_Spawn(units, f, overview.grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics);
-    units = Units_SpawnWithOffset(units, b, offset, overview, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics);
-    units = Units_SpawnWithOffset(units, e, offset, overview, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics);
-    for(int i = 0; i < 10; i++)
+    typedef struct
     {
-        const Point gg = { -5, -5 };
-        const Point g = Point_Add(a, gg);
+        Point point;
+        Point offset;
+        Graphics file;
+    }
+    Layout;
+    const Point offset = {
+        +overview.grid.tile_cart_width / 2,
+        -overview.grid.tile_cart_height / 2,
+    };
+    const Point middle = {
+        overview.grid.cols / 2,
+        overview.grid.cols / 2,
+    };
+    const Point zero = { 0,0 };
+    const Layout layouts[] = {
+        { {middle.x - 2, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
+        { {middle.x - 2, middle.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
+        { {middle.x - 2, middle.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+        { {middle.x - 1, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+        { {middle.x - 2, middle.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
+        { {middle.x - 2, middle.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+        { {middle.x - 1, middle.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {middle.x + 0, middle.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
+    };
+    for(int i = 0; i < UTIL_LEN(layouts); i++)
+    {
+        const Layout layout = layouts[i];
+        units = Units_SpawnWithOffset(units, layout.point, layout.offset, overview, layout.file, color, graphics);
+    }
+    for(int i = 0; i < 5; i++)
+    {
+        const Point gg = { -2, +3 };
+        const Point g = Point_Add(middle, gg);
         units = Units_Spawn(units, g, overview.grid, FILE_MALE_VILLAGER_IDLE, color, graphics);
     }
     return units;
