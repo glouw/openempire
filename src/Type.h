@@ -5,6 +5,7 @@ typedef enum
     TYPE_NONE = -1,
     TYPE_VILLAGER,
     TYPE_TEUTONIC_KNIGHT,
+    TYPE_FIRE,
     TYPE_SHADOW,
     TYPE_TOWN_CENTER,
     TYPE_BERRY_BUSH,

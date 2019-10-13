@@ -573,6 +573,8 @@ static void Tick(const Units units)
         unit->state_timer++;
         unit->dir_timer++;
         unit->path_index_timer++;
+        if(unit->timing_to_collect)
+            unit->garbage_collection_timer++;
     }
 }
 
@@ -582,8 +584,7 @@ static void Decay(const Units units)
     {
         Unit* const unit = &units.unit[i];
         const int32_t last_tick = Unit_GetLastFallTick(unit);
-        if(unit->state == STATE_FALL
-        && unit->state_timer == last_tick)
+        if(unit->state == STATE_FALL && unit->state_timer == last_tick)
         {
             Unit_SetState(unit, STATE_DECAY, true);
             unit->is_selected = false;
@@ -609,9 +610,14 @@ static void FlagGarbage(const Units units)
     {
         Unit* const unit = &units.unit[i];
         const int32_t last_tick = Unit_GetLastDecayTick(unit);
-        if(unit->state == STATE_DECAY
-        && unit->state_timer == last_tick)
+        if(unit->state == STATE_DECAY && unit->state_timer == last_tick)
             unit->must_garbage_collect = true;
+        if(unit->timing_to_collect)
+        {
+            const int32_t time = (unit->trait.type == TYPE_FIRE) ? CONFIG_UNITS_CLEANUP_FIRE : CONFIG_UNITS_CLEANUP_RUBBLE;
+            if(unit->garbage_collection_timer == time)
+                unit->must_garbage_collect = true;
+        }
     }
 }
 

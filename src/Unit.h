@@ -38,6 +38,7 @@ typedef struct Unit
     int32_t health;
     int32_t state_timer;
     int32_t dir_timer;
+    int32_t garbage_collection_timer;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
     int32_t decay_frames_per_dir;
@@ -49,6 +50,7 @@ typedef struct Unit
     bool already_tiled;
     bool was_wall_pushed;
     bool has_shadow;
+    bool timing_to_collect;
 }
 Unit;
 

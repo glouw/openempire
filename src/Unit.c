@@ -178,6 +178,9 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
         unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
+    if(unit.trait.type == TYPE_FIRE
+    || unit.trait.type == TYPE_RUBBLE)
+        unit.timing_to_collect = true;
     Unit_UpdateEntropy(&unit);
     unit.entropy_static = Util_Rand();
     return unit;
@@ -331,8 +334,7 @@ void Unit_Melee(Unit* const unit, const Grid grid)
             Unit_Unlock(unit);
         }
     }
-    else
-        Unit_Unlock(unit);
+    else Unit_Unlock(unit);
 }
 
 void Unit_Repath(Unit* const unit, const Field field)
