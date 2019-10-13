@@ -17,7 +17,7 @@ static void GenerateTestZone(const Map map)
 
 Map Map_Make(const int32_t size, const Registrar terrain)
 {
-    const Frame frame = terrain.animation[COLOR_BLU][FILE_DIRT].frame[0];
+    const Frame frame = terrain.animation[COLOR_NONE][FILE_DIRT].frame[0];
     static Map zero;
     Map map = zero;
     map.rows = size;

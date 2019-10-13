@@ -20,3 +20,8 @@ typedef enum
     COLOR_COUNT,
 }
 Color;
+
+// Color does not matter for some registrars, like terrain, so any color (eg. BLUE)
+// can be used for unpacking the registrar.
+
+#define COLOR_NONE (COLOR_BLU)

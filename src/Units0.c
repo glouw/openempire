@@ -132,7 +132,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         {
             units.command_group_next++;
             FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
-            units = Units_SpawnWithOffset(units, cart_goal, cart_grid_offset_goal, overview, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
+            units = Units_SpawnWithOffset(units, cart_goal, cart_grid_offset_goal, overview, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_NONE, graphics);
         }
     }
     return units;
@@ -306,7 +306,7 @@ static Units SpamFire(Units units, Unit* const unit, const Overview overview, co
             Util_Rand() % w - w / 2,
             Util_Rand() % h - h / 2,
         };
-        units = Units_SpawnWithOffset(units, cart, grid_offset, overview, fires[index], COLOR_BLU, graphics);
+        units = Units_SpawnWithOffset(units, cart, grid_offset, overview, fires[index], COLOR_NONE, graphics);
     }
     return units;
 }
@@ -323,7 +323,7 @@ static Units SpamDust(Units units, Unit* const unit, const Overview overview, co
         const Point offset = { x - 1, y - 1 };
         const Point cart = Point_Add(unit->cart, offset);
         const int32_t index = Util_Rand() % UTIL_LEN(dusts);
-        units = Units_Spawn(units, cart, overview.grid, dusts[index], COLOR_BLU, graphics);
+        units = Units_Spawn(units, cart, overview.grid, dusts[index], COLOR_NONE, graphics);
     }
     return units;
 }
@@ -331,7 +331,7 @@ static Units SpamDust(Units units, Unit* const unit, const Overview overview, co
 static Units PlaceStump(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
     if(unit->trait.type == TYPE_TREE)
-        return Units_Spawn(units, unit->cart, overview.grid, FILE_TREE_STUMPS, COLOR_BLU, graphics);
+        return Units_Spawn(units, unit->cart, overview.grid, FILE_TREE_STUMPS, COLOR_NONE, graphics);
     return units;
 }
 
@@ -351,7 +351,7 @@ Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const 
         {
             units = SpamFire(units, unit, overview, graphics);
             units = SpamDust(units, unit, overview, graphics);
-            return Units_Spawn(units, unit->cart, overview.grid, rubble, COLOR_BLU, graphics); // XXX. Should paint ground with broken rock texture?
+            return Units_Spawn(units, unit->cart, overview.grid, rubble, COLOR_NONE, graphics); // XXX. Should paint ground with broken rock texture?
         }
     }
     return units;
@@ -650,13 +650,13 @@ static void UpdateEntropy(const Units units)
     }
 }
 
-static Action GetAction(const Units units)
+static Action GetAction(const Units units, const Overview overview)
 {
     int32_t counts[] = { 0, 0, 0, 0 };
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
+        if(unit->is_selected && unit->color == overview.color)
         {
             switch(unit->trait.action)
             {
@@ -697,9 +697,9 @@ static Action GetAction(const Units units)
     }
 }
 
-static Units UpdateAction(Units units)
+static Units UpdateAction(Units units, const Overview overview)
 {
-    units.action = GetAction(units);
+    units.action = GetAction(units, overview);
     return units;
 }
 
@@ -709,7 +709,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
-    units = UpdateAction(units);
+    units = UpdateAction(units, overview);
     Decay(units);
     Expire(units);
     units = Kill(units, overview, graphics, input);

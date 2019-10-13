@@ -206,7 +206,7 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
     const Terrain file = Map_GetTerrainFile(map, inner);
     // The outer tile uses the outer tile animation,
     // but with the inner file so that the correct surface can be looked up.
-    const Animation outer_animation = terrain.animation[COLOR_BLU][file];
+    const Animation outer_animation = terrain.animation[COLOR_NONE][file];
     const Tile outer_tile = Tile_GetTerrain(overview, outer, outer_animation, file);
     const Mode blend_mode = blendomatic.mode[0]; // XXX: Which mode? How to choose?
     const int32_t blend_id = Mode_GetBlendIndex(inner, outer);
@@ -426,8 +426,8 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
-    const Image image = terrain.animation[COLOR_BLU][FILE_DIRT].image[0];
-    const Frame frame = terrain.animation[COLOR_BLU][FILE_DIRT].frame[0];
+    const Image image = terrain.animation[COLOR_NONE][FILE_DIRT].image[0];
+    const Frame frame = terrain.animation[COLOR_NONE][FILE_DIRT].frame[0];
     const Point snap = Overview_IsoSnapTo(overview, input.point);
     for(int32_t i = 0; i < frame.height; i++)
     {

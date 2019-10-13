@@ -28,7 +28,7 @@
 
 #define CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_UNITS (-600) // Make big enough to enscapsulate largest building on the render screen.
 
-#define CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN (-75)
+#define CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN (-90)
 
 #define CONFIG_FIELD_MAX_PATHING_TRIES (1000)
 
