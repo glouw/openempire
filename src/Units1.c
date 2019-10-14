@@ -121,16 +121,19 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     units = Units_SpawnTownCenter(units, overview, graphics, middle, COLOR_BLU);
     for(int i = 0; i < 5; i++)
     {
-        const Point gg = { -2, +3 };
-        const Point g = Point_Add(middle, gg);
-        units = Units_Spawn(units, g, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+        const Point aa = { -2, 3 };
+        const Point bb = { -5, -5 };
+        const Point a = Point_Add(middle, aa);
+        const Point b = Point_Add(middle, bb);
+        units = Units_Spawn(units, a, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+        units = Units_Spawn(units, b, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics);
     }
     return units;
 }
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Overview overview, const Registrar graphics)
 {
-    switch(6)
+    switch(4)
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);

@@ -23,8 +23,8 @@ Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, cons
     units = Units_Spawn(units, cart, grid, shadow, color, graphics);
     const int32_t a = units.count - 1;
     const int32_t b = units.count - 2;
-    units.unit[b].shadow_id = units.unit[a].id;
-    units.unit[b].has_shadow = true;
+    units.unit[a].parent_id = units.unit[b].id;
+    units.unit[b].has_children = true;
     return units;
 }
 
@@ -56,10 +56,23 @@ Units Units_SpawnTownCenter(Units units, const Overview overview, const Registra
         { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
         { {cart.x + 0, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
     };
-    for(int i = 0; i < UTIL_LEN(layouts); i++)
+    const int32_t size = UTIL_LEN(layouts);
+    for(int i = 0; i < size; i++)
     {
         const Layout layout = layouts[i];
         units = Units_SpawnWithOffset(units, layout.point, layout.offset, overview, layout.file, color, graphics);
+    }
+    int32_t id = -1;
+    for(int i = 0; i < size; i++)
+    {
+        Unit* const unit = &units.unit[size - 1 - i];
+        if(i == 0)
+        {
+            unit->has_children = true;
+            id = unit->id;
+        }
+        else unit->parent_id = id;
+
     }
     return units;
 }

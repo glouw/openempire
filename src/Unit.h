@@ -30,7 +30,7 @@ typedef struct Unit
     Graphics file;
     int32_t entropy_static;
     int32_t id;
-    int32_t shadow_id;
+    int32_t parent_id;
     int32_t path_index;
     int32_t path_index_timer;
     int32_t command_group;
@@ -49,8 +49,8 @@ typedef struct Unit
     bool is_state_locked;
     bool already_tiled;
     bool was_wall_pushed;
-    bool has_shadow;
     bool timing_to_collect;
+    bool has_children;
 }
 Unit;
 
@@ -82,7 +82,7 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
 
-int32_t Unit_Kill(Unit* const);
+void Unit_Kill(Unit* const);
 
 int32_t Unit_GetLastExpireTick(Unit* const);
 
@@ -101,5 +101,3 @@ Point Unit_Separate(Unit* const, Unit* const);
 bool Unit_IsExempt(Unit* const);
 
 Point Unit_GetShift(Unit* const, const Point);
-
-void Unit_UpdateEntropy(Unit* const);

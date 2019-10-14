@@ -164,7 +164,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.file = file;
     static int32_t id;
     unit.id = id++;
-    unit.shadow_id = -1;
+    unit.parent_id = -1;
     unit.cart = cart;
     unit.cell = Grid_CartToCell(grid, cart);
     unit.color = color;
@@ -181,7 +181,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     if(unit.trait.type == TYPE_FIRE
     || unit.trait.type == TYPE_RUBBLE)
         unit.timing_to_collect = true;
-    Unit_UpdateEntropy(&unit);
+    unit.entropy = Point_Rand();
     unit.entropy_static = Util_Rand();
     return unit;
 }
@@ -203,10 +203,9 @@ void Unit_Print(Unit* const unit)
     Log_Append("file                  :: %d",    unit->file);
     Log_Append("file_name             :: %s",    unit->trait.file_name);
     Log_Append("id                    :: %d",    unit->id);
-    Log_Append("shadow_id             :: %d",    unit->shadow_id);
+    Log_Append("parent_id             :: %d",    unit->parent_id);
     Log_Append("command_group         :: %d",    unit->command_group);
     Log_Append("health                :: %d",    unit->health);
-    Log_Append("has_shadow            :: %d",    unit->has_shadow);
     Log_Append("attack_frames_per_dir :: %d",    unit->attack_frames_per_dir);
     Log_Append("fall_frames_per_dir   :: %d",    unit->fall_frames_per_dir);
     Log_Append("decay_frames_per_dir  :: %d",    unit->decay_frames_per_dir);
@@ -265,18 +264,13 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     }
 }
 
-int32_t Unit_Kill(Unit* const unit)
+void Unit_Kill(Unit* const unit)
 {
     unit->health = 0;
-    if(unit->trait.is_building || unit->trait.type == TYPE_SHADOW)
-    {
+    if(unit->trait.is_building)
         unit->must_garbage_collect = true;
-        if(unit->has_shadow)
-            return unit->shadow_id;
-    }
     else
         Unit_SetState(unit, STATE_FALL, true);
-    return -1;
 }
 
 int32_t Unit_GetLastExpireTick(Unit* const unit)
@@ -344,10 +338,9 @@ void Unit_Repath(Unit* const unit, const Field field)
     && unit->path.count > 0)
     {
         const Point cart_goal = unit->path.point[unit->path.count - 1];
-        if(unit->path.count > MOCK_PATH_POINTS)
-            Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field);
-        else
-            Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
+        (unit->path.count > MOCK_PATH_POINTS)
+            ? Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field)
+            : Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
     }
 }
 
@@ -384,9 +377,4 @@ Point Unit_GetShift(Unit* const unit, const Point cart)
     const Point shift = { 0, 1 };
     const Point half = Point_Div(unit->trait.dimensions, 2);
     return Point_Add(cart, Point_Add(shift, half));
-}
-
-void Unit_UpdateEntropy(Unit* const unit)
-{
-    unit->entropy = Point_Rand();
 }
