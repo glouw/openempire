@@ -164,3 +164,14 @@ void Video_PrintPerformanceMonitor(const Video video, const Units units, const i
             units.count, dt_hold, cycles);
 }
 
+void Video_PrintResources(const Video video, const Units units)
+{
+    Text_Printf(video.text_small, video.renderer, video.top_rite, POSITION_TOP_RITE, 0xFF, 0,
+            "food  : %6d\n"
+            "wood  : %6d\n"
+            "gold  : %6d\n"
+            "stone : %6d\n"
+            ,
+            units.food, units.wood, units.gold, units.stone);
+}
+

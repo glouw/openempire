@@ -27,6 +27,10 @@ typedef struct
     int32_t cpu_count;
     int32_t repath_index;
     Action action;
+    int32_t food;
+    int32_t gold;
+    int32_t stone;
+    int32_t wood;
 }
 Units;
 

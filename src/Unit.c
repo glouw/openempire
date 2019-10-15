@@ -3,6 +3,7 @@
 #include "Rect.h"
 #include "Util.h"
 #include "Log.h"
+#include "Resource.h"
 #include "Config.h"
 
 #define MOCK_PATH_POINTS (2)
@@ -311,7 +312,33 @@ static bool ShouldEngage(Unit* const unit, const Grid grid)
         return Point_Mag(diff) < reach;
 }
 
-void Unit_Melee(Unit* const unit, const Grid grid)
+static Resource CollectResource(Unit* const unit)
+{
+    Resource resource = {
+        TYPE_NONE,
+        unit->trait.attack
+    };
+    switch(unit->interest->trait.type)
+    {
+    case TYPE_TREE:
+        resource.type = TYPE_WOOD;
+        break;
+    case TYPE_STONE_MINE:
+        resource.type = TYPE_STONE;
+        break;
+    case TYPE_GOLD_MINE:
+        resource.type = TYPE_GOLD;
+        break;
+    case TYPE_BERRY_BUSH:
+        resource.type = TYPE_FOOD;
+        break;
+    default:
+        break;
+    }
+    return resource;
+}
+
+Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
     if(unit->interest != NULL
     && !Unit_IsExempt(unit)
@@ -326,9 +353,14 @@ void Unit_Melee(Unit* const unit, const Grid grid)
         {
             unit->interest->health -= unit->trait.attack;
             Unit_Unlock(unit);
+            if(unit->trait.type == TYPE_VILLAGER)
+                return CollectResource(unit);
         }
     }
-    else Unit_Unlock(unit);
+    else
+        Unit_Unlock(unit);
+    const Resource none = { TYPE_NONE, 0 };
+    return none;
 }
 
 void Unit_Repath(Unit* const unit, const Field field)

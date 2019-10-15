@@ -475,9 +475,31 @@ static Units Repath(Units units, const Field field)
 static Units ProcessHardRules(Units units, const Field field, const Grid grid)
 {
     units = Repath(units, field);
-    for(int32_t i = 0; i < units.count; i++) ConditionallyStopBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) ChaseBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++) Unit_Melee(&units.unit[i], grid);
+    for(int32_t i = 0; i < units.count; i++)
+        ConditionallyStopBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++)
+        ChaseBoids(units, &units.unit[i]);
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        const Resource resource = Unit_Melee(&units.unit[i], grid);
+        switch(resource.type)
+        {
+        case TYPE_FOOD:
+            units.food += resource.amount;
+            break;
+        case TYPE_WOOD:
+            units.wood += resource.amount;
+            break;
+        case TYPE_GOLD:
+            units.gold += resource.amount;
+            break;
+        case TYPE_STONE:
+            units.stone += resource.amount;
+            break;
+        default:
+            break;
+        }
+    }
     return units;
 }
 

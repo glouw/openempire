@@ -18,5 +18,10 @@ typedef enum
     TYPE_HOUSE,
     TYPE_RUBBLE,
     TYPE_TREE,
+    // Resources.
+    TYPE_FOOD,
+    TYPE_WOOD,
+    TYPE_GOLD,
+    TYPE_STONE,
 }
 Type;

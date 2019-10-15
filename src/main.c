@@ -30,7 +30,11 @@ int main(const int argc, const char* argv[])
             const int32_t t1 = SDL_GetTicks();
             Video_CopyCanvas(video);
             Log_Dump();
+#if 0
             Video_PrintPerformanceMonitor(video, units, t1 - t0, cycles);
+#else
+            Video_PrintResources(video, units);
+#endif
             Video_Present(video);
             Field_Free(field);
             Window_Free(window);

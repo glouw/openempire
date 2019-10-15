@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "State.h"
 #include "Field.h"
+#include "Resource.h"
 #include "Registrar.h"
 #include "Color.h"
 #include "Grid.h"
@@ -92,7 +93,7 @@ int32_t Unit_GetLastDecayTick(Unit* const);
 
 int32_t Unit_GetLastFallTick(Unit* const);
 
-void Unit_Melee(Unit* const, const Grid);
+Resource Unit_Melee(Unit* const, const Grid);
 
 void Unit_Repath(Unit* const, const Field);
 
