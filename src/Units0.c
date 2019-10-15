@@ -678,7 +678,7 @@ static Action GetAction(const Units units, const Overview overview)
             case ACTION_COMMAND:
                 counts[2]++;
                 break;
-            case ACTION_UNIT_AND_TECH:
+            case ACTION_UNIT_TECH:
                 counts[3]++;
                 break;
             }
@@ -701,7 +701,7 @@ static Action GetAction(const Units units, const Overview overview)
     case 2:
         return ACTION_COMMAND;
     case 3:
-        return ACTION_UNIT_AND_TECH;
+        return ACTION_UNIT_TECH;
     }
 }
 

@@ -483,7 +483,7 @@ static Pack GetPackFromAction(const Registrar interfac, const Action action, con
     case ACTION_COMMAND:
         pack.animations[0] = base[FILE_INTERFAC_COMMAND_ICONS];
         break;
-    case ACTION_UNIT_AND_TECH:
+    case ACTION_UNIT_TECH:
         pack.animations[0] = base[FILE_INTERFAC_UNIT_ICONS];
         pack.animations[1] = base[FILE_INTERFAC_TECH_ICONS];
         break;
