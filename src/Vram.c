@@ -7,6 +7,7 @@
 #include "Rect.h"
 #include "Quad.h"
 #include "Interfac.h"
+#include "Icon.h"
 
 Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yres)
 {
@@ -464,8 +465,10 @@ void Vram_DrawAction(const Vram vram, SDL_Surface* surface, const Point offset)
 typedef struct
 {
     Animation animations[2];
+    Icon* icons;
+    int32_t count;
 }
-Pack;
+Pack; // This is brutally stupid. revise pls.
 
 static Pack GetPackFromAction(const Registrar interfac, const Action action, const Color color)
 {
@@ -479,6 +482,8 @@ static Pack GetPackFromAction(const Registrar interfac, const Action action, con
         break;
     case ACTION_BUILD:
         pack.animations[0] = base[FILE_INTERFAC_BUILDING_ICONS];
+        pack.icons = (Icon*) Icon_Age1;
+        pack.count = UTIL_LEN(Icon_Age1);
         break;
     case ACTION_COMMAND:
         pack.animations[0] = base[FILE_INTERFAC_COMMAND_ICONS];
@@ -497,11 +502,14 @@ void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action 
     for(int32_t j = 0; j < UTIL_LEN(pack.animations); j++)
     {
         const Animation animation = pack.animations[j];
+        if(animation.count == 0)
+            return;
         int32_t x = 0;
-        for(int i = 0; i < animation.count; i++)
+        for(int i = 0; i < pack.count; i++)
         {
+            const Icon icon = pack.icons[i];
+            SDL_Surface* const surface = animation.surface[icon];
             const Point offset = { x, vram.yres - 32 * (j + 1) };
-            SDL_Surface* const surface = animation.surface[i];
             Vram_DrawAction(vram, surface, offset);
             x += surface->w;
         }
