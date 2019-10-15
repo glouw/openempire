@@ -35,18 +35,32 @@ Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, c
     return Append(units, unit);
 }
 
+static void LinkTailTownCenter(const Units units, const int32_t size)
+{
+    int32_t id = -1;
+    for(int i = 0; i < size; i++)
+    {
+        Unit* const unit = &units.unit[size - 1 - i];
+        if(i == 0)
+        {
+            unit->has_children = true;
+            id = unit->id;
+        }
+        else unit->parent_id = id;
+    }
+}
+
 Units Units_SpawnTownCenter(Units units, const Overview overview, const Registrar graphics, const Point cart, const Color color)
 {
-    typedef struct
+    const Point offset = { overview.grid.tile_cart_width / 2, -overview.grid.tile_cart_height / 2 };
+    const Point zero = { 0,0 };
+    struct
     {
         Point point;
         Point offset;
         Graphics file;
     }
-    Layout;
-    const Point offset = { overview.grid.tile_cart_width / 2, -overview.grid.tile_cart_height / 2 };
-    const Point zero = { 0,0 };
-    const Layout layouts[] = {
+    const layouts[] = {
         { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
         { {cart.x - 3, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
         { {cart.x - 3, cart.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
@@ -58,22 +72,8 @@ Units Units_SpawnTownCenter(Units units, const Overview overview, const Registra
     };
     const int32_t size = UTIL_LEN(layouts);
     for(int i = 0; i < size; i++)
-    {
-        const Layout layout = layouts[i];
-        units = Units_SpawnWithOffset(units, layout.point, layout.offset, overview, layout.file, color, graphics);
-    }
-    int32_t id = -1;
-    for(int i = 0; i < size; i++)
-    {
-        Unit* const unit = &units.unit[size - 1 - i];
-        if(i == 0)
-        {
-            unit->has_children = true;
-            id = unit->id;
-        }
-        else unit->parent_id = id;
-
-    }
+        units = Units_SpawnWithOffset(units, layouts[i].point, layouts[i].offset, overview, layouts[i].file, color, graphics);
+    LinkTailTownCenter(units, size);
     return units;
 }
 

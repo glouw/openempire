@@ -122,18 +122,27 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     for(int i = 0; i < 5; i++)
     {
         const Point aa = { -2, 3 };
-        const Point bb = { -5, -5 };
+        const Point bb = { -9, -9 };
         const Point a = Point_Add(middle, aa);
         const Point b = Point_Add(middle, bb);
         units = Units_Spawn(units, a, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
         units = Units_Spawn(units, b, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics);
     }
+    const Point cc = { -3, -3 };
+    const Point c = Point_Add(middle, cc);
+    const Point dd = { 3, 3 };
+    const Point d = Point_Add(middle, dd);
+    const Point ee = { 3, -3 };
+    const Point e = Point_Add(middle, ee);
+    units = Units_SpawnWithShadow(units, c, overview.grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
+    units = Units_Spawn(units, d, overview.grid, FILE_STONE_MINE, COLOR_GRY, graphics);
+    units = Units_Spawn(units, e, overview.grid, FILE_BERRY_BUSH, COLOR_GRY, graphics);
     return units;
 }
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Overview overview, const Registrar graphics)
 {
-    switch(4)
+    switch(6)
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);

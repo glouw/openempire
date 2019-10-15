@@ -324,13 +324,6 @@ static Units SpamDust(Units units, Unit* const unit, const Overview overview, co
     return units;
 }
 
-static Units PlaceStump(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
-{
-    if(unit->trait.type == TYPE_TREE)
-        return Units_Spawn(units, unit->cart, overview.grid, FILE_TREE_STUMPS, COLOR_GRY, graphics);
-    return units;
-}
-
 Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
     const Graphics rubbles[] = {
@@ -362,11 +355,10 @@ static bool ShouldDelete(Unit* const unit, const Input input, const Overview ove
         unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
-// Trees are treated as buildings to avoid the intermediatery "logs on the ground" state.
 static Units PlaceBuildingRemains(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
     if(unit->trait.is_building)
-        return (unit->trait.type == TYPE_TREE) ? PlaceStump(units, unit, overview, graphics) : PlaceRubble(units, unit, overview, graphics);
+        return PlaceRubble(units, unit, overview, graphics);
     return units;
 }
 
