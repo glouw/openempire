@@ -1,10 +1,11 @@
 #include "Log.h"
 
 #include "Util.h"
+#include "Config.h"
 
 #include <stdarg.h>
 
-#define MAX (48)
+#define MAX CONFIG_LOG_MAX_LINES
 
 #define CAP(index) (index % MAX)
 

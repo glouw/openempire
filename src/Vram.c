@@ -500,7 +500,7 @@ void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action 
         int32_t x = 0;
         for(int i = 0; i < animation.count; i++)
         {
-            const Point offset = { x, j * 32 };
+            const Point offset = { x, vram.yres - 32 * (j + 1) };
             SDL_Surface* const surface = animation.surface[i];
             Vram_DrawAction(vram, surface, offset);
             x += surface->w;
