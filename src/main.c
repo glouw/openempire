@@ -9,7 +9,7 @@
 int main(const int argc, const char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
-    const Video video = Video_Setup(1200, 700, args.demo ? "Render Demo" : "Open Empires");
+    const Video video = Video_Setup(1280, 700, args.demo ? "Render Demo" : "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);

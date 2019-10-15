@@ -24,6 +24,7 @@ typedef struct
     int32_t xres;
     int32_t yres;
     Point middle;
+    Point bot_left;
     Point bot_rite;
     Point top_left;
     Point top_rite;

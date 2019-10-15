@@ -51,32 +51,26 @@ static void Write(const Text text, SDL_Renderer* const renderer, const Point poi
     case POSITION_TOP_LEFT:
         to.x = point.x;
         to.y = point.y + line * sz.h;
-        to.w = sz.w;
-        to.h = sz.h;
         break;
 
     case POSITION_TOP_RITE:
         to.x = point.x - sz.w;
         to.y = point.y + line * sz.h;
-        to.w = sz.w;
-        to.h = sz.h;
         break;
 
     case POSITION_BOT_LEFT:
+        to.x = point.x;
+        to.y = point.y - sz.h + line * sz.h;
         break;
 
     case POSITION_BOT_RITE:
         to.x = point.x - sz.w;
         to.y = point.y - sz.h + line * sz.h;
-        to.w = sz.w;
-        to.h = sz.h;
         break;
 
     case POSITION_MIDDLE:
         to.x = point.x - sz.w / 2;
         to.y = point.y - sz.h / 2 + line * sz.h;
-        to.w = sz.w;
-        to.h = sz.h;
         break;
     }
     Render(text, renderer, to, string, alpha);

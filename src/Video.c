@@ -3,6 +3,7 @@
 #include "Surface.h"
 #include "Point.h"
 #include "Tile.h"
+#include "Interfac.h"
 #include "Vram.h"
 
 #include "Util.h"
@@ -17,6 +18,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
 {
     const Point middle = { xres / 2, yres / 2 };
     const Point bot_rite = { xres, yres };
+    const Point bot_left = { 0, yres };
     const Point top_rite = { xres, 0 };
     const Point top_left = { 0, 0 };
     SDL_Init(SDL_INIT_VIDEO);
@@ -33,8 +35,9 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
     video.middle = middle;
     video.bot_rite = bot_rite;
-    video.top_left = top_left;
+    video.bot_left = bot_left;
     video.top_rite = top_rite;
+    video.top_left = top_left;
     PrintTitle(video);
     SDL_SetCursor(video.cursor);
     return video;
@@ -104,13 +107,69 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
     }
 }
 
+static Point Wrap(const Video video, const int32_t index)
+{
+    const int32_t w = 32;
+    const int32_t size = video.xres / 4;
+    const Point point = { (index * w) % size, w * ((w * index) / size) };
+    return point;
+}
+
+static void LayoutNumbers(const Video video, const Animation animation)
+{
+    for(int32_t index = 0; index < animation.count; index++)
+    {
+        const Point point = Wrap(video, index);
+        Text_Printf(video.text_small, video.renderer, point, POSITION_TOP_LEFT, 0xFF, 0, "%d", index);
+    }
+}
+
+static void LayoutIcons(const Video video, const Animation animation)
+{
+    const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
+    Vram_Clear(vram, 0x0);
+    for(int32_t index = 0; index < animation.count; index++)
+    {
+        const Point point = Wrap(video, index);
+        const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false };
+        Vram_DrawTile(vram, tile);
+    }
+    SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
+    Vram_Unlock(video.canvas);
+}
+
+// XXX. TO BE DEPRECATED.
+static void RenderIcons(const Video video, const Registrar interfac, const Interfac file, const Color color)
+{
+    const Animation animation = interfac.animation[color][file];
+    LayoutIcons(video, animation);
+    LayoutNumbers(video, animation);
+    const char* const str = Interfac_GetString(file);
+    Text_Printf(video.text_small, video.renderer, video.bot_left, POSITION_BOT_LEFT, 0xFF, 0, str);
+    SDL_RenderPresent(video.renderer);
+    for(Input input = Input_Ready(); !input.key[SDL_SCANCODE_RETURN]; input = Input_Pump(input))
+    {
+        if(input.done)
+            return;
+        SDL_Delay(1);
+    }
+    SDL_Delay(100);
+}
+
 // XXX. TO BE DEPRECATED.
 void Video_RenderDataDemo(const Video video, const Data data, const Color color)
 {
+#if 1
+    RenderIcons(video, data.interfac, FILE_INTERFAC_BUILDING_ICONS, color);
+    RenderIcons(video, data.interfac, FILE_INTERFAC_COMMAND_ICONS, color);
+    RenderIcons(video, data.interfac, FILE_INTERFAC_TECH_ICONS, color);
+    RenderIcons(video, data.interfac, FILE_INTERFAC_UNIT_ICONS, color);
+#else
     RenderRegistrarDemo(video, data.interfac, color, video.middle);
     RenderRegistrarDemo(video, data.graphics, color, video.middle);
     RenderRegistrarDemo(video, data.terrain, color, video.middle);
     RenderBlendomaticDemo(video, data.blendomatic);
+#endif
 }
 
 void Video_CopyCanvas(const Video video)
