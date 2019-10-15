@@ -159,17 +159,23 @@ static void RenderIcons(const Video video, const Registrar interfac, const Inter
 // XXX. TO BE DEPRECATED.
 void Video_RenderDataDemo(const Video video, const Data data, const Color color)
 {
-#if 1
-    RenderIcons(video, data.interfac, FILE_INTERFAC_BUILDING_ICONS, color);
-    RenderIcons(video, data.interfac, FILE_INTERFAC_COMMAND_ICONS, color);
-    RenderIcons(video, data.interfac, FILE_INTERFAC_TECH_ICONS, color);
-    RenderIcons(video, data.interfac, FILE_INTERFAC_UNIT_ICONS, color);
-#else
-    RenderRegistrarDemo(video, data.interfac, color, video.middle);
-    RenderRegistrarDemo(video, data.graphics, color, video.middle);
-    RenderRegistrarDemo(video, data.terrain, color, video.middle);
+    const Interfac interfacs[] = {
+        FILE_INTERFAC_BUILDING_ICONS,
+        FILE_INTERFAC_COMMAND_ICONS,
+        FILE_INTERFAC_TECH_ICONS,
+        FILE_INTERFAC_UNIT_ICONS,
+    };
+    for(int32_t i = 0; i < UTIL_LEN(interfacs); i++)
+        RenderIcons(video, data.interfac, interfacs[i], color);
+
+    const Registrar registrars[] ={
+        data.graphics,
+        data.terrain
+    };
+    for(int32_t i = 0; i < UTIL_LEN(registrars); i++)
+        RenderRegistrarDemo(video, registrars[i], color, video.middle);
+
     RenderBlendomaticDemo(video, data.blendomatic);
-#endif
 }
 
 void Video_CopyCanvas(const Video video)
