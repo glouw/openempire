@@ -42,44 +42,9 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
     return units;
 }
 
-static Units GenerateVillieZone(Units units, const Grid grid, const Registrar graphics)
+static Units GenerateInanimateZone(Units units, const Grid grid, const Registrar graphics)
 {
-    const Point a = { units.cols / 2 + 0, units.rows / 2 + 0 };
-    const Point b = { units.cols / 2 + 0, units.rows / 2 + 1 };
-    units = Units_Spawn(units, a, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
-    units = Units_Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
-    return units;
-}
-
-static Units GenerateBerryZone(Units units, const Grid grid, const Registrar graphics)
-{
-    const Point a = { grid.cols / 2 + 0, grid.cols / 2 - 1};
-    const Point b = { grid.cols / 2 - 1, grid.cols / 2 + 1};
-    const Point c = { grid.cols / 2 - 0, grid.cols / 2 + 1};
-    const Point d = { grid.cols / 2 - 0, grid.cols / 2 - 2};
-    const Point e = { grid.cols / 2 - 0, grid.cols / 2 - 4};
-    const Point f = { grid.cols / 2 - 2, grid.cols / 2 - 4};
-    units = Units_Spawn(units, a, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
-    units = Units_Spawn(units, b, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
-    units = Units_Spawn(units, c, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
-    units = Units_Spawn(units, d, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
-    units = Units_Spawn(units, e, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
-    units = Units_Spawn(units, f, grid, FILE_BERRY_BUSH, COLOR_BLU, graphics);
-    return units;
-}
-
-static Units GenerateRandomZone(Units units, const Grid grid, const Registrar graphics)
-{
-    const Point a = { grid.cols / 2 + 0, grid.cols / 2 - 1};
-    const Point b = { grid.cols / 2 - 1, grid.cols / 2 + 1};
-    units = Units_Spawn(units, a, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_BLU, graphics);
-    units = Units_Spawn(units, b, grid, FILE_WAYPOINT_FLAG, COLOR_BLU, graphics);
-    return units;
-}
-
-static Units GenerateBuildingZone(Units units, const Grid grid, const Registrar graphics)
-{
-    const Point a = { grid.cols / 2, grid.cols / 2 }; // XXX. THIS BUILDING POINT needs to be bottom left corner of building.
+    const Point a = { grid.cols / 2, grid.cols / 2 };
     const Point b = { grid.cols / 2 - 4, grid.cols / 2 };
     const Point c = { grid.cols / 2 + 2, grid.cols / 2 + 3 };
     const Point d = { grid.cols / 2 + 6, grid.cols / 2 + 6 };
@@ -142,15 +107,12 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Overview overview, const Registrar graphics)
 {
-    switch(6)
+    switch(3)
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);
-    case 1: return GenerateBerryZone(units, overview.grid, graphics);
-    case 2: return GenerateVillieZone(units, overview.grid, graphics);
-    case 3: return GenerateRandomZone(units, overview.grid, graphics);
-    case 4: return GenerateBuildingZone(units, overview.grid, graphics);
-    case 5: return GenerateTreeZone(units, overview.grid, graphics);
-    case 6: return GenerateGameZone(units, overview, graphics);
+    case 1: return GenerateInanimateZone(units, overview.grid, graphics);
+    case 2: return GenerateTreeZone(units, overview.grid, graphics);
+    case 3: return GenerateGameZone(units, overview, graphics);
     }
 }

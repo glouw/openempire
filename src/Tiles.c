@@ -47,7 +47,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             if(!ref->already_tiled)
             {
                 const Animation animation = graphics.animation[ref->color][ref->file];
-                const Point overrider = ref->trait.is_building ? ref->cart : point;
+                const Point overrider = ref->trait.is_inanimate ? ref->cart : point;
                 tile[unit_count] = Tile_GetGraphics(overview, overrider, ref->cart_grid_offset, animation, ref);
                 unit_count++;
                 ref->already_tiled = true;
@@ -143,7 +143,7 @@ int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
-        if(tile.reference->trait.is_building)
+        if(tile.reference->trait.is_inanimate)
             continue;
         if(Tile_IsHotspotInRect(tile, box))
         {

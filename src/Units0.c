@@ -84,7 +84,7 @@ static Units Select(Units units, const Overview overview, const Input input, con
     if(input.lu)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
-        Tiles_SortByHeight(tiles); // For selecting transparent units behind buildings or trees.
+        Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
@@ -355,9 +355,9 @@ static bool ShouldDelete(Unit* const unit, const Input input, const Overview ove
         unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
-static Units PlaceBuildingRemains(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
+static Units PlaceInanimateRemains(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
-    if(unit->trait.is_building)
+    if(unit->trait.is_inanimate)
         return PlaceRubble(units, unit, overview, graphics);
     return units;
 }
@@ -381,7 +381,7 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
                             Unit_Kill(child);
                     }
                 }
-                units = PlaceBuildingRemains(units, unit, overview, graphics);
+                units = PlaceInanimateRemains(units, unit, overview, graphics);
             }
         }
     }
@@ -416,7 +416,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
             if(other->color != unit->color && !Unit_IsExempt(other)) // XXX. USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
             {
                 Point cell = other->cell;
-                if(other->trait.is_building)
+                if(other->trait.is_inanimate)
                 {
                     const Point mid = {
                         CONFIG_GRID_CELL_SIZE / 2,

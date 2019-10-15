@@ -117,7 +117,7 @@ static void StackStacks(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->trait.is_building)
+        if(unit->trait.is_inanimate)
             for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
             for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
             {

@@ -114,7 +114,7 @@ Registrar Registrar_Load(const char* const path, const char* const drs_file_name
 Registrar Registrar_LoadInterfac(const char* const path)
 {
     static const Interfac interfac[] = {
-#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, detail) name,
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, inanimate, dimensions, action, detail) name,
         FILE_X_INTERFAC
 #undef FILE_X
     };
@@ -124,7 +124,7 @@ Registrar Registrar_LoadInterfac(const char* const path)
 Registrar Registrar_LoadTerrain(const char* const path)
 {
     static const Terrain terrain[] = {
-#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, detail) name,
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, inanimate, dimensions, action, detail) name,
         FILE_X_TERRAIN
 #undef FILE_X
     };
@@ -134,7 +134,7 @@ Registrar Registrar_LoadTerrain(const char* const path)
 Registrar Registrar_LoadGraphics(const char* const path)
 {
     static const Graphics graphics[] = {
-#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, building, dimensions, action, detail) name,
+#define FILE_X(name, file, prio, walkable, type, max_speed, health, attack, width, rotatable, single_frame, multi_state, expire, inanimate, dimensions, action, detail) name,
         FILE_X_GRAPHICS
 #undef FILE_X
     };

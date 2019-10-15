@@ -267,7 +267,7 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
 void Unit_Kill(Unit* const unit)
 {
     unit->health = 0;
-    if(unit->trait.is_building)
+    if(unit->trait.is_inanimate)
         unit->must_garbage_collect = true;
     else
         Unit_SetState(unit, STATE_FALL, true);
@@ -297,7 +297,7 @@ static bool ShouldEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(unit->interest->cell, unit->cell);
     const int32_t reach = unit->trait.width + CONFIG_UNIT_SWORD_LENGTH;
-    if(unit->interest->trait.is_building)
+    if(unit->interest->trait.is_inanimate)
     {
         const Point feeler = Point_Normalize(diff, reach);
         const Point cell = Point_Add(unit->cell, feeler);
