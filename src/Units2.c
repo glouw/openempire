@@ -112,6 +112,12 @@ static void ResetStacks(const Units units)
     }
 }
 
+static void SafeAppend(const Units units, Unit* const unit, const Point cart)
+{
+    if(!OutOfBounds(units, cart))
+        Stack_Append(GetStack(units, cart), unit);
+}
+
 static void StackStacks(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -123,14 +129,9 @@ static void StackStacks(const Units units)
             {
                 const Point point = { x, y };
                 const Point cart = Point_Add(point, unit->cart);
-                Stack* const stack = GetStack(units, cart);
-                Stack_Append(stack, unit);
+                SafeAppend(units, unit, cart);
             }
-        else
-        {
-            Stack* const stack = GetStack(units, unit->cart);
-            Stack_Append(stack, unit);
-        }
+        else SafeAppend(units, unit, unit->cart);
     }
 }
 

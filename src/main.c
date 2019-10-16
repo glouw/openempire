@@ -16,39 +16,37 @@ int main(const int argc, const char* argv[])
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(video.xres, video.yres, grid, COLOR_BLU);
     Units units = Units_New(map, overview, data.graphics);
-    int32_t cycles = 0;
-    if(!args.demo)
-        for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
-        {
-            const int32_t t0 = SDL_GetTicks();
-            overview = Overview_Update(overview, input); // TO BE SENT VIA P2P (ALONG WITH INPUT).
-            Map_Edit(map, overview, input);
-            const Field field = Units_Field(units, map);
-            const Window window = Window_Make(overview);
-            units = Units_Caretake(units, data.graphics, overview, input, map, field, window); // TO BE MODIFIED BY ALL P2P CLIENTS.
-            Video_Render(video, data, map, units, overview, input, window);
-            const int32_t t1 = SDL_GetTicks();
-            Video_CopyCanvas(video);
-            Log_Dump();
 #if 1
-            Video_PrintPerformanceMonitor(video, units, t1 - t0, cycles);
+    int32_t cycles = 0;
+    for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
+    {
+        const int32_t t0 = SDL_GetTicks();
+        overview = Overview_Update(overview, input); // TO BE SENT VIA P2P (ALONG WITH INPUT).
+        Map_Edit(map, overview, input);
+        const Field field = Units_Field(units, map);
+        const Window window = Window_Make(overview);
+        units = Units_Caretake(units, data.graphics, overview, input, map, field, window); // TO BE MODIFIED BY ALL P2P CLIENTS.
+        Video_Render(video, data, map, units, overview, input, window);
+        const int32_t t1 = SDL_GetTicks();
+        Video_CopyCanvas(video);
+        Log_Dump();
+        input.key[SDL_SCANCODE_F12]
+            ? Video_PrintPerformanceMonitor(video, units, t1 - t0, cycles)
+            : Video_PrintResources(video, units);
+        Video_Present(video);
+        Field_Free(field);
+        Window_Free(window);
+        cycles++;
+        if(args.measure && cycles > 10)
+            break;
+        const int32_t t2 = SDL_GetTicks();
+        const int32_t ms = 15 - (t2 - t0);
+        if(ms > 0)
+            SDL_Delay(ms);
+    }
 #else
-            Video_PrintResources(video, units);
+    Video_RenderDataDemo(video, data, args.color);
 #endif
-            Video_Present(video);
-            Field_Free(field);
-            Window_Free(window);
-            cycles++;
-            if(args.measure)
-                if(cycles > 10) // Measure performance with valgrind --tool=cachegrind ./openempires.
-                    break;
-            const int32_t t2 = SDL_GetTicks();
-            const int32_t ms = 15 - (t2 - t0);
-            if(ms > 0)
-                SDL_Delay(ms);
-        }
-    else
-        Video_RenderDataDemo(video, data, args.color);
     Units_Free(units);
     Map_Free(map);
     Data_Free(data);
