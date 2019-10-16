@@ -38,7 +38,7 @@ Drs Drs_Load(const char* const path)
     for(int32_t i = 0; i < drs.table_count; i++)
     for(int32_t j = 0; j < drs.table[i].num_files; j++)
         drs.table[i].file[j] = File_Load(drs.fp);
-#if 1
+#if 0
     Drs_Print(drs);
 #endif
     return drs;

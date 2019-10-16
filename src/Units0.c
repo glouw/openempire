@@ -544,7 +544,7 @@ static int32_t FlowThread(void* data)
     for(int32_t i = needle->a; i < needle->b; i++)
     {
         Unit* const unit = &needle->units.unit[i];
-        if(!Unit_IsExempt(unit))
+        if(!State_IsDead(unit->state))
         {
             Unit_Flow(unit, needle->grid);
             Unit_Move(unit, needle->grid);

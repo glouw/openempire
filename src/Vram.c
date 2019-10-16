@@ -465,16 +465,23 @@ void Vram_DrawAction(const Vram vram, SDL_Surface* surface, const Point offset)
 
 typedef struct
 {
-    Animation animations[2];
-    Icon* icons;
+    Animation animation;
+    const Icon* icons;
     int32_t count;
 }
-Pack; // XXX. This is brutally stupid. revise pls.
+Pack;
 
-static Pack GetPackFromAction(const Registrar interfac, const Action action, const Color color)
+typedef struct
 {
-    static Pack zero;
-    Pack pack = zero;
+    Pack primary;
+    Pack secondary;
+}
+Packs;
+
+static Packs GetPacksFromAction(const Registrar interfac, const Action action, const Color color)
+{
+    static Packs zero;
+    Packs packs = zero;
     Animation* const base = interfac.animation[color];
     switch(action)
     {
@@ -482,37 +489,34 @@ static Pack GetPackFromAction(const Registrar interfac, const Action action, con
     case ACTION_NONE:
         break;
     case ACTION_BUILD:
-        pack.animations[0] = base[FILE_INTERFAC_BUILDING_ICONS];
-        pack.icons = (Icon*) Icon_Age1;
-        pack.count = UTIL_LEN(Icon_Age1);
+        packs.primary.animation = base[FILE_INTERFAC_BUILDING_ICONS];
+        packs.primary.icons = Icon_GetAge1();
+        packs.primary.count = Icon_GetAge1Len();
         break;
     case ACTION_COMMAND:
-        pack.animations[0] = base[FILE_INTERFAC_COMMAND_ICONS];
         break;
     case ACTION_UNIT_TECH:
-        pack.animations[0] = base[FILE_INTERFAC_UNIT_ICONS];
-        pack.animations[1] = base[FILE_INTERFAC_TECH_ICONS];
         break;
     }
-    return pack;
+    return packs;
+}
+
+void DrawPack(const Vram vram, const Pack pack)
+{
+    int32_t x = 0;
+    for(int i = 0; i < pack.count; i++)
+    {
+        const Icon icon = pack.icons[i];
+        SDL_Surface* const surface = pack.animation.surface[icon];
+        const Point offset = { x, vram.yres - surface->h };
+        Vram_DrawAction(vram, surface, offset);
+        x += surface->w;
+    }
 }
 
 void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action action, const Color color)
 {
-    const Pack pack = GetPackFromAction(interfac, action, color);
-    for(int32_t j = 0; j < UTIL_LEN(pack.animations); j++)
-    {
-        const Animation animation = pack.animations[j];
-        if(animation.count == 0)
-            return;
-        int32_t x = 0;
-        for(int i = 0; i < pack.count; i++)
-        {
-            const Icon icon = pack.icons[i];
-            SDL_Surface* const surface = animation.surface[icon];
-            const Point offset = { x, vram.yres - 32 * (j + 1) };
-            Vram_DrawAction(vram, surface, offset);
-            x += surface->w;
-        }
-    }
+    const Packs packs = GetPacksFromAction(interfac, action, color);
+    DrawPack(vram, packs.primary);
+    DrawPack(vram, packs.secondary);
 }

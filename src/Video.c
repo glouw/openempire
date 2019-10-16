@@ -168,13 +168,8 @@ void Video_RenderDataDemo(const Video video, const Data data, const Color color)
     for(int32_t i = 0; i < UTIL_LEN(interfacs); i++)
         RenderIcons(video, data.interfac, interfacs[i], color);
 
-    const Registrar registrars[] ={
-        data.graphics,
-        data.terrain
-    };
-    for(int32_t i = 0; i < UTIL_LEN(registrars); i++)
-        RenderRegistrarDemo(video, registrars[i], color, video.middle);
-
+    RenderRegistrarDemo(video, data.graphics, color, video.middle);
+    RenderRegistrarDemo(video, data.terrain, color, video.middle);
     RenderBlendomaticDemo(video, data.blendomatic);
 }
 
