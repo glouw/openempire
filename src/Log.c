@@ -43,11 +43,12 @@ void Log_Append(const char* const format, ...)
 
 void Log_Dump(void)
 {
+    const Point top_left = { 0, 30 };
     for(int32_t i = logger.a, line = 0; CAP(i) != logger.b ; i++)
         Text_Puts(
                 logger.video.text_small,
                 logger.video.renderer,
-                logger.video.top_left,
+                top_left,
                 POSITION_TOP_LEFT,
                 0xFF,
                 line++,

@@ -706,8 +706,22 @@ static Units UpdateAction(Units units, const Overview overview)
     return units;
 }
 
+static Units CountPopulation(Units units, const Overview overview)
+{
+    int32_t count = 0;
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(!Unit_IsExempt(unit) && unit->color == overview.color && !unit->trait.is_inanimate)
+            count++;
+    }
+    units.population = count;
+    return units;
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Window window)
 {
+    UpdateEntropy(units);
     Tick(units);
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
@@ -718,6 +732,6 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Kill(units, overview, graphics, input);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
-    UpdateEntropy(units);
+    units = CountPopulation(units, overview);
     return units;
 }

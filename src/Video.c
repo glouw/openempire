@@ -195,6 +195,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
     Vram_DrawActionRow(vram, data.interfac, units.action, overview.color);
+    Vram_DrawHud(vram, data.interfac);
     Vram_Unlock(video.canvas);
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
@@ -214,10 +215,17 @@ void Video_PrintPerformanceMonitor(const Video video, const Units units, const i
 
 void Video_PrintResources(const Video video, const Units units)
 {
-    Text_Printf(video.text_small, video.renderer, video.top_rite, POSITION_TOP_RITE, 0xFF, 0,
-            "food  : %6d\n"
-            "wood  : %6d\n"
-            "gold  : %6d\n"
-            "stone : %6d\n", units.food, units.wood, units.gold, units.stone);
+    const int32_t space = 77;
+    const int32_t x0 = 27;
+    const int32_t y0 = 11;
+    const Point a = { x0 + 0 * space, y0 };
+    const Point b = { x0 + 1 * space, y0 };
+    const Point c = { x0 + 2 * space, y0 };
+    const Point d = { x0 + 3 * space, y0 };
+    const Point e = { x0 + 4 * space, y0 };
+    Text_Printf(video.text_small, video.renderer, a, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.wood);
+    Text_Printf(video.text_small, video.renderer, b, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.food);
+    Text_Printf(video.text_small, video.renderer, c, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.gold);
+    Text_Printf(video.text_small, video.renderer, d, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.stone);
+    Text_Printf(video.text_small, video.renderer, e, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.population);
 }
-

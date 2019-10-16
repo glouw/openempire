@@ -22,3 +22,7 @@ Icon;
 const Icon* Icon_GetAge1(void);
 
 int32_t Icon_GetAge1Len(void);
+
+const char* Icon_GetLayout(void);
+
+int32_t Icon_GetLayoutLen(void);

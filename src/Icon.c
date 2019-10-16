@@ -11,9 +11,26 @@
     ICON_BUILD_STONE_CAMP,\
     ICON_BUILD_LUMBER_CAMP,\
 
+static const char Layout[] = {
+    '1', '2', '3', '4',
+    'q', 'w', 'e', 'r',
+    'a', 's', 'd', 'f',
+    'z', 'x', 'c', 'v',
+};
+
 static const Icon Age1[] = {
     ICON_AGE_1
 };
+
+const char* Icon_GetLayout(void)
+{
+    return Layout;
+}
+
+int32_t Icon_GetLayoutLen(void)
+{
+    return UTIL_LEN(Layout);
+}
 
 const Icon* Icon_GetAge1(void)
 {

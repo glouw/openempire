@@ -449,17 +449,17 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
     }
 }
 
-void Vram_DrawAction(const Vram vram, SDL_Surface* surface, const Point offset)
+void Vram_DrawGeneric(const Vram vram, SDL_Surface* surface, const Point offset, const int32_t y0, const int32_t y1)
 {
-    for(int32_t y = 0; y < surface->h; y++)
-    for(int32_t x = 0; x < surface->w; x++)
+    for(int32_t y = y0; y < y1; y++)
+    for(int32_t x =  0; x < surface->w; x++)
     {
         const uint32_t pixel = Surface_GetPixel(surface, x, y);
         const int32_t xx = offset.x + x;
         const int32_t yy = offset.y + y;
         if(pixel != SURFACE_COLOR_KEY)
             if(!OutOfBounds(vram, xx, yy))
-                Put(vram, xx, yy, pixel);
+                Put(vram, xx, yy, pixel); // XXX. DRAW WITH PRIO IN ALPHA??
     }
 }
 
@@ -506,11 +506,16 @@ void DrawPack(const Vram vram, const Pack pack)
     const int32_t columns = 4;
     const int32_t width = 32;
     const int32_t xres = columns * width;
+    const Point center = { vram.xres / 2, vram.yres };
+    const Point shift = { width * columns / 2, width * columns };
+    const Point start = Point_Sub(center, shift);
     for(int32_t index = 0; index < pack.count; index++)
     {
         const Icon icon = pack.icons[index];
-        const Point offset = Point_Wrap(index, width, xres);
-        Vram_DrawAction(vram, pack.animation.surface[icon], offset);
+        const Point wrap = Point_Wrap(index, width, xres);
+        const Point offset = Point_Add(wrap, start);
+        SDL_Surface* const surface = pack.animation.surface[icon];
+        Vram_DrawGeneric(vram, surface, offset, 0, surface->h);
     }
 }
 
@@ -519,4 +524,13 @@ void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action 
     const Packs packs = GetPacksFromAction(interfac, action, color);
     DrawPack(vram, packs.primary);
     DrawPack(vram, packs.secondary);
+}
+
+void Vram_DrawHud(const Vram vram, const Registrar interfac)
+{
+    const int32_t top_height = 50;
+    const int32_t y0 = 0;
+    const int32_t y1 = top_height;
+    const Point a = { 0, 0 };
+    Vram_DrawGeneric(vram, interfac.animation[COLOR_GRY][FILE_INTERFAC_HUD_0].surface[0], a, y0, y1);
 }
