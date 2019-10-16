@@ -107,7 +107,7 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Overview overview, const Registrar graphics)
 {
-    switch(1)
+    switch(3)
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);

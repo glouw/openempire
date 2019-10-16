@@ -376,6 +376,7 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
+// XXX. INANIMATE objects need a square drawn around them, not an ellipse.
 void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
 {
     for(int32_t i = 0; i < tiles.count; i++)
@@ -468,7 +469,7 @@ typedef struct
     Icon* icons;
     int32_t count;
 }
-Pack; // This is brutally stupid. revise pls.
+Pack; // XXX. This is brutally stupid. revise pls.
 
 static Pack GetPackFromAction(const Registrar interfac, const Action action, const Color color)
 {

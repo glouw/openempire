@@ -105,7 +105,7 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
     {
         Unit* const unit = &units.unit[i];
         if(unit->is_selected
-#if CONFIG_UNITS_GOD_MODE == 0
+#if !CONFIG_UNITS_GOD_MODE
         && unit->color == overview.color
 #endif
         && unit->trait.max_speed > 0)
@@ -349,7 +349,7 @@ Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const 
 static bool ShouldDelete(Unit* const unit, const Input input, const Overview overview)
 {
     return
-#if CONFIG_UNITS_GOD_MODE == 0
+#if !CONFIG_UNITS_GOD_MODE
         unit->color == overview.color &&
 #endif
         unit->is_selected && input.key[SDL_SCANCODE_DELETE];
@@ -660,7 +660,11 @@ static Action GetAction(const Units units, const Overview overview)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == overview.color)
+        if(
+#if !CONFIG_UNITS_GOD_MODE
+        unit->color == overview.color &&
+#endif
+        unit->is_selected)
         {
             switch(unit->trait.action)
             {
