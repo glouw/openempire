@@ -13,6 +13,15 @@ static int32_t CompareByY(const void* a, const void* b)
     return pa.y < pb.y;
 }
 
+static int32_t CompareBySurface(const void* a, const void* b)
+{
+    Tile* const aa = (Tile*) a;
+    Tile* const bb = (Tile*) b;
+    SDL_Surface* sa = aa->surface;
+    SDL_Surface* sb = bb->surface;
+    return sa < sb;
+}
+
 static int32_t CompareByHeight(const void* a, const void* b)
 {
     Tile* const aa = (Tile*) a;
@@ -24,6 +33,7 @@ static int32_t CompareByHeight(const void* a, const void* b)
 
 static void SortByY(const Tiles tiles)
 {
+    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareBySurface);
     qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByY);
 }
 

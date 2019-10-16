@@ -110,7 +110,7 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
 static Point Wrap(const Video video, const int32_t index)
 {
     const int32_t w = 32;
-    const int32_t size = video.xres / 4;
+    const int32_t size = 320;
     const Point point = { (index * w) % size, w * ((w * index) / size) };
     return point;
 }
@@ -224,9 +224,7 @@ void Video_PrintPerformanceMonitor(const Video video, const Units units, const i
     Text_Printf(video.text_small, video.renderer, video.top_rite, POSITION_TOP_RITE, 0xFF, 0,
             "units.count   : %6d\n"
             "dt (ms) video : %6d\n"
-            "cycles        : %6d\n"
-            ,
-            units.count, dt_hold, cycles);
+            "cycles        : %6d\n", units.count, dt_hold, cycles);
 }
 
 void Video_PrintResources(const Video video, const Units units)
@@ -235,8 +233,6 @@ void Video_PrintResources(const Video video, const Units units)
             "food  : %6d\n"
             "wood  : %6d\n"
             "gold  : %6d\n"
-            "stone : %6d\n"
-            ,
-            units.food, units.wood, units.gold, units.stone);
+            "stone : %6d\n", units.food, units.wood, units.gold, units.stone);
 }
 

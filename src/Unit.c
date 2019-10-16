@@ -134,15 +134,14 @@ void Unit_Unlock(Unit* const unit)
 
 void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer)
 {
-    if(unit->was_wall_pushed)
-        return;
-    if(unit->is_state_locked)
-        return;
-    const Graphics file = GetFileFromState(unit, state);
-    unit->state = state;
-    unit->file = file;
-    if(reset_state_timer)
-        unit->state_timer = 0;
+    if(!unit->was_wall_pushed && !unit->is_state_locked)
+    {
+        const Graphics file = GetFileFromState(unit, state);
+        unit->state = state;
+        unit->file = file;
+        if(reset_state_timer)
+            unit->state_timer = 0;
+    }
 }
 
 static int32_t GetFramesFromState(Unit* const unit, const Registrar graphics, const State state)
@@ -297,7 +296,7 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
 static bool ShouldEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(unit->interest->cell, unit->cell);
-    const int32_t reach = unit->trait.width + CONFIG_UNIT_SWORD_LENGTH;
+    const int32_t reach = UTIL_MAX(unit->trait.width, unit->interest->trait.width);
     if(unit->interest->trait.is_inanimate)
     {
         const Point feeler = Point_Normalize(diff, reach);
@@ -349,7 +348,8 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
             Unit_SetState(unit, STATE_ATTACK, true);
             Unit_Lock(unit);
         }
-        if(unit->state_timer == Unit_GetLastAttackTick(unit))
+        if(unit->state == STATE_ATTACK
+        && unit->state_timer >= Unit_GetLastAttackTick(unit))
         {
             unit->interest->health -= unit->trait.attack;
             Unit_Unlock(unit);

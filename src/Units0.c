@@ -355,11 +355,14 @@ static bool ShouldDelete(Unit* const unit, const Input input, const Overview ove
         unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
-static Units PlaceInanimateRemains(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
+static void KillChildren(const Units units, Unit* const unit)
 {
-    if(unit->trait.is_inanimate)
-        return PlaceRubble(units, unit, overview, graphics);
-    return units;
+    for(int32_t j = 0; j < units.count; j++)
+    {
+        Unit* const child = &units.unit[j];
+        if(child->parent_id == unit->id)
+            Unit_Kill(child);
+    }
 }
 
 static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input)
@@ -368,22 +371,14 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
-        {
             if(unit->health <= 0 || ShouldDelete(unit, input, overview))
             {
                 Unit_Kill(unit);
                 if(unit->has_children)
-                {
-                    for(int32_t j = 0; j < units.count; j++)
-                    {
-                        Unit* const child = &units.unit[j];
-                        if(child->parent_id == unit->id)
-                            Unit_Kill(child);
-                    }
-                }
-                units = PlaceInanimateRemains(units, unit, overview, graphics);
+                    KillChildren(units, unit);
+                if(unit->trait.is_inanimate)
+                    units = PlaceRubble(units, unit, overview, graphics);
             }
-        }
     }
     return units;
 }
@@ -482,23 +477,24 @@ static Units ProcessHardRules(Units units, const Field field, const Grid grid)
     for(int32_t i = 0; i < units.count; i++)
     {
         const Resource resource = Unit_Melee(&units.unit[i], grid);
-        switch(resource.type)
-        {
-        case TYPE_FOOD:
-            units.food += resource.amount;
-            break;
-        case TYPE_WOOD:
-            units.wood += resource.amount;
-            break;
-        case TYPE_GOLD:
-            units.gold += resource.amount;
-            break;
-        case TYPE_STONE:
-            units.stone += resource.amount;
-            break;
-        default:
-            break;
-        }
+        if(resource.type != TYPE_NONE)
+            switch(resource.type)
+            {
+            default:
+                break;
+            case TYPE_FOOD:
+                units.food += resource.amount;
+                break;
+            case TYPE_WOOD:
+                units.wood += resource.amount;
+                break;
+            case TYPE_GOLD:
+                units.gold += resource.amount;
+                break;
+            case TYPE_STONE:
+                units.stone += resource.amount;
+                break;
+            }
     }
     return units;
 }
