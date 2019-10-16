@@ -99,6 +99,12 @@ void Unit_Repath(Unit* const, const Field);
 
 Point Unit_Separate(Unit* const, Unit* const);
 
+bool Unit_IsDead(Unit* const);
+
 bool Unit_IsExempt(Unit* const);
 
 Point Unit_GetShift(Unit* const, const Point);
+
+bool Unit_IsDifferent(Unit* const, Unit* const);
+
+bool Unit_HasNoPath(Unit* const);

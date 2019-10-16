@@ -351,10 +351,13 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         if(unit->state == STATE_ATTACK
         && unit->state_timer >= Unit_GetLastAttackTick(unit))
         {
-            unit->interest->health -= unit->trait.attack;
-            Unit_Unlock(unit);
-            if(unit->trait.type == TYPE_VILLAGER)
-                return CollectResource(unit);
+            if(!Unit_IsDead(unit->interest))
+            {
+                unit->interest->health -= unit->trait.attack;
+                Unit_Unlock(unit);
+                if(unit->trait.type == TYPE_VILLAGER)
+                    return CollectResource(unit);
+            }
         }
     }
     else
@@ -386,8 +389,7 @@ static Point Nudge(Unit* const unit)
 Point Unit_Separate(Unit* const unit, Unit* const other)
 {
     static Point zero;
-    if(!Unit_IsExempt(other)
-    && unit->id != other->id)
+    if(!Unit_IsExempt(other) && Unit_IsDifferent(unit, other))
     {
         const Point diff = Point_Sub(other->cell, unit->cell);
         if(Point_IsZero(diff))
@@ -397,6 +399,11 @@ Point Unit_Separate(Unit* const unit, Unit* const other)
             return Point_Sub(Point_Normalize(diff, width), diff);
     }
     return zero;
+}
+
+bool Unit_IsDead(Unit* const unit)
+{
+    return unit->health <= 0;
 }
 
 bool Unit_IsExempt(Unit* const unit)
@@ -409,4 +416,14 @@ Point Unit_GetShift(Unit* const unit, const Point cart)
     const Point shift = { 0, 1 };
     const Point half = Point_Div(unit->trait.dimensions, 2);
     return Point_Add(cart, Point_Add(shift, half));
+}
+
+bool Unit_IsDifferent(Unit* const unit, Unit* const other)
+{
+    return unit->id != other->id;
+}
+
+bool Unit_HasNoPath(Unit* const unit)
+{
+    return unit->path.count == 0;
 }

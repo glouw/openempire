@@ -186,9 +186,7 @@ static Point AlignBoids(const Units units, Unit* const unit)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
-                if(!Unit_IsExempt(other)
-                && unit->id != other->id
-                && Unit_InPlatoon(unit, other))
+                if(!Unit_IsExempt(other) && Unit_IsDifferent(unit, other) && Unit_InPlatoon(unit, other))
                     out = Point_Add(out, other->velocity);
             }
         }
@@ -251,10 +249,7 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(!Unit_IsExempt(other)
-            && unit->id != other->id
-            && unit->path.count == 0
-            && Unit_InPlatoon(unit, other))
+            if(!Unit_IsExempt(other) && Unit_IsDifferent(unit, other) && Unit_HasNoPath(unit) && Unit_InPlatoon(unit, other))
                 Unit_FreePath(other);
         }
     }
@@ -549,7 +544,7 @@ static int32_t FlowThread(void* data)
     for(int32_t i = needle->a; i < needle->b; i++)
     {
         Unit* const unit = &needle->units.unit[i];
-        if(!State_IsDead(unit->state)) // Not using EXEMPT else fractional cart is discarded for right click red arrows.
+        if(!Unit_IsExempt(unit))
         {
             Unit_Flow(unit, needle->grid);
             Unit_Move(unit, needle->grid);

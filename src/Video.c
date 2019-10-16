@@ -107,7 +107,7 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
     }
 }
 
-static Point Wrap(const Video video, const int32_t index)
+static Point Wrap(const int32_t index)
 {
     const int32_t w = 32;
     const int32_t size = 320;
@@ -119,7 +119,7 @@ static void LayoutNumbers(const Video video, const Animation animation)
 {
     for(int32_t index = 0; index < animation.count; index++)
     {
-        const Point point = Wrap(video, index);
+        const Point point = Wrap(index);
         Text_Printf(video.text_small, video.renderer, point, POSITION_TOP_LEFT, 0xFF, 0, "%d", index);
     }
 }
@@ -130,7 +130,7 @@ static void LayoutIcons(const Video video, const Animation animation)
     Vram_Clear(vram, 0x0);
     for(int32_t index = 0; index < animation.count; index++)
     {
-        const Point point = Wrap(video, index);
+        const Point point = Wrap(index);
         const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false };
         Vram_DrawTile(vram, tile);
     }
@@ -198,14 +198,10 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
-
 #if SANITIZE_THREAD == 0
-    // When the thread sanitizer is enabled from the makefile, map drawing needs to be disabled else race conditions
-    // will be caught when terrain tiles are drawn due to their single pixel overlapping nature.
-    // This is fine, as peer to peer simulation determinism is not dependent on the renderer.
+    // Breaks sanitizer - but that's okay - renderer race conditions will not affect syncing P2P.
     Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, blend_lines, terrain_tiles);
 #endif
-
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l);
