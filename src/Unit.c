@@ -296,7 +296,7 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
 static bool ShouldEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(unit->interest->cell, unit->cell);
-    const int32_t reach = UTIL_MAX(unit->trait.width, unit->interest->trait.width);
+    const int32_t reach = UTIL_MAX(unit->trait.width, unit->interest->trait.width) + CONFIG_UNIT_SWORD_LENGTH;
     if(unit->interest->trait.is_inanimate)
     {
         const Point feeler = Point_Normalize(diff, reach);

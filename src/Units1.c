@@ -86,7 +86,7 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     units = Units_SpawnTownCenter(units, overview, graphics, middle, COLOR_BLU);
     for(int32_t i = 0; i < 5; i++)
     {
-        const Point aa = { -2, 3 };
+        const Point aa = { -2, +3 };
         const Point bb = { -9, -9 };
         const Point a = Point_Add(middle, aa);
         const Point b = Point_Add(middle, bb);
@@ -107,7 +107,7 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Overview overview, const Registrar graphics)
 {
-    switch(3)
+    switch(0)
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);

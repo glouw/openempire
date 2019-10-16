@@ -227,10 +227,9 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
     if(!Unit_IsExempt(unit))
     {
         unit->group_alignment = AlignBoids(units, unit);
-        const Point cohese = unit->command_group_count > CONFIG_UNIT_COHESION_COUNT ? CoheseBoids(units, unit) : zero;
         const Point point[] = {
             unit->group_alignment,
-            cohese,
+            CoheseBoids(units, unit),
             SeparateBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };
@@ -366,7 +365,7 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
-            if(unit->health <= 0 || ShouldDelete(unit, input, overview))
+            if(Unit_IsDead(unit) || ShouldDelete(unit, input, overview))
             {
                 Unit_Kill(unit);
                 if(unit->has_children)
@@ -620,8 +619,7 @@ static void FlagGarbage(const Units units)
 
 static Units Resize(Units units)
 {
-    int32_t index = 0;
-    for(index = 0; index < units.count; index++)
+    for(int32_t index = 0; index < units.count; index++)
     {
         Unit* const unit = &units.unit[index];
         if(unit->must_garbage_collect)
@@ -633,8 +631,21 @@ static Units Resize(Units units)
     return units;
 }
 
+static bool IsLocked(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_state_locked)
+            return true;
+    }
+    return false;
+}
+
 static Units RemoveGarbage(const Units units)
 {
+    if(IsLocked(units))
+        return units;
     FlagGarbage(units);
     SortGarbage(units);
     return Resize(units);
