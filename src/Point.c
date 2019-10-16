@@ -113,3 +113,11 @@ Point Point_Rand(void)
     };
     return point;
 }
+
+Point Point_Wrap(const int32_t index, const int32_t width, const int32_t xres)
+{
+    const int32_t x = (index * width ) % xres;
+    const int32_t y =   width * ((width * index) / xres);
+    const Point point = { x, y };
+    return point;
+}

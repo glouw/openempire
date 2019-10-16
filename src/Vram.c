@@ -503,14 +503,14 @@ static Packs GetPacksFromAction(const Registrar interfac, const Action action, c
 
 void DrawPack(const Vram vram, const Pack pack)
 {
-    int32_t x = 0;
-    for(int i = 0; i < pack.count; i++)
+    const int32_t columns = 4;
+    const int32_t width = 32;
+    const int32_t xres = columns * width;
+    for(int32_t index = 0; index < pack.count; index++)
     {
-        const Icon icon = pack.icons[i];
-        SDL_Surface* const surface = pack.animation.surface[icon];
-        const Point offset = { x, vram.yres - surface->h };
-        Vram_DrawAction(vram, surface, offset);
-        x += surface->w;
+        const Icon icon = pack.icons[index];
+        const Point offset = Point_Wrap(index, width, xres);
+        Vram_DrawAction(vram, pack.animation.surface[icon], offset);
     }
 }
 

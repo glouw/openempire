@@ -37,3 +37,5 @@ Point Point_Dot(const Point a, const Point b);
 int32_t Point_Slope(const Point);
 
 Point Point_Rand(void);
+
+Point Point_Wrap(const int32_t index, const int32_t width, const int32_t xres);

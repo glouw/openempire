@@ -107,30 +107,22 @@ static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomat
     }
 }
 
-static Point Wrap(const int32_t index)
-{
-    const int32_t w = 32;
-    const int32_t size = 320;
-    const Point point = { (index * w) % size, w * ((w * index) / size) };
-    return point;
-}
-
-static void LayoutNumbers(const Video video, const Animation animation)
+static void LayoutNumbers(const Video video, const Animation animation, const int32_t width, const int32_t xres)
 {
     for(int32_t index = 0; index < animation.count; index++)
     {
-        const Point point = Wrap(index);
+        const Point point = Point_Wrap(index, width, xres);
         Text_Printf(video.text_small, video.renderer, point, POSITION_TOP_LEFT, 0xFF, 0, "%d", index);
     }
 }
 
-static void LayoutIcons(const Video video, const Animation animation)
+static void LayoutIcons(const Video video, const Animation animation, const int32_t width, const int32_t xres)
 {
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
     Vram_Clear(vram, 0x0);
     for(int32_t index = 0; index < animation.count; index++)
     {
-        const Point point = Wrap(index);
+        const Point point = Point_Wrap(index, width, xres);
         const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false };
         Vram_DrawTile(vram, tile);
     }
@@ -141,9 +133,11 @@ static void LayoutIcons(const Video video, const Animation animation)
 // XXX. TO BE DEPRECATED.
 static void RenderIcons(const Video video, const Registrar interfac, const Interfac file, const Color color)
 {
+    const int32_t width = 32;
+    const int32_t xres = 320;
     const Animation animation = interfac.animation[color][file];
-    LayoutIcons(video, animation);
-    LayoutNumbers(video, animation);
+    LayoutIcons(video, animation, width, xres);
+    LayoutNumbers(video, animation, width, xres);
     const char* const str = Interfac_GetString(file);
     Text_Printf(video.text_small, video.renderer, video.bot_left, POSITION_BOT_LEFT, 0xFF, 0, str);
     SDL_RenderPresent(video.renderer);

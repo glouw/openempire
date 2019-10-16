@@ -38,7 +38,7 @@ Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, c
 static void LinkTailTownCenter(const Units units, const int32_t size)
 {
     int32_t id = -1;
-    for(int i = 0; i < size; i++)
+    for(int32_t i = 0; i < size; i++)
     {
         Unit* const unit = &units.unit[size - 1 - i];
         if(i == 0)
@@ -71,7 +71,7 @@ Units Units_SpawnTownCenter(Units units, const Overview overview, const Registra
         { {cart.x + 0, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
     };
     const int32_t size = UTIL_LEN(layouts);
-    for(int i = 0; i < size; i++)
+    for(int32_t i = 0; i < size; i++)
         units = Units_SpawnWithOffset(units, layouts[i].point, layouts[i].offset, overview, layouts[i].file, color, graphics);
     LinkTailTownCenter(units, size);
     return units;

@@ -285,8 +285,8 @@ static Units SpamFire(Units units, Unit* const unit, const Overview overview, co
         FILE_FIRE_MEDIUM_A,
         FILE_FIRE_MEDIUM_B,
     };
-    for(int x = 1; x < unit->trait.dimensions.x - 1; x++)
-    for(int y = 1; y < unit->trait.dimensions.y - 1; y++)
+    for(int32_t x = 1; x < unit->trait.dimensions.x - 1; x++)
+    for(int32_t y = 1; y < unit->trait.dimensions.y - 1; y++)
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(unit->cart, offset);
@@ -308,8 +308,8 @@ static Units SpamDust(Units units, Unit* const unit, const Overview overview, co
         FILE_SMALLER_EXPLOSION_SMOKE,
         FILE_BIGGER_EXPLOSION_SMOKE,
     };
-    for(int x = 0; x < unit->trait.dimensions.x; x++)
-    for(int y = 0; y < unit->trait.dimensions.y; y++)
+    for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+    for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
         const Point offset = { x - 1, y - 1 };
         const Point cart = Point_Add(unit->cart, offset);
@@ -328,7 +328,7 @@ Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const 
         FILE_RUBBLE_4X4,
         FILE_RUBBLE_5X5,
     };
-    for(int i = 0; i < UTIL_LEN(rubbles); i++)
+    for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
     {
         const Graphics rubble = rubbles[i];
         if(EqualDimension(unit->trait.dimensions, rubble))

@@ -5,6 +5,6 @@
 typedef struct
 {
     Type type;
-    int amount;
+    int32_t amount;
 }
 Resource;

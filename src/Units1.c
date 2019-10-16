@@ -84,7 +84,7 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
 {
     const Point middle = { overview.grid.cols / 2, overview.grid.cols / 2 };
     units = Units_SpawnTownCenter(units, overview, graphics, middle, COLOR_BLU);
-    for(int i = 0; i < 5; i++)
+    for(int32_t i = 0; i < 5; i++)
     {
         const Point aa = { -2, 3 };
         const Point bb = { -9, -9 };
