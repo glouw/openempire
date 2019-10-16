@@ -270,7 +270,10 @@ void Unit_Kill(Unit* const unit)
     if(unit->trait.is_inanimate)
         unit->must_garbage_collect = true;
     else
+    {
+        Unit_Unlock(unit);
         Unit_SetState(unit, STATE_FALL, true);
+    }
 }
 
 int32_t Unit_GetLastExpireTick(Unit* const unit)
