@@ -430,8 +430,9 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
-    const Image image = terrain.animation[COLOR_GRY][FILE_DIRT].image[0];
-    const Frame frame = terrain.animation[COLOR_GRY][FILE_DIRT].frame[0];
+    const Animation animation = terrain.animation[COLOR_GRY][FILE_DIRT];
+    const Image image = animation.image[0];
+    const Frame frame = animation.frame[0];
     const Point snap = Overview_IsoSnapTo(overview, input.point);
     for(int32_t i = 0; i < frame.height; i++)
     {
@@ -451,7 +452,7 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
     }
 }
 
-void Vram_DrawGeneric(const Vram vram, SDL_Surface* surface, const Point offset, const int32_t y0, const int32_t y1)
+static void DrawGeneric(const Vram vram, SDL_Surface* surface, const Point offset, const int32_t y0, const int32_t y1)
 {
     for(int32_t y = y0; y < y1; y++)
     for(int32_t x =  0; x < surface->w; x++)
@@ -460,8 +461,7 @@ void Vram_DrawGeneric(const Vram vram, SDL_Surface* surface, const Point offset,
         const int32_t xx = offset.x + x;
         const int32_t yy = offset.y + y;
         if(pixel != SURFACE_COLOR_KEY)
-            if(!OutOfBounds(vram, xx, yy))
-                Put(vram, xx, yy, pixel); // XXX. DRAW WITH PRIO IN ALPHA??
+            Put(vram, xx, yy, pixel);
     }
 }
 
@@ -505,19 +505,12 @@ static Packs GetPacksFromAction(const Registrar interfac, const Action action, c
 
 void DrawPack(const Vram vram, const Pack pack)
 {
-    const int32_t columns = 4;
-    const int32_t width = 32;
-    const int32_t xres = columns * width;
-    const Point center = { vram.xres / 2, vram.yres };
-    const Point shift = { width * columns / 2, width * columns };
-    const Point start = Point_Sub(center, shift);
     for(int32_t index = 0; index < pack.count; index++)
     {
         const Icon icon = pack.icons[index];
-        const Point wrap = Point_Wrap(index, width, xres);
-        const Point offset = Point_Add(wrap, start);
         SDL_Surface* const surface = pack.animation.surface[icon];
-        Vram_DrawGeneric(vram, surface, offset, 0, surface->h);
+        const Point offset = Point_Layout(index, vram.xres, vram.yres);
+        DrawGeneric(vram, surface, offset, 0, surface->h);
     }
 }
 
@@ -534,5 +527,6 @@ void Vram_DrawHud(const Vram vram, const Registrar interfac)
     const int32_t y0 = 0;
     const int32_t y1 = top_height;
     const Point a = { 0, 0 };
-    Vram_DrawGeneric(vram, interfac.animation[COLOR_GRY][FILE_INTERFAC_HUD_0].surface[0], a, y0, y1);
+    const Animation animation = interfac.animation[COLOR_GRY][FILE_INTERFAC_HUD_0];
+    DrawGeneric(vram, animation.surface[0], a, y0, y1);
 }

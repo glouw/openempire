@@ -16,4 +16,6 @@ typedef enum
 }
 Color;
 
-#define COLOR_GAIA (COLOR_GRY)
+void Color_SetMyColor(const Color);
+
+Color Color_GetMyColor(void);

@@ -23,6 +23,6 @@ const Icon* Icon_GetAge1(void);
 
 int32_t Icon_GetAge1Len(void);
 
-const char* Icon_GetLayout(void);
+const char* Icon_GetHotkeys(void);
 
-int32_t Icon_GetLayoutLen(void);
+int32_t Icon_GetHotkeysLen(void);

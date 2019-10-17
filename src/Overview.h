@@ -18,7 +18,7 @@ typedef struct
 }
 Overview;
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid, const Color);
+Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid);
 
 Overview Overview_Update(Overview, const Input);
 

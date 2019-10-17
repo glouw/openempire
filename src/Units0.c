@@ -647,7 +647,7 @@ static void UpdateEntropy(const Units units)
     }
 }
 
-static Action GetAction(const Units units, const Overview overview)
+static Action GetAction(const Units units)
 {
     int32_t counts[] = { 0, 0, 0, 0 };
     for(int32_t i = 0; i < units.count; i++)
@@ -655,7 +655,7 @@ static Action GetAction(const Units units, const Overview overview)
         Unit* const unit = &units.unit[i];
         if(
 #if !CONFIG_UNITS_GOD_MODE
-        unit->color == overview.color &&
+        unit->color == Color_GetMyColor() &&
 #endif
         unit->is_selected)
         {
@@ -698,19 +698,21 @@ static Action GetAction(const Units units, const Overview overview)
     }
 }
 
-static Units UpdateAction(Units units, const Overview overview)
+static Units UpdateAction(Units units)
 {
-    units.action = GetAction(units, overview);
+    units.action = GetAction(units);
     return units;
 }
 
-static Units CountPopulation(Units units, const Overview overview)
+static Units CountPopulation(Units units)
 {
     int32_t count = 0;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(!Unit_IsExempt(unit) && unit->color == overview.color && !unit->trait.is_inanimate)
+        if(!Unit_IsExempt(unit)
+        && unit->color == Color_GetMyColor()
+        && !unit->trait.is_inanimate)
             count++;
     }
     units.population = count;
@@ -724,12 +726,12 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
-    units = UpdateAction(units, overview);
+    units = UpdateAction(units);
     Decay(units);
     Expire(units);
     units = Kill(units, overview, graphics, input);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
-    units = CountPopulation(units, overview);
+    units = CountPopulation(units);
     return units;
 }

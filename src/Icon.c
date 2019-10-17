@@ -11,33 +11,32 @@
     ICON_BUILD_STONE_CAMP,\
     ICON_BUILD_LUMBER_CAMP,\
 
-static const char Layout[] = {
-    '1', '2', '3', '4',
-    'q', 'w', 'e', 'r',
-    'a', 's', 'd', 'f',
-    'z', 'x', 'c', 'v',
+static const char hotkeys[] = {
+    'Q', 'W', 'E', 'R', 'T',
+    'A', 'S', 'D', 'F', 'G',
+    'Z', 'X', 'C', 'V', 'B',
 };
 
-static const Icon Age1[] = {
+static const Icon age1[] = {
     ICON_AGE_1
 };
 
-const char* Icon_GetLayout(void)
+const char* Icon_GetHotkeys(void)
 {
-    return Layout;
+    return hotkeys;
 }
 
-int32_t Icon_GetLayoutLen(void)
+int32_t Icon_GetHotkeysLen(void)
 {
-    return UTIL_LEN(Layout);
+    return UTIL_LEN(hotkeys);
 }
 
 const Icon* Icon_GetAge1(void)
 {
-    return Age1;
+    return age1;
 }
 
 int32_t Icon_GetAge1Len(void)
 {
-    return UTIL_LEN(Age1);
+    return UTIL_LEN(age1);
 }

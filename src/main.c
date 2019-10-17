@@ -14,7 +14,8 @@ int main(const int argc, const char* argv[])
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
-    Overview overview = Overview_Init(video.xres, video.yres, grid, COLOR_BLU);
+    Color_SetMyColor(COLOR_BLU);
+    Overview overview = Overview_Init(video.xres, video.yres, grid);
     Units units = Units_New(map, overview, data.graphics);
 #if 1
     int32_t cycles = 0;
@@ -32,6 +33,7 @@ int main(const int argc, const char* argv[])
         Log_Dump();
         Video_PrintPerformanceMonitor(video, units, t1 - t0, cycles);
         Video_PrintResources(video, units);
+        Video_PrintHotkeys(video);
         Video_Present(video);
         Field_Free(field);
         Window_Free(window);

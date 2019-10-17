@@ -2,6 +2,7 @@
 
 #include "Surface.h"
 #include "Point.h"
+#include "Icon.h"
 #include "Tile.h"
 #include "Config.h"
 #include "Interfac.h"
@@ -134,8 +135,8 @@ static void LayoutIcons(const Video video, const Animation animation, const int3
 // XXX. TO BE DEPRECATED.
 static void RenderIcons(const Video video, const Registrar interfac, const Interfac file, const Color color)
 {
-    const int32_t width = 32;
-    const int32_t xres = 320;
+    const int32_t width = CONFIG_ICON_SIZE;
+    const int32_t xres = 10 * CONFIG_ICON_SIZE;
     const Animation animation = interfac.animation[color][file];
     LayoutIcons(video, animation, width, xres);
     LayoutNumbers(video, animation, width, xres);
@@ -176,6 +177,17 @@ void Video_CopyCanvas(const Video video)
 void Video_Present(const Video video)
 {
     SDL_RenderPresent(video.renderer);
+}
+
+void Video_PrintHotkeys(const Video video)
+{
+    const char* hotkeys = Icon_GetHotkeys();
+    for(int32_t index = 0; index < 15; index++)
+    {
+        const char hotkey = hotkeys[index];
+        const Point offset = Point_Layout(index, video.xres, video.yres);
+        Text_Printf(video.text_small, video.renderer, offset, POSITION_TOP_LEFT, 0xFF, 0, "%c", hotkey);
+    }
 }
 
 void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Window window)

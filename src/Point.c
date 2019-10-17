@@ -1,6 +1,7 @@
 #include "Point.h"
 
 #include "Util.h"
+#include "Config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,10 +115,24 @@ Point Point_Rand(void)
     return point;
 }
 
-Point Point_Wrap(const int32_t index, const int32_t width, const int32_t xres)
+Point Point_Wrap(const int32_t index, const int32_t width, const int32_t res)
 {
-    const int32_t x = (index * width ) % xres;
-    const int32_t y =   width * ((width * index) / xres);
+    const int32_t x = (index * width ) % res;
+    const int32_t y =   width * ((width * index) / res);
     const Point point = { x, y };
     return point;
+}
+
+Point Point_Layout(const int32_t index, const int32_t xres, const int32_t yres)
+{
+    const int32_t width = CONFIG_ICON_SIZE;
+    const int32_t height = CONFIG_ICON_SIZE;
+    const int32_t rows = 3;
+    const int32_t columns = 5;
+    const int32_t res = columns * width;
+    const Point center = { xres / 2, yres };
+    const Point shift = { width * columns / 2, height * rows };
+    const Point start = Point_Sub(center, shift);
+    const Point wrap = Point_Wrap(index, width, res);
+    return Point_Add(wrap, start);
 }

@@ -46,3 +46,5 @@ void Video_PrintPerformanceMonitor(const Video, const Units, const int32_t dt, c
 void Video_CopyCanvas(const Video);
 
 void Video_PrintResources(const Video, const Units);
+
+void Video_PrintHotkeys(const Video);

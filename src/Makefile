@@ -6,6 +6,7 @@ LIBS += -lSDL2_ttf
 SRCS  = Animation.c
 SRCS += Args.c
 SRCS += Blendomatic.c
+SRCS += Color.c
 SRCS += Data.c
 SRCS += Direction.c
 SRCS += Drs.c
