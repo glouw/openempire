@@ -631,21 +631,8 @@ static Units Resize(Units units)
     return units;
 }
 
-static bool IsLocked(const Units units)
-{
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        if(unit->is_state_locked)
-            return true;
-    }
-    return false;
-}
-
 static Units RemoveGarbage(const Units units)
 {
-    if(IsLocked(units))
-        return units;
     FlagGarbage(units);
     SortGarbage(units);
     return Resize(units);
