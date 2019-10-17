@@ -48,7 +48,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
 {
     static Point zero;
     unit->velocity = (unit->state == STATE_ATTACK) ? zero : Point_Normalize(delta, unit->trait.max_speed);
-    if(unit->is_chasing)
+    if(unit->is_engaged)
         Unit_SetDir(unit, Point_Sub(unit->interest->cell, unit->cell));
     else
     {

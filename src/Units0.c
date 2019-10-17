@@ -426,20 +426,20 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
     return closest;
 }
 
-static void ChaseBoids(const Units units, Unit* const unit)
+static void EngageBoids(const Units units, Unit* const unit)
 {
     if(!Unit_IsExempt(unit))
     {
         Unit* const closest = GetClosestBoid(units, unit);
         if(closest != NULL)
         {
-            unit->is_chasing = true;
+            unit->is_engaged = true;
             unit->interest = closest;
             Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
         }
         else
         {
-            unit->is_chasing = false;
+            unit->is_engaged = false;
             unit->interest = NULL;
         }
     }
@@ -467,7 +467,7 @@ static Units ProcessHardRules(Units units, const Field field, const Grid grid)
     for(int32_t i = 0; i < units.count; i++)
         ConditionallyStopBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++)
-        ChaseBoids(units, &units.unit[i]);
+        EngageBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++)
     {
         const Resource resource = Unit_Melee(&units.unit[i], grid);
