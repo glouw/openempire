@@ -385,7 +385,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Point center = Tile_GetHotSpotCoords(tile);
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(tile.reference->is_selected)
-            DrawEllipse(vram, rect, 0x00FFFFFF);
+            DrawEllipse(vram, rect, tile.reference->is_chasing ? 0xFF0000 : 0xFFFFFF);
     }
 }
 
@@ -393,11 +393,13 @@ static void DrawHealthBar(const Vram vram, const Point top, const int32_t health
 {
     const int32_t w = 30;
     const int32_t h = 2;
+    const int32_t hh =  h / 2;
+    const int32_t hw =  w / 2;
     const int32_t percent = (w * health) / max_health;
-    const int32_t y0 = top.y - (h / 2);
-    const int32_t y1 = top.y + (h / 2);
-    const int32_t x0 = top.x - (w / 2);
-    const int32_t x1 = top.x + (w / 2);
+    const int32_t y0 = top.y - hh;
+    const int32_t y1 = top.y + hh;
+    const int32_t x0 = top.x - hw;
+    const int32_t x1 = top.x + hw;
     for(int32_t y = y0; y < y1; y++)
     for(int32_t x = x0; x < x1; x++)
         if(!OutOfBounds(vram, x, y))
