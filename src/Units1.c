@@ -99,15 +99,18 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     const Point d = Point_Add(middle, dd);
     const Point ee = { 3, -3 };
     const Point e = Point_Add(middle, ee);
+    const Point ff = { -3, 3 };
+    const Point f = Point_Add(middle, ff);
     units = Units_SpawnWithShadow(units, c, overview.grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
     units = Units_Spawn(units, d, overview.grid, FILE_STONE_MINE, COLOR_GRY, graphics);
     units = Units_Spawn(units, e, overview.grid, FILE_BERRY_BUSH, COLOR_GRY, graphics);
+    units = Units_Spawn(units, f, overview.grid, FILE_GOLD_MINE, COLOR_GRY, graphics);
     return units;
 }
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Overview overview, const Registrar graphics)
 {
-    switch(0)
+    switch(3)
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);

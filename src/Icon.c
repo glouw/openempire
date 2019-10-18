@@ -3,13 +3,13 @@
 #include "Util.h"
 
 #define ICON_AGE_1 \
-    ICON_BUILD_BARRACKS,\
-    ICON_BUILD_MILL,\
-    ICON_BUILD_PALISADE_WALL,\
     ICON_BUILD_HOUSE,\
-    ICON_BUILD_OUTPOST,\
+    ICON_BUILD_MILL,\
     ICON_BUILD_STONE_CAMP,\
     ICON_BUILD_LUMBER_CAMP,\
+    ICON_BUILD_BARRACKS,\
+    ICON_BUILD_PALISADE_WALL,\
+    ICON_BUILD_OUTPOST,\
 
 static const char hotkeys[] = {
     'Q', 'W', 'E', 'R', 'T',
