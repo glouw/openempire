@@ -52,7 +52,10 @@ static void LinkTailTownCenter(const Units units, const int32_t size)
 
 Units Units_SpawnTownCenter(Units units, const Overview overview, const Registrar graphics, const Point cart, const Color color)
 {
-    const Point offset = { overview.grid.tile_cart_width / 2, -overview.grid.tile_cart_height / 2 };
+    const Point offset = {
+        +overview.grid.tile_cart_mid.x,
+        -overview.grid.tile_cart_mid.y
+    };
     const Point zero = { 0,0 };
     struct
     {

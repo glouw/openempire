@@ -24,19 +24,15 @@ static bool CanWalk(const Units units, const Map map, const Point point)
 
 static bool CanBuild(const Units units, const Map map, const Point dimensions, const Point point)
 {
-    bool can_build = true;
     for(int32_t y = 0; y < dimensions.y; y++)
     for(int32_t x = 0; x < dimensions.x; x++)
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(point, offset);
-        printf("%d %d\n", cart.x, cart.y);
         if(!CanWalk(units, map, cart))
-            can_build = false;
+            return false;
     }
-    puts("");
-    printf("%d\n", can_build);
-    return can_build;
+    return true;
 }
 
 Field Units_Field(const Units units, const Map map)
@@ -324,19 +320,20 @@ static Units SpamFire(Units units, Unit* const unit, const Overview overview, co
     return units;
 }
 
-static Units SpamDust(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
+static Units SpamSmoke(Units units, Unit* const unit, const Overview overview, const Registrar graphics)
 {
-    const Graphics dusts[] = {
+    const Graphics smokes[] = {
         FILE_SMALLER_EXPLOSION_SMOKE,
-        FILE_BIGGER_EXPLOSION_SMOKE,
+        //FILE_BIGGER_EXPLOSION_SMOKE,
     };
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
-        const Point offset = { x - 1, y - 1 };
-        const Point cart = Point_Add(unit->cart, offset);
-        const int32_t index = Util_Rand() % UTIL_LEN(dusts);
-        units = Units_Spawn(units, cart, overview.grid, dusts[index], COLOR_GRY, graphics);
+        const Point offset = Point_Mul(overview.grid.tile_cart_mid, -1);
+        const Point shift = { x, y };
+        const Point cart = Point_Add(unit->cart, shift);
+        const int32_t index = Util_Rand() % UTIL_LEN(smokes);
+        units = Units_SpawnWithOffset(units, cart, offset, overview, smokes[index], COLOR_GRY, graphics);
     }
     return units;
 }
@@ -356,7 +353,7 @@ Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const 
         if(EqualDimension(unit->trait.dimensions, rubble))
         {
             units = SpamFire(units, unit, overview, graphics);
-            units = SpamDust(units, unit, overview, graphics);
+            units = SpamSmoke(units, unit, overview, graphics);
             return Units_Spawn(units, unit->cart, overview.grid, rubble, COLOR_GRY, graphics); // XXX. Should paint ground with broken rock texture?
         }
     }
