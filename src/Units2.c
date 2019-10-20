@@ -12,15 +12,18 @@ static Units Append(Units units, const Unit unit)
     return units;
 }
 
-Units Units_Spawn(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
+Units Units_Spawn(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map)
 {
-    return Append(units, Unit_Make(cart, grid, file, color, graphics));
+    const Unit unit = Unit_Make(cart, grid, file, color, graphics);
+    return Units_CanBuild(units, map, unit.trait.dimensions, unit.cart)
+        ? Append(units, unit)
+        : units;
 }
 
-Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow)
+Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow, const Map map)
 {
-    units = Units_Spawn(units, cart, grid, file, color, graphics);
-    units = Units_Spawn(units, cart, grid, shadow, color, graphics);
+    units = Units_Spawn(units, cart, grid, file, color, graphics, map);
+    units = Units_Spawn(units, cart, grid, shadow, color, graphics, map);
     const int32_t a = units.count - 1;
     const int32_t b = units.count - 2;
     units.unit[a].parent_id = units.unit[b].id;
@@ -28,11 +31,13 @@ Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, cons
     return units;
 }
 
-Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, const Overview overview, const Graphics file, const Color color, const Registrar graphics)
+Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, const Overview overview, const Graphics file, const Color color, const Registrar graphics, const Map map)
 {
     Unit unit = Unit_Make(cart, overview.grid, file, color, graphics);
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
-    return Append(units, unit);
+    return Units_CanBuild(units, map, unit.trait.dimensions, unit.cart)
+        ? Append(units, unit)
+        : units;
 }
 
 static void LinkTailTownCenter(const Units units, const int32_t size)
@@ -50,7 +55,7 @@ static void LinkTailTownCenter(const Units units, const int32_t size)
     }
 }
 
-Units Units_SpawnTownCenter(Units units, const Overview overview, const Registrar graphics, const Point cart, const Color color)
+Units Units_SpawnTownCenter(Units units, const Overview overview, const Registrar graphics, const Point cart, const Color color, const Map map)
 {
     const Point offset = {
         +overview.grid.tile_cart_mid.x,
@@ -64,18 +69,18 @@ Units Units_SpawnTownCenter(Units units, const Overview overview, const Registra
         Graphics file;
     }
     const layouts[] = {
-        { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
-        { {cart.x - 3, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
-        { {cart.x - 3, cart.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {cart.x - 3, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
-        { {cart.x - 3, cart.y + 1}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {cart.x - 2, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {cart.x - 1, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
+        { {cart.x - 2, cart.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
+        { {cart.x - 2, cart.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+        { {cart.x - 1, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+        { {cart.x - 2, cart.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
+        { {cart.x - 2, cart.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+        { {cart.x - 1, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
         { {cart.x + 0, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
     };
     const int32_t size = UTIL_LEN(layouts);
     for(int32_t i = 0; i < size; i++)
-        units = Units_SpawnWithOffset(units, layouts[i].point, layouts[i].offset, overview, layouts[i].file, color, graphics);
+        units = Units_SpawnWithOffset(units, layouts[i].point, layouts[i].offset, overview, layouts[i].file, color, graphics, map);
     LinkTailTownCenter(units, size);
     return units;
 }

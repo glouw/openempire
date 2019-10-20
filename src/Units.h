@@ -32,7 +32,6 @@ typedef struct
     int32_t stone;
     int32_t wood;
     int32_t population;
-    int32_t hover_id;
 }
 Units;
 
@@ -50,14 +49,14 @@ void Units_ResetTiled(const Units);
 
 Units Units_GenerateTestZone(Units, const Map, const Overview, const Registrar);
 
-Units Units_Spawn(Units, const Point, const Grid, const Graphics, const Color, const Registrar);
+Units Units_Spawn(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Map);
 
-Units Units_SpawnWithShadow(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics);
+Units Units_SpawnWithShadow(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics, const Map);
 
-Units Units_SpawnWithOffset(Units, const Point, const Point, const Overview, const Graphics, const Color, const Registrar);
+Units Units_SpawnWithOffset(Units, const Point, const Point, const Overview, const Graphics, const Color, const Registrar, const Map);
 
-Units Units_SpawnTownCenter(Units, const Overview, const Registrar, const Point, const Color);
+Units Units_SpawnTownCenter(Units, const Overview, const Registrar, const Point, const Color, const Map);
 
 void Units_ManageStacks(const Units);
 
-bool Units_IsHovering(const Units);
+bool Units_CanBuild(const Units, const Map, const Point dimensions, const Point point);

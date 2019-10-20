@@ -17,10 +17,13 @@ Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
 
 Overview Overview_Update(Overview overview, const Input input)
 {
-    if(input.key[SDL_SCANCODE_W]) overview.point.y -= CONFIG_OVERVIEW_SCROLL_SPEED;
-    if(input.key[SDL_SCANCODE_S]) overview.point.y += CONFIG_OVERVIEW_SCROLL_SPEED;
-    if(input.key[SDL_SCANCODE_D]) overview.point.x += CONFIG_OVERVIEW_SCROLL_SPEED;
-    if(input.key[SDL_SCANCODE_A]) overview.point.x -= CONFIG_OVERVIEW_SCROLL_SPEED;
+    if(!input.key[SDL_SCANCODE_LSHIFT])
+    {
+        if(input.key[SDL_SCANCODE_W]) overview.point.y -= CONFIG_OVERVIEW_SCROLL_SPEED;
+        if(input.key[SDL_SCANCODE_S]) overview.point.y += CONFIG_OVERVIEW_SCROLL_SPEED;
+        if(input.key[SDL_SCANCODE_D]) overview.point.x += CONFIG_OVERVIEW_SCROLL_SPEED;
+        if(input.key[SDL_SCANCODE_A]) overview.point.x -= CONFIG_OVERVIEW_SCROLL_SPEED;
+    }
     overview.selection_box.a = input.ld_point;
     overview.selection_box.b = input.point;
     return overview;

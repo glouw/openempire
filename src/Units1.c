@@ -12,16 +12,16 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
     {
         const Point cart = { x, y };
         const Graphics file = y < map.rows / 3 ? FILE_KNIGHT_IDLE : FILE_TEUTONIC_KNIGHT_IDLE;
-        units = Units_Spawn(units, cart, grid, file, COLOR_BLU, graphics);
+        units = Units_Spawn(units, cart, grid, file, COLOR_BLU, graphics, map);
     }
     for(int32_t x = map.cols - depth; x < map.cols; x++)
     for(int32_t y = 0; y < map.rows; y++)
     {
         const Point cart = { x, y };
-        units = Units_Spawn(units, cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics);
+        units = Units_Spawn(units, cart, grid, FILE_KNIGHT_IDLE, COLOR_RED, graphics, map);
     }
     const Point cart = { map.cols / 2, map.rows / 2 };
-    units = Units_Spawn(units, cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU, graphics);
+    units = Units_Spawn(units, cart, grid, FILE_KNIGHT_IDLE, COLOR_BLU, graphics, map);
     const Field field = Units_Field(units, map);
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -42,7 +42,7 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
     return units;
 }
 
-static Units GenerateInanimateZone(Units units, const Grid grid, const Registrar graphics)
+static Units GenerateInanimateZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
     const Point a = { grid.cols / 2, grid.cols / 2 };
     const Point b = { grid.cols / 2 - 4, grid.cols / 2 };
@@ -51,47 +51,47 @@ static Units GenerateInanimateZone(Units units, const Grid grid, const Registrar
     const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8 };
     const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9 };
     const Point g = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
-    units = Units_Spawn(units, a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics);
-    units = Units_Spawn(units, c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics);
-    units = Units_Spawn(units, d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
-    units = Units_Spawn(units, e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics);
-    units = Units_Spawn(units, f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics);
-    units = Units_SpawnWithShadow(units, g, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW);
+    units = Units_Spawn(units, a, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics, map);
+    units = Units_Spawn(units, c, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics, map);
+    units = Units_Spawn(units, d, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics, map);
+    units = Units_Spawn(units, e, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics, map);
+    units = Units_Spawn(units, f, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics, map);
+    units = Units_SpawnWithShadow(units, g, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, map);
     for(int32_t i = 0; i < 300; i++)
-        units = Units_Spawn(units, b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics);
+        units = Units_Spawn(units, b, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics, map);
     for(int32_t j = 0; j < 10; j++)
     for(int32_t i = 0; i < 10; i++)
     {
         const Point h = { i, j };
-        units = Units_SpawnWithShadow(units, h, grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
+        units = Units_SpawnWithShadow(units, h, grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW, map);
     }
-    units = Units_Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
+    units = Units_Spawn(units, b, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics, map);
     return units;
 }
 
-static Units GenerateTreeZone(Units units, const Grid grid, const Registrar graphics)
+static Units GenerateTreeZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
     for(int32_t j = 0; j < units.rows; j++)
     for(int32_t i = 0; i < units.cols; i++)
     {
         const Point a = { i, j };
-        units = Units_SpawnWithShadow(units, a, grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
+        units = Units_SpawnWithShadow(units, a, grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW, map);
     }
     return units;
 }
 
-static Units GenerateGameZone(Units units, const Overview overview, const Registrar graphics)
+static Units GenerateGameZone(Units units, const Map map, const Overview overview, const Registrar graphics)
 {
     const Point middle = { overview.grid.cols / 2, overview.grid.cols / 2 };
-    units = Units_SpawnTownCenter(units, overview, graphics, middle, COLOR_BLU);
+    units = Units_SpawnTownCenter(units, overview, graphics, middle, COLOR_BLU, map);
     for(int32_t i = 0; i < 5; i++)
     {
         const Point aa = { -2, +3 };
         const Point bb = { -9, -9 };
         const Point a = Point_Add(middle, aa);
         const Point b = Point_Add(middle, bb);
-        units = Units_Spawn(units, a, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics);
-        units = Units_Spawn(units, b, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics);
+        units = Units_Spawn(units, a, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics, map);
+        units = Units_Spawn(units, b, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics, map);
     }
     const Point cc = { -3, -3 };
     const Point c = Point_Add(middle, cc);
@@ -101,10 +101,10 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     const Point e = Point_Add(middle, ee);
     const Point ff = { -6, 3 };
     const Point f = Point_Add(middle, ff);
-    units = Units_SpawnWithShadow(units, c, overview.grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
-    units = Units_Spawn(units, d, overview.grid, FILE_STONE_MINE, COLOR_GRY, graphics);
-    units = Units_Spawn(units, e, overview.grid, FILE_BERRY_BUSH, COLOR_GRY, graphics);
-    units = Units_Spawn(units, f, overview.grid, FILE_GOLD_MINE, COLOR_GRY, graphics);
+    units = Units_SpawnWithShadow(units, c, overview.grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW, map);
+    units = Units_Spawn(units, d, overview.grid, FILE_STONE_MINE, COLOR_GRY, graphics, map);
+    units = Units_Spawn(units, e, overview.grid, FILE_BERRY_BUSH, COLOR_GRY, graphics, map);
+    units = Units_Spawn(units, f, overview.grid, FILE_GOLD_MINE, COLOR_GRY, graphics, map);
     return units;
 }
 
@@ -114,8 +114,8 @@ Units Units_GenerateTestZone(const Units units, const Map map, const Overview ov
     {
     default:
     case 0: return GenerateBattleZone(units, map, overview.grid, graphics);
-    case 1: return GenerateInanimateZone(units, overview.grid, graphics);
-    case 2: return GenerateTreeZone(units, overview.grid, graphics);
-    case 3: return GenerateGameZone(units, overview, graphics);
+    case 1: return GenerateInanimateZone(units, map, overview.grid, graphics);
+    case 2: return GenerateTreeZone(units, map, overview.grid, graphics);
+    case 3: return GenerateGameZone(units, map, overview, graphics);
     }
 }
