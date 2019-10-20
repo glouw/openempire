@@ -32,6 +32,7 @@ typedef struct
     int32_t stone;
     int32_t wood;
     int32_t population;
+    int32_t hover_id;
 }
 Units;
 
@@ -58,3 +59,5 @@ Units Units_SpawnWithOffset(Units, const Point, const Point, const Overview, con
 Units Units_SpawnTownCenter(Units, const Overview, const Registrar, const Point, const Color);
 
 void Units_ManageStacks(const Units);
+
+bool Units_IsHovering(const Units);

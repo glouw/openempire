@@ -99,7 +99,7 @@ static Units GenerateGameZone(Units units, const Overview overview, const Regist
     const Point d = Point_Add(middle, dd);
     const Point ee = { 3, -3 };
     const Point e = Point_Add(middle, ee);
-    const Point ff = { -3, 3 };
+    const Point ff = { -6, 3 };
     const Point f = Point_Add(middle, ff);
     units = Units_SpawnWithShadow(units, c, overview.grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW);
     units = Units_Spawn(units, d, overview.grid, FILE_STONE_MINE, COLOR_GRY, graphics);

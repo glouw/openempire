@@ -59,6 +59,7 @@ Units Units_New(const Map map, const Overview overview, const Registrar graphics
     units.cols = overview.grid.cols;
     units = Units_GenerateTestZone(units, map, overview, graphics);
     units.cpu_count = 2 * SDL_GetCPUCount();
+    units.hover_id = -1;
     return units;
 }
 
@@ -79,9 +80,14 @@ static Units UnSelectAll(Units units)
     return units;
 }
 
+bool Units_IsHovering(const Units units)
+{
+    return units.hover_id != -1;
+}
+
 static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics, const Points render_points)
 {
-    if(input.lu)
+    if(input.lu && !Units_IsHovering(units))
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
         Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
@@ -704,6 +710,14 @@ static Units UpdateAction(Units units)
     return units;
 }
 
+
+static Units Hover(Units units, Unit* const unit, const bool enable)
+{
+    units.hover_id = enable ? unit->id : -1;
+    unit->trait.is_detail = enable;
+    return units;
+}
+
 static Units CountPopulation(Units units)
 {
     int32_t count = 0;
@@ -719,6 +733,46 @@ static Units CountPopulation(Units units)
     return units;
 }
 
+static Units HoverBuilding(Units units, const Point cart, const Overview overview, const Registrar graphics, const Input input)
+{
+    if(input.key[SDL_SCANCODE_LSHIFT])
+    {
+        if(input.key[SDL_SCANCODE_Q])
+            units = Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics);
+        if(input.key[SDL_SCANCODE_Q]) // ALL.
+            units = Hover(units, &units.unit[units.count - 1], true);
+    }
+    return units;
+}
+
+
+static Units PutBuilding(Units units, const Point cart, const Overview overview, const Input input)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->id == units.hover_id)
+        {
+            const Point shift = Point_Sub(cart, Point_Div(unit->trait.dimensions, 2));
+            unit->cell = Grid_CartToCell(overview.grid, shift);
+            unit->cart = shift;
+            if(input.lu)
+                units = Hover(units, unit, false);
+        }
+    }
+    return units;
+}
+
+static Units PlaceBuilding(Units units, const Overview overview, const Registrar graphics, const Input input)
+{
+    const Point cart = Overview_IsoToCart(overview, input.point, false);
+    if(overview.color == Color_GetMyColor())
+        return Units_IsHovering(units)
+            ? PutBuilding(units, cart, overview, input)
+            : HoverBuilding(units, cart, overview, graphics, input);
+    return units;
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Window window)
 {
     UpdateEntropy(units);
@@ -727,6 +781,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
     units = UpdateAction(units);
+    units = PlaceBuilding(units, overview, graphics, input);
     Decay(units);
     Expire(units);
     units = Kill(units, overview, graphics, input);
