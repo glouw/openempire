@@ -22,6 +22,23 @@ static bool CanWalk(const Units units, const Map map, const Point point)
         && Stack_IsWalkable(stack);
 }
 
+static bool CanBuild(const Units units, const Map map, const Point dimensions, const Point point)
+{
+    bool can_build = true;
+    for(int32_t y = 0; y < dimensions.y; y++)
+    for(int32_t x = 0; x < dimensions.x; x++)
+    {
+        const Point offset = { x, y };
+        const Point cart = Point_Add(point, offset);
+        printf("%d %d\n", cart.x, cart.y);
+        if(!CanWalk(units, map, cart))
+            can_build = false;
+    }
+    puts("");
+    printf("%d\n", can_build);
+    return can_build;
+}
+
 Field Units_Field(const Units units, const Map map)
 {
     static Field zero;
@@ -710,11 +727,11 @@ static Units UpdateAction(Units units)
     return units;
 }
 
-
 static Units Hover(Units units, Unit* const unit, const bool enable)
 {
     units.hover_id = enable ? unit->id : -1;
     unit->trait.is_detail = enable;
+    unit->trait.is_walkable = enable;
     return units;
 }
 
@@ -746,7 +763,7 @@ static Units HoverBuilding(Units units, const Point cart, const Overview overvie
 }
 
 
-static Units PutBuilding(Units units, const Point cart, const Overview overview, const Input input)
+static Units PutBuilding(Units units, const Point cart, const Overview overview, const Input input, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -756,20 +773,24 @@ static Units PutBuilding(Units units, const Point cart, const Overview overview,
             const Point shift = Point_Sub(cart, Point_Div(unit->trait.dimensions, 2));
             unit->cell = Grid_CartToCell(overview.grid, shift);
             unit->cart = shift;
-            if(input.lu)
+            if(input.lu
+            && CanBuild(units, map, unit->trait.dimensions, shift))
                 units = Hover(units, unit, false);
         }
     }
     return units;
 }
 
-static Units PlaceBuilding(Units units, const Overview overview, const Registrar graphics, const Input input)
+static Units PlaceBuilding(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
-    const Point cart = Overview_IsoToCart(overview, input.point, false);
-    if(overview.color == Color_GetMyColor())
-        return Units_IsHovering(units)
-            ? PutBuilding(units, cart, overview, input)
-            : HoverBuilding(units, cart, overview, graphics, input);
+    if(units.action == ACTION_BUILD)
+    {
+        const Point cart = Overview_IsoToCart(overview, input.point, false);
+        if(overview.color == Color_GetMyColor())
+            return Units_IsHovering(units)
+                ? PutBuilding(units, cart, overview, input, map)
+                : HoverBuilding(units, cart, overview, graphics, input);
+    }
     return units;
 }
 
@@ -781,7 +802,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
     units = UpdateAction(units);
-    units = PlaceBuilding(units, overview, graphics, input);
+    units = PlaceBuilding(units, overview, graphics, input, map);
     Decay(units);
     Expire(units);
     units = Kill(units, overview, graphics, input);
