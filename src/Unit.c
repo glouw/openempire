@@ -134,7 +134,7 @@ void Unit_Unlock(Unit* const unit)
 
 void Unit_SetState(Unit* const unit, const State state, const bool reset_state_timer)
 {
-    if(!unit->was_wall_pushed && !unit->is_state_locked)
+    if(!unit->was_wall_pushed && !unit->is_state_locked && unit->trait.is_multi_state)
     {
         const Graphics file = GetFileFromState(unit, state);
         unit->state = state;
@@ -348,7 +348,6 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
     if(unit->interest != NULL
     && !Unit_IsExempt(unit)
-    && unit->trait.is_multi_state
     && !Unit_IsExempt(unit->interest))
     {
         if(ShouldEngage(unit, grid))
