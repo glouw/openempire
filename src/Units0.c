@@ -13,6 +13,14 @@
 
 #include <stdlib.h>
 
+static bool CanPlace(const Units units, const Map map, const Point point)
+{
+    const Terrain terrain = Map_GetTerrainFile(map, point);
+    const Stack stack = Units_GetStackCart(units, point);
+    return stack.count == 0
+        && Terrain_IsWalkable(terrain);
+}
+
 static bool CanWalk(const Units units, const Map map, const Point point)
 {
     const Terrain terrain = Map_GetTerrainFile(map, point);
@@ -29,7 +37,7 @@ bool Units_CanBuild(const Units units, const Map map, const Point dimensions, co
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(point, offset);
-        if(!CanWalk(units, map, cart))
+        if(!CanPlace(units, map, cart))
             return false;
     }
     return true;

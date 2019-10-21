@@ -355,8 +355,7 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
             Unit_SetState(unit, STATE_ATTACK, true);
             Unit_Lock(unit);
         }
-        if(unit->state == STATE_ATTACK
-        && unit->state_timer >= Unit_GetLastAttackTick(unit))
+        if(unit->state == STATE_ATTACK && unit->state_timer >= Unit_GetLastAttackTick(unit))
         {
             if(!Unit_IsDead(unit->interest))
             {
