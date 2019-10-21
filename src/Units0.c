@@ -737,7 +737,7 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
     if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
     {
         const Point cart = Overview_IsoToCart(overview, input.point, false);
-        if(input.key[SDL_SCANCODE_Q])
+        if(input.key[SDL_SCANCODE_Q]) // XXX. HAVE THESE REFERENCE ICON ARRAYS.
             return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
         if(input.key[SDL_SCANCODE_S])
             return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);

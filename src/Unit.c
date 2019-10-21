@@ -348,6 +348,7 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
     if(unit->interest != NULL
     && !Unit_IsExempt(unit)
+    && unit->trait.is_multi_state
     && !Unit_IsExempt(unit->interest))
     {
         if(ShouldEngage(unit, grid))
