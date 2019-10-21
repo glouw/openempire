@@ -167,7 +167,10 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
     unit.parent_id = -1;
     unit.cart = cart;
     if(unit.trait.is_inanimate)
-        unit.cart = Point_Sub(unit.cart, Point_Div(unit.trait.dimensions, 2));
+    {
+        const Point shift = Point_Div(unit.trait.dimensions, 2);
+        unit.cart = Point_Sub(unit.cart, shift);
+    }
     unit.cell = Grid_CartToCell(grid, unit.cart);
     unit.color = color;
     unit.state = STATE_IDLE;

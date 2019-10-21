@@ -340,7 +340,7 @@ static Units SpamSmoke(Units units, Unit* const unit, const Overview overview, c
     return units;
 }
 
-Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const Registrar graphics, const Map map)
+void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
 {
     const Graphics rubbles[] = {
         FILE_RUBBLE_1X1,
@@ -349,18 +349,15 @@ Units PlaceRubble(Units units, Unit* const unit, const Overview overview, const 
         FILE_RUBBLE_4X4,
         FILE_RUBBLE_5X5,
     };
+    Graphics file = FILE_NONE;
     for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
     {
         const Graphics rubble = rubbles[i];
         if(EqualDimension(unit->trait.dimensions, rubble))
-        {
-            // XXX. SOMETHING IN THE WAY FOR ALL OF THESE, WONT SPAWN.
-            units = SpamFire(units, unit, overview, graphics, map);
-            units = SpamSmoke(units, unit, overview, graphics, map);
-            return Units_Spawn(units, unit->cart, overview.grid, rubble, COLOR_GRY, graphics, map); // XXX. Should paint ground with broken rock texture?
-        }
+            file = rubble;
     }
-    return units;
+    if(file != FILE_NONE)
+        *unit = Unit_Make(unit->cart, grid, file, unit->color, graphics);
 }
 
 static bool ShouldDelete(Unit* const unit, const Input input, const Overview overview)
@@ -382,7 +379,7 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
-static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
+static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -394,7 +391,7 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
                 if(unit->has_children)
                     KillChildren(units, unit);
                 if(unit->trait.is_inanimate)
-                    units = PlaceRubble(units, unit, overview, graphics, map);
+                    MakeRubble(unit, overview.grid, graphics);
             }
     }
     return units;
@@ -771,7 +768,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = UpdateAction(units);
     Decay(units);
     Expire(units);
-    units = Kill(units, overview, graphics, input, map);
+    units = Kill(units, overview, graphics, input);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);
