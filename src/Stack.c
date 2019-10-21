@@ -31,8 +31,11 @@ void Stack_Free(const Stack stack)
 bool Stack_IsWalkable(const Stack stack)
 {
     for(int32_t i = 0; i < stack.count; i++)
-        if(!stack.reference[i]->trait.is_walkable)
+    {
+        const Trait trait = stack.reference[i]->trait;
+        if(!trait.is_walkable)
             return false;
+    }
     return true;
 }
 

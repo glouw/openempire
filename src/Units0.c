@@ -13,14 +13,6 @@
 
 #include <stdlib.h>
 
-static bool CanPlace(const Units units, const Map map, const Point point)
-{
-    const Terrain terrain = Map_GetTerrainFile(map, point);
-    const Stack stack = Units_GetStackCart(units, point);
-    return stack.count == 0
-        && Terrain_IsWalkable(terrain);
-}
-
 static bool CanWalk(const Units units, const Map map, const Point point)
 {
     const Terrain terrain = Map_GetTerrainFile(map, point);
@@ -37,7 +29,7 @@ bool Units_CanBuild(const Units units, const Map map, const Point dimensions, co
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(point, offset);
-        if(!CanPlace(units, map, cart))
+        if(!CanWalk(units, map, cart))
             return false;
     }
     return true;
@@ -326,16 +318,15 @@ static Units SpamSmoke(Units units, Unit* const unit, const Overview overview, c
 {
     const Graphics smokes[] = {
         FILE_SMALLER_EXPLOSION_SMOKE,
-        //FILE_BIGGER_EXPLOSION_SMOKE,
+        FILE_BIGGER_EXPLOSION_SMOKE,
     };
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
-        const Point offset = Point_Mul(overview.grid.tile_cart_mid, -1);
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const int32_t index = Util_Rand() % UTIL_LEN(smokes);
-        units = Units_SpawnWithOffset(units, cart, offset, overview, smokes[index], COLOR_GRY, graphics, map);
+        units = Units_Spawn(units, cart, overview.grid, smokes[index], COLOR_GRY, graphics, map);
     }
     return units;
 }
@@ -379,7 +370,7 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
-static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input)
+static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -391,7 +382,11 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
                 if(unit->has_children)
                     KillChildren(units, unit);
                 if(unit->trait.is_inanimate)
+                {
                     MakeRubble(unit, overview.grid, graphics);
+                    units = SpamFire(units, unit, overview, graphics, map);
+                    units = SpamSmoke(units, unit, overview, graphics, map);
+                }
             }
     }
     return units;
@@ -768,7 +763,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = UpdateAction(units);
     Decay(units);
     Expire(units);
-    units = Kill(units, overview, graphics, input);
+    units = Kill(units, overview, graphics, input, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);
