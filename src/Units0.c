@@ -340,7 +340,7 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         FILE_RUBBLE_4X4,
         FILE_RUBBLE_5X5,
     };
-    Graphics file = FILE_NONE;
+    Graphics file = (Graphics) FILE_NONE;
     for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
     {
         const Graphics rubble = rubbles[i];
