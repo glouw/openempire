@@ -27,8 +27,9 @@ static void Heapify(Meap* const meap, const int32_t index)
 
 Meap Meap_Init(void)
 {
-    static Meap meap;
-    meap.max = 512;
+    static Meap zero;
+    Meap meap = zero;
+    meap.max = 32;
     meap.step = UTIL_ALLOC(Step, meap.max);
     return meap;
 }
