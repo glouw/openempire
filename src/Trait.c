@@ -15,7 +15,6 @@ Trait Trait_Build(const Graphics file)
     trait.attack = Graphics_GetAttack(file);
     trait.width = Graphics_GetWidth(file);
     trait.action = Graphics_GetAction(file);
-    trait.is_rotatable = Graphics_GetRotatable(file);
     trait.is_single_frame = Graphics_GetSingleFrame(file);
     trait.is_walkable = Graphics_GetWalkable(file);
     trait.is_multi_state = Graphics_GetMultiState(file);

@@ -109,7 +109,7 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
     if(reference->trait.is_single_frame)
         dynamics.index = reference->entropy_static % animation.count;
     else
-    if(reference->trait.is_rotatable)
+    if(reference->trait.is_multi_state)
     {
         const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
         const Direction fixed_dir = Direction_Fix(reference->dir, &dynamics.flip_vert);
@@ -118,7 +118,7 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
         const int32_t frame = ticks % frames_per_direction;
         dynamics.index = frames_per_direction * fixed_dir + frame;
     }
-    else // Many frames, but not rotatable.
+    else // Many frames, but not multi-state.
     {
         const int32_t ticks = reference->state_timer / CONFIG_ANIMATION_DIVISOR;
         dynamics.index = ticks % animation.count;
