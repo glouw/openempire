@@ -744,6 +744,7 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
         if(input.key[SDL_SCANCODE_T]) return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
         if(input.key[SDL_SCANCODE_Q]) return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
         if(input.key[SDL_SCANCODE_R]) return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
+        if(input.key[SDL_SCANCODE_W]) return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
     }
     return units;
 }
