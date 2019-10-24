@@ -59,4 +59,4 @@ Units Units_SpawnTownCenter(Units, const Overview, const Registrar, const Point,
 
 void Units_ManageStacks(const Units);
 
-bool Units_CanBuild(const Units, const Map, const Point dimensions, const Point point);
+bool Units_CanBuild(const Units, const Map, Unit* const);

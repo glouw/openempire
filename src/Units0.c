@@ -22,13 +22,15 @@ static bool CanWalk(const Units units, const Map map, const Point point)
         && Stack_IsWalkable(stack);
 }
 
-bool Units_CanBuild(const Units units, const Map map, const Point dimensions, const Point point)
+bool Units_CanBuild(const Units units, const Map map, Unit* const unit)
 {
-    for(int32_t y = 0; y < dimensions.y; y++)
-    for(int32_t x = 0; x < dimensions.x; x++)
+    if(unit->trait.type == TYPE_SMOKE)
+        return true;
+    for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+    for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     {
         const Point offset = { x, y };
-        const Point cart = Point_Add(point, offset);
+        const Point cart = Point_Add(unit->cart, offset);
         if(!CanWalk(units, map, cart))
             return false;
     }

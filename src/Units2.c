@@ -14,8 +14,8 @@ static Units Append(Units units, const Unit unit)
 
 Units Units_Spawn(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map)
 {
-    const Unit unit = Unit_Make(cart, grid, file, color, graphics);
-    return Units_CanBuild(units, map, unit.trait.dimensions, unit.cart)
+    Unit unit = Unit_Make(cart, grid, file, color, graphics);
+    return Units_CanBuild(units, map, &unit)
         ? Append(units, unit)
         : units;
 }
@@ -35,7 +35,7 @@ Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, c
 {
     Unit unit = Unit_Make(cart, overview.grid, file, color, graphics);
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
-    return Units_CanBuild(units, map, unit.trait.dimensions, unit.cart)
+    return Units_CanBuild(units, map, &unit)
         ? Append(units, unit)
         : units;
 }
