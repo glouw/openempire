@@ -15,12 +15,12 @@ Args Args_Parse(const int32_t argc, const char* argv[])
     static Args zero;
     Args args = zero;
     args.path = "/home/gl/.steam/steam/steamapps/common/Age2HD/Directory/data/";
+    args.color = COLOR_BLU;
     for(int32_t i = 0; i < argc; i++)
     {
         const char* const arg = argv[i];
-        if(Check(arg, "--demo", "-d"))
+        if(Check(arg, "--color", "-c"))
         {
-            args.demo = true;
             if(i != argc - 1)
             {
                 const Color color = (Color) atoi(argv[++i]);

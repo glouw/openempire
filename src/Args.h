@@ -9,7 +9,6 @@ typedef struct
 {
     const char* path;
     Color color;
-    bool demo;
     bool measure;
 }
 Args;
