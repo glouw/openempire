@@ -8,7 +8,6 @@
     ICON_BUILD_STONE_CAMP,\
     ICON_BUILD_LUMBER_CAMP,\
     ICON_BUILD_BARRACKS,\
-    ICON_BUILD_PALISADE_WALL,\
     ICON_BUILD_OUTPOST,\
 
 static const char hotkeys[] = {

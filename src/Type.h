@@ -11,7 +11,6 @@ typedef enum
     TYPE_OUTPOST,
     TYPE_TOWN_CENTER,
     TYPE_BERRY_BUSH,
-    TYPE_WALL,
     TYPE_KNIGHT,
     TYPE_GOLD_MINE,
     TYPE_STONE_MINE,
@@ -24,6 +23,7 @@ typedef enum
     TYPE_HOUSE,
     TYPE_RUBBLE,
     TYPE_TREE,
+
     // Resources.
     TYPE_FOOD,
     TYPE_WOOD,
