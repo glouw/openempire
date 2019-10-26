@@ -49,18 +49,20 @@ Units Units_SpawnTownCenter(Units units, const Grid grid, const Registrar graphi
         -grid.tile_cart_mid.y
     };
     const Point zero = { 0,0 };
-    const Point a = { cart.x - 1, cart.y + 1 };
-    const Point b = { cart.x - 2, cart.y + 2 };
-    const Point c = { cart.x + 0, cart.y + 0 };
+    const Point a = { cart.x - 2, cart.y + 3 };
+    const Point b = { cart.x + 0, cart.y + 0 };
+    const Point c = { cart.x - 1, cart.y + 1 };
+    const Point d = { cart.x - 0, cart.y + 2 };
+    const Point e = { cart.x - 1, cart.y + 3 };
     Unit temp[] = {
-        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics),
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics),
-        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics),
-        Unit_Make(b, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics),
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics),
-        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics),
-        Unit_Make(b, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics),
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics),
+        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics),
+        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics),
+        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics),
+        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics),
+        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics),
+        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics),
     };
     const int32_t len = UTIL_LEN(temp);
     temp[0].has_children = true;

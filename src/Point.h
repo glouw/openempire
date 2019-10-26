@@ -41,3 +41,5 @@ Point Point_Rand(void);
 Point Point_Wrap(const int32_t index, const int32_t width, const int32_t res);
 
 Point Point_Layout(const int32_t index, const int32_t xres, const int32_t yres);
+
+bool Point_IsEven(const Point);

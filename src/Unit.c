@@ -91,16 +91,11 @@ static void CapSpeed(Unit* const unit)
         unit->velocity = Point_Normalize(unit->velocity, unit->trait.max_speed);
 }
 
-static void UpdateCart(Unit* const unit, const Grid grid)
-{
-    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
-    unit->cart = Grid_CellToCart(grid, unit->cell);
-}
-
 void Unit_UndoMove(Unit* const unit, const Grid grid)
 {
     unit->cell = unit->cell_last;
-    UpdateCart(unit, grid);
+    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
+    unit->cart = Grid_CellToCart(grid, unit->cell);
     static Point zero;
     unit->velocity = zero;
 }
@@ -109,7 +104,8 @@ void Unit_Move(Unit* const unit, const Grid grid)
 {
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
-    UpdateCart(unit, grid);
+    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
+    unit->cart = Grid_CellToCart(grid, unit->cell);
     Unit_SetState(unit, STATE_MOVE, false);
     if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
         Unit_SetState(unit, STATE_IDLE, false);
@@ -158,21 +154,25 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
 
 Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
 {
+    static int32_t id;
     static Unit zero;
     Unit unit = zero;
     unit.trait = Trait_Build(file);
     unit.file = file;
-    static int32_t id;
     unit.id = id++;
     unit.parent_id = -1;
     unit.cart = cart;
-    if(unit.trait.is_inanimate)
-    {
-        const Point shift = Point_Div(unit.trait.dimensions, 2);
-        unit.cart = Point_Sub(unit.cart, shift);
-    }
     unit.cell = Grid_CartToCell(grid, unit.cart);
+    if(Point_IsEven(unit.trait.dimensions))
+    {
+        const Point shift = {
+            grid.tile_cart_mid.x * CONFIG_GRID_CELL_SIZE,
+            grid.tile_cart_mid.y * CONFIG_GRID_CELL_SIZE,
+        };
+        unit.cell = Point_Sub(unit.cell, shift);
+    }
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
+    unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;

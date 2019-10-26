@@ -136,3 +136,9 @@ Point Point_Layout(const int32_t index, const int32_t xres, const int32_t yres)
     const Point wrap = Point_Wrap(index, width, res);
     return Point_Add(wrap, start);
 }
+
+bool Point_IsEven(const Point point)
+{
+    return (point.x % 2) == 0
+        && (point.y % 2) == 0;
+}
