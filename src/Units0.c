@@ -25,7 +25,7 @@ static bool CanWalk(const Units units, const Map map, const Point point)
 
 bool Units_CanBuild(const Units units, const Map map, Unit* const unit)
 {
-    if(unit->trait.type == TYPE_SMOKE)
+    if(unit->trait.can_expire)
         return true;
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)

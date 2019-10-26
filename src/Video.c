@@ -182,7 +182,8 @@ void Video_Present(const Video video)
 void Video_PrintHotkeys(const Video video)
 {
     const char* hotkeys = Icon_GetHotkeys();
-    for(int32_t index = 0; index < 15; index++)
+    const int32_t len = Icon_GetHotkeysLen();
+    for(int32_t index = 0; index < len; index++)
     {
         const char hotkey = hotkeys[index];
         const Point offset = Point_Layout(index, video.xres, video.yres);

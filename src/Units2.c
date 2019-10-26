@@ -45,7 +45,8 @@ static void LinkTailTownCenter(const Units units, const int32_t size)
     int32_t id = -1;
     for(int32_t i = 0; i < size; i++)
     {
-        Unit* const unit = &units.unit[size - 1 - i];
+        const int32_t index = units.count - 1 - i;
+        Unit* const unit = &units.unit[index];
         if(i == 0)
         {
             unit->has_children = true;
