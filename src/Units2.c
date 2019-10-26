@@ -12,78 +12,61 @@ static Units Append(Units units, const Unit unit)
     return units;
 }
 
-Units Units_Spawn(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map)
+Units Units_Spawn(Units units, const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map)
 {
-    Unit unit = Unit_Make(cart, grid, file, color, graphics);
+    Unit unit = Unit_Make(cart, offset, grid, file, color, graphics);
     return Units_CanBuild(units, map, &unit)
         ? Append(units, unit)
         : units;
+}
+
+static Units BulkAppend(Units units, const Map map, Unit unit[], const int len)
+{
+    for(int32_t i = 0; i < len; i++)
+        if(!Units_CanBuild(units, map, &unit[i]))
+            return units;
+    for(int32_t i = 0; i < len; i++)
+        units = Append(units, unit[i]);
+    return units;
 }
 
 Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow, const Map map)
 {
-    units = Units_Spawn(units, cart, grid, file, color, graphics, map); // XXX, Would be safer to use Unit_Make(), fix the unit, then append.
-    units = Units_Spawn(units, cart, grid, shadow, color, graphics, map);
-    const int32_t a = units.count - 1;
-    const int32_t b = units.count - 2;
-    units.unit[a].parent_id = units.unit[b].id;
-    units.unit[b].has_children = true;
-    return units;
+    const Point offset = { 0,0 };
+    Unit temp[] = {
+        Unit_Make(cart, offset, grid, file,   color, graphics),
+        Unit_Make(cart, offset, grid, shadow, color, graphics),
+    };
+    temp[0].has_children = true;
+    temp[1].parent_id = temp[0].id;
+    return BulkAppend(units, map, temp, UTIL_LEN(temp));
 }
 
-Units Units_SpawnWithOffset(Units units, const Point cart, const Point offset, const Overview overview, const Graphics file, const Color color, const Registrar graphics, const Map map)
-{
-    Unit unit = Unit_Make(cart, overview.grid, file, color, graphics);
-    unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
-    return Units_CanBuild(units, map, &unit)
-        ? Append(units, unit)
-        : units;
-}
-
-static void LinkTailTownCenter(const Units units, const int32_t size)
-{
-    int32_t id = -1;
-    for(int32_t i = 0; i < size; i++)
-    {
-        const int32_t index = units.count - 1 - i;
-        Unit* const unit = &units.unit[index];
-        if(i == 0)
-        {
-            unit->has_children = true;
-            id = unit->id;
-        }
-        else unit->parent_id = id;
-    }
-}
-
-Units Units_SpawnTownCenter(Units units, const Overview overview, const Registrar graphics, const Point cart, const Color color, const Map map)
+Units Units_SpawnTownCenter(Units units, const Grid grid, const Registrar graphics, const Point cart, const Color color, const Map map)
 {
     const Point offset = {
-        +overview.grid.tile_cart_mid.x,
-        -overview.grid.tile_cart_mid.y
+        +grid.tile_cart_mid.x,
+        -grid.tile_cart_mid.y
     };
     const Point zero = { 0,0 };
-    struct
-    {
-        Point point;
-        Point offset;
-        Graphics file;
-    }
-    const layouts[] = {
-        { {cart.x - 1, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_SHADOW },
-        { {cart.x - 2, cart.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT },
-        { {cart.x - 2, cart.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {cart.x - 1, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {cart.x - 2, cart.y + 2}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE },
-        { {cart.x - 2, cart.y + 2}, offset, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {cart.x - 1, cart.y + 1}, zero,   FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-        { {cart.x + 0, cart.y + 0}, zero,   FILE_DARK_AGE_TOWN_CENTER_TOP },
+    const Point a = { cart.x - 1, cart.y + 1 };
+    const Point b = { cart.x - 2, cart.y + 2 };
+    const Point c = { cart.x + 0, cart.y + 0 };
+    Unit temp[] = {
+        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics),
+        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics),
+        Unit_Make(b, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics),
+        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics),
+        Unit_Make(b, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics),
     };
-    const int32_t size = UTIL_LEN(layouts);
-    for(int32_t i = 0; i < size; i++) // XXX, Would be safer to use Unit_Make(), fix the unit, then append.
-        units = Units_SpawnWithOffset(units, layouts[i].point, layouts[i].offset, overview, layouts[i].file, color, graphics, map);
-    LinkTailTownCenter(units, size);
-    return units;
+    const int32_t len = UTIL_LEN(temp);
+    temp[0].has_children = true;
+    for(int32_t i = 1; i < len; i++)
+        temp[i].parent_id = temp[0].id;
+    return BulkAppend(units, map, temp, len);
 }
 
 void Units_ResetTiled(const Units units)

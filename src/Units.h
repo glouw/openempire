@@ -49,13 +49,11 @@ void Units_ResetTiled(const Units);
 
 Units Units_GenerateTestZone(Units, const Map, const Overview, const Registrar);
 
-Units Units_Spawn(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Map);
+Units Units_Spawn(Units, const Point, const Point offset, const Grid, const Graphics, const Color, const Registrar, const Map);
 
 Units Units_SpawnWithShadow(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics, const Map);
 
-Units Units_SpawnWithOffset(Units, const Point, const Point, const Overview, const Graphics, const Color, const Registrar, const Map);
-
-Units Units_SpawnTownCenter(Units, const Overview, const Registrar, const Point, const Color, const Map);
+Units Units_SpawnTownCenter(Units, const Grid, const Registrar, const Point, const Color, const Map);
 
 void Units_ManageStacks(const Units);
 

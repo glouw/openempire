@@ -144,7 +144,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         {
             units.command_group_next++;
             FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
-            units = Units_SpawnWithOffset(units, cart_goal, cart_grid_offset_goal, overview, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GRY, graphics, map);
+            units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GRY, graphics, map);
         }
     }
     return units;
@@ -291,7 +291,7 @@ static bool EqualDimension(Point dimensions, const Graphics file)
     }
 }
 
-static Units SpamFire(Units units, Unit* const unit, const Overview overview, const Registrar graphics, const Map map)
+static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Map map)
 {
     const Graphics fires[] = {
         FILE_FIRE_SMALL_A,
@@ -306,30 +306,31 @@ static Units SpamFire(Units units, Unit* const unit, const Overview overview, co
         const Point offset = { x, y };
         const Point cart = Point_Add(unit->cart, offset);
         const int32_t index = Util_Rand() % UTIL_LEN(fires);
-        const int32_t w = overview.grid.tile_cart_width;
-        const int32_t h = overview.grid.tile_cart_height;
+        const int32_t w = grid.tile_cart_width;
+        const int32_t h = grid.tile_cart_height;
         const Point grid_offset = {
             Util_Rand() % w - w / 2,
             Util_Rand() % h - h / 2,
         };
-        units = Units_SpawnWithOffset(units, cart, grid_offset, overview, fires[index], COLOR_GRY, graphics, map);
+        units = Units_Spawn(units, cart, grid_offset, grid, fires[index], COLOR_GRY, graphics, map);
     }
     return units;
 }
 
-static Units SpamSmoke(Units units, Unit* const unit, const Overview overview, const Registrar graphics, const Map map)
+static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Map map)
 {
     const Graphics smokes[] = {
         FILE_SMALLER_EXPLOSION_SMOKE,
         FILE_BIGGER_EXPLOSION_SMOKE,
     };
+    const Point none = { 0,0 };
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const int32_t index = Util_Rand() % UTIL_LEN(smokes);
-        units = Units_Spawn(units, cart, overview.grid, smokes[index], COLOR_GRY, graphics, map);
+        units = Units_Spawn(units, cart, none, grid, smokes[index], COLOR_GRY, graphics, map);
     }
     return units;
 }
@@ -351,7 +352,10 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
             file = rubble;
     }
     if(file != FILE_NONE)
-        *unit = Unit_Make(unit->cart, grid, file, unit->color, graphics);
+    {
+        const Point offset = { 0,0 };
+        *unit = Unit_Make(unit->cart, offset, grid, file, unit->color, graphics);
+    }
 }
 
 static bool ShouldDelete(Unit* const unit, const Input input, const Overview overview)
@@ -387,8 +391,8 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
                 if(unit->trait.is_inanimate)
                 {
                     MakeRubble(unit, overview.grid, graphics);
-                    units = SpamFire(units, unit, overview, graphics, map);
-                    units = SpamSmoke(units, unit, overview, graphics, map);
+                    units = SpamFire(units, unit, overview.grid, graphics, map);
+                    units = SpamSmoke(units, unit, overview.grid, graphics, map);
                 }
             }
     }
@@ -742,22 +746,23 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
         const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
         const Icon icon = Icon_FromInput(input);
         {
+            const Point none = { 0,0 };
             switch(icon)
             {
             case ICON_BUILD_HOUSE:
-                return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
+                return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
             case ICON_BUILD_MILL:
                 return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
             case ICON_BUILD_STONE_CAMP:
-                return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
+                return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
             case ICON_BUILD_LUMBER_CAMP:
-                return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
+                return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
             case ICON_BUILD_BARRACKS:
-                return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
+                return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
             case ICON_BUILD_OUTPOST:
                 return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
             case ICON_BUILD_TOWN_CENTER:
-                return Units_SpawnTownCenter(units, overview, graphics, cart, overview.color, map);
+                return Units_SpawnTownCenter(units, overview.grid, graphics, cart, overview.color, map);
             default:
                 break;
             }

@@ -156,7 +156,7 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
     return graphics.animation[unit->color][unit->file].count;
 }
 
-Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
+Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
 {
     static Unit zero;
     Unit unit = zero;
@@ -172,6 +172,7 @@ Unit Unit_Make(const Point cart, const Grid grid, const Graphics file, const Col
         unit.cart = Point_Sub(unit.cart, shift);
     }
     unit.cell = Grid_CartToCell(grid, unit.cart);
+    unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;
