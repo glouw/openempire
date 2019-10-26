@@ -1,13 +1,16 @@
 #pragma once
 
+#include "Input.h"
+
 #include <stdint.h>
 
 typedef enum
 {
     // Building Icons.
+    ICON_NONE = -1,
     ICON_BUILD_BARRACKS = 2,
     ICON_BUILD_MILL = 19,
-    ICON_BUILD_PALISADE_WALL = 30,
+    ICON_BUILD_TOWN_CENTER = 28,
     ICON_BUILD_HOUSE = 34,
     ICON_BUILD_OUTPOST = 38,
     ICON_BUILD_STONE_CAMP = 39,
@@ -26,3 +29,5 @@ int32_t Icon_GetAge1Len(void);
 const char* Icon_GetHotkeys(void);
 
 int32_t Icon_GetHotkeysLen(void);
+
+Icon Icon_FromInput(const Input);

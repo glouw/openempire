@@ -5,6 +5,7 @@
 #include "Util.h"
 #include "File.h"
 #include "Field.h"
+#include "Icon.h"
 #include "Rect.h"
 #include "Surface.h"
 #include "Tiles.h"
@@ -739,12 +740,28 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
     if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
     {
         const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
-        if(input.key[SDL_SCANCODE_E]) return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
-        if(input.key[SDL_SCANCODE_S]) return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
-        if(input.key[SDL_SCANCODE_T]) return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
-        if(input.key[SDL_SCANCODE_Q]) return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
-        if(input.key[SDL_SCANCODE_R]) return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
-        if(input.key[SDL_SCANCODE_W]) return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
+        const Icon icon = Icon_FromInput(input);
+        {
+            switch(icon)
+            {
+            case ICON_BUILD_HOUSE:
+                return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
+            case ICON_BUILD_MILL:
+                return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
+            case ICON_BUILD_STONE_CAMP:
+                return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
+            case ICON_BUILD_LUMBER_CAMP:
+                return Units_Spawn(units, cart, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
+            case ICON_BUILD_BARRACKS:
+                return Units_Spawn(units, cart, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
+            case ICON_BUILD_OUTPOST:
+                return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
+            case ICON_BUILD_TOWN_CENTER:
+                return Units_SpawnTownCenter(units, overview, graphics, cart, overview.color, map);
+            default:
+                break;
+            }
+        }
     }
     return units;
 }
