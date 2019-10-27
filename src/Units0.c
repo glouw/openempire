@@ -97,7 +97,7 @@ static Units UnSelectAll(Units units)
 
 static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics, const Points render_points)
 {
-    if(input.lu)
+    if(input.lu && !input.key[SDL_SCANCODE_LSHIFT])
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
         Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
