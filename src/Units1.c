@@ -97,12 +97,12 @@ static Units GenerateGameZone(Units units, const Map map, const Overview overvie
         units = Units_Spawn(units, b, none, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics, map);
     }
     const Point cc = { -3, -3 };
+    const Point dd = {  3,  3 };
+    const Point ee = {  3, -3 };
+    const Point ff = { -6,  3 };
     const Point c = Point_Add(middle, cc);
-    const Point dd = { 3, 3 };
     const Point d = Point_Add(middle, dd);
-    const Point ee = { 3, -3 };
     const Point e = Point_Add(middle, ee);
-    const Point ff = { -6, 3 };
     const Point f = Point_Add(middle, ff);
     units = Units_SpawnWithShadow(units, c, overview.grid, FILE_FOREST_TREE, COLOR_GRY, graphics, FILE_FOREST_TREE_SHADOW, map);
     units = Units_Spawn(units, d, none, overview.grid, FILE_STONE_MINE, COLOR_GRY, graphics, map);

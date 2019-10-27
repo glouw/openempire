@@ -23,7 +23,7 @@ void Field_Set(const Field field, const Point point, const char ch)
     field.object[point.x + point.y * field.cols] = ch;
 }
 
-static bool IsWalkable(const Field field, const Point point) // XXX. MUST expand this to avoid pathing into corners.
+static bool IsWalkable(const Field field, const Point point)
 {
     return IsInBounds(field, point)
         && Field_Get(field, point) == FIELD_WALKABLE_SPACE;
@@ -73,9 +73,14 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
         };
         for(int32_t i = 0; i < UTIL_LEN(deltas); i++)
         {
-            const Point next = Point_Add(current.point, deltas[i]);
-            if(IsInBounds(field, next)
-            && IsWalkable(field, next))
+            const Point delta = deltas[i];
+            const Point vert = { current.point.x + delta.x, current.point.y };
+            const Point horz = { current.point.x, current.point.y + delta.y };
+            const Point next = Point_Add(current.point, delta);
+            // Check all three so corners are not cut with buildings.
+            if(IsWalkable(field, next)
+            && IsWalkable(field, vert)
+            && IsWalkable(field, horz))
             {
                 if(Point_Equal(came_from.point[next.x + next.y * field.cols], none))
                 {
