@@ -418,7 +418,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
         const Point center = Tile_GetHotSpotCoords(tile);
         const Point top = {
             center.x,
-            center.y - tile.frame.height,
+            center.y - CONFIG_VRAM_UNIT_HEALTH_HEIGHT,
         };
         Unit* const unit = tile.reference;
         if(unit->is_selected)
