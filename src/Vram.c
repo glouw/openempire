@@ -442,17 +442,15 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const In
         const int32_t y = i + snap.y;
         for(int32_t j = 0; j < line_width; j++)
         {
-            const Point point[] = {
-                { left  - j, y },
-                { right + j, y },
-            };
-            for(int32_t k = 0; k < UTIL_LEN(point); k++)
-                DrawSelectionPixel(vram, point[k], color);
+            const Point a = { left  - j, y };
+            const Point b = { right + j, y };
+            DrawSelectionPixel(vram, a, color);
+            DrawSelectionPixel(vram, b, color);
         }
     }
 }
 
-static void DrawGeneric(const Vram vram, SDL_Surface* surface, const Point offset, const int32_t y0, const int32_t y1)
+static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const int32_t y0, const int32_t y1)
 {
     for(int32_t y = y0; y < y1; y++)
     for(int32_t x =  0; x < surface->w; x++)
@@ -510,7 +508,7 @@ void DrawPack(const Vram vram, const Pack pack)
         const Icon icon = pack.icons[index];
         SDL_Surface* const surface = pack.animation.surface[icon];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
-        DrawGeneric(vram, surface, offset, 0, surface->h);
+        DrawWithBounds(vram, surface, offset, 0, surface->h);
     }
 }
 
@@ -523,10 +521,9 @@ void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action 
 
 void Vram_DrawHud(const Vram vram, const Registrar interfac)
 {
-    const int32_t top_height = 50;
     const int32_t y0 = 0;
-    const int32_t y1 = top_height;
-    const Point a = { 0, 0 };
+    const int32_t y1 = 50;
+    const Point corner = { 0, 0 };
     const Animation animation = interfac.animation[COLOR_GRY][FILE_INTERFAC_HUD_0];
-    DrawGeneric(vram, animation.surface[0], a, y0, y1);
+    DrawWithBounds(vram, animation.surface[0], corner, y0, y1);
 }

@@ -161,8 +161,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.file = file;
     unit.id = id++;
     unit.parent_id = -1;
-    unit.cart = cart;
-    unit.cell = Grid_CartToCell(grid, unit.cart);
+    unit.cell = Grid_CartToCell(grid, cart);
     if(Point_IsEven(unit.trait.dimensions))
     {
         const Point shift = {
@@ -173,6 +172,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     }
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
     unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
+    unit.cart = Grid_CellToCart(grid, unit.cell);
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;

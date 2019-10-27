@@ -319,24 +319,20 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
 
 static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Map map)
 {
-    const Graphics smokes[] = {
-        FILE_SMALLER_EXPLOSION_SMOKE,
-        FILE_BIGGER_EXPLOSION_SMOKE,
-    };
     const Point none = { 0,0 };
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
-        const int32_t index = Util_Rand() % UTIL_LEN(smokes);
-        units = Units_Spawn(units, cart, none, grid, smokes[index], COLOR_GRY, graphics, map);
+        units = Units_Spawn(units, cart, none, grid, FILE_SMALLER_EXPLOSION_SMOKE, COLOR_GRY, graphics, map);
     }
     return units;
 }
 
 void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
 {
+    const Point none = { 0,0 };
     const Graphics rubbles[] = {
         FILE_RUBBLE_1X1,
         FILE_RUBBLE_2X2,
@@ -352,10 +348,7 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
             file = rubble;
     }
     if(file != FILE_NONE)
-    {
-        const Point offset = { 0,0 };
-        *unit = Unit_Make(unit->cart, offset, grid, file, unit->color, graphics);
-    }
+        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics);
 }
 
 static bool ShouldDelete(Unit* const unit, const Input input, const Overview overview)

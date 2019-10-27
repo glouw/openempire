@@ -28,7 +28,7 @@ Tile;
 
 bool Tile_ContainsPoint(const Tile, const Point);
 
-Tile Tile_GetTerrain(const Overview, const Point point, const Animation, const Terrain);
+Tile Tile_GetTerrain(const Overview, const Point cart, const Animation, const Terrain);
 
 Tile Tile_GetGraphics(const Overview, const Point cart, const Point cart_grid_offset, const Animation, Unit* const reference);
 

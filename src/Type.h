@@ -22,6 +22,7 @@ typedef enum
     TYPE_WONDER,
     TYPE_HOUSE,
     TYPE_RUBBLE,
+    TYPE_MILITIA,
     TYPE_TREE,
 
     // Resources.

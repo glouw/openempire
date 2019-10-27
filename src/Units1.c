@@ -91,10 +91,13 @@ static Units GenerateGameZone(Units units, const Map map, const Overview overvie
     {
         const Point aa = { -2, +3 };
         const Point bb = { -9, -9 };
+        const Point cc = {  9,  9 };
         const Point a = Point_Add(middle, aa);
         const Point b = Point_Add(middle, bb);
+        const Point c = Point_Add(middle, cc);
         units = Units_Spawn(units, a, none, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics, map);
         units = Units_Spawn(units, b, none, overview.grid, FILE_MALE_VILLAGER_IDLE, COLOR_RED, graphics, map);
+        units = Units_Spawn(units, c, none, overview.grid, FILE_MILITIA_IDLE, COLOR_BLU, graphics, map);
     }
     const Point cc = { -3, -3 };
     const Point dd = {  3,  3 };
