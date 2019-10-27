@@ -75,12 +75,14 @@ SANITIZE_THREAD = 0
 
 FLAGS = -O3 -march=native -flto
 
+DEBUG = -Og -g
+
 ifeq (1, $(SANITIZE_ADDRESS))
-FLAGS = -Og -g -fsanitize=address
+FLAGS = $(DEBUG) -fsanitize=address
 endif
 
 ifeq (1, $(SANITIZE_THREAD))
-FLAGS = -Og -g -fsanitize=thread
+FLAGS = $(DEBUG) -fsanitize=thread
 endif
 
 FLAGS += -Wall -Wextra -Wshadow -Wpedantic
