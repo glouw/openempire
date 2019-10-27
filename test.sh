@@ -5,6 +5,3 @@ do
     make -C src clean
     time make -C src SANITIZE=0 CLANG=${i:0:1} CPP=${i:1:2}
 done
-
-make -C src clean
-make -C src analysis

@@ -119,13 +119,3 @@ clean:
 	rm -f $(BIN)
 	rm -f $(OBJS)
 	rm -f $(DEPS)
-
-.PHONY analysis:
-analysis:
-	pvs-studio-analyzer trace -- make -j8
-	pvs-studio-analyzer analyze -j2 -l ~/pvs-lic -o log
-	plog-converter -a GA:1,2 -t tasklist -o tasks log
-	cat tasks
-	rm log
-	rm strace_out
-	rm tasks

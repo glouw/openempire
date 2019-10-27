@@ -766,7 +766,8 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
 
 static Units PlaceBuilding(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
-    return units.action == ACTION_BUILD && overview.color == Color_GetMyColor()
+    return units.action == ACTION_BUILD
+        && overview.color == Color_GetMyColor()
         ? PutBuilding(units, overview, graphics, input, map)
         : units;
 }
