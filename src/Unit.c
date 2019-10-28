@@ -91,11 +91,16 @@ static void CapSpeed(Unit* const unit)
         unit->velocity = Point_Normalize(unit->velocity, unit->trait.max_speed);
 }
 
+void UpdateCart(Unit* const unit, const Grid grid)
+{
+    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
+    unit->cart = Grid_CellToCart(grid, unit->cell);
+}
+
 void Unit_UndoMove(Unit* const unit, const Grid grid)
 {
     unit->cell = unit->cell_last;
-    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
-    unit->cart = Grid_CellToCart(grid, unit->cell);
+    UpdateCart(unit, grid);
     static Point zero;
     unit->velocity = zero;
 }
@@ -104,8 +109,7 @@ void Unit_Move(Unit* const unit, const Grid grid)
 {
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
-    unit->cart_grid_offset = Grid_CellToOffset(grid, unit->cell);
-    unit->cart = Grid_CellToCart(grid, unit->cell);
+    UpdateCart(unit, grid);
     Unit_SetState(unit, STATE_MOVE, false);
     if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
         Unit_SetState(unit, STATE_IDLE, false);
@@ -171,8 +175,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
         unit.cell = Point_Sub(unit.cell, shift);
     }
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
-    unit.cart_grid_offset = Grid_CellToOffset(grid, unit.cell);
-    unit.cart = Grid_CellToCart(grid, unit.cell);
+    UpdateCart(&unit, grid);
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;

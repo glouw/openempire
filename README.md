@@ -1,6 +1,6 @@
 ![](art/logo.png)
 
-This is a custom game engine for Age of Empires II written in pure C99 and SDL2 built for fast network play.
+This is a custom game engine for Age of Empires II written in C99 and SDL2 built for fast network play.
 
 Data, art, and sound files are not supplied - to play Open Empires you must either own the original boxed-set
 of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on Steam.
