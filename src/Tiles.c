@@ -31,7 +31,7 @@ static int32_t CompareByHeight(const void* a, const void* b)
     return ha < hb;
 }
 
-static void SortByY(const Tiles tiles)
+static void Sort(const Tiles tiles)
 {
     qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareBySurface);
     qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByY);
@@ -66,7 +66,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
     }
     Units_ResetTiled(units);
     const Tiles tiles = { tile, unit_count };
-    SortByY(tiles);
+    Sort(tiles);
     return tiles;
 }
 
