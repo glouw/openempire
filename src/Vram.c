@@ -115,7 +115,7 @@ void Vram_DrawTile(const Vram vram, const Tile tile)
 typedef struct
 {
     Vram vram;
-    Tile* tiles;
+    Tiles tiles;
     int32_t a;
     int32_t b;
 }
@@ -125,7 +125,7 @@ static int32_t DrawBatchNeedle(void* data)
 {
     BatchNeedle* needle = (BatchNeedle*) data;
     for(int32_t i = needle->a; i < needle->b; i++)
-        Vram_DrawTile(needle->vram, needle->tiles[i]);
+        Vram_DrawTile(needle->vram, needle->tiles.tile[i]);
     return 0;
 }
 
@@ -138,7 +138,7 @@ static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
     for(int32_t i = 0; i < vram.cpu_count; i++)
     {
         needles[i].vram = vram;
-        needles[i].tiles = terrain_tiles.tile;
+        needles[i].tiles = terrain_tiles;
         needles[i].a = (i + 0) * width;
         needles[i].b = (i + 1) * width;
     }
