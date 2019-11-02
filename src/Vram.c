@@ -483,6 +483,7 @@ static Packs GetPacksFromAction(const Registrar interfac, const Action action, c
     static Packs zero;
     Packs packs = zero;
     Animation* const base = interfac.animation[color];
+    const int32_t age = 0; // XXX. AGE... OF EMPIRES!
     switch(action)
     {
     default:
@@ -490,8 +491,8 @@ static Packs GetPacksFromAction(const Registrar interfac, const Action action, c
         break;
     case ACTION_BUILD:
         packs.primary.animation = base[FILE_INTERFAC_BUILDING_ICONS];
-        packs.primary.icons = Icon_GetAge1();
-        packs.primary.count = Icon_GetAge1Len();
+        packs.primary.icons = Icon_GetBuilding(age);
+        packs.primary.count = Icon_GetBuildingLen(age);
         break;
     case ACTION_COMMAND:
         break;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Action.h"
 #include "Input.h"
 
 #include <stdint.h>
@@ -22,12 +23,12 @@ typedef enum
 }
 Icon;
 
-const Icon* Icon_GetAge1(void);
+const Icon* Icon_GetBuilding(const int32_t age);
 
-int32_t Icon_GetAge1Len(void);
+int32_t Icon_GetBuildingLen(const int32_t age);
 
 const char* Icon_GetHotkeys(void);
 
 int32_t Icon_GetHotkeysLen(void);
 
-Icon Icon_FromInput(const Input);
+Icon Icon_FromInput(const Input, const Action);

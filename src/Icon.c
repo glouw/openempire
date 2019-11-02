@@ -4,34 +4,11 @@
 
 #include "Util.h"
 
-#define X_LIST \
-    X(ICON_BUILD_HOUSE,       SDL_SCANCODE_Q, 'Q') \
-    X(ICON_BUILD_MILL,        SDL_SCANCODE_W, 'W') \
-    X(ICON_BUILD_STONE_CAMP,  SDL_SCANCODE_E, 'E') \
-    X(ICON_BUILD_LUMBER_CAMP, SDL_SCANCODE_R, 'R') \
-    X(ICON_BUILD_BARRACKS,    SDL_SCANCODE_T, 'T') \
-    X(ICON_BUILD_OUTPOST,     SDL_SCANCODE_A, 'A') \
-    X(ICON_BUILD_TOWN_CENTER, SDL_SCANCODE_S, 'S')
-
 static const char hotkeys[] = {
-#define X(icon, scancode, c) c,
-    X_LIST
-#undef X
+    'Q', 'W', 'E', 'R', 'T',
+    'A', 'S', 'D', 'F', 'G',
+    'Z', 'X', 'C', 'V', 'B',
 };
-
-static const Icon age1[] = {
-#define X(icon, scancode, c) icon,
-    X_LIST
-#undef X
-};
-
-Icon Icon_FromInput(const Input input)
-{
-#define X(icon, scancode, c) if(input.key[scancode]) return icon;
-    X_LIST
-#undef X
-    return ICON_NONE;
-}
 
 const char* Icon_GetHotkeys(void)
 {
@@ -43,12 +20,86 @@ int32_t Icon_GetHotkeysLen(void)
     return UTIL_LEN(hotkeys);
 }
 
-const Icon* Icon_GetAge1(void)
+#define AGE_1               \
+    ICON_BUILD_HOUSE,       \
+    ICON_BUILD_MILL,        \
+    ICON_BUILD_STONE_CAMP,  \
+    ICON_BUILD_LUMBER_CAMP, \
+    ICON_BUILD_BARRACKS,    \
+    ICON_BUILD_OUTPOST,     \
+    ICON_BUILD_TOWN_CENTER
+
+#define AGE_2 \
+    ICON_NONE
+
+#define AGE_3 \
+    ICON_NONE
+
+#define AGE_4 \
+    ICON_NONE
+
+static const Icon age1[] = {
+    AGE_1,
+};
+
+static const Icon age2[] = {
+    AGE_1,
+    AGE_2,
+};
+
+static const Icon age3[] = {
+    AGE_1,
+    AGE_2,
+    AGE_3,
+};
+
+static const Icon age4[] = {
+    AGE_1,
+    AGE_2,
+    AGE_3,
+    AGE_4,
+};
+
+const Icon* Icon_GetBuilding(const int32_t age)
 {
-    return age1;
+    const Icon* ages[] = {
+        age1,
+        age2,
+        age3,
+        age4,
+    };
+    return ages[age];
 }
 
-int32_t Icon_GetAge1Len(void)
+int32_t Icon_GetBuildingLen(const int32_t age)
 {
-    return UTIL_LEN(age1);
+    const int32_t lens[] = {
+        UTIL_LEN(age1),
+        UTIL_LEN(age2),
+        UTIL_LEN(age3),
+        UTIL_LEN(age4),
+    };
+    return lens[age];
+}
+
+Icon Icon_FromInput(const Input input, const Action action)
+{
+    switch(action)
+    {
+    default:
+    case ACTION_BUILD:
+        if(input.key[SDL_SCANCODE_Q]) return ICON_BUILD_HOUSE;
+        if(input.key[SDL_SCANCODE_W]) return ICON_BUILD_MILL;
+        if(input.key[SDL_SCANCODE_E]) return ICON_BUILD_STONE_CAMP;
+        if(input.key[SDL_SCANCODE_R]) return ICON_BUILD_LUMBER_CAMP;
+        if(input.key[SDL_SCANCODE_T]) return ICON_BUILD_BARRACKS;
+        if(input.key[SDL_SCANCODE_A]) return ICON_BUILD_OUTPOST;
+        if(input.key[SDL_SCANCODE_S]) return ICON_BUILD_TOWN_CENTER;
+        break;
+    case ACTION_COMMAND:
+        break;
+    case ACTION_UNIT_TECH:
+        break;
+    }
+    return ICON_NONE;
 }

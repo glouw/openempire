@@ -737,7 +737,7 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
     if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
     {
         const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
-        const Icon icon = Icon_FromInput(input);
+        const Icon icon = Icon_FromInput(input, units.action);
         {
             const Point none = { 0,0 };
             switch(icon)
