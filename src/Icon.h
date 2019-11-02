@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Action.h"
+#include "Motive.h"
 #include "Input.h"
 
 #include <stdint.h>
@@ -31,4 +31,4 @@ const char* Icon_GetHotkeys(void);
 
 int32_t Icon_GetHotkeysLen(void);
 
-Icon Icon_FromInput(const Input, const Action);
+Icon Icon_FromInput(const Input, const Motive);

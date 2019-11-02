@@ -82,9 +82,9 @@ int32_t Icon_GetBuildingLen(const int32_t age)
     return lens[age];
 }
 
-Icon Icon_FromInput(const Input input, const Action action)
+Icon Icon_FromInput(const Input input, const Motive motive)
 {
-    switch(action)
+    switch(motive.action)
     {
     default:
     case ACTION_BUILD:

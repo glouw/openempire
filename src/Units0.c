@@ -745,12 +745,12 @@ static Units CountPopulation(Units units)
     return units;
 }
 
-static Units PutBuilding(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
+static Units ServiceIcons(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
     if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
     {
         const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
-        const Icon icon = Icon_FromInput(input, units.motive.action);
+        const Icon icon = Icon_FromInput(input, units.motive);
         const Point none = { 0,0 };
         switch(icon)
         {
@@ -775,11 +775,11 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
     return units;
 }
 
-static Units PlaceBuilding(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
+static Units CheckIcons(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
     return units.motive.action == ACTION_BUILD
         && overview.color == Color_GetMyColor()
-        ? PutBuilding(units, overview, graphics, input, map)
+        ? ServiceIcons(units, overview, graphics, input, map)
         : units;
 }
 
@@ -787,7 +787,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
 {
     UpdateEntropy(units);
     Tick(units);
-    units = PlaceBuilding(units, overview, graphics, input, map);
+    units = CheckIcons(units, overview, graphics, input, map);
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
