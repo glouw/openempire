@@ -6,5 +6,6 @@ typedef enum
     ACTION_BUILD,
     ACTION_COMMAND,
     ACTION_UNIT_TECH,
+    ACTION_COUNT
 }
 Action;

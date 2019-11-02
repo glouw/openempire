@@ -674,22 +674,8 @@ static Action GetAction(const Units units)
 #endif
         unit->is_selected)
         {
-            switch(unit->trait.action)
-            {
-            default:
-            case ACTION_NONE:
-                counts[0]++;
-                break;
-            case ACTION_BUILD:
-                counts[1]++;
-                break;
-            case ACTION_COMMAND:
-                counts[2]++;
-                break;
-            case ACTION_UNIT_TECH:
-                counts[3]++;
-                break;
-            }
+            const int32_t index = (int32_t) unit->trait.action + 1;
+            counts[index]++;
         }
     }
     int32_t max = 0;
@@ -700,15 +686,7 @@ static Action GetAction(const Units units)
             max = counts[i];
             index = i;
         }
-    switch(index)
-    {
-    default:
-        return ACTION_BUILD;
-    case 2:
-        return ACTION_COMMAND;
-    case 3:
-        return ACTION_UNIT_TECH;
-    }
+    return (Action) (index - 1);
 }
 
 static Units UpdateAction(Units units)
@@ -738,27 +716,25 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
     {
         const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
         const Icon icon = Icon_FromInput(input, units.action);
+        const Point none = { 0,0 };
+        switch(icon)
         {
-            const Point none = { 0,0 };
-            switch(icon)
-            {
-            case ICON_BUILD_HOUSE:
-                return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
-            case ICON_BUILD_MILL:
-                return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
-            case ICON_BUILD_STONE_CAMP:
-                return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
-            case ICON_BUILD_LUMBER_CAMP:
-                return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
-            case ICON_BUILD_BARRACKS:
-                return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
-            case ICON_BUILD_OUTPOST:
-                return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
-            case ICON_BUILD_TOWN_CENTER:
-                return Units_SpawnTownCenter(units, overview.grid, graphics, cart, overview.color, map);
-            default:
-                break;
-            }
+        case ICON_BUILD_HOUSE:
+            return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
+        case ICON_BUILD_MILL:
+            return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
+        case ICON_BUILD_STONE_CAMP:
+            return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
+        case ICON_BUILD_LUMBER_CAMP:
+            return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
+        case ICON_BUILD_BARRACKS:
+            return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
+        case ICON_BUILD_OUTPOST:
+            return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
+        case ICON_BUILD_TOWN_CENTER:
+            return Units_SpawnTownCenter(units, overview.grid, graphics, cart, overview.color, map);
+        default:
+            break;
         }
     }
     return units;
