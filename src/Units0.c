@@ -662,36 +662,71 @@ static void UpdateEntropy(const Units units)
     }
 }
 
+static void Zero(int32_t array[], const int32_t size)
+{
+    for(int32_t i = 0; i < size; i++)
+        array[i] = 0;
+}
+
+static int32_t MaxIndex(int32_t array[], const int32_t size)
+{
+    int32_t max = 0;
+    int32_t index = 0;
+    for(int32_t i = 0; i < size; i++)
+        if(array[i] > max)
+        {
+            max = array[i];
+            index = i;
+        }
+    return index;
+}
+
 static Action GetAction(const Units units)
 {
-    int32_t counts[] = { 0, 0, 0, 0 };
+    int32_t counts[ACTION_COUNT + 1];
+    const int32_t size = UTIL_LEN(counts);
+    Zero(counts, size);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(
 #if !CONFIG_UNITS_GOD_MODE
-        unit->color == Color_GetMyColor() &&
+        if(unit->color == Color_GetMyColor())
 #endif
-        unit->is_selected)
+        if(unit->is_selected)
         {
             const int32_t index = (int32_t) unit->trait.action + 1;
             counts[index]++;
         }
     }
-    int32_t max = 0;
-    int32_t index = 0;
-    for(int32_t i = 0; i < UTIL_LEN(counts); i++)
-        if(counts[i] > max)
-        {
-            max = counts[i];
-            index = i;
-        }
-    return (Action) (index - 1);
+    return (Action) (MaxIndex(counts, size) - 1);
 }
 
-static Units UpdateAction(Units units)
+static Type GetType(const Units units)
 {
-    units.action = GetAction(units);
+    int32_t counts[TYPE_COUNT + 1];
+    const int32_t size = UTIL_LEN(counts);
+    Zero(counts, size);
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+#if !CONFIG_UNITS_GOD_MODE
+        if(unit->color == Color_GetMyColor())
+#endif
+        if(unit->is_selected)
+        {
+            const int32_t index = (int32_t) unit->trait.type + 1;
+            counts[index]++;
+        }
+    }
+    return (Type) (MaxIndex(counts, size) - 1);
+}
+
+static Units UpdateMotive(Units units)
+{
+    static Motive zero;
+    units.motive = zero;
+    units.motive.action = GetAction(units);
+    units.motive.type = GetType(units);
     return units;
 }
 
@@ -715,7 +750,7 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
     if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
     {
         const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
-        const Icon icon = Icon_FromInput(input, units.action);
+        const Icon icon = Icon_FromInput(input, units.motive.action);
         const Point none = { 0,0 };
         switch(icon)
         {
@@ -742,7 +777,7 @@ static Units PutBuilding(Units units, const Overview overview, const Registrar g
 
 static Units PlaceBuilding(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
-    return units.action == ACTION_BUILD
+    return units.motive.action == ACTION_BUILD
         && overview.color == Color_GetMyColor()
         ? PutBuilding(units, overview, graphics, input, map)
         : units;
@@ -756,7 +791,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);
-    units = UpdateAction(units);
+    units = UpdateMotive(units);
     Decay(units);
     Expire(units);
     units = Kill(units, overview, graphics, input, map);

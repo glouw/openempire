@@ -478,13 +478,13 @@ typedef struct
 }
 Packs;
 
-static Packs GetPacksFromAction(const Registrar interfac, const Action action, const Color color)
+static Packs GetPacksFromMotive (const Registrar interfac, const Motive motive, const Color color)
 {
     static Packs zero;
     Packs packs = zero;
     Animation* const base = interfac.animation[color];
     const int32_t age = 0; // XXX. AGE... OF EMPIRES!
-    switch(action)
+    switch(motive.action)
     {
     default:
     case ACTION_NONE:
@@ -513,9 +513,9 @@ void DrawPack(const Vram vram, const Pack pack)
     }
 }
 
-void Vram_DrawActionRow(const Vram vram, const Registrar interfac, const Action action, const Color color)
+void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color)
 {
-    const Packs packs = GetPacksFromAction(interfac, action, color);
+    const Packs packs = GetPacksFromMotive(interfac, motive, color);
     DrawPack(vram, packs.primary);
     DrawPack(vram, packs.secondary);
 }

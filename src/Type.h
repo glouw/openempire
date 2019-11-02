@@ -30,5 +30,7 @@ typedef enum
     TYPE_WOOD,
     TYPE_GOLD,
     TYPE_STONE,
+
+    TYPE_COUNT,
 }
 Type;

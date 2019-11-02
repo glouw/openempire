@@ -207,7 +207,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l && !input.key[SDL_SCANCODE_LSHIFT]);
-    Vram_DrawActionRow(vram, data.interfac, units.action, overview.color);
+    Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color);
     Vram_DrawHud(vram, data.interfac);
     Vram_Unlock(video.canvas);
     Tiles_Free(graphics_tiles);
