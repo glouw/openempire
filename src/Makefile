@@ -16,6 +16,7 @@ SRCS += Frame.c
 SRCS += Graphics.c
 SRCS += Grid.c
 SRCS += Icon.c
+SRCS += Icons.c
 SRCS += Image.c
 SRCS += Input.c
 SRCS += Interfac.c

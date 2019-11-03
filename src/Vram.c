@@ -7,7 +7,7 @@
 #include "Rect.h"
 #include "Quad.h"
 #include "Interfac.h"
-#include "Icon.h"
+#include "Icons.h"
 
 Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yres)
 {
@@ -466,47 +466,36 @@ static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point of
 typedef struct
 {
     Animation animation;
-    const Icon* icons;
-    int32_t count;
+    Icons icons;
 }
 Pack;
 
-typedef struct
+static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color)
 {
-    Pack primary;
-    Pack secondary;
-}
-Packs;
-
-static Packs GetPacksFromMotive (const Registrar interfac, const Motive motive, const Color color)
-{
-    static Packs zero;
-    Packs packs = zero;
+    const int32_t age = 0; // XXX. SHOULD BE TOP LEVEL.
+    static Pack zero;
+    Pack pack = zero;
+    pack.icons = Icons_FromMotive(motive, age);
     Animation* const base = interfac.animation[color];
-    const int32_t age = 0; // XXX. AGE... OF EMPIRES!
     switch(motive.action)
     {
-    default:
-    case ACTION_NONE:
-        break;
     case ACTION_BUILD:
-        packs.primary.animation = base[FILE_INTERFAC_BUILDING_ICONS];
-        packs.primary.icons = Icon_GetBuilding(age);
-        packs.primary.count = Icon_GetBuildingLen(age);
-        break;
-    case ACTION_COMMAND:
+        pack.animation = base[FILE_INTERFAC_BUILDING_ICONS];
         break;
     case ACTION_UNIT_TECH:
+        pack.animation = base[FILE_INTERFAC_UNIT_ICONS];
+        break;
+    default:
         break;
     }
-    return packs;
+    return pack;
 }
 
 void DrawPack(const Vram vram, const Pack pack)
 {
-    for(int32_t index = 0; index < pack.count; index++)
+    for(int32_t index = 0; index < pack.icons.count; index++)
     {
-        const Icon icon = pack.icons[index];
+        const Icon icon = pack.icons.icon[index];
         SDL_Surface* const surface = pack.animation.surface[icon];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         DrawWithBounds(vram, surface, offset, 0, surface->h);
@@ -515,9 +504,8 @@ void DrawPack(const Vram vram, const Pack pack)
 
 void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color)
 {
-    const Packs packs = GetPacksFromMotive(interfac, motive, color);
-    DrawPack(vram, packs.primary);
-    DrawPack(vram, packs.secondary);
+    const Pack pack = GetPackFromMotive(interfac, motive, color);
+    DrawPack(vram, pack);
 }
 
 void Vram_DrawHud(const Vram vram, const Registrar interfac)

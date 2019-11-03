@@ -19,16 +19,18 @@ typedef enum
 
     // Unit Icons.
     ICON_UNIT_MILITIA = 8,
-    ICON_UNIT_VILLAGER = 15,
+    ICON_UNIT_MALE_VILLAGER = 15,
+    ICON_UNIT_FEMALE_VILLAGER = 16,
 }
 Icon;
 
-const Icon* Icon_GetBuilding(const int32_t age);
+const char* Icon_GetHotkeys(void);
+int32_t Icon_GetHotkeysLen(void);
 
+const Icon* Icon_GetBuilding(const int32_t age);
 int32_t Icon_GetBuildingLen(const int32_t age);
 
-const char* Icon_GetHotkeys(void);
-
-int32_t Icon_GetHotkeysLen(void);
+const Icon* Icon_GetBarracks(const int32_t age);
+int32_t Icon_GetBarracksLen(const int32_t age);
 
 Icon Icon_FromInput(const Input, const Motive);
