@@ -30,7 +30,7 @@ static const char hotkeys[] = {
 #undef X
 };
 
-int32_t Icon_ScancodeToIndex(const Input input)
+static int32_t ScancodeToIndex(const Input input)
 {
 #define X(index, scancode, ch) if(input.key[scancode]) return index;
     X_LIST
@@ -72,12 +72,12 @@ int32_t Icon_GetBuildingLen(const int32_t age)
     return lens[age];
 }
 
+/* Barracks */
+
 #define BARRACKS_AGE_1 ICON_UNIT_MILITIA
 #define BARRACKS_AGE_2 ICON_NONE
 #define BARRACKS_AGE_3 ICON_NONE
 #define BARRACKS_AGE_4 ICON_NONE
-
-/* Barracks */
 
 static const Icon barracks_age1[] = { BARRACKS_AGE_1 };
 static const Icon barracks_age2[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
@@ -96,10 +96,34 @@ int32_t Icon_GetBarracksLen(const int32_t age)
     return lens[age];
 }
 
+/* Town Center */
+
+#define TOWN_CENTER_AGE_1 ICON_UNIT_MALE_VILLAGER
+#define TOWN_CENTER_AGE_2 ICON_NONE
+#define TOWN_CENTER_AGE_3 ICON_NONE
+#define TOWN_CENTER_AGE_4 ICON_NONE
+
+static const Icon town_center_age1[] = { TOWN_CENTER_AGE_1 };
+static const Icon town_center_age2[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2 };
+static const Icon town_center_age3[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2, TOWN_CENTER_AGE_3 };
+static const Icon town_center_age4[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2, TOWN_CENTER_AGE_3, TOWN_CENTER_AGE_4 };
+
+const Icon* Icon_GetTownCenter(const int32_t age)
+{
+    const Icon* ages[] = { town_center_age1, town_center_age2, town_center_age3, town_center_age4 };
+    return ages[age];
+}
+
+int32_t Icon_GetTownCenterLen(const int32_t age)
+{
+    const int32_t lens[] = { UTIL_LEN(town_center_age1), UTIL_LEN(town_center_age2), UTIL_LEN(town_center_age3), UTIL_LEN(town_center_age4) };
+    return lens[age];
+}
+
 Icon Icon_FromInput(const Input input, const Motive motive)
 {
     const int32_t age = 0; // XXX. SHOULD BE TOP LEVEL.
     const Icons icons = Icons_FromMotive(motive, age);
-    const int32_t index = Icon_ScancodeToIndex(input);
+    const int32_t index = ScancodeToIndex(input);
     return (index != -1 && icons.icon != NULL && index < icons.count) ? icons.icon[index] : ICON_NONE;
 }

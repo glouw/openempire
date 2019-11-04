@@ -466,7 +466,7 @@ static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point of
 typedef struct
 {
     Animation animation;
-    Icons icons;
+    Icons icons; // XXX. Will need a primary and secondary...
 }
 Pack;
 

@@ -21,6 +21,10 @@ Icons Icons_FromMotive(const Motive motive, const int32_t age)
             icons.icon = Icon_GetBarracks(age);
             icons.count = Icon_GetBarracksLen(age);
             break;
+        case TYPE_TOWN_CENTER:
+            icons.icon = Icon_GetTownCenter(age);
+            icons.count = Icon_GetTownCenterLen(age);
+            break;
         default:
             break;
         }

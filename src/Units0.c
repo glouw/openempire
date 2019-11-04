@@ -754,20 +754,15 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
         const Point none = { 0,0 };
         switch(icon)
         {
-        case ICON_BUILD_HOUSE:
-            return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_HOUSE, overview.color, graphics, map);
-        case ICON_BUILD_MILL:
-            return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_MILL, overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
-        case ICON_BUILD_STONE_CAMP:
-            return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
-        case ICON_BUILD_LUMBER_CAMP:
-            return Units_Spawn(units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP, overview.color, graphics, map);
-        case ICON_BUILD_BARRACKS:
-            return Units_Spawn(units, cart, none, overview.grid, FILE_DARK_AGE_BARRACKS, overview.color, graphics, map);
-        case ICON_BUILD_OUTPOST:
-            return Units_SpawnWithShadow(units, cart, overview.grid, FILE_DARK_AGE_OUTPOST, overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
-        case ICON_BUILD_TOWN_CENTER:
-            return Units_SpawnTownCenter(units, overview.grid, graphics, cart, overview.color, map);
+        case ICON_BUILD_HOUSE       : return Units_Spawn          (units, cart, none, overview.grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics, map);
+        case ICON_BUILD_MILL        : return Units_SpawnWithShadow(units, cart,       overview.grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
+        case ICON_BUILD_STONE_CAMP  : return Units_Spawn          (units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
+        case ICON_BUILD_LUMBER_CAMP : return Units_Spawn          (units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics, map);
+        case ICON_BUILD_BARRACKS    : return Units_Spawn          (units, cart, none, overview.grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics, map);
+        case ICON_BUILD_OUTPOST     : return Units_SpawnWithShadow(units, cart,       overview.grid, FILE_DARK_AGE_OUTPOST,                 overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
+        case ICON_BUILD_TOWN_CENTER : return Units_SpawnTownCenter(units, cart,       overview.grid,                                        overview.color, graphics, map);
+        case ICON_UNIT_MILITIA      : return Units_Spawn          (units, cart, none, overview.grid, FILE_MILITIA_IDLE,                     overview.color, graphics, map);
+        case ICON_UNIT_MALE_VILLAGER: return Units_Spawn          (units, cart, none, overview.grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics, map);
         default:
             break;
         }
@@ -777,8 +772,7 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
 
 static Units CheckIcons(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
 {
-    return units.motive.action == ACTION_BUILD
-        && overview.color == Color_GetMyColor()
+    return overview.color == Color_GetMyColor()
         ? ServiceIcons(units, overview, graphics, input, map)
         : units;
 }

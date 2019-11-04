@@ -42,7 +42,7 @@ Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, cons
     return BulkAppend(units, map, temp, UTIL_LEN(temp));
 }
 
-Units Units_SpawnTownCenter(Units units, const Grid grid, const Registrar graphics, const Point cart, const Color color, const Map map)
+Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, const Color color, const Registrar graphics, const Map map)
 {
     const Point offset = {
         +grid.tile_cart_mid.x,

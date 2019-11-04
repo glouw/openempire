@@ -53,7 +53,7 @@ Units Units_Spawn(Units, const Point, const Point offset, const Grid, const Grap
 
 Units Units_SpawnWithShadow(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics, const Map);
 
-Units Units_SpawnTownCenter(Units, const Grid, const Registrar, const Point, const Color, const Map);
+Units Units_SpawnTownCenter(Units units, const Point, const Grid, const Color, const Registrar, const Map);
 
 void Units_ManageStacks(const Units);
 
