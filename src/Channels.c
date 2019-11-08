@@ -2,20 +2,14 @@
 
 #include "Util.h"
 
-static void Prep(const Channels channels, const Overview overview)
+static void Divide(const Channels channels, const Overview overview)
 {
     for(int32_t j = 0; j < channels.count; j++)
     {
-        Tiles tiles = channels.tiles[j];
+        const Tiles tiles = channels.tiles[j];
         const Rect bound = overview.rects.rect[j];
         for(int32_t i = 0; i < tiles.count; i++)
-        {
-            Tile* tile = &tiles.tile[i];
-            const Rect outline = Tile_GetFrameOutline(*tile);
-            tile->needs_clipping = !Rect_OnScreen(outline, bound);
-            tile->totally_offscreen = Rect_TotallyOffScreen(outline, bound);
-            tile->bound = bound;
-        }
+            tiles.tile[i] = Tile_Clip(tiles.tile[i], bound);
     }
 }
 
@@ -27,7 +21,7 @@ Channels Channels_Make(const Tiles tiles, const Overview overview)
     channels.tiles = UTIL_ALLOC(Tiles, channels.count);
     for(int32_t i = 0; i < channels.count; i++)
         channels.tiles[i] = Tiles_Copy(tiles);
-    Prep(channels, overview);
+    Divide(channels, overview);
     return channels;
 }
 

@@ -39,13 +39,12 @@ bool Tile_ContainsPoint(const Tile tile, const Point point)
     return Rect_ContainsPoint(rect, point);
 }
 
-static Tile Clip(Tile tile, const Overview overview)
+Tile Tile_Clip(Tile tile, const Rect bound)
 {
-    const Rect full = { { 0, 0 }, { overview.xres, overview.yres } };
     const Rect outline = Tile_GetFrameOutline(tile);
-    tile.needs_clipping = !Rect_OnScreen(outline, full);
-    tile.totally_offscreen = Rect_TotallyOffScreen(outline, full);
-    tile.bound = full;
+    tile.needs_clipping = !Rect_OnScreen(outline, bound);
+    tile.totally_offscreen = Rect_TotallyOffScreen(outline, bound);
+    tile.bound = bound;
     return tile;
 }
 
@@ -67,7 +66,11 @@ static Tile Construct(const Overview overview, const Point cart, const Point car
     tile.flip_vert = dynamics.flip_vert;
     tile.height = height;
     tile.reference = reference;
-    return Clip(tile, overview);
+    const Rect bound = {
+        { 0, 0 },
+        { overview.xres, overview.yres }
+    };
+    return Tile_Clip(tile, bound);
 }
 
 Tile Tile_GetTerrain(const Overview overview, const Point cart, const Animation animation, const Terrain file)
