@@ -101,7 +101,7 @@ static void DrawTileClip(const Vram vram, const Tile tile)
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
         const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
-        if(!OutOfBounds(vram, coords.x, coords.y))
+        if(Rect_ContainsPoint(tile.bound, coords))
             TransferTilePixel(vram, tile, coords, x, y);
     }
 }
@@ -291,10 +291,59 @@ void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const
         BlendTerrainTiles(vram, terrain, map, overview, blend_lines, blendomatic);
 }
 
-void Vram_DrawUnits(const Vram vram, const Tiles tiles)
+void Prep(Tiles copy[4], const int32_t channels, const Overview overview)
 {
-    for(int32_t i = 0; i < tiles.count; i++)
-        Vram_DrawTile(vram, tiles.tile[i]);
+    for(int32_t j = 0; j < channels; j++)
+    {
+        Tiles tiles = copy[j];
+        const Rect bound = overview.rects.rect[j];
+        for(int32_t i = 0; i < tiles.count; i++)
+        {
+            Tile* tile = &tiles.tile[i];
+            const Rect outline = Tile_GetFrameOutline(*tile);
+            tile->needs_clipping = !Rect_OnScreen(outline, bound);
+            tile->totally_offscreen = Rect_TotallyOffScreen(outline, bound);
+            tile->bound = bound;
+        }
+    }
+}
+
+typedef struct
+{
+    Vram vram;
+    Tiles tiles;
+}
+ChannelNeedle;
+
+static int32_t DrawChannelNeedle(void* data)
+{
+    ChannelNeedle* const needle = (ChannelNeedle*) data;
+    for(int32_t i = 0; i < needle->tiles.count; i++)
+        Vram_DrawTile(needle->vram, needle->tiles.tile[i]);
+    return 0;
+}
+
+void Vram_DrawUnits(const Vram vram, const Tiles tiles, const Overview overview)
+{
+#define MAX (4)
+    Tiles copy[MAX];
+    for(int32_t i = 0; i < MAX; i++)
+        copy[i] = Tiles_Copy(tiles);
+    Prep(copy, MAX, overview);
+    ChannelNeedle* const needles = UTIL_ALLOC(ChannelNeedle, MAX);
+    for(int32_t i = 0; i < MAX; i++)
+    {
+        needles[i].vram = vram;
+        needles[i].tiles = copy[i];
+    }
+    SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, MAX);
+    for(int32_t i = 0; i < MAX; i++) threads[i] = SDL_CreateThread(DrawChannelNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < MAX; i++) SDL_WaitThread(threads[i], NULL);
+    free(needles);
+    free(threads);
+    for(int32_t i = 0; i < MAX; i++)
+        Tiles_Free(copy[i]);
+#undef MAX
 }
 
 static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)

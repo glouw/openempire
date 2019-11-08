@@ -24,3 +24,5 @@ int32_t Tiles_SelectSimilar(const Tiles, const Tile);
 int32_t Tiles_SelectWithBox(const Tiles, const Rect);
 
 void Tiles_SortByHeight(const Tiles);
+
+Tiles Tiles_Copy(const Tiles);

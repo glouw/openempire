@@ -19,3 +19,9 @@ int32_t Rect_GetArea(const Rect);
 Rect Rect_CorrectOrientation(const Rect);
 
 bool Rect_ContainsPoint(const Rect, const Point);
+
+bool Rect_SeesRect(const Rect out, const Rect in);
+
+bool Rect_OnScreen(const Rect outline, const Rect rect);
+
+bool Rect_TotallyOffScreen(const Rect outline, const Rect rect);

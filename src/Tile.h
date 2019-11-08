@@ -23,6 +23,7 @@ typedef struct
     bool needs_clipping;
     bool flip_vert;
     bool totally_offscreen;
+    Rect bound;
 }
 Tile;
 

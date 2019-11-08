@@ -163,3 +163,13 @@ int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
     }
     return count;
 }
+
+Tiles Tiles_Copy(const Tiles tiles)
+{
+    Tiles copy = tiles;
+    copy.tile = UTIL_ALLOC(Tile, tiles.count);
+    copy.count = tiles.count;
+    for(int32_t i = 0; i < tiles.count; i++)
+        copy.tile[i] = tiles.tile[i];
+    return copy;
+}

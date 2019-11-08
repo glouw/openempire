@@ -1,8 +1,28 @@
 #include "Overview.h"
 
 #include "Config.h"
+#include "Util.h"
 
 #include <SDL2/SDL.h>
+
+static Rects GetChannels(const int32_t xres, const int32_t yres)
+{
+    const int32_t cpu_count = SDL_GetCPUCount();
+    Rects rects = Rects_Make(cpu_count);
+    const int32_t width = xres / rects.count;
+    const int32_t remainder = xres % rects.count;
+    for(int32_t i = 0; i < rects.count; i++)
+    {
+        Rect rect = {
+            { (i + 0) * width,    0 },
+            { (i + 1) * width, yres },
+        };
+        if(i == rects.count - 1)
+            rect.b.x += remainder;
+        rects.rect[i] = rect;
+    }
+    return rects;
+}
 
 Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
 {
@@ -12,6 +32,7 @@ Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
     overview.xres = xres;
     overview.yres = yres;
     overview.color = Color_GetMyColor();
+    overview.rects = GetChannels(xres, yres);
     return overview;
 }
 
@@ -112,4 +133,9 @@ Point Overview_IsoSnapTo(const Overview overview, const Point iso)
     const Point cart = Overview_IsoToCart(overview, iso, false);
     const Point snap = Overview_CartToIso(overview, cart);
     return snap;
+}
+
+void Overview_Free(const Overview overview)
+{
+    Rects_Free(overview.rects);
 }

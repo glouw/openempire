@@ -39,36 +39,13 @@ bool Tile_ContainsPoint(const Tile tile, const Point point)
     return Rect_ContainsPoint(rect, point);
 }
 
-// (0, 0)
-// +-------------------+
-// |                   | Where the inner box, bounded by points (a, b),
-// |       a------+    | are within screen dimensions (0,0) and (xres, yres)
-// |       |      |    |
-// |       +------b    |
-// |                   |
-// +-------------------+ (xres, yres)
-static bool OnScreen(const Tile tile, const int32_t xres, const int32_t yres)
-{
-    const Rect rect = Tile_GetFrameOutline(tile);
-    return rect.a.x >= 0
-        && rect.a.y >= 0
-        && rect.b.x < xres
-        && rect.b.y < yres;
-}
-
-static bool TotallyOffScreen(const Tile tile, const int32_t xres, const int32_t yres)
-{
-    const Rect rect = Tile_GetFrameOutline(tile);
-    return rect.a.x >= xres || rect.b.x < 0
-        || rect.a.y >= yres || rect.b.y < 0;
-}
-
 static Tile Clip(Tile tile, const Overview overview)
 {
-    if(!OnScreen(tile, overview.xres, overview.yres))
-        tile.needs_clipping = true;
-    if(TotallyOffScreen(tile, overview.xres, overview.yres))
-        tile.totally_offscreen = true;
+    const Rect full = { { 0, 0 }, { overview.xres, overview.yres } };
+    const Rect outline = Tile_GetFrameOutline(tile);
+    tile.needs_clipping = !Rect_OnScreen(outline, full);
+    tile.totally_offscreen = Rect_TotallyOffScreen(outline, full);
+    tile.bound = full;
     return tile;
 }
 

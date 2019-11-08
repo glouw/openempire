@@ -77,11 +77,12 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
 // XXX. TO BE DEPRECATED.
 static void RenderAnimationDemo(const Video video, const Animation animation, const Point point)
 {
+    static Rect zero;
     const bool flips[] = { false, true };
     for(int32_t j = 0; j < UTIL_LEN(flips); j++)
     for(int32_t i = 0; i < animation.count; i++)
     {
-        const Tile tile = { NULL, animation.surface[i], animation.frame[i], point, {0,0}, 255, true, flips[j], false };
+        const Tile tile = { NULL, animation.surface[i], animation.frame[i], point, {0,0}, 255, true, flips[j], false, zero };
         RenderDemoTile(video, tile, i, animation.count);
     }
 }
@@ -100,11 +101,12 @@ static void RenderRegistrarDemo(const Video video, const Registrar registrar, co
 // XXX. TO BE DEPRECATED.
 static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomatic)
 {
+    static Rect zero;
     for(int32_t i = 0; i < (int32_t) blendomatic.nr_blending_modes; i++)
     for(int32_t j = 0; j < (int32_t) blendomatic.nr_tiles; j++)
     {
         const Mode mode = blendomatic.mode[i];
-        const Tile tile = { NULL, mode.mask_demo[j], mode.frame, video.middle, {0,0}, 255, true, false, false };
+        const Tile tile = { NULL, mode.mask_demo[j], mode.frame, video.middle, {0,0}, 255, true, false, false, zero };
         RenderDemoTile(video, tile, j, blendomatic.nr_tiles);
     }
 }
@@ -120,12 +122,13 @@ static void LayoutNumbers(const Video video, const Animation animation, const in
 
 static void LayoutIcons(const Video video, const Animation animation, const int32_t width, const int32_t xres)
 {
+    static Rect zero;
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
     Vram_Clear(vram, 0x0);
     for(int32_t index = 0; index < animation.count; index++)
     {
         const Point point = Point_Wrap(index, width, xres);
-        const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false };
+        const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false, zero };
         Vram_DrawTile(vram, tile);
     }
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
@@ -198,7 +201,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     const Lines blend_lines = Map_GetBlendLines(map, window.terrain);
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
-    Vram_DrawUnits(vram, graphics_tiles);
+    Vram_DrawUnits(vram, graphics_tiles, overview);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
 #if SANITIZE_THREAD == 0
     // Breaks sanitizer - but that's okay - renderer race conditions will not affect syncing P2P.

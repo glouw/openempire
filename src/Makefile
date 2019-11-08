@@ -34,6 +34,7 @@ SRCS += Point.c
 SRCS += Points.c
 SRCS += Quad.c
 SRCS += Rect.c
+SRCS += Rects.c
 SRCS += Registrar.c
 SRCS += Scanline.c
 SRCS += State.c

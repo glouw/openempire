@@ -3,7 +3,7 @@
 #include "Input.h"
 #include "Point.h"
 #include "Color.h"
-#include "Rect.h"
+#include "Rects.h"
 #include "Grid.h"
 #include "Quad.h"
 
@@ -15,6 +15,7 @@ typedef struct
     int32_t xres;
     int32_t yres;
     Color color;
+    Rects rects;
 }
 Overview;
 

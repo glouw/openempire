@@ -64,3 +64,37 @@ bool Rect_ContainsPoint(const Rect rect, const Point point)
         && point.x < rect.b.x
         && point.y < rect.b.y;
 }
+
+bool Rect_SeesRect(const Rect out, const Rect in)
+{
+    return Rect_ContainsPoint(out, in.a)
+        || Rect_ContainsPoint(out, in.b);
+}
+
+// A-------------------+
+// |                   |
+// |       a------+    |
+// |       |      |    |
+// |       +------b    |
+// |                   |
+// +-------------------B
+bool Rect_OnScreen(const Rect outline, const Rect rect)
+{
+    return outline.a.x >= rect.a.x
+        && outline.a.y >= rect.a.y
+        && outline.b.x < rect.b.x
+        && outline.b.y < rect.b.y;
+}
+
+// A-------------------+
+// |                   |
+// |                   |
+// |                   | a------+
+// |                   | |      |
+// |                   | +------b
+// +-------------------B
+bool Rect_TotallyOffScreen(const Rect outline, const Rect rect)
+{
+    return outline.a.x >= rect.b.x || outline.b.x < rect.a.x
+        || outline.a.y >= rect.b.y || outline.b.y < rect.a.y;
+}
