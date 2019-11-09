@@ -27,7 +27,7 @@ typedef struct
 }
 Vram;
 
-Vram Vram_Lock(SDL_Texture* const, const int32_t xres, const int32_t yres);
+Vram Vram_Lock(SDL_Texture* const, const int32_t xres, const int32_t yres, const int32_t cpu_count);
 
 void Vram_Unlock(SDL_Texture* const);
 

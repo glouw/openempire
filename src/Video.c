@@ -40,6 +40,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.bot_left = bot_left;
     video.top_rite = top_rite;
     video.top_left = top_left;
+    video.cpu_count = SDL_GetCPUCount();
     PrintTitle(video);
     SDL_SetCursor(video.cursor);
     return video;
@@ -62,7 +63,7 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
     const Input input = Input_Ready();
     if(!input.done)
     {
-        const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
+        const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
         Vram_Clear(vram, 0x0);
         Vram_DrawTile(vram, tile);
         Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
@@ -123,7 +124,7 @@ static void LayoutNumbers(const Video video, const Animation animation, const in
 static void LayoutIcons(const Video video, const Animation animation, const int32_t width, const int32_t xres)
 {
     static Rect zero;
-    const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
+    const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
     Vram_Clear(vram, 0x0);
     for(int32_t index = 0; index < animation.count; index++)
     {
@@ -195,7 +196,7 @@ void Video_PrintHotkeys(const Video video)
 
 void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Window window)
 {
-    const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres);
+    const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
     const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, window.units);
     const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, window.terrain);
     const Lines blend_lines = Map_GetBlendLines(map, window.terrain);

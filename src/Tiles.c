@@ -115,7 +115,8 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
         {
             const Rect rect = Tile_GetFrameOutline(tile);
             const Point origin_click = Point_Sub(click, rect.a);
-            if(Surface_GetPixel(tile.surface, origin_click.x, origin_click.y) != SURFACE_COLOR_KEY)
+            const uint32_t pixel = Surface_GetPixel(tile.surface, origin_click.x, origin_click.y);
+            if(pixel != SURFACE_COLOR_KEY)
             {
                 Tile_Select(tile);
                 return tile;

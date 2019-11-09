@@ -56,7 +56,7 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-Units Units_New(const Map map, const Overview overview, const Registrar graphics)
+Units Units_New(const Map map, const Overview overview, const Registrar graphics, const int32_t cpu_count)
 {
     const int32_t max = CONFIG_UNITS_MAX;
     const int32_t area = overview.grid.rows * overview.grid.cols;
@@ -74,7 +74,7 @@ Units Units_New(const Map map, const Overview overview, const Registrar graphics
     units.rows = overview.grid.rows;
     units.cols = overview.grid.cols;
     units = Units_GenerateTestZone(units, map, overview, graphics);
-    units.cpu_count = 2 * SDL_GetCPUCount();
+    units.cpu_count = cpu_count;
     return units;
 }
 

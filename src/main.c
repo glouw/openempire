@@ -15,8 +15,8 @@ int main(const int argc, const char* argv[])
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Color_SetMyColor(args.color);
-    Overview overview = Overview_Init(video.xres, video.yres, grid);
-    Units units = Units_New(map, overview, data.graphics);
+    Overview overview = Overview_Init(video.xres, video.yres, grid, video.cpu_count);
+    Units units = Units_New(map, overview, data.graphics, video.cpu_count);
 #if 1
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))

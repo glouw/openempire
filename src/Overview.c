@@ -5,9 +5,8 @@
 
 #include <SDL2/SDL.h>
 
-static Rects GetChannels(const int32_t xres, const int32_t yres)
+static Rects GetRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
 {
-    const int32_t cpu_count = SDL_GetCPUCount();
     Rects rects = Rects_Make(cpu_count);
     const int32_t width = xres / rects.count;
     const int32_t remainder = xres % rects.count;
@@ -24,7 +23,7 @@ static Rects GetChannels(const int32_t xres, const int32_t yres)
     return rects;
 }
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
+Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid, const int32_t cpu_count)
 {
     static Overview zero;
     Overview overview = zero;
@@ -32,7 +31,7 @@ Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid)
     overview.xres = xres;
     overview.yres = yres;
     overview.color = Color_GetMyColor();
-    overview.rects = GetChannels(xres, yres);
+    overview.rects = GetRects(xres, yres, cpu_count);
     return overview;
 }
 

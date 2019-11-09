@@ -35,7 +35,7 @@ typedef struct
 }
 Units;
 
-Units Units_New(const Map map, const Overview, const Registrar graphics);
+Units Units_New(const Map map, const Overview, const Registrar graphics, const int32_t cpu_count);
 
 void Units_Free(const Units);
 

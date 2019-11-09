@@ -2,7 +2,7 @@
 
 #include "Util.h"
 
-static void Divide(const Channels channels, const Overview overview)
+static void Reclip(const Channels channels, const Overview overview)
 {
     for(int32_t j = 0; j < channels.count; j++)
     {
@@ -21,7 +21,9 @@ Channels Channels_Make(const Tiles tiles, const Overview overview)
     channels.tiles = UTIL_ALLOC(Tiles, channels.count);
     for(int32_t i = 0; i < channels.count; i++)
         channels.tiles[i] = Tiles_Copy(tiles);
-    Divide(channels, overview);
+    // Only reclip when screen is being subdivided into smaller windows (eg. channels).
+    if(channels.count > 1)
+        Reclip(channels, overview);
     return channels;
 }
 
