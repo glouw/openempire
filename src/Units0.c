@@ -115,16 +115,12 @@ static Units Select(Units units, const Overview overview, const Input input, con
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Overview overview, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static void FindPathForSelected(const Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected
-#if !CONFIG_UNITS_GOD_MODE
-        && unit->color == overview.color
-#endif
-        && unit->trait.max_speed > 0)
+        if(unit->is_selected && unit->trait.max_speed > 0)
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
@@ -143,7 +139,7 @@ static Units Command(Units units, const Overview overview, const Input input, co
         if(CanWalk(units, map, cart_goal))
         {
             units.command_group_next++;
-            FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
+            FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
             units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GRY, graphics, map);
         }
     }
@@ -351,13 +347,9 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics);
 }
 
-static bool ShouldDelete(Unit* const unit, const Input input, const Overview overview)
+static bool ShouldDelete(Unit* const unit, const Input input)
 {
-    return
-#if !CONFIG_UNITS_GOD_MODE
-        unit->color == overview.color &&
-#endif
-        unit->is_selected && input.key[SDL_SCANCODE_DELETE];
+    return unit->is_selected && input.key[SDL_SCANCODE_DELETE];
 }
 
 static void KillChildren(const Units units, Unit* const unit)
@@ -376,7 +368,7 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
-            if(Unit_IsDead(unit) || ShouldDelete(unit, input, overview))
+            if(Unit_IsDead(unit) || ShouldDelete(unit, input))
             {
                 Unit_Kill(unit);
                 if(unit->has_children)
@@ -689,9 +681,6 @@ static Action GetAction(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-#if !CONFIG_UNITS_GOD_MODE
-        if(unit->color == Color_GetMyColor())
-#endif
         if(unit->is_selected)
         {
             const int32_t index = (int32_t) unit->trait.action + 1;
@@ -709,9 +698,6 @@ static Type GetType(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-#if !CONFIG_UNITS_GOD_MODE
-        if(unit->color == Color_GetMyColor())
-#endif
         if(unit->is_selected)
         {
             const int32_t index = (int32_t) unit->trait.type + 1;
@@ -737,7 +723,6 @@ static Units CountPopulation(Units units)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit)
-        && unit->color == Color_GetMyColor()
         && !unit->trait.is_inanimate)
             count++;
     }
@@ -749,7 +734,7 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
 {
     if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
     {
-        const Point cart = Overview_IsoToCart(overview, input.point, false); // XXX. Use Color_GetMyColor
+        const Point cart = Overview_IsoToCart(overview, input.point, false);
         const Icon icon = Icon_FromInput(input, units.motive);
         const Point none = { 0,0 };
         switch(icon)
@@ -770,18 +755,11 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
     return units;
 }
 
-static Units CheckIcons(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
-{
-    return overview.color == Color_GetMyColor()
-        ? ServiceIcons(units, overview, graphics, input, map)
-        : units;
-}
-
 Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Window window)
 {
     UpdateEntropy(units);
     Tick(units);
-    units = CheckIcons(units, overview, graphics, input, map);
+    units = ServiceIcons(units, overview, graphics, input, map);
     units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, input, graphics, window.units);
     units = Command(units, overview, input, graphics, map, field);

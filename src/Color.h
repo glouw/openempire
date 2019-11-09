@@ -15,7 +15,3 @@ typedef enum
     COLOR_COUNT,
 }
 Color;
-
-void Color_SetMyColor(const Color);
-
-Color Color_GetMyColor(void);

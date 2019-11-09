@@ -23,14 +23,14 @@ static Rects GetRects(const int32_t xres, const int32_t yres, const int32_t cpu_
     return rects;
 }
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Grid grid, const int32_t cpu_count)
+Overview Overview_Init(const Color color, const int32_t xres, const int32_t yres, const Grid grid, const int32_t cpu_count)
 {
     static Overview zero;
     Overview overview = zero;
     overview.grid = grid;
     overview.xres = xres;
     overview.yres = yres;
-    overview.color = Color_GetMyColor();
+    overview.color = color;
     overview.rects = GetRects(xres, yres, cpu_count);
     return overview;
 }

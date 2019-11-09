@@ -9,13 +9,13 @@
 int main(const int argc, const char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
+    const Color color = args.color;
     const Video video = Video_Setup(1280, 700, "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
-    Color_SetMyColor(args.color);
-    Overview overview = Overview_Init(video.xres, video.yres, grid, video.cpu_count);
+    Overview overview = Overview_Init(color, video.xres, video.yres, grid, video.cpu_count);
     Units units = Units_New(map, overview, data.graphics, video.cpu_count);
 #if 1
     int32_t cycles = 0;
