@@ -181,7 +181,7 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     for(int32_t x = 0; x < tile.frame.width; x++)
     {
         const Point coords = Tile_GetTopLeftOffsetCoords(tile, x, y);
-        if(!OutOfBounds(vram, coords.x, coords.y))
+        if(Rect_ContainsPoint(tile.bound, coords))
             BlendTilePixel(vram, tile, coords, mask, x, y);
     }
 }

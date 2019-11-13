@@ -22,11 +22,11 @@ int main(const int argc, const char* argv[])
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
-        overview = Overview_Update(overview, input); // TO BE SENT VIA P2P (ALONG WITH INPUT).
+        overview = Overview_Update(overview, input); // XXX. TO BE SENT VIA P2P (ALONG WITH INPUT).
         Map_Edit(map, overview, input);
         const Field field = Units_Field(units, map);
         const Window window = Window_Make(overview);
-        units = Units_Caretake(units, data.graphics, overview, input, map, field, window); // TO BE MODIFIED BY ALL P2P CLIENTS.
+        units = Units_Caretake(units, data.graphics, overview, input, map, field, window); // XXX. TO BE MODIFIED BY ALL P2P CLIENTS.
         Video_Render(video, data, map, units, overview, input, window);
         const int32_t t1 = SDL_GetTicks();
         Video_CopyCanvas(video);
