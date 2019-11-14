@@ -86,7 +86,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     const Lines blend_lines = Map_GetBlendLines(map, window.terrain);
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
-    Vram_DrawUnits(vram, graphics_tiles, overview);
+    Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
 #if SANITIZE_THREAD == 0
     // Breaks sanitizer - but that's okay - renderer race conditions will not affect syncing P2P.
@@ -99,6 +99,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color);
     Vram_DrawHud(vram, data.interfac);
     Vram_Unlock(video.canvas);
+    Vram_Free(vram);
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);

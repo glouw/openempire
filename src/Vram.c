@@ -10,6 +10,24 @@
 #include "Interfac.h"
 #include "Icons.h"
 
+static Rects GetChannelRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
+{
+    Rects rects = Rects_Make(cpu_count);
+    const int32_t width = xres / rects.count;
+    const int32_t remainder = xres % rects.count;
+    for(int32_t i = 0; i < rects.count; i++)
+    {
+        Rect rect = {
+            { (i + 0) * width,    0 },
+            { (i + 1) * width, yres },
+        };
+        if(i == rects.count - 1)
+            rect.b.x += remainder;
+        rects.rect[i] = rect;
+    }
+    return rects;
+}
+
 Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yres, const int32_t cpu_count)
 {
     void* raw;
@@ -22,6 +40,7 @@ Vram Vram_Lock(SDL_Texture* const texture, const int32_t xres, const int32_t yre
     vram.xres = xres;
     vram.yres = yres;
     vram.cpu_count = cpu_count;
+    vram.channel_rects = GetChannelRects(xres, yres, cpu_count);
     return vram;
 }
 
@@ -308,9 +327,9 @@ static int32_t DrawChannelNeedle(void* data)
     return 0;
 }
 
-void Vram_DrawUnits(const Vram vram, const Tiles tiles, const Overview overview)
+void Vram_DrawUnits(const Vram vram, const Tiles tiles)
 {
-    const Channels channels = Channels_Make(tiles, overview);
+    const Channels channels = Channels_Make(tiles, vram);
     ChannelNeedle* const needles = UTIL_ALLOC(ChannelNeedle, channels.count);
     for(int32_t i = 0; i < channels.count; i++)
     {
@@ -543,4 +562,9 @@ void Vram_DrawHud(const Vram vram, const Registrar interfac)
     const Point corner = { 0, 0 };
     const Animation animation = interfac.animation[COLOR_GRY][FILE_INTERFAC_HUD_0];
     DrawWithBounds(vram, animation.surface[0], corner, y0, y1);
+}
+
+void Vram_Free(const Vram vram)
+{
+    Rects_Free(vram.channel_rects);
 }

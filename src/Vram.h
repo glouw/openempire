@@ -7,7 +7,7 @@
 #include "Registrar.h"
 #include "Motive.h"
 #include "Units.h"
-#include "Rect.h"
+#include "Rects.h"
 #include "Map.h"
 #include "Overview.h"
 #include "Tiles.h"
@@ -23,6 +23,7 @@ typedef struct
     int32_t xres;
     int32_t yres;
     int32_t cpu_count;
+    Rects channel_rects;
 }
 Vram;
 
@@ -38,7 +39,7 @@ void Vram_DrawTile(const Vram, const Tile);
 
 void Vram_DrawMap(const Vram, const Registrar, const Map, const Overview, const Blendomatic, const Lines, const Tiles);
 
-void Vram_DrawUnits(const Vram, const Tiles, const Overview);
+void Vram_DrawUnits(const Vram, const Tiles);
 
 void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Overview);
 
@@ -51,3 +52,5 @@ void Vram_DrawUnitHealthBars(const Vram, const Tiles);
 void Vram_DrawMotiveRow(const Vram, const Registrar, const Motive, const Color);
 
 void Vram_DrawHud(const Vram, const Registrar);
+
+void Vram_Free(const Vram);

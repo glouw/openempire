@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Tiles.h"
-#include "Overview.h"
+#include "Vram.h"
 
 #include <stdint.h>
 
@@ -12,6 +12,6 @@ typedef struct
 }
 Channels;
 
-Channels Channels_Make(const Tiles, const Overview);
+Channels Channels_Make(const Tiles, const Vram);
 
 void Channels_Free(const Channels);

@@ -3,19 +3,18 @@
 #include "Input.h"
 #include "Point.h"
 #include "Color.h"
-#include "Rects.h"
+#include "Rect.h"
 #include "Grid.h"
 #include "Quad.h"
 
 typedef struct
 {
     Point pan;
-    Grid grid;
+    Grid grid; // XXX. Should not be in here.
     Rect selection_box;
     int32_t xres;
     int32_t yres;
     Color color;
-    Rects channel_rects;
     Point mouse_cursor;
     bool mouse_l;
     bool mouse_r;

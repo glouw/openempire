@@ -25,10 +25,8 @@ int main(const int argc, const char* argv[])
         overview = Overview_Update(overview, input); // XXX. TO BE SENT VIA P2P (ALONG WITH INPUT).
         Map_Edit(map, overview);
         const Field field = Units_Field(units, map);
-
         units = Units_Service(units, data.graphics, overview, map, field); // XXX. TO BE UPDATED BY OTHER P2P CLIENTS.
         units = Units_Caretake(units, grid, map, field);
-
         Video_Render(video, data, map, units, overview);
         const int32_t t1 = SDL_GetTicks();
         Video_CopyCanvas(video);
