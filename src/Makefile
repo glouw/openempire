@@ -52,7 +52,8 @@ SRCS += Units0.c
 SRCS += Units1.c
 SRCS += Units2.c
 SRCS += Util.c
-SRCS += Video.c
+SRCS += Video0.c
+SRCS += Video1.c
 SRCS += Vram.c
 
 # 0: Compile with gcc.

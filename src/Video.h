@@ -5,9 +5,7 @@
 #include "Color.h"
 #include "Map.h"
 #include "Units.h"
-#include "Blendomatic.h"
 #include "Data.h"
-#include "Points.h"
 
 #include <SDL2/SDL.h>
 
