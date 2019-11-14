@@ -71,7 +71,7 @@ static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const 
 static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)
 {
     const uint32_t vram_pixel = Get(vram, coords.x, coords.y);
-    const uint8_t height = vram_pixel >> 24;
+    const uint8_t height = vram_pixel >> SURFACE_ALPHA;
     if(tile.height > height)
     {
         uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
@@ -80,7 +80,7 @@ static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, co
             if(height == FILE_PRIO_BUILDING
             || height == FILE_PRIO_SHADOW)
                 surface_pixel = Blend(surface_pixel, vram_pixel, 0xFF / 2);
-            const uint32_t pixel = (tile.height << 24) | surface_pixel;
+            const uint32_t pixel = (tile.height << SURFACE_ALPHA) | surface_pixel;
             Put(vram, coords.x, coords.y, pixel);
         }
     }
@@ -162,14 +162,14 @@ static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int
 
 static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
 {
-    const uint8_t height = Get(vram, coords.x, coords.y) >> 24;
+    const uint8_t height = Get(vram, coords.x, coords.y) >> SURFACE_ALPHA;
     if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
     {
         const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
         if(top_pixel != SURFACE_COLOR_KEY)
         {
             const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
-            const uint32_t pixel = blend_pixel | (tile.height << 24);
+            const uint32_t pixel = blend_pixel | (tile.height << SURFACE_ALPHA);
             Put(vram, coords.x, coords.y, pixel);
         }
     }
@@ -328,7 +328,7 @@ void Vram_DrawUnits(const Vram vram, const Tiles tiles, const Overview overview)
 static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
     if(!OutOfBounds(vram, point.x, point.y))
-        if((Get(vram, point.x, point.y) >> 24) < FILE_PRIO_DECAY)
+        if((Get(vram, point.x, point.y) >> SURFACE_ALPHA) < FILE_PRIO_DECAY)
             Put(vram, point.x, point.y, color);
 }
 
@@ -433,7 +433,7 @@ static void DrawHealthBar(const Vram vram, const Point top, const int32_t health
         if(!OutOfBounds(vram, x, y))
         {
             const uint32_t base = x - x0 > percent ? 0xFF0000 : 0x00FF00;
-            const uint32_t color = base | (FILE_PRIO_HIGHEST << 24);
+            const uint32_t color = base | (FILE_PRIO_HIGHEST << SURFACE_ALPHA);
             Put(vram, x, y, color);
         }
 }
