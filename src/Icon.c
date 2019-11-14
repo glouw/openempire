@@ -30,14 +30,6 @@ static const char hotkeys[] = {
 #undef X
 };
 
-static int32_t ScancodeToIndex(const Input input)
-{
-#define X(index, scancode, ch) if(input.key[scancode]) return index;
-    X_LIST
-#undef X
-    return -1;
-}
-
 const char* Icon_GetHotkeys(void)
 {
     return hotkeys;
@@ -120,10 +112,26 @@ int32_t Icon_GetTownCenterLen(const int32_t age)
     return lens[age];
 }
 
-Icon Icon_FromInput(const Input input, const Motive motive)
+Icon Icon_FromOverview(const Overview overview, const Motive motive)
 {
     const int32_t age = 0; // XXX. SHOULD BE TOP LEVEL.
     const Icons icons = Icons_FromMotive(motive, age);
-    const int32_t index = ScancodeToIndex(input);
+    int32_t index = -1;
+    if(overview.key_q) index =  0;
+    if(overview.key_w) index =  1;
+    if(overview.key_e) index =  2;
+    if(overview.key_r) index =  3;
+    if(overview.key_t) index =  4;
+    if(overview.key_a) index =  5;
+    if(overview.key_s) index =  6;
+    if(overview.key_d) index =  7;
+    if(overview.key_f) index =  8;
+    if(overview.key_g) index =  9;
+    if(overview.key_z) index = 10;
+    if(overview.key_x) index = 11;
+    if(overview.key_c) index = 12;
+    if(overview.key_v) index = 13;
+    if(overview.key_b) index = 14;
     return (index != -1 && icons.icon != NULL && index < icons.count) ? icons.icon[index] : ICON_NONE;
+
 }

@@ -95,9 +95,9 @@ static Units UnSelectAll(Units units)
     return units;
 }
 
-static Units Select(Units units, const Overview overview, const Input input, const Registrar graphics, const Points render_points)
+static Units Select(Units units, const Overview overview, const Registrar graphics, const Points render_points)
 {
-    if(input.lu && !input.key[SDL_SCANCODE_LSHIFT])
+    if(overview.mouse_lu && !overview.key_left_shift)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
         Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
@@ -106,9 +106,9 @@ static Units Select(Units units, const Overview overview, const Input input, con
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
-            const Tile tile = Tiles_SelectOne(tiles, input.point);
+            const Tile tile = Tiles_SelectOne(tiles, overview.mouse_cursor);
             if(tile.reference && tile.reference->is_selected)
-                units.select_count = input.key[SDL_SCANCODE_LCTRL] ? Tiles_SelectSimilar(tiles, tile) : 1;
+                units.select_count = overview.key_left_ctrl ? Tiles_SelectSimilar(tiles, tile) : 1;
         }
         Tiles_Free(tiles);
     }
@@ -129,12 +129,12 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     }
 }
 
-static Units Command(Units units, const Overview overview, const Input input, const Registrar graphics, const Map map, const Field field)
+static Units Command(Units units, const Overview overview, const Registrar graphics, const Map map, const Field field)
 {
-    if(input.ru && units.select_count > 0)
+    if(overview.mouse_ru && units.select_count > 0)
     {
-        const Point cart_goal = Overview_IsoToCart(overview, input.point, false);
-        const Point cart = Overview_IsoToCart(overview, input.point, true);
+        const Point cart_goal = Overview_IsoToCart(overview, overview.mouse_cursor, false);
+        const Point cart = Overview_IsoToCart(overview, overview.mouse_cursor, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
         if(CanWalk(units, map, cart_goal))
         {
@@ -347,9 +347,9 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics);
 }
 
-static bool ShouldDelete(Unit* const unit, const Input input)
+static bool ShouldDelete(Unit* const unit, const Overview overview)
 {
-    return unit->is_selected && input.key[SDL_SCANCODE_DELETE];
+    return unit->is_selected && overview.key_delete;
 }
 
 static void KillChildren(const Units units, Unit* const unit)
@@ -362,13 +362,13 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
-static Units Kill(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
+static Units Kill(Units units, const Overview overview, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
-            if(Unit_IsDead(unit) || ShouldDelete(unit, input))
+            if(Unit_IsDead(unit) || ShouldDelete(unit, overview))
             {
                 Unit_Kill(unit);
                 if(unit->has_children)
@@ -730,12 +730,12 @@ static Units CountPopulation(Units units)
     return units;
 }
 
-static Units ServiceIcons(Units units, const Overview overview, const Registrar graphics, const Input input, const Map map)
+static Units ServiceIcons(Units units, const Overview overview, const Registrar graphics, const Map map)
 {
-    if(input.key[SDL_SCANCODE_LSHIFT] && input.lu)
+    if(overview.key_left_shift && overview.mouse_lu)
     {
-        const Point cart = Overview_IsoToCart(overview, input.point, false);
-        const Icon icon = Icon_FromInput(input, units.motive);
+        const Point cart = Overview_IsoToCart(overview, overview.mouse_cursor, false);
+        const Icon icon = Icon_FromOverview(overview, units.motive);
         const Point none = { 0,0 };
         switch(icon)
         {
@@ -755,18 +755,18 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
     return units;
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Input input, const Map map, const Field field, const Window window)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Map map, const Field field, const Window window)
 {
     UpdateEntropy(units);
     Tick(units);
-    units = ServiceIcons(units, overview, graphics, input, map);
+    units = ServiceIcons(units, overview, graphics, map);
     units = ManagePathFinding(units, overview.grid, map, field);
-    units = Select(units, overview, input, graphics, window.units);
-    units = Command(units, overview, input, graphics, map, field);
+    units = Select(units, overview, graphics, window.units);
+    units = Command(units, overview, graphics, map, field);
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
-    units = Kill(units, overview, graphics, input, map);
+    units = Kill(units, overview, graphics, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);

@@ -194,7 +194,7 @@ void Video_PrintHotkeys(const Video video)
     }
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Input input, const Window window)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Window window)
 {
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
     const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, window.units);
@@ -206,11 +206,12 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
 #if SANITIZE_THREAD == 0
     // Breaks sanitizer - but that's okay - renderer race conditions will not affect syncing P2P.
-    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, input, blend_lines, terrain_tiles);
+    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, blend_lines, terrain_tiles);
 #endif
-    Vram_DrawMouseTileSelect(vram, data.terrain, input, overview);
+    Vram_DrawMouseTileSelect(vram, data.terrain, overview);
     Vram_DrawUnitSelections(vram, graphics_tiles);
-    Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, input.l && !input.key[SDL_SCANCODE_LSHIFT]);
+    const bool should_draw = overview.mouse_l && !overview.key_left_shift;
+    Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
     Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color);
     Vram_DrawHud(vram, data.interfac);
     Vram_Unlock(video.canvas);

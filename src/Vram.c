@@ -210,7 +210,8 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
     // but with the inner file so that the correct surface can be looked up.
     const Animation outer_animation = terrain.animation[COLOR_GRY][file];
     const Tile outer_tile = Tile_GetTerrain(overview, outer, outer_animation, file);
-    const Mode blend_mode = blendomatic.mode[0]; // XXX: Which mode? How to choose?
+    const int32_t index = (file == FILE_FARM) ? 3 : 0;
+    const Mode blend_mode = blendomatic.mode[index];
     const int32_t blend_id = Mode_GetBlendIndex(inner, outer);
     DrawTileMask(vram, outer_tile, blend_mode.mask_real[blend_id]);
 }
@@ -285,10 +286,10 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
     free(threads);
 }
 
-void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Input input, const Lines blend_lines, const Tiles terrain_tiles)
+void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Lines blend_lines, const Tiles terrain_tiles)
 {
     RenderTerrainTiles(vram, terrain_tiles);
-    if(!input.key[SDL_SCANCODE_LSHIFT])
+    if(!overview.key_left_shift)
         BlendTerrainTiles(vram, terrain, map, overview, blend_lines, blendomatic);
 }
 
@@ -410,7 +411,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
     {
         const Tile tile = tiles.tile[i];
         const Point center = Tile_GetHotSpotCoords(tile);
-        const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
+        const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE / 2);
         if(tile.reference->is_selected)
             DrawEllipse(vram, rect, tile.reference->is_engaged ? 0xFF0000 : 0xFFFFFF);
     }
@@ -453,14 +454,14 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
     }
 }
 
-void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Input input, const Overview overview)
+void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Overview overview)
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
     const Animation animation = terrain.animation[COLOR_GRY][FILE_DIRT];
     const Image image = animation.image[0];
     const Frame frame = animation.frame[0];
-    const Point snap = Overview_IsoSnapTo(overview, input.point);
+    const Point snap = Overview_IsoSnapTo(overview, overview.mouse_cursor);
     for(int32_t i = 0; i < frame.height; i++)
     {
         const Outline outline = image.outline_table[i];

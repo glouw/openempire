@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 
-static Rects GetRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
+static Rects GetChannelRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
 {
     Rects rects = Rects_Make(cpu_count);
     const int32_t width = xres / rects.count;
@@ -31,21 +31,75 @@ Overview Overview_Init(const Color color, const int32_t xres, const int32_t yres
     overview.xres = xres;
     overview.yres = yres;
     overview.color = color;
-    overview.rects = GetRects(xres, yres, cpu_count);
+    overview.channel_rects = GetChannelRects(xres, yres, cpu_count);
+    return overview;
+}
+
+static Overview UpdateMouse(Overview overview, const Input input)
+{
+    overview.mouse_cursor = input.cursor;
+    overview.mouse_l = input.l;
+    overview.mouse_r = input.r;
+    overview.mouse_ld = input.ld;
+    overview.mouse_lu = input.lu;
+    overview.mouse_rd = input.rd;
+    overview.mouse_ru = input.ru;
+    return overview;
+}
+
+static Overview UpdateKeys(Overview overview, const Input input)
+{
+    overview.key_left_shift = input.key[SDL_SCANCODE_LSHIFT];
+    overview.key_q = input.key[SDL_SCANCODE_Q];
+    overview.key_w = input.key[SDL_SCANCODE_W];
+    overview.key_e = input.key[SDL_SCANCODE_E];
+    overview.key_r = input.key[SDL_SCANCODE_R];
+    overview.key_t = input.key[SDL_SCANCODE_T];
+    overview.key_a = input.key[SDL_SCANCODE_A];
+    overview.key_s = input.key[SDL_SCANCODE_S];
+    overview.key_d = input.key[SDL_SCANCODE_D];
+    overview.key_f = input.key[SDL_SCANCODE_F];
+    overview.key_g = input.key[SDL_SCANCODE_G];
+    overview.key_z = input.key[SDL_SCANCODE_Z];
+    overview.key_x = input.key[SDL_SCANCODE_X];
+    overview.key_c = input.key[SDL_SCANCODE_C];
+    overview.key_v = input.key[SDL_SCANCODE_V];
+    overview.key_b = input.key[SDL_SCANCODE_B];
+    overview.key_1 = input.key[SDL_SCANCODE_1];
+    overview.key_2 = input.key[SDL_SCANCODE_2];
+    overview.key_3 = input.key[SDL_SCANCODE_3];
+    overview.key_left_ctrl = input.key[SDL_SCANCODE_LCTRL];
+    overview.key_delete = input.key[SDL_SCANCODE_DELETE];
+    overview.key_return = input.key[SDL_SCANCODE_RETURN];
+    return overview;
+}
+
+static Overview UpdateSelectionBox(Overview overview)
+{
+    if(overview.mouse_ld)
+        overview.selection_box.a = overview.mouse_cursor;
+    overview.selection_box.b = overview.mouse_cursor;
+    return overview;
+}
+
+static Overview UpdatePan(Overview overview)
+{
+    if(!overview.key_left_shift)
+    {
+        if(overview.key_w) overview.pan.y -= CONFIG_OVERVIEW_SCROLL_SPEED;
+        if(overview.key_s) overview.pan.y += CONFIG_OVERVIEW_SCROLL_SPEED;
+        if(overview.key_d) overview.pan.x += CONFIG_OVERVIEW_SCROLL_SPEED;
+        if(overview.key_a) overview.pan.x -= CONFIG_OVERVIEW_SCROLL_SPEED;
+    }
     return overview;
 }
 
 Overview Overview_Update(Overview overview, const Input input)
 {
-    if(!input.key[SDL_SCANCODE_LSHIFT])
-    {
-        if(input.key[SDL_SCANCODE_W]) overview.point.y -= CONFIG_OVERVIEW_SCROLL_SPEED;
-        if(input.key[SDL_SCANCODE_S]) overview.point.y += CONFIG_OVERVIEW_SCROLL_SPEED;
-        if(input.key[SDL_SCANCODE_D]) overview.point.x += CONFIG_OVERVIEW_SCROLL_SPEED;
-        if(input.key[SDL_SCANCODE_A]) overview.point.x -= CONFIG_OVERVIEW_SCROLL_SPEED;
-    }
-    overview.selection_box.a = input.ld_point;
-    overview.selection_box.b = input.point;
+    overview = UpdateMouse(overview, input);
+    overview = UpdateKeys(overview, input);
+    overview = UpdatePan(overview);
+    overview = UpdateSelectionBox(overview);
     return overview;
 }
 
@@ -70,8 +124,8 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, const bool ra
 {
     const int32_t x = +iso.x - overview.xres / 2;
     const int32_t y = -iso.y + overview.yres / 2;
-    const int32_t xx = x + overview.point.x;
-    const int32_t yy = y - overview.point.y;
+    const int32_t xx = x + overview.pan.x;
+    const int32_t yy = y - overview.pan.y;
     const int32_t w = overview.grid.tile_iso_width - 1;
     const int32_t h = overview.grid.tile_iso_height - 1;
     const int32_t rx = (xx * h + yy * w);
@@ -107,8 +161,8 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
     const int32_t cx = mx - (w / 2) * overview.grid.cols;
     const int32_t cy = my - (h / 2);
     const Point iso = {
-        cx - overview.point.x,
-        cy - overview.point.y,
+        cx - overview.pan.x,
+        cy - overview.pan.y,
     };
     return iso;
 }
@@ -136,5 +190,5 @@ Point Overview_IsoSnapTo(const Overview overview, const Point iso)
 
 void Overview_Free(const Overview overview)
 {
-    Rects_Free(overview.rects);
+    Rects_Free(overview.channel_rects);
 }

@@ -41,7 +41,7 @@ void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-Units Units_Caretake(Units, const Registrar, const Overview, const Input, const Map, const Field, const Window);
+Units Units_Caretake(Units, const Registrar, const Overview, const Map, const Field, const Window);
 
 Field Units_Field(const Units, const Map);
 

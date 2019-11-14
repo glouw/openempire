@@ -56,17 +56,17 @@ void Map_Free(const Map map)
     free(map.file);
 }
 
-void Map_Edit(const Map map, const Overview overview, const Input input)
+void Map_Edit(const Map map, const Overview overview)
 {
-    if(input.key[SDL_SCANCODE_LSHIFT])
+    if(overview.key_left_shift)
     {
         Terrain file = FILE_DIRT;
-        if(input.key[SDL_SCANCODE_1]) file = FILE_GRASS;
-        if(input.key[SDL_SCANCODE_2]) file = FILE_WATER;
-        if(input.key[SDL_SCANCODE_3]) file = FILE_FARM;
-        if(input.l)
+        if(overview.key_1) file = FILE_GRASS;
+        if(overview.key_2) file = FILE_WATER;
+        if(overview.key_3) file = FILE_FARM;
+        if(overview.mouse_l)
         {
-            const Point cartesian = Overview_IsoToCart(overview, input.point, false);
+            const Point cartesian = Overview_IsoToCart(overview, overview.mouse_cursor, false);
             if(InBounds(map, cartesian))
                 Map_SetTerrainFile(map, cartesian, file);
         }
