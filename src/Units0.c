@@ -2,6 +2,7 @@
 
 #include "Units.h"
 
+#include "Window.h"
 #include "Util.h"
 #include "File.h"
 #include "Field.h"
@@ -755,8 +756,9 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
     return units;
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Map map, const Field field, const Window window)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Map map, const Field field)
 {
+    const Window window = Window_Make(overview);
     UpdateEntropy(units);
     Tick(units);
     units = ServiceIcons(units, overview, graphics, map);
@@ -770,5 +772,6 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);
+    Window_Free(window);
     return units;
 }

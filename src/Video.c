@@ -2,6 +2,7 @@
 
 #include "Surface.h"
 #include "Point.h"
+#include "Window.h"
 #include "Icon.h"
 #include "Tile.h"
 #include "Config.h"
@@ -194,8 +195,9 @@ void Video_PrintHotkeys(const Video video)
     }
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Window window)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview)
 {
+    const Window window = Window_Make(overview);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
     const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, window.units);
     const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, window.terrain);
@@ -218,6 +220,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Tiles_Free(graphics_tiles);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);
+    Window_Free(window);
 }
 
 void Video_PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles)

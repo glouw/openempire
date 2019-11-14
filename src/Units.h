@@ -2,7 +2,6 @@
 
 #include "Unit.h"
 #include "Overview.h"
-#include "Window.h"
 #include "Motive.h"
 #include "Field.h"
 #include "Map.h"
@@ -41,7 +40,7 @@ void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-Units Units_Caretake(Units, const Registrar, const Overview, const Map, const Field, const Window);
+Units Units_Caretake(Units, const Registrar, const Overview, const Map, const Field);
 
 Field Units_Field(const Units, const Map);
 
