@@ -756,22 +756,27 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
     return units;
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Map map, const Field field)
+Units Units_Service(Units units, const Registrar graphics, const Overview overview, const Map map, const Field field)
 {
     const Window window = Window_Make(overview);
-    UpdateEntropy(units);
-    Tick(units);
-    units = ServiceIcons(units, overview, graphics, map);
-    units = ManagePathFinding(units, overview.grid, map, field);
     units = Select(units, overview, graphics, window.units);
     units = Command(units, overview, graphics, map, field);
+    units = ServiceIcons(units, overview, graphics, map);
+    units = Kill(units, overview, graphics, map);
+    Window_Free(window);
+    return units;
+}
+
+Units Units_Caretake(Units units, const Grid grid, const Map map, const Field field)
+{
+    UpdateEntropy(units);
+    Tick(units);
+    units = ManagePathFinding(units, grid, map, field);
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
-    units = Kill(units, overview, graphics, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);
-    Window_Free(window);
     return units;
 }

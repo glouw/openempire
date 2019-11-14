@@ -40,8 +40,6 @@ void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-Units Units_Caretake(Units, const Registrar, const Overview, const Map, const Field);
-
 Field Units_Field(const Units, const Map);
 
 void Units_ResetTiled(const Units);
@@ -57,3 +55,7 @@ Units Units_SpawnTownCenter(Units units, const Point, const Grid, const Color, c
 void Units_ManageStacks(const Units);
 
 bool Units_CanBuild(const Units, const Map, Unit* const);
+
+Units Units_Service(Units, const Registrar, const Overview, const Map, const Field);
+
+Units Units_Caretake(Units, const Grid, const Map, const Field);
