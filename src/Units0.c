@@ -57,10 +57,10 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-Units Units_New(const Map map, const Overview overview, const Registrar graphics, const int32_t cpu_count)
+Units Units_New(const Map map, const Grid grid, const Registrar graphics, const int32_t cpu_count)
 {
     const int32_t max = CONFIG_UNITS_MAX;
-    const int32_t area = overview.grid.rows * overview.grid.cols;
+    const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
     UTIL_CHECK(unit);
@@ -72,9 +72,9 @@ Units Units_New(const Map map, const Overview overview, const Registrar graphics
     units.unit = unit;
     units.max = max;
     units.stack = stack;
-    units.rows = overview.grid.rows;
-    units.cols = overview.grid.cols;
-    units = Units_GenerateTestZone(units, map, overview, graphics);
+    units.rows = grid.rows;
+    units.cols = grid.cols;
+    units = Units_GenerateTestZone(units, map, grid, graphics);
     units.cpu_count = cpu_count;
     return units;
 }
@@ -96,11 +96,11 @@ static Units UnSelectAll(Units units)
     return units;
 }
 
-static Units Select(Units units, const Overview overview, const Registrar graphics, const Points render_points)
+static Units Select(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Points render_points)
 {
     if(overview.mouse_lu && !overview.key_left_shift)
     {
-        const Tiles tiles = Tiles_PrepGraphics(graphics, overview, units, render_points);
+        const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
         Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
@@ -130,18 +130,18 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
     }
 }
 
-static Units Command(Units units, const Overview overview, const Registrar graphics, const Map map, const Field field)
+static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field)
 {
     if(overview.mouse_ru && units.select_count > 0)
     {
-        const Point cart_goal = Overview_IsoToCart(overview, overview.mouse_cursor, false);
-        const Point cart = Overview_IsoToCart(overview, overview.mouse_cursor, true);
-        const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(overview.grid, cart);
+        const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
+        const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
         if(CanWalk(units, map, cart_goal))
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
-            units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, overview.grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GRY, graphics, map);
+            units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GRY, graphics, map);
         }
     }
     return units;
@@ -363,7 +363,7 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
-static Units Kill(Units units, const Overview overview, const Registrar graphics, const Map map)
+static Units Kill(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -376,9 +376,9 @@ static Units Kill(Units units, const Overview overview, const Registrar graphics
                     KillChildren(units, unit);
                 if(unit->trait.is_inanimate)
                 {
-                    MakeRubble(unit, overview.grid, graphics);
-                    units = SpamFire(units, unit, overview.grid, graphics, map);
-                    units = SpamSmoke(units, unit, overview.grid, graphics, map);
+                    MakeRubble(unit, grid, graphics);
+                    units = SpamFire(units, unit, grid, graphics, map);
+                    units = SpamSmoke(units, unit, grid, graphics, map);
                 }
             }
     }
@@ -731,24 +731,24 @@ static Units CountPopulation(Units units)
     return units;
 }
 
-static Units ServiceIcons(Units units, const Overview overview, const Registrar graphics, const Map map)
+static Units ServiceIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     if(overview.key_left_shift && overview.mouse_lu)
     {
-        const Point cart = Overview_IsoToCart(overview, overview.mouse_cursor, false);
+        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
         const Icon icon = Icon_FromOverview(overview, units.motive);
         const Point none = { 0,0 };
         switch(icon)
         {
-        case ICON_BUILD_HOUSE       : return Units_Spawn          (units, cart, none, overview.grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics, map);
-        case ICON_BUILD_MILL        : return Units_SpawnWithShadow(units, cart,       overview.grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
-        case ICON_BUILD_STONE_CAMP  : return Units_Spawn          (units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
-        case ICON_BUILD_LUMBER_CAMP : return Units_Spawn          (units, cart, none, overview.grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics, map);
-        case ICON_BUILD_BARRACKS    : return Units_Spawn          (units, cart, none, overview.grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics, map);
-        case ICON_BUILD_OUTPOST     : return Units_SpawnWithShadow(units, cart,       overview.grid, FILE_DARK_AGE_OUTPOST,                 overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
-        case ICON_BUILD_TOWN_CENTER : return Units_SpawnTownCenter(units, cart,       overview.grid,                                        overview.color, graphics, map);
-        case ICON_UNIT_MILITIA      : return Units_Spawn          (units, cart, none, overview.grid, FILE_MILITIA_IDLE,                     overview.color, graphics, map);
-        case ICON_UNIT_MALE_VILLAGER: return Units_Spawn          (units, cart, none, overview.grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics, map);
+        case ICON_BUILD_HOUSE        : return Units_Spawn          (units, cart, none, grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics, map);
+        case ICON_BUILD_MILL         : return Units_SpawnWithShadow(units, cart,       grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
+        case ICON_BUILD_STONE_CAMP   : return Units_Spawn          (units, cart, none, grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
+        case ICON_BUILD_LUMBER_CAMP  : return Units_Spawn          (units, cart, none, grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics, map);
+        case ICON_BUILD_BARRACKS     : return Units_Spawn          (units, cart, none, grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics, map);
+        case ICON_BUILD_OUTPOST      : return Units_SpawnWithShadow(units, cart,       grid, FILE_DARK_AGE_OUTPOST,                 overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
+        case ICON_BUILD_TOWN_CENTER  : return Units_SpawnTownCenter(units, cart,       grid,                                        overview.color, graphics, map);
+        case ICON_UNIT_MILITIA       : return Units_Spawn          (units, cart, none, grid, FILE_MILITIA_IDLE,                     overview.color, graphics, map);
+        case ICON_UNIT_MALE_VILLAGER : return Units_Spawn          (units, cart, none, grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics, map);
         default:
             break;
         }
@@ -756,13 +756,13 @@ static Units ServiceIcons(Units units, const Overview overview, const Registrar 
     return units;
 }
 
-Units Units_Service(Units units, const Registrar graphics, const Overview overview, const Map map, const Field field)
+Units Units_Service(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Field field)
 {
-    const Window window = Window_Make(overview);
-    units = Select(units, overview, graphics, window.units);
-    units = Command(units, overview, graphics, map, field);
-    units = ServiceIcons(units, overview, graphics, map);
-    units = Kill(units, overview, graphics, map);
+    const Window window = Window_Make(overview, grid);
+    units = Select(units, overview, grid, graphics, window.units);
+    units = Command(units, overview, grid, graphics, map, field);
+    units = ServiceIcons(units, overview, grid, graphics, map);
+    units = Kill(units, overview, grid, graphics, map);
     Window_Free(window);
     return units;
 }

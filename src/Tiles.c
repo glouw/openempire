@@ -42,7 +42,7 @@ void Tiles_SortByHeight(const Tiles tiles)
     qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByHeight);
 }
 
-Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Units units, const Points points)
+Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Grid grid, const Units units, const Points points)
 {
     Tile* const tile = UTIL_ALLOC(Tile, units.count);
     UTIL_CHECK(tile);
@@ -58,7 +58,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             {
                 const Animation animation = graphics.animation[ref->color][ref->file];
                 const Point overrider = ref->trait.is_inanimate ? ref->cart : point;
-                tile[unit_count] = Tile_GetGraphics(overview, overrider, ref->cart_grid_offset, animation, ref);
+                tile[unit_count] = Tile_GetGraphics(overview, grid, overrider, ref->cart_grid_offset, animation, ref);
                 unit_count++;
                 ref->already_tiled = true;
             }
@@ -87,7 +87,7 @@ static void SortByTileSurface(const Tiles tiles)
     qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByTileSurface);
 }
 
-Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview overview, const Points points)
+Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Points points)
 {
     Tile* const tile = UTIL_ALLOC(Tile, points.count);
     UTIL_CHECK(tile);
@@ -98,7 +98,7 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
         if(file != FILE_TERRAIN_NONE)
         {
             const Animation animation = terrain.animation[COLOR_GRY][file];
-            tile[i] = Tile_GetTerrain(overview, point, animation, file);
+            tile[i] = Tile_GetTerrain(overview, grid, point, animation, file);
         }
     }
     const Tiles tiles = { tile, points.count };

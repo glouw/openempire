@@ -37,11 +37,11 @@ void Vram_Clear(const Vram, const uint32_t color);
 
 void Vram_DrawTile(const Vram, const Tile);
 
-void Vram_DrawMap(const Vram, const Registrar, const Map, const Overview, const Blendomatic, const Lines, const Tiles);
+void Vram_DrawMap(const Vram, const Registrar, const Map, const Overview, const Grid, const Blendomatic, const Lines, const Tiles);
 
 void Vram_DrawUnits(const Vram, const Tiles);
 
-void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Overview);
+void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Overview, const Grid);
 
 void Vram_DrawUnitSelections(const Vram, const Tiles);
 

@@ -15,19 +15,19 @@ int main(const int argc, const char* argv[])
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
-    Overview overview = Overview_Init(color, video.xres, video.yres, grid, video.cpu_count);
-    Units units = Units_New(map, overview, data.graphics, video.cpu_count);
+    Overview overview = Overview_Init(color, video.xres, video.yres);
+    Units units = Units_New(map, grid, data.graphics, video.cpu_count);
 #if 1
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
         overview = Overview_Update(overview, input); // XXX. TO BE SENT VIA P2P (ALONG WITH INPUT).
-        Map_Edit(map, overview);
+        Map_Edit(map, overview, grid);
         const Field field = Units_Field(units, map);
-        units = Units_Service(units, data.graphics, overview, map, field); // XXX. TO BE UPDATED BY OTHER P2P CLIENTS.
+        units = Units_Service(units, data.graphics, overview, grid, map, field); // XXX. TO BE UPDATED BY OTHER P2P CLIENTS.
         units = Units_Caretake(units, grid, map, field);
-        Video_Render(video, data, map, units, overview);
+        Video_Render(video, data, map, units, overview, grid);
         const int32_t t1 = SDL_GetTicks();
         Video_CopyCanvas(video);
         Log_Dump();

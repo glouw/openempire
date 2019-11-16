@@ -4,12 +4,12 @@
 #include "Util.h"
 
 #include <SDL2/SDL.h>
+#include <stdbool.h>
 
-Overview Overview_Init(const Color color, const int32_t xres, const int32_t yres, const Grid grid, const int32_t cpu_count)
+Overview Overview_Init(const Color color, const int32_t xres, const int32_t yres)
 {
     static Overview zero;
     Overview overview = zero;
-    overview.grid = grid;
     overview.xres = xres;
     overview.yres = yres;
     overview.color = color;
@@ -101,18 +101,18 @@ bool Overview_IsSelectionBoxBigEnough(const Overview overview)
  *
  * This isometric to cartesian projection preserves integer rounding errors.
  */
-Point Overview_IsoToCart(const Overview overview, const Point iso, const bool raw)
+Point Overview_IsoToCart(const Overview overview, const Grid grid, const Point iso, const bool raw)
 {
     const int32_t x = +iso.x - overview.xres / 2;
     const int32_t y = -iso.y + overview.yres / 2;
     const int32_t xx = x + overview.pan.x;
     const int32_t yy = y - overview.pan.y;
-    const int32_t w = overview.grid.tile_iso_width - 1;
-    const int32_t h = overview.grid.tile_iso_height - 1;
+    const int32_t w = grid.tile_iso_width - 1;
+    const int32_t h = grid.tile_iso_height - 1;
     const int32_t rx = (xx * h + yy * w);
     const int32_t ry = (yy * w - xx * h);
-    const int32_t cx = (+2 * rx + w * h * overview.grid.cols) / (2 * w);
-    const int32_t cy = (-2 * ry + w * h * overview.grid.rows) / (4 * h);
+    const int32_t cx = (+2 * rx + w * h * grid.cols) / (2 * w);
+    const int32_t cy = (-2 * ry + w * h * grid.rows) / (4 * h);
     const Point cart_raw = { cx, cy };
     const Point cart = {
         1 * cx / h,
@@ -131,15 +131,15 @@ Point Overview_IsoToCart(const Overview overview, const Point iso, const bool ra
  *  +--------+        \m/
  *                     +
  */
-Point Overview_CartToIso(const Overview overview, const Point cart)
+Point Overview_CartToIso(const Overview overview, const Grid grid, const Point cart)
 {
-    const int32_t w = overview.grid.tile_iso_width - 1;
-    const int32_t h = overview.grid.tile_iso_height - 1;
+    const int32_t w = grid.tile_iso_width - 1;
+    const int32_t h = grid.tile_iso_height - 1;
     const int32_t xx = (cart.y + cart.x) * (w / 2);
     const int32_t yy = (cart.y - cart.x) * (h / 2);
     const int32_t mx = xx + overview.xres / 2;
     const int32_t my = yy + overview.yres / 2;
-    const int32_t cx = mx - (w / 2) * overview.grid.cols;
+    const int32_t cx = mx - (w / 2) * grid.cols;
     const int32_t cy = my - (h / 2);
     const Point iso = {
         cx - overview.pan.x,
@@ -148,23 +148,23 @@ Point Overview_CartToIso(const Overview overview, const Point cart)
     return iso;
 }
 
-Quad Overview_GetRenderBox(const Overview overview, const int32_t border)
+Quad Overview_GetRenderBox(const Overview overview, const Grid grid, const int32_t border)
 {
     const Point p0 = { border, border};
     const Point p1 = { overview.xres - border, border};
     const Point p2 = { border, overview.yres - border };
     const Point p3 = { overview.xres - border, overview.yres - border};
-    const Point a = Overview_IsoToCart(overview, p0, false);
-    const Point b = Overview_IsoToCart(overview, p1, false);
-    const Point c = Overview_IsoToCart(overview, p2, false);
-    const Point d = Overview_IsoToCart(overview, p3, false);
+    const Point a = Overview_IsoToCart(overview, grid, p0, false);
+    const Point b = Overview_IsoToCart(overview, grid, p1, false);
+    const Point c = Overview_IsoToCart(overview, grid, p2, false);
+    const Point d = Overview_IsoToCart(overview, grid, p3, false);
     const Quad quad = { a, b, c, d};
     return quad;
 }
 
-Point Overview_IsoSnapTo(const Overview overview, const Point iso)
+Point Overview_IsoSnapTo(const Overview overview, const Grid grid, const Point iso)
 {
-    const Point cart = Overview_IsoToCart(overview, iso, false);
-    const Point snap = Overview_CartToIso(overview, cart);
+    const Point cart = Overview_IsoToCart(overview, grid, iso, false);
+    const Point snap = Overview_CartToIso(overview, grid, cart);
     return snap;
 }

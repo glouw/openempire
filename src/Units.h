@@ -2,6 +2,8 @@
 
 #include "Unit.h"
 #include "Overview.h"
+#include "Grid.h"
+#include "Grid.h"
 #include "Motive.h"
 #include "Field.h"
 #include "Map.h"
@@ -34,7 +36,7 @@ typedef struct
 }
 Units;
 
-Units Units_New(const Map map, const Overview, const Registrar graphics, const int32_t cpu_count);
+Units Units_New(const Map map, const Grid, const Registrar graphics, const int32_t cpu_count);
 
 void Units_Free(const Units);
 
@@ -44,7 +46,7 @@ Field Units_Field(const Units, const Map);
 
 void Units_ResetTiled(const Units);
 
-Units Units_GenerateTestZone(Units, const Map, const Overview, const Registrar);
+Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar);
 
 Units Units_Spawn(Units, const Point, const Point offset, const Grid, const Graphics, const Color, const Registrar, const Map);
 
@@ -56,6 +58,6 @@ void Units_ManageStacks(const Units);
 
 bool Units_CanBuild(const Units, const Map, Unit* const);
 
-Units Units_Service(Units, const Registrar, const Overview, const Map, const Field);
+Units Units_Service(Units, const Registrar, const Overview, const Grid, const Map, const Field);
 
 Units Units_Caretake(Units, const Grid, const Map, const Field);

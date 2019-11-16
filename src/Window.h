@@ -10,6 +10,6 @@ typedef struct
 }
 Window;
 
-Window Window_Make(const Overview);
+Window Window_Make(const Overview, const Grid);
 
 void Window_Free(const Window);

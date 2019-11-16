@@ -56,7 +56,7 @@ void Map_Free(const Map map)
     free(map.file);
 }
 
-void Map_Edit(const Map map, const Overview overview)
+void Map_Edit(const Map map, const Overview overview, const Grid grid)
 {
     if(overview.key_left_shift)
     {
@@ -66,7 +66,7 @@ void Map_Edit(const Map map, const Overview overview)
         if(overview.key_3) file = FILE_FARM;
         if(overview.mouse_l)
         {
-            const Point cartesian = Overview_IsoToCart(overview, overview.mouse_cursor, false);
+            const Point cartesian = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
             if(InBounds(map, cartesian))
                 Map_SetTerrainFile(map, cartesian, file);
         }

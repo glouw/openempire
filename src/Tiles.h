@@ -11,9 +11,9 @@ typedef struct
 }
 Tiles;
 
-Tiles Tiles_PrepGraphics(const Registrar, const Overview, const Units, const Points);
+Tiles Tiles_PrepGraphics(const Registrar, const Overview, const Grid, const Units, const Points);
 
-Tiles Tiles_PrepTerrain(const Registrar, const Map, const Overview, const Points);
+Tiles Tiles_PrepTerrain(const Registrar, const Map, const Overview, const Grid, const Points);
 
 void Tiles_Free(const Tiles);
 

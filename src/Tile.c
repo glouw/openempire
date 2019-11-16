@@ -55,13 +55,13 @@ typedef struct
 }
 Dynamics;
 
-static Tile Construct(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, const Dynamics dynamics, const uint8_t height, Unit* const reference)
+static Tile Construct(const Overview overview, const Grid grid, const Point cart, const Point cart_grid_offset, const Animation animation, const Dynamics dynamics, const uint8_t height, Unit* const reference)
 {
     static Tile zero;
     Tile tile = zero;
     tile.frame = animation.frame[dynamics.index];
     tile.surface = animation.surface[dynamics.index];
-    tile.iso_pixel = Overview_CartToIso(overview, cart);
+    tile.iso_pixel = Overview_CartToIso(overview, grid, cart);
     tile.iso_pixel_offset = Point_ToIso(cart_grid_offset);
     tile.flip_vert = dynamics.flip_vert;
     tile.height = height;
@@ -73,14 +73,14 @@ static Tile Construct(const Overview overview, const Point cart, const Point car
     return Tile_Clip(tile, bound);
 }
 
-Tile Tile_GetTerrain(const Overview overview, const Point cart, const Animation animation, const Terrain file)
+Tile Tile_GetTerrain(const Overview overview, const Grid grid, const Point cart, const Animation animation, const Terrain file)
 {
     const int32_t bound = Util_Sqrt(animation.count);
     const int32_t index = (cart.x % bound) + ((cart.y % bound) * bound);
     const Point cart_grid_offset = { 0,0 };
     const uint8_t height = Terrain_GetHeight(file);
     const Dynamics dynamics = { index, false };
-    return Construct(overview, cart, cart_grid_offset, animation, dynamics, height, NULL);
+    return Construct(overview, grid, cart, cart_grid_offset, animation, dynamics, height, NULL);
 }
 
 static Dynamics GetDynamics(const Animation animation, Unit* const reference)
@@ -108,7 +108,7 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
     return dynamics;
 }
 
-Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
+Tile Tile_GetGraphics(const Overview overview, const Grid grid, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
 {
     const Dynamics dynamics = GetDynamics(animation, reference);
     const Point shifted = Unit_GetShift(reference, cart);
@@ -117,10 +117,10 @@ Tile Tile_GetGraphics(const Overview overview, const Point cart, const Point car
     // MINOR graphics tweak for rubble - seems like sprite rubble artwork was always bugged with a half grid offset.
     if(reference->trait.type == TYPE_RUBBLE)
     {
-        const Point shift = { 0, overview.grid.tile_cart_mid.y / 2 };
+        const Point shift = { 0, grid.tile_cart_mid.y / 2 };
         offset = Point_Sub(offset, shift);
     }
-    return Construct(overview, shifted, offset, animation, dynamics, height, reference);
+    return Construct(overview, grid, shifted, offset, animation, dynamics, height, reference);
 }
 
 Point Tile_GetHotSpotCoords(const Tile tile)

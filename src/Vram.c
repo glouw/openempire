@@ -220,7 +220,7 @@ static void DrawTileMask(const Vram vram, const Tile tile, SDL_Surface* const ma
     tile.needs_clipping ? DrawTileMaskClip(vram, tile, mask) : DrawTileMaskNoClip(vram, tile, mask);
 }
 
-static void DrawBlendLine(const Vram vram, const Line line, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic)
+static void DrawBlendLine(const Vram vram, const Line line, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Blendomatic blendomatic)
 {
     const Point inner = line.inner;
     const Point outer = line.outer;
@@ -228,7 +228,7 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
     // The outer tile uses the outer tile animation,
     // but with the inner file so that the correct surface can be looked up.
     const Animation outer_animation = terrain.animation[COLOR_GRY][file];
-    const Tile outer_tile = Tile_GetTerrain(overview, outer, outer_animation, file);
+    const Tile outer_tile = Tile_GetTerrain(overview, grid, outer, outer_animation, file);
     const int32_t index = (file == FILE_FARM) ? 3 : 0;
     const Mode blend_mode = blendomatic.mode[index];
     const int32_t blend_id = Mode_GetBlendIndex(inner, outer);
@@ -243,6 +243,7 @@ typedef struct
     Map map;
     Overview overview;
     Blendomatic blendomatic;
+    Grid grid;
     int32_t a;
     int32_t b;
 }
@@ -254,7 +255,7 @@ static int32_t DrawBlendNeedle(void* const data)
     for(int32_t i = needle->a; i < needle->b; i++)
     {
         const Line line = needle->lines.line[i];
-        DrawBlendLine(needle->vram, line, needle->terrain, needle->map, needle->overview, needle->blendomatic);
+        DrawBlendLine(needle->vram, line, needle->terrain, needle->map, needle->overview, needle->grid, needle->blendomatic);
     }
     return 0;
 }
@@ -282,7 +283,7 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
     return index;
 }
 
-static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Lines blend_lines, const Blendomatic blendomatic)
+static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Lines blend_lines, const Blendomatic blendomatic)
 {
     BlendNeedle* const needles = UTIL_ALLOC(BlendNeedle, vram.cpu_count);
     UTIL_CHECK(needles);
@@ -294,6 +295,7 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
         needles[i].map = map;
         needles[i].overview = overview;
         needles[i].blendomatic = blendomatic;
+        needles[i].grid = grid;
         needles[i].a = GetNextBestBlendTile(blend_lines, i + 0, vram.cpu_count);
         needles[i].b = GetNextBestBlendTile(blend_lines, i + 1, vram.cpu_count);
     }
@@ -305,11 +307,11 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
     free(threads);
 }
 
-void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Blendomatic blendomatic, const Lines blend_lines, const Tiles terrain_tiles)
+void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Blendomatic blendomatic, const Lines blend_lines, const Tiles terrain_tiles)
 {
     RenderTerrainTiles(vram, terrain_tiles);
     if(!overview.key_left_shift)
-        BlendTerrainTiles(vram, terrain, map, overview, blend_lines, blendomatic);
+        BlendTerrainTiles(vram, terrain, map, overview, grid, blend_lines, blendomatic);
 }
 
 typedef struct
@@ -473,14 +475,14 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
     }
 }
 
-void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Overview overview)
+void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid)
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
     const Animation animation = terrain.animation[COLOR_GRY][FILE_DIRT];
     const Image image = animation.image[0];
     const Frame frame = animation.frame[0];
-    const Point snap = Overview_IsoSnapTo(overview, overview.mouse_cursor);
+    const Point snap = Overview_IsoSnapTo(overview, grid, overview.mouse_cursor);
     for(int32_t i = 0; i < frame.height; i++)
     {
         const Outline outline = image.outline_table[i];

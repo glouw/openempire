@@ -2,6 +2,7 @@
 
 #include "Text.h"
 #include "Overview.h"
+#include "Grid.h"
 #include "Color.h"
 #include "Map.h"
 #include "Units.h"
@@ -33,7 +34,7 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
 
 void Video_Free(const Video);
 
-void Video_Render(const Video, const Data, const Map, const Units, const Overview);
+void Video_Render(const Video, const Data, const Map, const Units, const Overview, const Grid);
 
 void Video_RenderDataDemo(const Video, const Data, const Color);
 

@@ -2,10 +2,10 @@
 
 #include "Config.h"
 
-Window Window_Make(const Overview overview)
+Window Window_Make(const Overview overview, const Grid grid)
 {
-    const Quad units = Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_UNITS);
-    const Quad terrain = Overview_GetRenderBox(overview, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN);
+    const Quad units = Overview_GetRenderBox(overview, grid, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_UNITS);
+    const Quad terrain = Overview_GetRenderBox(overview, grid, CONFIG_VIDEO_TOP_LEFT_BORDER_OFFSET_TERRAIN);
     const Window window = {
         Quad_GetRenderPoints(units),
         Quad_GetRenderPoints(terrain),

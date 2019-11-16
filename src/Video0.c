@@ -77,12 +77,12 @@ void Video_PrintHotkeys(const Video video)
     }
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Grid grid)
 {
-    const Window window = Window_Make(overview);
+    const Window window = Window_Make(overview, grid);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
-    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, units, window.units);
-    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, window.terrain);
+    const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, grid, units, window.units);
+    const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, grid, window.terrain);
     const Lines blend_lines = Map_GetBlendLines(map, window.terrain);
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
@@ -90,9 +90,9 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
 #if SANITIZE_THREAD == 0
     // Breaks sanitizer - but that's okay - renderer race conditions will not affect syncing P2P.
-    Vram_DrawMap(vram, data.terrain, map, overview, data.blendomatic, blend_lines, terrain_tiles);
+    Vram_DrawMap(vram, data.terrain, map, overview, grid, data.blendomatic, blend_lines, terrain_tiles);
 #endif
-    Vram_DrawMouseTileSelect(vram, data.terrain, overview);
+    Vram_DrawMouseTileSelect(vram, data.terrain, overview, grid);
     Vram_DrawUnitSelections(vram, graphics_tiles);
     const bool should_draw = overview.mouse_l && !overview.key_left_shift;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);

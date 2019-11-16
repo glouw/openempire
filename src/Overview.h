@@ -2,15 +2,14 @@
 
 #include "Input.h"
 #include "Point.h"
+#include "Grid.h"
 #include "Color.h"
 #include "Rect.h"
-#include "Grid.h"
 #include "Quad.h"
 
 typedef struct
 {
     Point pan;
-    Grid grid; // XXX. Should not be in here.
     Rect selection_box;
     int32_t xres;
     int32_t yres;
@@ -47,16 +46,16 @@ typedef struct
 }
 Overview;
 
-Overview Overview_Init(const Color, const int32_t xres, const int32_t yres, const Grid, const int32_t cpu_count);
+Overview Overview_Init(const Color, const int32_t xres, const int32_t yres);
 
 Overview Overview_Update(Overview, const Input);
 
-Point Overview_IsoToCart(const Overview, const Point, const bool raw);
+Point Overview_IsoToCart(const Overview, const Grid, const Point, const bool raw);
 
-Point Overview_CartToIso(const Overview, const Point);
+Point Overview_CartToIso(const Overview, const Grid, const Point);
 
-Quad Overview_GetRenderBox(const Overview, const int32_t border);
+Quad Overview_GetRenderBox(const Overview, const Grid, const int32_t border);
 
-Point Overview_IsoSnapTo(const Overview, const Point);
+Point Overview_IsoSnapTo(const Overview, const Grid, const Point);
 
 bool Overview_IsSelectionBoxBigEnough(const Overview);

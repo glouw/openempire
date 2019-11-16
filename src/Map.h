@@ -25,7 +25,7 @@ void Map_SetTerrainFile(const Map, const Point, const Terrain file);
 
 void Map_Free(const Map);
 
-void Map_Edit(const Map, const Overview);
+void Map_Edit(const Map, const Overview, const Grid);
 
 Points Map_GetBlendBox(const Map, const Point inner);
 
