@@ -147,18 +147,6 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
     return units;
 }
 
-static Point CoheseBoids(const Units units, Unit* const unit)
-{
-    static Point zero;
-    if(!Unit_IsExempt(unit))
-    {
-        const Stack stack = Units_GetStackCart(units, unit->cart);
-        const Point delta = Point_Sub(stack.center_of_mass, unit->cell);
-        return Point_Div(delta, CONFIG_UNITS_COHESE_DIVISOR);
-    }
-    return zero;
-}
-
 static Point SeparateBoids(const Units units, Unit* const unit)
 {
     const int32_t width = 1;
@@ -242,7 +230,6 @@ static void CalculateBoidStressors(const Units units, Unit* const unit, const Ma
         unit->group_alignment = AlignBoids(units, unit);
         const Point point[] = {
             unit->group_alignment,
-            CoheseBoids(units, unit),
             SeparateBoids(units, unit),
             WallPushBoids(units, unit, map, grid),
         };

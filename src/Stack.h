@@ -10,7 +10,6 @@
 typedef struct
 {
     Unit** reference;
-    Point center_of_mass;
     int32_t count;
     int32_t max;
 }
@@ -23,7 +22,5 @@ void Stack_Append(Stack* const, Unit* const);
 void Stack_Free(const Stack);
 
 bool Stack_IsWalkable(const Stack);
-
-void Stack_UpdateCenterOfMass(Stack* const);
 
 int32_t Stack_GetMaxPathIndex(const Stack, Unit* const);

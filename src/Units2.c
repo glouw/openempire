@@ -129,20 +129,8 @@ static void StackStacks(const Units units)
     }
 }
 
-static void CalculateCenters(const Units units)
-{
-    for(int32_t y = 0; y < units.rows; y++)
-    for(int32_t x = 0; x < units.cols; x++)
-    {
-        const Point point = { x, y };
-        Stack* const stack = GetStack(units, point);
-        Stack_UpdateCenterOfMass(stack);
-    }
-}
-
 void Units_ManageStacks(const Units units)
 {
     ResetStacks(units);
     StackStacks(units);
-    CalculateCenters(units);
 }
