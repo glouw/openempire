@@ -116,7 +116,7 @@ static Units GenerateGameZone(Units units, const Map map, const Grid grid, const
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(0)
+    switch(3)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);

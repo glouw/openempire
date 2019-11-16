@@ -20,6 +20,7 @@ typedef struct Unit
     Point cart_grid_offset_goal;
     Point cell;
     Point cell_last;
+    Point cell_inanimate;
     Point velocity;
     Point group_alignment;
     Point stressors;

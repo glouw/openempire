@@ -383,8 +383,9 @@ static void Expire(const Units units)
     }
 }
 
-static Unit* GetClosestBoid(const Units units, Unit* const unit)
+static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid)
 {
+    static Point zero;
     const int32_t width = 1;
     Unit* closest = NULL;
     int32_t max = INT32_MAX;
@@ -399,15 +400,19 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
             Unit* const other = stack.reference[i];
             if(other->color != unit->color && !Unit_IsExempt(other)) // XXX. USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
             {
-                Point cell = other->cell;
+                Point cell = zero;
                 if(other->trait.is_inanimate)
                 {
+                    cell = Grid_CartToCell(grid, cart);
                     const Point mid = {
                         CONFIG_GRID_CELL_SIZE / 2,
                         CONFIG_GRID_CELL_SIZE / 2,
                     };
                     cell = Point_Add(cell, mid);
+                    other->cell_inanimate = cell;
                 }
+                else
+                    cell = other->cell;
                 const Point diff = Point_Sub(cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
                 if(mag < max)
@@ -421,16 +426,23 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit)
     return closest;
 }
 
-static void EngageBoids(const Units units, Unit* const unit)
+static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
 {
+    static Point zero;
     if(!Unit_IsExempt(unit))
     {
-        Unit* const closest = GetClosestBoid(units, unit);
+        Unit* const closest = GetClosestBoid(units, unit, grid);
         if(closest != NULL)
         {
+            if(closest->trait.is_inanimate)
+            {
+                const Point cart = Grid_CellToCart(grid, closest->cell_inanimate);
+                Unit_MockPath(unit, cart, zero);
+            }
+            else
+                Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
             unit->is_engaged = true;
             unit->interest = closest;
-            Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
         }
         else
         {
@@ -462,7 +474,7 @@ static Units ProcessHardRules(Units units, const Field field, const Grid grid)
     for(int32_t i = 0; i < units.count; i++)
         ConditionallyStopBoids(units, &units.unit[i]);
     for(int32_t i = 0; i < units.count; i++)
-        EngageBoids(units, &units.unit[i]);
+        EngageBoids(units, &units.unit[i], grid);
     for(int32_t i = 0; i < units.count; i++)
     {
         const Resource resource = Unit_Melee(&units.unit[i], grid);

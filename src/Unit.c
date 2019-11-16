@@ -49,7 +49,12 @@ static void GotoGoal(Unit* const unit, const Point delta)
     static Point zero;
     unit->velocity = (unit->state == STATE_ATTACK) ? zero : Point_Normalize(delta, unit->trait.max_speed);
     if(unit->is_engaged)
-        Unit_SetDir(unit, Point_Sub(unit->interest->cell, unit->cell));
+    {
+        const Point cell = unit->interest->trait.is_inanimate
+            ? unit->interest->cell_inanimate
+            : unit->interest->cell;
+        Unit_SetDir(unit, Point_Sub(cell, unit->cell));
+    }
     else
     {
         const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
@@ -309,7 +314,11 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
 
 static bool ShouldEngage(Unit* const unit, const Grid grid)
 {
-    const Point diff = Point_Sub(unit->interest->cell, unit->cell);
+    const Point diff = Point_Sub(
+            unit->interest->trait.is_inanimate
+                ? unit->interest->cell_inanimate
+                : unit->interest->cell,
+            unit->cell);
     const int32_t reach = UTIL_MAX(unit->trait.width, unit->interest->trait.width) + CONFIG_UNIT_SWORD_LENGTH;
     if(unit->interest->trait.is_inanimate)
     {
