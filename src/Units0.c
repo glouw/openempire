@@ -147,7 +147,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
 
 static Point SeparateBoids(const Units units, Unit* const unit)
 {
-    const int32_t width = 1;
+    const int32_t width = 2;
     static Point zero;
     Point out = zero;
     if(!Unit_IsExempt(unit))
@@ -384,7 +384,7 @@ static void Expire(const Units units)
 static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid)
 {
     static Point zero;
-    const int32_t width = 1;
+    const int32_t width = 3;
     Unit* closest = NULL;
     int32_t max = INT32_MAX;
     for(int32_t x = -width; x <= width; x++)
