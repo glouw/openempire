@@ -6,6 +6,8 @@
 #include "Args.h"
 #include "Util.h"
 
+#define DEMO (0)
+
 int main(const int argc, const char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
@@ -19,15 +21,17 @@ int main(const int argc, const char* argv[])
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
     units = Units_GenerateTestZone(units, map, grid, data.graphics);
     Units floats = Units_New(grid, video.cpu_count, 16);
-#if 1
+#if DEMO == 1
+    Video_RenderDataDemo(video, data, args.color);
+#else
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
-        overview = Overview_Update(overview, input); // XXX. TO BE SENT VIA P2P (ALONG WITH INPUT).
-        Map_Edit(map, overview, grid);
         const Field field = Units_Field(units, map);
-        units = Units_Service(units, data.graphics, overview, grid, map, field); // XXX. TO BE UPDATED BY OTHER P2P CLIENTS.
+        overview = Overview_Update(overview, input);
+        Map_Edit(map, overview, grid);
+        units = Units_Service(units, data.graphics, overview, grid, map, field);
         units = Units_Caretake(units, grid, map, field);
         floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
         Video_Render(video, data, map, units, floats, overview, grid);
@@ -47,8 +51,6 @@ int main(const int argc, const char* argv[])
         if(ms > 0)
             SDL_Delay(ms);
     }
-#else
-    Video_RenderDataDemo(video, data, args.color);
 #endif
     Units_Free(units);
     Units_Free(floats);

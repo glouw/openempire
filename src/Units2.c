@@ -51,11 +51,9 @@ Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, cons
     const Point zero = { 0,0 };
     const Point b = { cart.x + 0, cart.y + 0 };
     const Point c = { cart.x - 1, cart.y + 1 };
-
     const Point a = { cart.x - 3, cart.y + 2 };
     const Point d = { cart.x - 1, cart.y + 1 };
     const Point e = { cart.x - 2, cart.y + 2 };
-
     Unit temp[] = {
         Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics, true,  is_floating),
         Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics, true,  is_floating),
@@ -81,10 +79,7 @@ void Units_ResetTiled(const Units units)
 
 static bool OutOfBounds(const Units units, const Point point)
 {
-    return point.x < 0
-        || point.y < 0
-        || point.x >= units.cols
-        || point.y >= units.rows;
+    return point.x < 0 || point.y < 0 || point.x >= units.cols || point.y >= units.rows;
 }
 
 static Stack* GetStack(const Units units, const Point p)
