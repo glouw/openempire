@@ -12,9 +12,9 @@ static Units Append(Units units, const Unit unit)
     return units;
 }
 
-Units Units_Spawn(Units units, const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map)
+Units Units_Spawn(Units units, const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map, const bool is_floating)
 {
-    Unit unit = Unit_Make(cart, offset, grid, file, color, graphics, true);
+    Unit unit = Unit_Make(cart, offset, grid, file, color, graphics, true, is_floating);
     return Units_CanBuild(units, map, &unit)
         ? Append(units, unit)
         : units;
@@ -30,19 +30,19 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int len)
     return units;
 }
 
-Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow, const Map map)
+Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow, const Map map, const bool is_floating)
 {
     const Point offset = { 0,0 };
     Unit temp[] = {
-        Unit_Make(cart, offset, grid, file,   color, graphics, true),
-        Unit_Make(cart, offset, grid, shadow, color, graphics, true),
+        Unit_Make(cart, offset, grid, file,   color, graphics, true, is_floating),
+        Unit_Make(cart, offset, grid, shadow, color, graphics, true, is_floating),
     };
     temp[0].has_children = true;
     temp[1].parent_id = temp[0].id;
     return BulkAppend(units, map, temp, UTIL_LEN(temp));
 }
 
-Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, const Color color, const Registrar graphics, const Map map)
+Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating)
 {
     const Point offset = {
         +grid.tile_cart_mid.x,
@@ -57,16 +57,14 @@ Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, cons
     const Point e = { cart.x - 2, cart.y + 2 };
 
     Unit temp[] = {
-        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics, true),
-        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics, true),
-
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics, false),
-        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics, false),
-        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics, false),
-
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics, false),
-        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics, false),
-        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics, false),
+        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics, true,  is_floating),
+        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics, true,  is_floating),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics, false, is_floating),
+        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics, false, is_floating),
+        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics, false, is_floating),
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics, false, is_floating),
+        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics, false, is_floating),
+        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics, false, is_floating),
     };
     const int32_t len = UTIL_LEN(temp);
     temp[0].has_children = true;

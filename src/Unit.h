@@ -53,10 +53,11 @@ typedef struct Unit
     bool was_wall_pushed;
     bool timing_to_collect;
     bool has_children;
+    bool is_floating;
 }
 Unit;
 
-Unit Unit_Make(Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center);
+Unit Unit_Make(Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center, const bool is_floating);
 
 void Unit_UpdatePathIndex(Unit* const, const int32_t index, const bool reset_path_index_timer);
 

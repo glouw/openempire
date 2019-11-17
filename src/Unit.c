@@ -162,7 +162,7 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
     return graphics.animation[unit->color][unit->file].count;
 }
 
-Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center)
+Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating)
 {
     static int32_t id;
     static Unit zero;
@@ -176,6 +176,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.health = unit.trait.max_health;
     unit.entropy = Point_Rand();
     unit.entropy_static = Util_Rand();
+    unit.is_floating = is_floating;
     if(at_center)
     {
         const Point center = Point_Div(unit.trait.dimensions, 2);

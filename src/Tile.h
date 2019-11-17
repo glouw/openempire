@@ -24,6 +24,7 @@ typedef struct
     bool flip_vert;
     bool totally_offscreen;
     Rect bound;
+    bool is_floating;
 }
 Tile;
 

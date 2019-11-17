@@ -66,6 +66,12 @@ static Tile Construct(const Overview overview, const Grid grid, const Point cart
     tile.flip_vert = dynamics.flip_vert;
     tile.height = height;
     tile.reference = reference;
+    if(reference != NULL)
+    {
+        tile.is_floating = reference->is_floating;
+        if(tile.is_floating)
+            tile.height = FILE_PRIO_HIGHEST;
+    }
     const Rect bound = {
         { 0, 0 },
         { overview.xres, overview.yres }

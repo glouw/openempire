@@ -97,7 +97,8 @@ static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, co
         if(surface_pixel != SURFACE_COLOR_KEY)
         {
             if(height == FILE_PRIO_BUILDING
-            || height == FILE_PRIO_SHADOW)
+            || height == FILE_PRIO_SHADOW
+            || tile.is_floating)
                 surface_pixel = Blend(surface_pixel, vram_pixel, 0xFF / 2);
             const uint32_t pixel = (tile.height << SURFACE_ALPHA) | surface_pixel;
             Put(vram, coords.x, coords.y, pixel);
