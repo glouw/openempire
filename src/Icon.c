@@ -7,27 +7,8 @@
 
 /* Hotkeys */
 
-#define X_LIST \
-    X( 0, SDL_SCANCODE_Q, 'Q') \
-    X( 1, SDL_SCANCODE_W, 'W') \
-    X( 2, SDL_SCANCODE_E, 'E') \
-    X( 3, SDL_SCANCODE_R, 'R') \
-    X( 4, SDL_SCANCODE_T, 'T') \
-    X( 5, SDL_SCANCODE_A, 'A') \
-    X( 6, SDL_SCANCODE_S, 'S') \
-    X( 7, SDL_SCANCODE_D, 'D') \
-    X( 8, SDL_SCANCODE_F, 'F') \
-    X( 9, SDL_SCANCODE_G, 'G') \
-    X(10, SDL_SCANCODE_Z, 'Z') \
-    X(11, SDL_SCANCODE_X, 'X') \
-    X(12, SDL_SCANCODE_C, 'C') \
-    X(14, SDL_SCANCODE_V, 'V') \
-    X(15, SDL_SCANCODE_B, 'B') \
-
 static const char hotkeys[] = {
-#define X(index, scancode, ch) ch,
-    X_LIST
-#undef X
+    'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B'
 };
 
 const char* Icon_GetHotkeys(void)

@@ -14,7 +14,7 @@ static Units Append(Units units, const Unit unit)
 
 Units Units_Spawn(Units units, const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map)
 {
-    Unit unit = Unit_Make(cart, offset, grid, file, color, graphics);
+    Unit unit = Unit_Make(cart, offset, grid, file, color, graphics, true);
     return Units_CanBuild(units, map, &unit)
         ? Append(units, unit)
         : units;
@@ -34,8 +34,8 @@ Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, cons
 {
     const Point offset = { 0,0 };
     Unit temp[] = {
-        Unit_Make(cart, offset, grid, file,   color, graphics),
-        Unit_Make(cart, offset, grid, shadow, color, graphics),
+        Unit_Make(cart, offset, grid, file,   color, graphics, true),
+        Unit_Make(cart, offset, grid, shadow, color, graphics, true),
     };
     temp[0].has_children = true;
     temp[1].parent_id = temp[0].id;
@@ -49,20 +49,24 @@ Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, cons
         -grid.tile_cart_mid.y
     };
     const Point zero = { 0,0 };
-    const Point a = { cart.x - 2, cart.y + 3 };
     const Point b = { cart.x + 0, cart.y + 0 };
     const Point c = { cart.x - 1, cart.y + 1 };
-    const Point d = { cart.x - 0, cart.y + 2 };
-    const Point e = { cart.x - 1, cart.y + 3 };
+
+    const Point a = { cart.x - 3, cart.y + 2 };
+    const Point d = { cart.x - 1, cart.y + 1 };
+    const Point e = { cart.x - 2, cart.y + 2 };
+
     Unit temp[] = {
-        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics),
-        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics),
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics),
-        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics),
-        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics),
-        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics),
-        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics),
-        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics),
+        Unit_Make(b, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_TOP,                 color, graphics, true),
+        Unit_Make(c, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_SHADOW,              color, graphics, true),
+
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT,           color, graphics, false),
+        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics, false),
+        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics, false),
+
+        Unit_Make(a, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE,           color, graphics, false),
+        Unit_Make(e, offset, grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics, false),
+        Unit_Make(d, zero,   grid, FILE_DARK_AGE_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics, false),
     };
     const int32_t len = UTIL_LEN(temp);
     temp[0].has_children = true;

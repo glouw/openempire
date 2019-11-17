@@ -332,7 +332,7 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
             file = rubble;
     }
     if(file != FILE_NONE)
-        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics);
+        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false);
 }
 
 static bool ShouldDelete(Unit* const unit, const Overview overview)
@@ -617,7 +617,9 @@ static void FlagGarbage(const Units units)
             unit->must_garbage_collect = true;
         if(unit->timing_to_collect)
         {
-            const int32_t time = (unit->trait.type == TYPE_FIRE) ? CONFIG_UNITS_CLEANUP_FIRE : CONFIG_UNITS_CLEANUP_RUBBLE;
+            const int32_t time = (unit->trait.type == TYPE_FIRE)
+                ? CONFIG_UNITS_CLEANUP_FIRE
+                : CONFIG_UNITS_CLEANUP_RUBBLE;
             if(unit->garbage_collection_timer == time)
                 unit->must_garbage_collect = true;
         }
@@ -734,7 +736,7 @@ static Units ServiceIcons(Units units, const Overview overview, const Grid grid,
 {
     if(overview.key_left_shift && overview.mouse_lu)
     {
-        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+        Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
         const Icon icon = Icon_FromOverview(overview, units.motive);
         const Point none = { 0,0 };
         switch(icon)

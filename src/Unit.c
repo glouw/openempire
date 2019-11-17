@@ -10,15 +10,16 @@
 
 static void ConditionallySkipFirstPoint(Unit* const unit)
 {
-    if(unit->path.count > 1
-    && unit->path_index == 0)
+    if(unit->path.count > 1 && unit->path_index == 0)
         unit->path_index++;
 }
 
 static Point GetDelta(Unit* const unit, const Grid grid)
 {
     static Point zero;
-    const Point point = (unit->path_index == unit->path.count - 1) ? unit->cart_grid_offset_goal : zero;
+    const Point point = (unit->path_index == unit->path.count - 1)
+        ? unit->cart_grid_offset_goal
+        : zero;
     const Point goal_grid_coords = Grid_GetGridPointWithOffset(grid, unit->path.point[unit->path_index], point);
     const Point unit_grid_coords = Grid_GetGridPointWithOffset(grid, unit->cart, unit->cart_grid_offset);
     return Point_Sub(goal_grid_coords, unit_grid_coords);
@@ -71,7 +72,7 @@ static void MoveAlongPath(Unit* const unit, const Grid grid)
         GotoGoal(unit, delta);
 }
 
-static void Decelerate(Unit* const unit)
+static void Stop(Unit* const unit)
 {
     if(Point_Mag(unit->velocity) > 0) 
     {
@@ -87,7 +88,7 @@ static void FollowPath(Unit* const unit, const Grid grid)
         ConditionallySkipFirstPoint(unit);
         MoveAlongPath(unit, grid);
     }
-    else Decelerate(unit);
+    else Stop(unit);
 }
 
 static void CapSpeed(Unit* const unit)
@@ -161,7 +162,7 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
     return graphics.animation[unit->color][unit->file].count;
 }
 
-Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics)
+Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center)
 {
     static int32_t id;
     static Unit zero;
@@ -170,6 +171,16 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.file = file;
     unit.id = id++;
     unit.parent_id = -1;
+    unit.color = color;
+    unit.state = STATE_IDLE;
+    unit.health = unit.trait.max_health;
+    unit.entropy = Point_Rand();
+    unit.entropy_static = Util_Rand();
+    if(at_center)
+    {
+        const Point center = Point_Div(unit.trait.dimensions, 2);
+        cart = Point_Sub(cart, center);
+    }
     unit.cell = Grid_CartToCell(grid, cart);
     if(Point_IsEven(unit.trait.dimensions))
     {
@@ -181,9 +192,6 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     }
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
     UpdateCart(&unit, grid);
-    unit.color = color;
-    unit.state = STATE_IDLE;
-    unit.health = unit.trait.max_health;
     if(unit.trait.can_expire)
         unit.expire_frames = GetExpireFrames(&unit, graphics);
     if(unit.trait.is_multi_state)
@@ -192,11 +200,8 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
         unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
-    if(unit.trait.type == TYPE_FIRE
-    || unit.trait.type == TYPE_RUBBLE)
+    if(unit.trait.type == TYPE_FIRE || unit.trait.type == TYPE_RUBBLE)
         unit.timing_to_collect = true;
-    unit.entropy = Point_Rand();
-    unit.entropy_static = Util_Rand();
     return unit;
 }
 
@@ -244,7 +249,7 @@ void Unit_Flow(Unit* const unit, const Grid grid)
     CapSpeed(unit);
 }
 
-bool Unit_InPlatoon(Unit* const unit, Unit* const other) // XXX. NEEDS check for same unit type as well.
+bool Unit_InPlatoon(Unit* const unit, Unit* const other)
 {
     return unit->command_group == other->command_group && unit->color == other->color;
 }

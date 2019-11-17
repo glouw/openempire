@@ -39,6 +39,8 @@ static Units GenerateBattleZone(Units units, const Map map, const Grid grid, con
             Unit_FindPath(unit, point, zero, field);
         }
     }
+    const Point z = { 5, 5 };
+    units = Units_Spawn(units, z, none, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics, map);
     Field_Free(field);
     return units;
 }
@@ -116,7 +118,7 @@ static Units GenerateGameZone(Units units, const Map map, const Grid grid, const
 
 Units Units_GenerateTestZone(const Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(3)
+    switch(0)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
