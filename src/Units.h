@@ -36,7 +36,7 @@ typedef struct
 }
 Units;
 
-Units Units_New(const Map map, const Grid, const Registrar graphics, const int32_t cpu_count);
+Units Units_New(const Grid, const int32_t cpu_count, const int32_t max);
 
 void Units_Free(const Units);
 
@@ -61,3 +61,9 @@ bool Units_CanBuild(const Units, const Map, Unit* const);
 Units Units_Service(Units, const Registrar, const Overview, const Grid, const Map, const Field);
 
 Units Units_Caretake(Units, const Grid, const Map, const Field);
+
+void Units_StackStacks(const Units);
+
+void Units_ResetStacks(const Units);
+
+Units Units_Float(Units, const Registrar, const Overview, const Grid, const Map, const Motive);

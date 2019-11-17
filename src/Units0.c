@@ -57,9 +57,8 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-Units Units_New(const Map map, const Grid grid, const Registrar graphics, const int32_t cpu_count)
+Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max)
 {
-    const int32_t max = CONFIG_UNITS_MAX;
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
@@ -74,7 +73,6 @@ Units Units_New(const Map map, const Grid grid, const Registrar graphics, const 
     units.stack = stack;
     units.rows = grid.rows;
     units.cols = grid.cols;
-    units = Units_GenerateTestZone(units, map, grid, graphics);
     units.cpu_count = cpu_count;
     return units;
 }
@@ -732,29 +730,46 @@ static Units CountPopulation(Units units)
     return units;
 }
 
-static Units ServiceIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+static Units IconLookup(const Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Icon icon, const Point cart)
+{
+    static Point none;
+    switch(icon)
+    {
+        case ICON_BUILD_HOUSE        : return Units_Spawn           (units, cart, none, grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics, map);
+        case ICON_BUILD_MILL         : return Units_SpawnWithShadow (units, cart,       grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
+        case ICON_BUILD_STONE_CAMP   : return Units_Spawn           (units, cart, none, grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
+        case ICON_BUILD_LUMBER_CAMP  : return Units_Spawn           (units, cart, none, grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics, map);
+        case ICON_BUILD_BARRACKS     : return Units_Spawn           (units, cart, none, grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics, map);
+        case ICON_BUILD_OUTPOST      : return Units_SpawnWithShadow (units, cart,       grid, FILE_DARK_AGE_OUTPOST,                 overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
+        case ICON_BUILD_TOWN_CENTER  : return Units_SpawnTownCenter (units, cart,       grid,                                        overview.color, graphics, map);
+        case ICON_UNIT_MILITIA       : return Units_Spawn           (units, cart, none, grid, FILE_MILITIA_IDLE,                     overview.color, graphics, map);
+        case ICON_UNIT_MALE_VILLAGER : return Units_Spawn           (units, cart, none, grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics, map);
+        default:
+           break;
+    }
+    return units;
+}
+
+static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     if(overview.key_left_shift && overview.mouse_lu)
     {
-        Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
         const Icon icon = Icon_FromOverview(overview, units.motive);
-        const Point none = { 0,0 };
-        switch(icon)
-        {
-        case ICON_BUILD_HOUSE        : return Units_Spawn          (units, cart, none, grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics, map);
-        case ICON_BUILD_MILL         : return Units_SpawnWithShadow(units, cart,       grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map);
-        case ICON_BUILD_STONE_CAMP   : return Units_Spawn          (units, cart, none, grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map);
-        case ICON_BUILD_LUMBER_CAMP  : return Units_Spawn          (units, cart, none, grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics, map);
-        case ICON_BUILD_BARRACKS     : return Units_Spawn          (units, cart, none, grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics, map);
-        case ICON_BUILD_OUTPOST      : return Units_SpawnWithShadow(units, cart,       grid, FILE_DARK_AGE_OUTPOST,                 overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map);
-        case ICON_BUILD_TOWN_CENTER  : return Units_SpawnTownCenter(units, cart,       grid,                                        overview.color, graphics, map);
-        case ICON_UNIT_MILITIA       : return Units_Spawn          (units, cart, none, grid, FILE_MILITIA_IDLE,                     overview.color, graphics, map);
-        case ICON_UNIT_MALE_VILLAGER : return Units_Spawn          (units, cart, none, grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics, map);
-        default:
-            break;
-        }
+        units = IconLookup(units, overview, grid, graphics, map, icon, cart);
     }
     return units;
+}
+
+static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+{
+    if(overview.key_left_shift)
+    {
+        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+        const Icon icon = Icon_FromOverview(overview, floats.motive);
+        floats = IconLookup(floats, overview, grid, graphics, map, icon, cart);
+    }
+    return floats;
 }
 
 Units Units_Service(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Field field)
@@ -762,7 +777,7 @@ Units Units_Service(Units units, const Registrar graphics, const Overview overvi
     const Window window = Window_Make(overview, grid);
     units = Select(units, overview, grid, graphics, window.units);
     units = Command(units, overview, grid, graphics, map, field);
-    units = ServiceIcons(units, overview, grid, graphics, map);
+    units = SpawnUsingIcons(units, overview, grid, graphics, map);
     units = Kill(units, overview, grid, graphics, map);
     Window_Free(window);
     return units;
@@ -780,4 +795,14 @@ Units Units_Caretake(Units units, const Grid grid, const Map map, const Field fi
     Units_ManageStacks(units);
     units = CountPopulation(units);
     return units;
+}
+
+Units Units_Float(Units floats, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
+{
+    floats.count = 0;
+    floats.motive = motive;
+    Units_ResetStacks(floats);
+    floats = FloatUsingIcons(floats, overview, grid, graphics, map);
+    Units_StackStacks(floats);
+    return floats;
 }

@@ -100,7 +100,7 @@ Stack Units_GetStackCart(const Units units, const Point p)
     return OutOfBounds(units, p) ? zero : *GetStack(units, p);
 }
 
-static void ResetStacks(const Units units)
+void Units_ResetStacks(const Units units)
 {
     for(int32_t y = 0; y < units.rows; y++)
     for(int32_t x = 0; x < units.cols; x++)
@@ -116,7 +116,7 @@ static void SafeAppend(const Units units, Unit* const unit, const Point cart)
         Stack_Append(GetStack(units, cart), unit);
 }
 
-static void StackStacks(const Units units)
+void Units_StackStacks(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -135,6 +135,6 @@ static void StackStacks(const Units units)
 
 void Units_ManageStacks(const Units units)
 {
-    ResetStacks(units);
-    StackStacks(units);
+    Units_ResetStacks(units);
+    Units_StackStacks(units);
 }

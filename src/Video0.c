@@ -77,15 +77,17 @@ void Video_PrintHotkeys(const Video video)
     }
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Overview overview, const Grid grid)
+void Video_Render(const Video video, const Data data, const Map map, const Units units, const Units floats, const Overview overview, const Grid grid)
 {
     const Window window = Window_Make(overview, grid);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
     const Tiles graphics_tiles = Tiles_PrepGraphics(data.graphics, overview, grid, units, window.units);
+    const Tiles graphics_tiles_floats = Tiles_PrepGraphics(data.graphics, overview, grid, floats, window.units);
     const Tiles terrain_tiles = Tiles_PrepTerrain(data.terrain, map, overview, grid, window.terrain);
     const Lines blend_lines = Map_GetBlendLines(map, window.terrain);
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
+    Vram_DrawUnits(vram, graphics_tiles_floats);
     Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
 #if SANITIZE_THREAD == 0
@@ -101,6 +103,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_Unlock(video.canvas);
     Vram_Free(vram);
     Tiles_Free(graphics_tiles);
+    Tiles_Free(graphics_tiles_floats);
     Tiles_Free(terrain_tiles);
     Lines_Free(blend_lines);
     Window_Free(window);

@@ -16,7 +16,9 @@ int main(const int argc, const char* argv[])
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     Overview overview = Overview_Init(color, video.xres, video.yres);
-    Units units = Units_New(map, grid, data.graphics, video.cpu_count);
+    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
+    units = Units_GenerateTestZone(units, map, grid, data.graphics);
+    Units floats = Units_New(grid, video.cpu_count, 16);
 #if 1
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
@@ -27,7 +29,8 @@ int main(const int argc, const char* argv[])
         const Field field = Units_Field(units, map);
         units = Units_Service(units, data.graphics, overview, grid, map, field); // XXX. TO BE UPDATED BY OTHER P2P CLIENTS.
         units = Units_Caretake(units, grid, map, field);
-        Video_Render(video, data, map, units, overview, grid);
+        floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
+        Video_Render(video, data, map, units, floats, overview, grid);
         const int32_t t1 = SDL_GetTicks();
         Video_CopyCanvas(video);
         Log_Dump();
@@ -48,6 +51,7 @@ int main(const int argc, const char* argv[])
     Video_RenderDataDemo(video, data, args.color);
 #endif
     Units_Free(units);
+    Units_Free(floats);
     Map_Free(map);
     Data_Free(data);
     Video_Free(video);
