@@ -12,6 +12,7 @@ typedef enum
     COLOR_CYN,
     COLOR_PRP,
     COLOR_GRY,
+    COLOR_GAIA,
     COLOR_COUNT,
 }
 Color;

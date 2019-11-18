@@ -139,7 +139,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
-            units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GRY, graphics, map, false);
+            units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GAIA, graphics, map, false);
         }
     }
     return units;
@@ -294,7 +294,7 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % w - w / 2,
             Util_Rand() % h - h / 2,
         };
-        units = Units_Spawn(units, cart, grid_offset, grid, fires[index], COLOR_GRY, graphics, map, false);
+        units = Units_Spawn(units, cart, grid_offset, grid, fires[index], COLOR_GAIA, graphics, map, false);
     }
     return units;
 }
@@ -307,7 +307,7 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
     {
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
-        units = Units_Spawn(units, cart, none, grid, FILE_SMALLER_EXPLOSION_SMOKE, COLOR_GRY, graphics, map, false);
+        units = Units_Spawn(units, cart, none, grid, FILE_SMALLER_EXPLOSION_SMOKE, COLOR_GAIA, graphics, map, false);
     }
     return units;
 }

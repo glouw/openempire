@@ -228,7 +228,7 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
     const Terrain file = Map_GetTerrainFile(map, inner);
     // The outer tile uses the outer tile animation,
     // but with the inner file so that the correct surface can be looked up.
-    const Animation outer_animation = terrain.animation[COLOR_GRY][file];
+    const Animation outer_animation = terrain.animation[COLOR_GAIA][file];
     const Tile outer_tile = Tile_GetTerrain(overview, grid, outer, outer_animation, file);
     const int32_t index = (file == FILE_FARM) ? 3 : 0;
     const Mode blend_mode = blendomatic.mode[index];
@@ -480,7 +480,7 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Ov
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
-    const Animation animation = terrain.animation[COLOR_GRY][FILE_DIRT];
+    const Animation animation = terrain.animation[COLOR_GAIA][FILE_DIRT];
     const Image image = animation.image[0];
     const Frame frame = animation.frame[0];
     const Point snap = Overview_IsoSnapTo(overview, grid, overview.mouse_cursor);
@@ -563,7 +563,7 @@ void Vram_DrawHud(const Vram vram, const Registrar interfac)
     const int32_t y0 = 0;
     const int32_t y1 = 50;
     const Point corner = { 0, 0 };
-    const Animation animation = interfac.animation[COLOR_GRY][FILE_INTERFAC_HUD_0];
+    const Animation animation = interfac.animation[COLOR_GAIA][FILE_INTERFAC_HUD_0];
     DrawWithBounds(vram, animation.surface[0], corner, y0, y1);
 }
 

@@ -97,7 +97,7 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
         const Terrain file = Map_GetTerrainFile(map, point);
         if(file != FILE_TERRAIN_NONE)
         {
-            const Animation animation = terrain.animation[COLOR_GRY][file];
+            const Animation animation = terrain.animation[COLOR_GAIA][file];
             tile[i] = Tile_GetTerrain(overview, grid, point, animation, file);
         }
     }

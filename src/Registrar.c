@@ -51,11 +51,9 @@ static void LoadColors(const Registrar registrar, const Slp slp, const Palette p
         needles[i].color = (Color) i;
         needles[i].index = i;
     }
-
     SDL_Thread* threads[COLOR_COUNT];
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         threads[i] = SDL_CreateThread(LoadColorNeedle, "N/A", &needles[i]);
-
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         SDL_WaitThread(threads[i], NULL);
 }
