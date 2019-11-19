@@ -33,13 +33,13 @@ static int32_t CompareByHeight(const void* a, const void* b)
 
 static void Sort(const Tiles tiles)
 {
-    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareBySurface);
-    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByY);
+    UTIL_SORT(tiles.tile, tiles.count, CompareBySurface);
+    UTIL_SORT(tiles.tile, tiles.count, CompareByY);
 }
 
 void Tiles_SortByHeight(const Tiles tiles)
 {
-    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByHeight);
+    UTIL_SORT(tiles.tile, tiles.count, CompareByHeight);
 }
 
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Grid grid, const Units units, const Points points)
@@ -84,7 +84,7 @@ static int32_t CompareByTileSurface(const void* a, const void* b)
 
 static void SortByTileSurface(const Tiles tiles)
 {
-    qsort(tiles.tile, tiles.count, sizeof(*tiles.tile), CompareByTileSurface);
+    UTIL_SORT(tiles.tile, tiles.count, CompareByTileSurface);
 }
 
 Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Points points)

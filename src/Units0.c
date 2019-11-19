@@ -602,7 +602,7 @@ static int32_t CompareGarbage(const void* a, const void* b)
 
 static void SortGarbage(const Units units)
 {
-    qsort(units.unit, units.count, sizeof(*units.unit), CompareGarbage);
+    UTIL_SORT(units.unit, units.count, CompareGarbage);
 }
 
 static void FlagGarbage(const Units units)

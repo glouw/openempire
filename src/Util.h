@@ -5,7 +5,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define UTIL_ALLOC(type, count) (type*) calloc(count, sizeof(type));
+#define UTIL_SORT(pointer, count, comparator) (qsort(pointer, count, sizeof(*(pointer)), comparator))
+
+#define UTIL_ALLOC(type, count) (type*) calloc(count, sizeof(type))
 
 #define UTIL_REALLOC(pointer, type, count) ((type*) realloc(pointer, sizeof(type) * count))
 

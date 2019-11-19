@@ -47,9 +47,9 @@ static int32_t CompareByTileFile(const void* a, const void* b)
 
 void Lines_Sort(const Lines lines)
 {
-    qsort(lines.line, lines.count, sizeof(*lines.line), CompareByTileFile);
-    qsort(lines.line, lines.count, sizeof(*lines.line), CompareByX);
-    qsort(lines.line, lines.count, sizeof(*lines.line), CompareByY);
+    UTIL_SORT(lines.line, lines.count, CompareByTileFile);
+    UTIL_SORT(lines.line, lines.count, CompareByX);
+    UTIL_SORT(lines.line, lines.count, CompareByY);
 }
 
 void Lines_Print(const Lines lines)
