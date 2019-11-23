@@ -20,7 +20,7 @@ Units Units_Spawn(Units units, const Point cart, const Point offset, const Grid 
         : units;
 }
 
-static Units BulkAppend(Units units, const Map map, Unit unit[], const int len)
+static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len)
 {
     for(int32_t i = 0; i < len; i++)
         if(!Units_CanBuild(units, map, &unit[i]))
