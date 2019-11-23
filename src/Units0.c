@@ -735,40 +735,39 @@ static Units IconLookup(const Units units, const Overview overview, const Grid g
     static Point none;
     switch(icon)
     {
-        case ICON_BUILD_HOUSE        : return Units_Spawn           (units, cart, none, grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics, map,                               is_floating);
-        case ICON_BUILD_MILL         : return Units_SpawnWithShadow (units, cart,       grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY, map,    is_floating);
-        case ICON_BUILD_STONE_CAMP   : return Units_Spawn           (units, cart, none, grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics, map,                               is_floating);
-        case ICON_BUILD_LUMBER_CAMP  : return Units_Spawn           (units, cart, none, grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics, map,                               is_floating);
-        case ICON_BUILD_BARRACKS     : return Units_Spawn           (units, cart, none, grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics, map,                               is_floating);
+        case ICON_BUILD_HOUSE        : return Units_Spawn           (units, cart, none, grid, FILE_DARK_AGE_HOUSE,                   overview.color, graphics,                               map, is_floating);
+        case ICON_BUILD_MILL         : return Units_SpawnWithShadow (units, cart,       grid, FILE_DARK_AGE_MILL,                    overview.color, graphics, FILE_DARK_AGE_MILL_DONKEY,    map, is_floating);
+        case ICON_BUILD_STONE_CAMP   : return Units_Spawn           (units, cart, none, grid, FILE_NORTH_EUROPEAN_STONE_MINING_CAMP, overview.color, graphics,                               map, is_floating);
+        case ICON_BUILD_LUMBER_CAMP  : return Units_Spawn           (units, cart, none, grid, FILE_NORTH_EUROPEAN_LUMBER_CAMP,       overview.color, graphics,                               map, is_floating);
+        case ICON_BUILD_BARRACKS     : return Units_Spawn           (units, cart, none, grid, FILE_DARK_AGE_BARRACKS,                overview.color, graphics,                               map, is_floating);
         case ICON_BUILD_OUTPOST      : return Units_SpawnWithShadow (units, cart,       grid, FILE_DARK_AGE_OUTPOST,                 overview.color, graphics, FILE_DARK_AGE_OUTPOST_SHADOW, map, is_floating);
-        case ICON_BUILD_TOWN_CENTER  : return Units_SpawnTownCenter (units, cart,       grid,                                        overview.color, graphics, map,                               is_floating);
-        case ICON_UNIT_MILITIA       : return Units_Spawn           (units, cart, none, grid, FILE_MILITIA_IDLE,                     overview.color, graphics, map,                               is_floating);
-        case ICON_UNIT_MALE_VILLAGER : return Units_Spawn           (units, cart, none, grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics, map,                               is_floating);
+        case ICON_BUILD_TOWN_CENTER  : return Units_SpawnTownCenter (units, cart,       grid,                                        overview.color, graphics,                               map, is_floating);
+        case ICON_UNIT_MILITIA       : return Units_Spawn           (units, cart, none, grid, FILE_MILITIA_IDLE,                     overview.color, graphics,                               map, is_floating);
+        case ICON_UNIT_MALE_VILLAGER : return Units_Spawn           (units, cart, none, grid, FILE_MALE_VILLAGER_IDLE,               overview.color, graphics,                               map, is_floating);
         default:
            break;
     }
     return units;
 }
 
+static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
+{
+    const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+    const Icon icon = Icon_FromOverview(overview, units.motive);
+    return IconLookup(units, overview, grid, graphics, map, icon, cart, is_floating);
+}
+
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     if(overview.key_left_shift && overview.mouse_lu)
-    {
-        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-        const Icon icon = Icon_FromOverview(overview, units.motive);
-        units = IconLookup(units, overview, grid, graphics, map, icon, cart, false);
-    }
+        return UseIcon(units, overview, grid, graphics, map, false);
     return units;
 }
 
 static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     if(overview.key_left_shift)
-    {
-        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-        const Icon icon = Icon_FromOverview(overview, floats.motive);
-        floats = IconLookup(floats, overview, grid, graphics, map, icon, cart, true);
-    }
+        return UseIcon(floats, overview, grid, graphics, map, true);
     return floats;
 }
 
