@@ -541,7 +541,7 @@ static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, con
     return pack;
 }
 
-void DrawPack(const Vram vram, const Pack pack)
+static void DrawPack(const Vram vram, const Pack pack)
 {
     for(int32_t index = 0; index < pack.icons.count; index++)
     {
