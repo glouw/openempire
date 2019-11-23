@@ -60,14 +60,14 @@ static Units GenerateInanimateZone(Units units, const Map map, const Grid grid, 
     units = Units_Spawn(units, d, none, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics, map, false);
     units = Units_Spawn(units, e, none, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics, map, false);
     units = Units_Spawn(units, f, none, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics, map, false);
-    units = Units_SpawnWithShadow(units, g, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, map, false);
+    units = Units_SpawnWithChild(units, g, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, map, false);
     for(int32_t i = 0; i < 300; i++)
         units = Units_Spawn(units, b, none, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics, map, false);
     for(int32_t j = 0; j < 10; j++)
     for(int32_t i = 0; i < 10; i++)
     {
         const Point h = { i, j };
-        units = Units_SpawnWithShadow(units, h, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
+        units = Units_SpawnWithChild(units, h, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
     }
     units = Units_Spawn(units, b, none, grid, FILE_MALE_VILLAGER_IDLE, COLOR_BLU, graphics, map, false);
     return units;
@@ -79,7 +79,7 @@ static Units GenerateTreeZone(Units units, const Map map, const Grid grid, const
     for(int32_t i = 0; i < units.cols; i++)
     {
         const Point a = { i, j };
-        units = Units_SpawnWithShadow(units, a, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
+        units = Units_SpawnWithChild(units, a, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
     }
     return units;
 }
@@ -109,7 +109,7 @@ static Units GenerateGameZone(Units units, const Map map, const Grid grid, const
     const Point d = Point_Add(middle, dd);
     const Point e = Point_Add(middle, ee);
     const Point f = Point_Add(middle, ff);
-    units = Units_SpawnWithShadow(units, c, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
+    units = Units_SpawnWithChild(units, c, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
     units = Units_Spawn(units, d, none, grid, FILE_STONE_MINE, COLOR_GAIA, graphics, map, false);
     units = Units_Spawn(units, e, none, grid, FILE_BERRY_BUSH, COLOR_GAIA, graphics, map, false);
     units = Units_Spawn(units, f, none, grid, FILE_GOLD_MINE, COLOR_GAIA, graphics, map, false);

@@ -30,12 +30,12 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int len)
     return units;
 }
 
-Units Units_SpawnWithShadow(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics shadow, const Map map, const bool is_floating)
+Units Units_SpawnWithChild(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics child, const Map map, const bool is_floating)
 {
     const Point offset = { 0,0 };
     Unit temp[] = {
-        Unit_Make(cart, offset, grid, file,   color, graphics, true, is_floating),
-        Unit_Make(cart, offset, grid, shadow, color, graphics, true, is_floating),
+        Unit_Make(cart, offset, grid, file,  color, graphics, true, is_floating),
+        Unit_Make(cart, offset, grid, child, color, graphics, true, is_floating),
     };
     temp[0].has_children = true;
     temp[1].parent_id = temp[0].id;

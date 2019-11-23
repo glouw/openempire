@@ -50,7 +50,7 @@ Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar);
 
 Units Units_Spawn(Units, const Point, const Point offset, const Grid, const Graphics, const Color, const Registrar, const Map, const bool is_floating);
 
-Units Units_SpawnWithShadow(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics, const Map, const bool is_floating);
+Units Units_SpawnWithChild(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics, const Map, const bool is_floating);
 
 Units Units_SpawnTownCenter(Units units, const Point, const Grid, const Color, const Registrar, const Map, const bool is_floating);
 

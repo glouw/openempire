@@ -31,9 +31,19 @@ static int32_t CompareByHeight(const void* a, const void* b)
     return ha < hb;
 }
 
+static int32_t CompareByDetail(const void* a, const void* b)
+{
+    Tile* const aa = (Tile*) a;
+    Tile* const bb = (Tile*) b;
+    const bool da = aa->reference->trait.is_detail;
+    const bool db = bb->reference->trait.is_detail;
+    return da < db;
+}
+
 static void Sort(const Tiles tiles)
 {
     UTIL_SORT(tiles.tile, tiles.count, CompareBySurface);
+    UTIL_SORT(tiles.tile, tiles.count, CompareByDetail);
     UTIL_SORT(tiles.tile, tiles.count, CompareByY);
 }
 
