@@ -6,11 +6,9 @@
 #include "Args.h"
 #include "Util.h"
 
-#define DEMO (0)
-
-int main(const int argc, const char* argv[])
+static void RunClient(const Args args)
 {
-    const Args args = Args_Parse(argc, argv);
+#define DEMO (0)
     const Color color = args.color;
     const Video video = Video_Setup(1280, 700, "Open Empires");
     Log_Init(video);
@@ -44,8 +42,8 @@ int main(const int argc, const char* argv[])
         Video_Present(video);
         Field_Free(field);
         cycles++;
-        if(args.measure && cycles > 10)
-            break;
+        if(args.should_measure && cycles > 10)
+            break; // Use valgrind --tool=cachegrind and measure instruction counts when optimizing.
         const int32_t t2 = SDL_GetTicks();
         const int32_t ms = 15 - (t2 - t0);
         if(ms > 0)
@@ -57,4 +55,18 @@ int main(const int argc, const char* argv[])
     Map_Free(map);
     Data_Free(data);
     Video_Free(video);
+#undef DEMO
+}
+
+static void RunServer(const Args args)
+{
+}
+
+int main(const int argc, const char* argv[])
+{
+    const Args args = Args_Parse(argc, argv);
+    args.is_server
+        ? RunServer(args)
+        : RunClient(args);
+    return 0;
 }

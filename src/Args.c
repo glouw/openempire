@@ -30,10 +30,13 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         }
         else
         if(Check(arg, "--measure", "-m"))
-            args.measure = true;
+            args.should_measure = true;
         else
         if(Check(arg, "--path", "-p"))
             args.path = argv[i + 1];
+        else
+        if(Check(arg, "--server", "-s"))
+            args.is_server = true;
     }
     assert(args.path);
     return args;

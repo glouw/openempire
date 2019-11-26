@@ -2,6 +2,7 @@ BIN = ../openempires
 
 LIBS  = -lSDL2
 LIBS += -lSDL2_ttf
+LIBS += -lSDL2_net
 
 SRCS  = Animation.c
 SRCS += Args.c
@@ -37,6 +38,7 @@ SRCS += Rect.c
 SRCS += Rects.c
 SRCS += Registrar.c
 SRCS += Scanline.c
+SRCS += Sockets.c
 SRCS += State.c
 SRCS += Slp.c
 SRCS += Stack.c
@@ -55,6 +57,9 @@ SRCS += Util.c
 SRCS += Video0.c
 SRCS += Video1.c
 SRCS += Vram.c
+
+OBJS = $(SRCS:.c=.o)
+DEPS = $(SRCS:.c=.d)
 
 # 0: Compile with gcc.
 # 1: Compile with clang.
@@ -105,9 +110,6 @@ endif
 ifeq (11, $(CLANG)$(CPP))
 COMPILER = clang++ -std=c++11
 endif
-
-OBJS = $(SRCS:.c=.o)
-DEPS = $(SRCS:.c=.d)
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
