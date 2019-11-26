@@ -93,7 +93,7 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
 {
     Dynamics dynamics = { 0, false };
     if(reference->trait.is_single_frame)
-        dynamics.index = reference->entropy_static % animation.count;
+        dynamics.index = reference->entropy_static % animation.count; // XXX. cannot use entropy... trees and shadows do not align!
     else
     if(reference->trait.is_multi_state)
     {

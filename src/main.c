@@ -1,6 +1,7 @@
 #include "Video.h"
 #include "Input.h"
 #include "Config.h"
+#include "Sockets.h"
 #include "Log.h"
 #include "Units.h"
 #include "Args.h"
@@ -58,15 +59,29 @@ static void RunClient(const Args args)
 #undef DEMO
 }
 
-static void RunServer(const Args args)
+static void RunServer(void)
 {
+    SDLNet_Init();
+    IPaddress ip;
+    SDLNet_ResolveHost(&ip, NULL, 1234);
+    TCPsocket server = SDLNet_TCP_Open(&ip);
+    Sockets sockets = Sockets_Init();
+    for(int32_t cycles = 0; true; cycles++)
+    {
+        sockets = Sockets_Accept(sockets, server);
+        Sockets_Service(sockets, 1);
+        Sockets_Relay(sockets, cycles, 250);
+    }
+    Sockets_Free(sockets);
+    SDLNet_Quit();
+    SDL_Quit();
 }
 
 int main(const int argc, const char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
     args.is_server
-        ? RunServer(args)
+        ? RunServer()
         : RunClient(args);
     return 0;
 }

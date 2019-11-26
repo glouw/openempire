@@ -66,7 +66,7 @@ Sockets Sockets_Relay(const Sockets sockets, const int32_t cycles, const int32_t
 {
     if((cycles % interval) == 0)
     {
-        // SEND... then clear.
+        printf("%d\n", cycles);
         return Clear(sockets);
     }
     return sockets;
