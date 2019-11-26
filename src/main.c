@@ -9,7 +9,7 @@
 
 static void RunClient(const Args args)
 {
-#define DEMO (0)
+#define DEMO (1)
     const Color color = args.color;
     const Video video = Video_Setup(1280, 700, "Open Empires");
     Log_Init(video);

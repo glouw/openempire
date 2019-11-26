@@ -27,12 +27,12 @@ static void RenderDemoTile(const Video video, const Tile tile, const int32_t ind
 
 static void RenderAnimationDemo(const Video video, const Animation animation, const Point point)
 {
-    static Rect zero;
+    const Rect bound = { { 0,0 }, { video.xres, video.yres } };
     const bool flips[] = { false, true };
     for(int32_t j = 0; j < UTIL_LEN(flips); j++)
         for(int32_t i = 0; i < animation.count; i++)
         {
-            const Tile tile = { NULL, animation.surface[i], animation.frame[i], point, {0,0}, 255, true, flips[j], false, zero, false };
+            const Tile tile = { NULL, animation.surface[i], animation.frame[i], point, {0,0}, 255, true, flips[j], false, bound, false };
             RenderDemoTile(video, tile, i, animation.count);
         }
 }
@@ -49,12 +49,12 @@ static void RenderRegistrarDemo(const Video video, const Registrar registrar, co
 
 static void RenderBlendomaticDemo(const Video video, const Blendomatic blendomatic)
 {
-    static Rect zero;
+    const Rect bound = { { 0,0 }, { video.xres, video.yres } };
     for(int32_t i = 0; i < (int32_t) blendomatic.nr_blending_modes; i++)
         for(int32_t j = 0; j < (int32_t) blendomatic.nr_tiles; j++)
         {
             const Mode mode = blendomatic.mode[i];
-            const Tile tile = { NULL, mode.mask_demo[j], mode.frame, video.middle, {0,0}, 255, true, false, false, zero, false };
+            const Tile tile = { NULL, mode.mask_demo[j], mode.frame, video.middle, {0,0}, 255, true, false, false, bound, false };
             RenderDemoTile(video, tile, j, blendomatic.nr_tiles);
         }
 }
@@ -70,13 +70,13 @@ static void LayoutNumbers(const Video video, const Animation animation, const in
 
 static void LayoutIcons(const Video video, const Animation animation, const int32_t width, const int32_t xres)
 {
-    static Rect zero;
+    const Rect bound = { { 0,0 }, { video.xres, video.yres } };
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
     Vram_Clear(vram, 0x0);
     for(int32_t index = 0; index < animation.count; index++)
     {
         const Point point = Point_Wrap(index, width, xres);
-        const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false, zero, false };
+        const Tile tile = { NULL, animation.surface[index], animation.frame[index], point, {0,0}, 255, true, false, false, bound, false };
         Vram_DrawTile(vram, tile);
     }
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
