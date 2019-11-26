@@ -20,7 +20,7 @@ static void RunClient(const Args args)
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
     units = Units_GenerateTestZone(units, map, grid, data.graphics);
     Units floats = Units_New(grid, video.cpu_count, 16);
-#if DEMO == 1
+#if DEMO == 0
     Video_RenderDataDemo(video, data, args.color);
 #else
     int32_t cycles = 0;
