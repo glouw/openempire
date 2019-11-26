@@ -407,7 +407,6 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
                         CONFIG_GRID_CELL_SIZE / 2,
                     };
                     cell = Point_Add(cell, mid);
-                    other->cell_inanimate = cell;
                 }
                 else
                     cell = other->cell;
@@ -415,6 +414,8 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
                 const int32_t mag = Point_Mag(diff);
                 if(mag < max)
                 {
+                    if(other->trait.is_inanimate)
+                        other->cell_inanimate = cell;
                     max = mag;
                     closest = other;
                 }
