@@ -9,16 +9,10 @@
 
 static void RunClient(const Args args)
 {
-#define DEMO (1)
+#define DEMO (0)
     SDL_Init(SDL_INIT_EVERYTHING);
-    SDLNet_Init();
-    IPaddress ip;
-    SDLNet_ResolveHost(&ip, args.host, args.port);
-    TCPsocket server = SDLNet_TCP_Open(&ip);
-    if(server == NULL)
-        Util_Bomb("Could not connect to %s:%d... Is the openempires server running?\n", args.host, args.port);
     const Color color = args.color;
-    const Video video = Video_Setup(600, 480, "Open Empires");
+    const Video video = Video_Setup(800, 600, "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
@@ -27,9 +21,15 @@ static void RunClient(const Args args)
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
     units = Units_GenerateTestZone(units, map, grid, data.graphics);
     Units floats = Units_New(grid, video.cpu_count, 16);
-#if DEMO == 0
+#if DEMO == 1
     Video_RenderDataDemo(video, data, args.color);
 #else
+    SDLNet_Init();
+    IPaddress ip;
+    SDLNet_ResolveHost(&ip, args.host, args.port);
+    TCPsocket server = SDLNet_TCP_Open(&ip);
+    if(server == NULL)
+        Util_Bomb("Could not connect to %s:%d... Is the openempires server running?\n", args.host, args.port);
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -58,12 +58,12 @@ static void RunClient(const Args args)
         if(ms > 0)
             SDL_Delay(ms);
     }
+    SDLNet_TCP_Close(server);
 #endif
     Units_Free(units);
     Units_Free(floats);
     Map_Free(map);
     Data_Free(data);
-    SDLNet_TCP_Close(server);
     SDLNet_Quit();
     Video_Free(video);
 #undef DEMO
