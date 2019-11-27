@@ -2,8 +2,7 @@
 
 This is a custom game engine for Age of Empires II written in C99 and SDL2 built for fast network play.
 
-Data, art, and sound files are not supplied - to play Open Empires you must either own the original boxed-set
-of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on Steam.
+Data, art, and sound files are not supplied - to play Open Empires you must own the original boxed-set version of Age of Empires II and The Conquerors.
 
 ## Dependencies
 
@@ -23,11 +22,9 @@ First, start the server.
 
     ./openempires --server
 
-Second, start the client. Point the path flag to the Age of Empires 2 data installation folder on Steam.
+Second, start the client. Point the path flag to the installation's data folder.
 
-    ./openempires --path "/home/gl/.steam/steam/steamapps/common/Age2HD/Directory/data/"
-
-If on Linux, install Age 2 using Steam Proton.
+    ./openempires --path "/path/to/data/folder"
 
 ## Current Development Progress
 
