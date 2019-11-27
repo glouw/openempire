@@ -42,7 +42,7 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                 static Overview zero;
                 Overview overview = zero;
                 const int32_t bytes = SDLNet_TCP_Recv(sock, &overview, sizeof(overview));
-                if(bytes == 0)
+                if(bytes <= 0)
                 {
                     SDLNet_TCP_DelSocket(sockets.set, sock);
                     sockets.sock[i] = NULL;
@@ -66,7 +66,10 @@ Sockets Sockets_Relay(const Sockets sockets, const int32_t cycles, const int32_t
 {
     if((cycles % interval) == 0)
     {
-        printf("%d\n", cycles);
+        printf("%10d :: ", cycles);
+        for(int32_t i = 0; i < COLOR_COUNT; i++)
+            printf("%d ", sockets.sock[i] == NULL ? 0 : 1);
+        putchar('\n');
         return Clear(sockets);
     }
     return sockets;

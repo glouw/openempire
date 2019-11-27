@@ -21,7 +21,6 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     const Point bot_left = { 0, yres };
     const Point top_rite = { xres, 0 };
     const Point top_left = { 0, 0 };
-    SDL_Init(SDL_INIT_VIDEO);
     static Video zero;
     Video video = zero;
     video.window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, xres, yres, SDL_WINDOW_SHOWN);

@@ -10,8 +10,17 @@
 static void RunClient(const Args args)
 {
 #define DEMO (1)
+    SDL_Init(SDL_INIT_EVERYTHING);
+    SDLNet_Init();
+    IPaddress ip;
+    const char* const host = "localhost";
+    const int32_t port = 1234;
+    SDLNet_ResolveHost(&ip, host, port);
+    TCPsocket sock = SDLNet_TCP_Open(&ip);
+    if(sock == NULL)
+        Util_Bomb("Could not connect to %s:%d... Is the openempires server running?\n", host, port);
     const Color color = args.color;
-    const Video video = Video_Setup(1280, 700, "Open Empires");
+    const Video video = Video_Setup(600, 480, "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
@@ -29,6 +38,7 @@ static void RunClient(const Args args)
         const int32_t t0 = SDL_GetTicks();
         const Field field = Units_Field(units, map);
         overview = Overview_Update(overview, input);
+        SDLNet_TCP_Send(sock, &overview, sizeof(overview)); // XXX. MAYBE make a macro for this?
         Map_Edit(map, overview, grid);
         units = Units_Service(units, data.graphics, overview, grid, map, field);
         units = Units_Caretake(units, grid, map, field);
@@ -55,6 +65,8 @@ static void RunClient(const Args args)
     Units_Free(floats);
     Map_Free(map);
     Data_Free(data);
+    SDLNet_TCP_Close(sock);
+    SDLNet_Quit();
     Video_Free(video);
 #undef DEMO
 }
@@ -69,8 +81,8 @@ static void RunServer(void)
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets, server);
-        Sockets_Service(sockets, 1);
-        Sockets_Relay(sockets, cycles, 250);
+        sockets = Sockets_Service(sockets, 1);
+        sockets = Sockets_Relay(sockets, cycles, 250);
     }
     Sockets_Free(sockets);
     SDLNet_Quit();
