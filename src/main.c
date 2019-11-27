@@ -13,12 +13,10 @@ static void RunClient(const Args args)
     SDL_Init(SDL_INIT_EVERYTHING);
     SDLNet_Init();
     IPaddress ip;
-    const char* const host = "localhost";
-    const int32_t port = 1234;
-    SDLNet_ResolveHost(&ip, host, port);
-    TCPsocket sock = SDLNet_TCP_Open(&ip);
-    if(sock == NULL)
-        Util_Bomb("Could not connect to %s:%d... Is the openempires server running?\n", host, port);
+    SDLNet_ResolveHost(&ip, args.host, args.port);
+    TCPsocket server = SDLNet_TCP_Open(&ip);
+    if(server == NULL)
+        Util_Bomb("Could not connect to %s:%d... Is the openempires server running?\n", args.host, args.port);
     const Color color = args.color;
     const Video video = Video_Setup(600, 480, "Open Empires");
     Log_Init(video);
@@ -38,7 +36,7 @@ static void RunClient(const Args args)
         const int32_t t0 = SDL_GetTicks();
         const Field field = Units_Field(units, map);
         overview = Overview_Update(overview, input);
-        SDLNet_TCP_Send(sock, &overview, sizeof(overview)); // XXX. MAYBE make a macro for this?
+        SDLNet_TCP_Send(server, &overview, sizeof(overview));
         Map_Edit(map, overview, grid);
         units = Units_Service(units, data.graphics, overview, grid, map, field);
         units = Units_Caretake(units, grid, map, field);
@@ -65,26 +63,26 @@ static void RunClient(const Args args)
     Units_Free(floats);
     Map_Free(map);
     Data_Free(data);
-    SDLNet_TCP_Close(sock);
+    SDLNet_TCP_Close(server);
     SDLNet_Quit();
     Video_Free(video);
 #undef DEMO
 }
 
-static void RunServer(void)
+static void RunServer(const Args args)
 {
     SDLNet_Init();
     IPaddress ip;
-    SDLNet_ResolveHost(&ip, NULL, 1234);
+    SDLNet_ResolveHost(&ip, NULL, args.port);
     TCPsocket server = SDLNet_TCP_Open(&ip);
-    Sockets sockets = Sockets_Init();
+    Sockets clients = Sockets_Init();
     for(int32_t cycles = 0; true; cycles++)
     {
-        sockets = Sockets_Accept(sockets, server);
-        sockets = Sockets_Service(sockets, 1);
-        sockets = Sockets_Relay(sockets, cycles, 250);
+        clients = Sockets_Accept(clients, server);
+        clients = Sockets_Service(clients, 1);
+        clients = Sockets_Relay(clients, cycles, 250);
     }
-    Sockets_Free(sockets);
+    Sockets_Free(clients);
     SDLNet_Quit();
     SDL_Quit();
 }
@@ -93,7 +91,7 @@ int main(const int argc, const char* argv[])
 {
     const Args args = Args_Parse(argc, argv);
     args.is_server
-        ? RunServer()
+        ? RunServer(args)
         : RunClient(args);
     return 0;
 }

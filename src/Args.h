@@ -11,6 +11,8 @@ typedef struct
     Color color;
     bool should_measure;
     bool is_server;
+    const char* host;
+    int32_t port;
 }
 Args;
 

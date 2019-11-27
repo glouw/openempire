@@ -16,6 +16,8 @@ Args Args_Parse(const int32_t argc, const char* argv[])
     Args args = zero;
     args.path = "/home/gl/.steam/steam/steamapps/common/Age2HD/Directory/data/";
     args.color = COLOR_BLU;
+    args.host = "localhost";
+    args.port = 1234;
     for(int32_t i = 0; i < argc; i++)
     {
         const char* const arg = argv[i];
@@ -37,6 +39,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         else
         if(Check(arg, "--server", "-s"))
             args.is_server = true;
+
     }
     assert(args.path);
     return args;
