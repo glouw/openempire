@@ -9,6 +9,7 @@ of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on Stea
 
     sdl2
     sdl2_ttf
+    sdl2_net
 
 ## Building
 
@@ -18,10 +19,15 @@ of Age of Empires II and The Conquerors, or purchase a copy of Age II HD on Stea
 
 ## Running
 
-Assuming you were able to install Age of Empires II HD with steam on Linux (enable Proton under Beta options in settings),
-simply run the compiled executable with the path flag pointing to the data folder of your game's installation:
+First, start the server.
+
+    ./openempires --server
+
+Second, start the client. Point the path flag to the Age of Empires 2 data installation folder on Steam.
 
     ./openempires --path "/home/gl/.steam/steam/steamapps/common/Age2HD/Directory/data/"
+
+If on Linux, install Age 2 using Steam Proton.
 
 ## Current Development Progress
 
@@ -33,11 +39,11 @@ simply run the compiled executable with the path flag pointing to the data folde
     [x] Multi-threaded unit software rendering
     [x] Unit state switching
     [x] Melee combat
+    [x] Multiplayer networking (currently one way TCP)
+    [x] Fast compile times with link time optimization (full build: 8.346 seconds on a Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz)
     [ ] Ranged combat
-    [ ] Multiplayer networking
-    [x] Fast compile times with link time optimization (full build: 5.803 seconds on a Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz)
 
-## Development Blog
+## Development Blog (on hiatus)
 
 http://glouw.com/2019/04/10/Reverse-Engineering-Age-of-Empires-2-Part-0.html
 
