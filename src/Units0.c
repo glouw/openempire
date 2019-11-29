@@ -774,16 +774,18 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
 
 Units Units_Service(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Field field)
 {
-    const Window window = Window_Make(overview, grid);
-    units = Select(units, overview, grid, graphics, window.units);
-    units = Command(units, overview, grid, graphics, map, field);
-    units = SpawnUsingIcons(units, overview, grid, graphics, map);
-    units = Kill(units, overview, grid, graphics, map);
-    Window_Free(window);
+    if(overview.mouse_lu || overview.mouse_ru)
+    {
+        const Window window = Window_Make(overview, grid);
+        units = Select(units, overview, grid, graphics, window.units);
+        units = Command(units, overview, grid, graphics, map, field);
+        units = SpawnUsingIcons(units, overview, grid, graphics, map);
+        Window_Free(window);
+    }
     return units;
 }
 
-Units Units_Caretake(Units units, const Grid grid, const Map map, const Field field)
+Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
     Tick(units);
@@ -791,6 +793,7 @@ Units Units_Caretake(Units units, const Grid grid, const Map map, const Field fi
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
+    units = Kill(units, overview, grid, graphics, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);

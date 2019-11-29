@@ -60,7 +60,7 @@ bool Units_CanBuild(const Units, const Map, Unit* const);
 
 Units Units_Service(Units, const Registrar, const Overview, const Grid, const Map, const Field);
 
-Units Units_Caretake(Units, const Grid, const Map, const Field);
+Units Units_Caretake(Units, const Registrar, const Overview, const Grid, const Map, const Field);
 
 void Units_StackStacks(const Units);
 

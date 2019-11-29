@@ -41,14 +41,16 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
             {
                 static Overview zero;
                 Overview overview = zero;
-                const int32_t bytes = SDLNet_TCP_Recv(sock, &overview, sizeof(overview));
+                const int32_t max = sizeof(overview);
+                const int32_t bytes = SDLNet_TCP_Recv(sock, &overview, max);
                 if(bytes <= 0)
                 {
                     SDLNet_TCP_DelSocket(sockets.set, sock);
                     sockets.sock[i] = NULL;
                 }
-                else
-                    sockets.packet.overview[i] = overview;
+                if(bytes == max)
+                    if(overview.mouse_lu || overview.mouse_ru)
+                        sockets.packet.overview[i] = overview;
             }
         }
     return sockets;
@@ -70,6 +72,12 @@ Sockets Sockets_Relay(const Sockets sockets, const int32_t cycles, const int32_t
         for(int32_t i = 0; i < COLOR_COUNT; i++)
             printf("%d ", sockets.sock[i] == NULL ? 0 : 1);
         putchar('\n');
+        for(int32_t i = 0; i < COLOR_COUNT; i++)
+        {
+            TCPsocket sock = sockets.sock[i];
+            if(sock)
+                SDLNet_TCP_Send(sock, &sockets.packet, sizeof(sockets.packet));
+        }
         return Clear(sockets);
     }
     return sockets;
