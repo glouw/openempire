@@ -333,11 +333,6 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false);
 }
 
-static bool ShouldDelete(Unit* const unit, const Overview overview)
-{
-    return unit->is_selected && overview.key_delete;
-}
-
 static void KillChildren(const Units units, Unit* const unit)
 {
     for(int32_t j = 0; j < units.count; j++)
@@ -348,13 +343,13 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
-static Units Kill(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+static Units Kill(Units units, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit))
-            if(Unit_IsDead(unit) || ShouldDelete(unit, overview))
+            if(Unit_IsDead(unit))
             {
                 Unit_Kill(unit);
                 if(unit->has_children)
@@ -772,7 +767,7 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
     return floats;
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Field field)
+Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
     Tick(units);
@@ -780,7 +775,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Overview overv
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
-    units = Kill(units, overview, grid, graphics, map);
+    units = Kill(units, grid, graphics, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);

@@ -50,8 +50,6 @@ static Overview UpdateKeys(Overview overview, const Input input)
     overview.key_2 = input.key[SDL_SCANCODE_2];
     overview.key_3 = input.key[SDL_SCANCODE_3];
     overview.key_left_ctrl = input.key[SDL_SCANCODE_LCTRL];
-    overview.key_delete = input.key[SDL_SCANCODE_DELETE];
-    overview.key_return = input.key[SDL_SCANCODE_RETURN];
     return overview;
 }
 

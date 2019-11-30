@@ -43,8 +43,6 @@ typedef struct
     bool key_2;
     bool key_3;
     bool key_left_ctrl;
-    bool key_delete;
-    bool key_return;
 }
 Overview;
 

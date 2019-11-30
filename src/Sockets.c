@@ -1,6 +1,5 @@
 #include "Sockets.h"
 
-#include "Packet.h"
 #include "Util.h"
 
 #include <stdlib.h>

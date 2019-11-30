@@ -8,9 +8,10 @@
 #include "Args.h"
 #include "Util.h"
 
+#define DEMO (0)
+
 static void RunClient(const Args args)
 {
-#define DEMO (0)
     SDL_Init(SDL_INIT_VIDEO);
     const Color color = args.color;
     const Video video = Video_Setup(800, 600, "Open Empires");
@@ -36,7 +37,7 @@ static void RunClient(const Args args)
         Sock_Send(sock, overview);
         units = Units_PacketService(units, data.graphics, packet, grid, map, field);
         Map_Edit(map, overview, grid);
-        units = Units_Caretake(units, data.graphics, overview, grid, map, field);
+        units = Units_Caretake(units, data.graphics, grid, map, field);
         floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
         Video_Render(video, data, map, units, floats, overview, grid);
         const int32_t t1 = SDL_GetTicks();
@@ -47,13 +48,13 @@ static void RunClient(const Args args)
         Video_PrintHotkeys(video);
         Video_Present(video);
         Field_Free(field);
-        cycles++;
         if(args.should_measure && cycles > 10)
             break; // Use valgrind --tool=cachegrind and measure instruction counts when optimizing.
         const int32_t t2 = SDL_GetTicks();
         const int32_t ms = 15 - (t2 - t0);
         if(ms > 0)
             SDL_Delay(ms);
+        cycles++;
     }
     Sock_Disconnect(sock);
 #endif
@@ -63,7 +64,6 @@ static void RunClient(const Args args)
     Data_Free(data);
     Video_Free(video);
     SDL_Quit();
-#undef DEMO
 }
 
 static void RunServer(const Args args)

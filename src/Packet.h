@@ -9,7 +9,7 @@
 
 typedef struct
 {
-    Overview overview[COLOR_COUNT];
+    Overview overview[COLOR_COUNT]; // No pointers anywhere in here! Perfect for tcp...
 }
 Packet;
 
