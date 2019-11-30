@@ -39,6 +39,7 @@ SRCS += Rect.c
 SRCS += Rects.c
 SRCS += Registrar.c
 SRCS += Scanline.c
+SRCS += Sock.c
 SRCS += Sockets.c
 SRCS += State.c
 SRCS += Slp.c

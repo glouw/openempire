@@ -7,6 +7,8 @@
 #include "Rect.h"
 #include "Quad.h"
 
+#include <SDL2/SDL_net.h>
+
 typedef struct
 {
     Point pan;
@@ -59,3 +61,5 @@ Quad Overview_GetRenderBox(const Overview, const Grid, const int32_t border);
 Point Overview_IsoSnapTo(const Overview, const Grid, const Point);
 
 bool Overview_IsSelectionBoxBigEnough(const Overview);
+
+bool Overview_UsedAction(const Overview);

@@ -8,6 +8,7 @@
 #include "Field.h"
 #include "Map.h"
 #include "Points.h"
+#include "Packet.h"
 #include "Registrar.h"
 #include "Stack.h"
 
@@ -58,8 +59,6 @@ void Units_ManageStacks(const Units);
 
 bool Units_CanBuild(const Units, const Map, Unit* const);
 
-Units Units_Service(Units, const Registrar, const Overview, const Grid, const Map, const Field);
-
 Units Units_Caretake(Units, const Registrar, const Overview, const Grid, const Map, const Field);
 
 void Units_StackStacks(const Units);
@@ -67,3 +66,5 @@ void Units_StackStacks(const Units);
 void Units_ResetStacks(const Units);
 
 Units Units_Float(Units, const Registrar, const Overview, const Grid, const Map, const Motive);
+
+Units Units_PacketService(Units, const Registrar, const Packet, const Grid, const Map, const Field);

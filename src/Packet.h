@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Overview.h"
+#include "Sock.h"
 #include "Color.h"
 
 #include <stdbool.h>
@@ -12,4 +13,4 @@ typedef struct
 }
 Packet;
 
-Packet Packet_Get(TCPsocket server, SDLNet_SocketSet set);
+Packet Packet_Get(const Sock);

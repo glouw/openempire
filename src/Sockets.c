@@ -6,26 +6,30 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-Sockets Sockets_Init(void)
+Sockets Sockets_Init(const int32_t port)
 {
+    IPaddress ip;
+    SDLNet_ResolveHost(&ip, NULL, port);
     static Sockets zero;
     Sockets sockets = zero;
+    sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     return sockets;
 }
 
 void Sockets_Free(const Sockets sockets)
 {
+    SDLNet_TCP_Close(sockets.self);
     SDLNet_FreeSocketSet(sockets.set);
 }
 
-Sockets Sockets_Add(Sockets sockets, TCPsocket sock)
+static Sockets Add(Sockets sockets, TCPsocket socket)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        if(sockets.sock[i] == NULL)
+        if(sockets.socket[i] == NULL)
         {
-            SDLNet_TCP_AddSocket(sockets.set, sock);
-            sockets.sock[i] = sock;
+            SDLNet_TCP_AddSocket(sockets.set, socket);
+            sockets.socket[i] = socket;
             return sockets;
         }
     return sockets;
@@ -36,21 +40,20 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
     if(SDLNet_CheckSockets(sockets.set, timeout))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
-            TCPsocket sock = sockets.sock[i];
-            if(SDLNet_SocketReady(sock))
+            TCPsocket socket = sockets.socket[i];
+            if(SDLNet_SocketReady(socket))
             {
                 static Overview zero;
                 Overview overview = zero;
                 const int32_t max = sizeof(overview);
-                const int32_t bytes = SDLNet_TCP_Recv(sock, &overview, max);
+                const int32_t bytes = SDLNet_TCP_Recv(socket, &overview, max);
                 if(bytes <= 0)
                 {
-                    SDLNet_TCP_DelSocket(sockets.set, sock);
-                    sockets.sock[i] = NULL;
+                    SDLNet_TCP_DelSocket(sockets.set, socket);
+                    sockets.socket[i] = NULL;
                 }
-                if(bytes == max)
-                    if(overview.mouse_lu || overview.mouse_ru)
-                        sockets.packet.overview[i] = overview;
+                if(bytes == max && Overview_UsedAction(overview))
+                    sockets.packet.overview[i] = overview;
             }
         }
     return sockets;
@@ -70,23 +73,23 @@ Sockets Sockets_Relay(const Sockets sockets, const int32_t cycles, const int32_t
     {
         printf("%10d :: ", cycles);
         for(int32_t i = 0; i < COLOR_COUNT; i++)
-            printf("%d ", sockets.sock[i] == NULL ? 0 : 1);
+            printf("%d ", sockets.socket[i] == NULL ? 0 : 1);
         putchar('\n');
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
-            TCPsocket sock = sockets.sock[i];
-            if(sock)
-                SDLNet_TCP_Send(sock, &sockets.packet, sizeof(sockets.packet));
+            TCPsocket socket = sockets.socket[i];
+            if(socket)
+                SDLNet_TCP_Send(socket, &sockets.packet, sizeof(sockets.packet));
         }
         return Clear(sockets);
     }
     return sockets;
 }
 
-Sockets Sockets_Accept(const Sockets sockets, const TCPsocket server)
+Sockets Sockets_Accept(const Sockets sockets)
 {
-    const TCPsocket client = SDLNet_TCP_Accept(server);
+    const TCPsocket client = SDLNet_TCP_Accept(sockets.self);
     return (client != NULL)
-        ? Sockets_Add(sockets, client)
+        ? Add(sockets, client)
         : sockets;
 }

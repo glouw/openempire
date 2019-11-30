@@ -168,3 +168,8 @@ Point Overview_IsoSnapTo(const Overview overview, const Grid grid, const Point i
     const Point snap = Overview_CartToIso(overview, grid, cart);
     return snap;
 }
+
+bool Overview_UsedAction(const Overview overview)
+{
+    return overview.mouse_lu || overview.mouse_ru;
+}
