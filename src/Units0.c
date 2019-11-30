@@ -282,8 +282,8 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
         FILE_FIRE_MEDIUM_A,
         FILE_FIRE_MEDIUM_B,
     };
-    for(int32_t x = 1; x < unit->trait.dimensions.x - 1; x++)
-    for(int32_t y = 1; y < unit->trait.dimensions.y - 1; y++)
+    for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+    for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(unit->cart, offset);

@@ -26,7 +26,7 @@ static void RunClient(const Args args)
 #if DEMO == 1
     Video_RenderDataDemo(video, data, args.color);
 #else
-    Sock sock = Sock_Connect(args.host, args.port);
+    const Sock sock = Sock_Connect(args.host, args.port);
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {

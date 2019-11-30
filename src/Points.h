@@ -22,4 +22,4 @@ Points Points_Cat(Points a, const Points b);
 
 void Points_Print(const Points);
 
-Points Points_Reverse(const Points);
+Points Points_Reverse(Points);
