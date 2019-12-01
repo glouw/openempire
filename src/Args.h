@@ -9,7 +9,6 @@ typedef struct
 {
     const char* path;
     Color color;
-    bool should_measure;
     bool is_server;
     const char* host;
     int32_t port;

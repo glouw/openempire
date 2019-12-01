@@ -31,9 +31,6 @@ Args Args_Parse(const int32_t argc, const char* argv[])
             }
         }
         else
-        if(Check(arg, "--measure", "-m"))
-            args.should_measure = true;
-        else
         if(Check(arg, "--path", "-p"))
             args.path = argv[i + 1];
         else

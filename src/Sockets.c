@@ -49,6 +49,8 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                 if(bytes <= 0)
                 {
                     SDLNet_TCP_DelSocket(sockets.set, socket);
+                    sockets.cycles[i] = 0;
+                    sockets.parity[i] = 0;
                     sockets.socket[i] = NULL;
                 }
                 if(bytes == max)
@@ -70,14 +72,46 @@ static Sockets Clear(Sockets sockets)
     return sockets;
 }
 
-static void Print(const Sockets sockets)
+static int32_t GetCycleSetpoint(const Sockets sockets)
 {
-    printf("%d\n", sockets.turns);
+    int32_t setpoint = 0;
+    int32_t count = 0;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t cycles = sockets.cycles[i];
+        if(cycles > 0)
+        {
+            setpoint += cycles;
+            count++;
+        }
+    }
+    return (count > 0) ? (setpoint / count) : 0;
+}
+
+static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t cycles = sockets.cycles[i];
+        if(cycles > setpoint)
+            sockets.control[i] = PACKET_CONTROL_SLOW_DOWN;
+        if(cycles == setpoint)
+            sockets.control[i] = PACKET_CONTROL_STEADY;
+        if(cycles < setpoint)
+            sockets.control[i] = PACKET_CONTROL_SPEED_UP;
+    }
+    return sockets;
+}
+
+static void Print(const Sockets sockets, const int32_t setpoint)
+{
+    printf("%d :: %d\n", sockets.turns, setpoint);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const uint64_t parity = sockets.parity[i];
         const int32_t cycles = sockets.cycles[i];
-        printf("0x%016lX :: %d\n", parity, cycles);
+        const char control = sockets.control[i];
+        printf("0x%016lX :: %c :: %d\n", parity, control, cycles);
     }
 }
 
@@ -87,7 +121,11 @@ static void Send(const Sockets sockets)
     {
         TCPsocket socket = sockets.socket[i];
         if(socket)
-            SDLNet_TCP_Send(socket, &sockets.packet, sizeof(sockets.packet));
+        {
+            Packet packet = sockets.packet;
+            packet.control = sockets.control[i];
+            SDLNet_TCP_Send(socket, &packet, sizeof(packet));
+        }
     }
 }
 
@@ -100,9 +138,11 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
 {
     if(ShouldRelay(cycles, interval))
     {
-        sockets.turns += 1;
-        Print(sockets);
+        const int32_t setpoint = GetCycleSetpoint(sockets);
+        sockets = CalculateControlChars(sockets, setpoint);
+        Print(sockets, setpoint);
         Send(sockets);
+        sockets.turns++;
         return Clear(sockets);
     }
     return sockets;
