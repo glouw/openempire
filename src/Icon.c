@@ -98,21 +98,21 @@ Icon Icon_FromOverview(const Overview overview, const Motive motive)
     const int32_t age = 0; // XXX. SHOULD BE TOP LEVEL.
     const Icons icons = Icons_FromMotive(motive, age);
     int32_t index = -1;
-    if(overview.key_q) index =  0;
-    if(overview.key_w) index =  1;
-    if(overview.key_e) index =  2;
-    if(overview.key_r) index =  3;
-    if(overview.key_t) index =  4;
-    if(overview.key_a) index =  5;
-    if(overview.key_s) index =  6;
-    if(overview.key_d) index =  7;
-    if(overview.key_f) index =  8;
-    if(overview.key_g) index =  9;
-    if(overview.key_z) index = 10;
-    if(overview.key_x) index = 11;
-    if(overview.key_c) index = 12;
-    if(overview.key_v) index = 13;
-    if(overview.key_b) index = 14;
+    if(overview.event.key_q) index =  0;
+    if(overview.event.key_w) index =  1;
+    if(overview.event.key_e) index =  2;
+    if(overview.event.key_r) index =  3;
+    if(overview.event.key_t) index =  4;
+    if(overview.event.key_a) index =  5;
+    if(overview.event.key_s) index =  6;
+    if(overview.event.key_d) index =  7;
+    if(overview.event.key_f) index =  8;
+    if(overview.event.key_g) index =  9;
+    if(overview.event.key_z) index = 10;
+    if(overview.event.key_x) index = 11;
+    if(overview.event.key_c) index = 12;
+    if(overview.event.key_v) index = 13;
+    if(overview.event.key_b) index = 14;
     return (index != -1 && icons.icon != NULL && index < icons.count) ? icons.icon[index] : ICON_NONE;
 
 }

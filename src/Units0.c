@@ -96,7 +96,7 @@ static Units UnSelectAll(Units units)
 
 static Units Select(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Points render_points)
 {
-    if(overview.mouse_lu && !overview.key_left_shift)
+    if(overview.event.mouse_lu && !overview.event.key_left_shift)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
         Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
@@ -107,7 +107,7 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
         {
             const Tile tile = Tiles_SelectOne(tiles, overview.mouse_cursor);
             if(tile.reference && tile.reference->is_selected)
-                units.select_count = overview.key_left_ctrl ? Tiles_SelectSimilar(tiles, tile) : 1;
+                units.select_count = overview.event.key_left_ctrl ? Tiles_SelectSimilar(tiles, tile) : 1;
         }
         Tiles_Free(tiles);
     }
@@ -130,7 +130,7 @@ static void FindPathForSelected(const Units units, const Point cart_goal, const 
 
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field)
 {
-    if(overview.mouse_ru && units.select_count > 0)
+    if(overview.event.mouse_ru && units.select_count > 0)
     {
         const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
         const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
@@ -755,14 +755,14 @@ static Units UseIcon(Units units, const Overview overview, const Grid grid, cons
 
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(overview.key_left_shift && overview.mouse_lu)
+    if(overview.event.key_left_shift && overview.event.mouse_lu)
         return UseIcon(units, overview, grid, graphics, map, false);
     return units;
 }
 
 static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(overview.key_left_shift)
+    if(overview.event.key_left_shift)
         return UseIcon(floats, overview, grid, graphics, map, true);
     return floats;
 }

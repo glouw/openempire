@@ -311,7 +311,7 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
 void Vram_DrawMap(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Blendomatic blendomatic, const Lines blend_lines, const Tiles terrain_tiles)
 {
     RenderTerrainTiles(vram, terrain_tiles);
-    if(!overview.key_left_shift)
+    if(!overview.event.key_left_shift)
         BlendTerrainTiles(vram, terrain, map, overview, grid, blend_lines, blendomatic);
 }
 

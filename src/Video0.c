@@ -95,7 +95,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Vram_DrawUnits(vram, graphics_tiles_floats);
     Vram_DrawMouseTileSelect(vram, data.terrain, overview, grid);
     Vram_DrawUnitSelections(vram, graphics_tiles);
-    const bool should_draw = overview.mouse_l && !overview.key_left_shift;
+    const bool should_draw = overview.event.mouse_l && !overview.event.key_left_shift;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
     Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color);
     Vram_DrawHud(vram, data.interfac);

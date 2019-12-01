@@ -11,38 +11,44 @@
 
 typedef struct
 {
+    bool mouse_l        : 1;
+    bool mouse_r        : 1;
+    bool mouse_ld       : 1;
+    bool mouse_lu       : 1;
+    bool mouse_rd       : 1;
+    bool mouse_ru       : 1;
+    bool key_left_shift : 1;
+    bool key_q          : 1;
+    bool key_w          : 1;
+    bool key_e          : 1;
+    bool key_r          : 1;
+    bool key_t          : 1;
+    bool key_a          : 1;
+    bool key_s          : 1;
+    bool key_d          : 1;
+    bool key_f          : 1;
+    bool key_g          : 1;
+    bool key_z          : 1;
+    bool key_x          : 1;
+    bool key_c          : 1;
+    bool key_v          : 1;
+    bool key_b          : 1;
+    bool key_1          : 1;
+    bool key_2          : 1;
+    bool key_3          : 1;
+    bool key_left_ctrl  : 1;
+}
+Event;
+
+typedef struct
+{
     Point pan;
     Rect selection_box;
     int32_t xres;
     int32_t yres;
     Color color;
     Point mouse_cursor;
-    bool mouse_l;
-    bool mouse_r;
-    bool mouse_ld;
-    bool mouse_lu;
-    bool mouse_rd;
-    bool mouse_ru;
-    bool key_left_shift;
-    bool key_q;
-    bool key_w;
-    bool key_e;
-    bool key_r;
-    bool key_t;
-    bool key_a;
-    bool key_s;
-    bool key_d;
-    bool key_f;
-    bool key_g;
-    bool key_z;
-    bool key_x;
-    bool key_c;
-    bool key_v;
-    bool key_b;
-    bool key_1;
-    bool key_2;
-    bool key_3;
-    bool key_left_ctrl;
+    Event event;
     uint64_t parity;
     int32_t cycles;
 }

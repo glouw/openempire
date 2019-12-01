@@ -87,6 +87,7 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
+    printf("%ld\n", sizeof(Event));
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server
