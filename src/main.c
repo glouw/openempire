@@ -14,7 +14,7 @@ static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
     const Color color = args.color;
-    const Video video = Video_Setup(800, 600, "Open Empires");
+    const Video video = Video_Setup(640, 480, "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
@@ -87,7 +87,7 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
-    printf("%ld\n", sizeof(Event));
+    printf("%ld\n", sizeof(Packet));
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server
