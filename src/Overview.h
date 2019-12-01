@@ -43,12 +43,14 @@ typedef struct
     bool key_2;
     bool key_3;
     bool key_left_ctrl;
+    uint64_t parity;
+    int32_t cycles;
 }
 Overview;
 
 Overview Overview_Init(const Color, const int32_t xres, const int32_t yres);
 
-Overview Overview_Update(Overview, const Input);
+Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles);
 
 Point Overview_IsoToCart(const Overview, const Grid, const Point, const bool raw);
 

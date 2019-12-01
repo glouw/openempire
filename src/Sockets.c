@@ -51,8 +51,13 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                     SDLNet_TCP_DelSocket(sockets.set, socket);
                     sockets.socket[i] = NULL;
                 }
-                if(bytes == max && Overview_UsedAction(overview))
-                    sockets.packet.overview[i] = overview;
+                if(bytes == max)
+                {
+                    sockets.cycles[i] = overview.cycles;
+                    sockets.parity[i] = overview.parity;
+                    if(Overview_UsedAction(overview))
+                        sockets.packet.overview[i] = overview;
+                }
             }
         }
     return sockets;
@@ -60,26 +65,44 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
 
 static Sockets Clear(Sockets sockets)
 {
-    static Overview zero;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-        sockets.packet.overview[i] = zero;
+    static Packet zero;
+    sockets.packet = zero;
     return sockets;
 }
 
-Sockets Sockets_Relay(const Sockets sockets, const int32_t cycles, const int32_t interval)
+static void Print(const Sockets sockets)
 {
-    if((cycles % interval) == 0)
+    printf("%d\n", sockets.turns);
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        printf("%10d :: ", cycles);
-        for(int32_t i = 0; i < COLOR_COUNT; i++)
-            printf("%d ", sockets.socket[i] == NULL ? 0 : 1);
-        putchar('\n');
-        for(int32_t i = 0; i < COLOR_COUNT; i++)
-        {
-            TCPsocket socket = sockets.socket[i];
-            if(socket)
-                SDLNet_TCP_Send(socket, &sockets.packet, sizeof(sockets.packet));
-        }
+        const uint64_t parity = sockets.parity[i];
+        const int32_t cycles = sockets.cycles[i];
+        printf("0x%016lX :: %d\n", parity, cycles);
+    }
+}
+
+static void Send(const Sockets sockets)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        TCPsocket socket = sockets.socket[i];
+        if(socket)
+            SDLNet_TCP_Send(socket, &sockets.packet, sizeof(sockets.packet));
+    }
+}
+
+static bool ShouldRelay(const int32_t cycles, const int32_t interval)
+{
+    return (cycles % interval) == 0;
+}
+
+Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval)
+{
+    if(ShouldRelay(cycles, interval))
+    {
+        sockets.turns += 1;
+        Print(sockets);
+        Send(sockets);
         return Clear(sockets);
     }
     return sockets;

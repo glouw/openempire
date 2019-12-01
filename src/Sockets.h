@@ -8,10 +8,13 @@
 
 typedef struct
 {
+    int32_t cycles[COLOR_COUNT];
+    uint64_t parity[COLOR_COUNT];
     TCPsocket socket[COLOR_COUNT];
     TCPsocket self;
     Packet packet;
     SDLNet_SocketSet set;
+    int32_t turns;
 }
 Sockets;
 

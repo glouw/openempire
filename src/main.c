@@ -33,7 +33,8 @@ static void RunClient(const Args args)
         const int32_t t0 = SDL_GetTicks();
         const Field field = Units_Field(units, map);
         const Packet packet = Packet_Get(sock);
-        overview = Overview_Update(overview, input);
+        const uint64_t parity = Units_Xor(units);
+        overview = Overview_Update(overview, input, parity, cycles);
         Sock_Send(sock, overview);
         units = Units_PacketService(units, data.graphics, packet, grid, map, field);
         Map_Edit(map, overview, grid);

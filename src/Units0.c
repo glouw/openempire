@@ -811,3 +811,16 @@ Units Units_PacketService(Units units, const Registrar graphics, const Packet pa
         units = Service(units, graphics, packet.overview[i], grid, map, field);
     return units;
 }
+
+uint64_t Units_Xor(const Units units)
+{
+    uint64_t parity = 0;
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        const uint64_t x = (uint64_t) unit->cell.x;
+        const uint64_t y = (uint64_t) unit->cell.y;
+        parity ^= (y << 32) | x;
+    }
+    return parity;
+}

@@ -24,6 +24,5 @@ void Sock_Disconnect(const Sock sock)
 
 void Sock_Send(const Sock sock, const Overview overview)
 {
-    if(Overview_UsedAction(overview))
-        SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
+    SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
 }

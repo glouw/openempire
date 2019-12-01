@@ -68,3 +68,5 @@ void Units_ResetStacks(const Units);
 Units Units_Float(Units, const Registrar, const Overview, const Grid, const Map, const Motive);
 
 Units Units_PacketService(Units, const Registrar, const Packet, const Grid, const Map, const Field);
+
+uint64_t Units_Xor(const Units);

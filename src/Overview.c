@@ -73,12 +73,14 @@ static Overview UpdatePan(Overview overview)
     return overview;
 }
 
-Overview Overview_Update(Overview overview, const Input input)
+Overview Overview_Update(Overview overview, const Input input, const uint64_t parity, const int32_t cycles)
 {
     overview = UpdateMouse(overview, input);
     overview = UpdateKeys(overview, input);
     overview = UpdatePan(overview);
     overview = UpdateSelectionBox(overview);
+    overview.parity = parity;
+    overview.cycles = cycles;
     return overview;
 }
 
