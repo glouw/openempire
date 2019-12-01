@@ -15,7 +15,7 @@ typedef struct
     TCPsocket self;
     Packet packet;
     SDLNet_SocketSet set;
-    int32_t turns;
+    int32_t turn;
 }
 Sockets;
 

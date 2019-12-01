@@ -1,5 +1,7 @@
 #include "Packet.h"
 
+#include "Util.h"
+
 Packet Packet_Get(const Sock sock)
 {
     static Packet zero;

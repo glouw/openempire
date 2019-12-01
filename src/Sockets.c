@@ -105,7 +105,7 @@ static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
 
 static void Print(const Sockets sockets, const int32_t setpoint)
 {
-    printf("%d :: %d\n", sockets.turns, setpoint);
+    printf("%d :: %d\n", sockets.turn, setpoint);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const uint64_t parity = sockets.parity[i];
@@ -124,6 +124,7 @@ static void Send(const Sockets sockets)
         {
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
+            packet.turn = sockets.turn;
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
     }
@@ -142,7 +143,7 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         sockets = CalculateControlChars(sockets, setpoint);
         Print(sockets, setpoint);
         Send(sockets);
-        sockets.turns++;
+        sockets.turn++;
         return Clear(sockets);
     }
     return sockets;
