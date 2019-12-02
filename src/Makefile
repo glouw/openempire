@@ -31,6 +31,7 @@ SRCS += Outline.c
 SRCS += Overview.c
 SRCS += Window.c
 SRCS += Packet.c
+SRCS += Packets.c
 SRCS += Palette.c
 SRCS += Point.c
 SRCS += Points.c

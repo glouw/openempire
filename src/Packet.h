@@ -16,6 +16,8 @@ typedef struct
     Overview overview[COLOR_COUNT]; // No pointers anywhere in here! Perfect for tcp...
     char control;
     int32_t turn;
+    int32_t exec_cycle;
+    int32_t index;
 }
 Packet;
 

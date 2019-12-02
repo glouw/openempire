@@ -1,6 +1,7 @@
 #include "Video.h"
 #include "Input.h"
 #include "Config.h"
+#include "Packets.h"
 #include "Sockets.h"
 #include "Stream.h"
 #include "Overview.h"
@@ -25,6 +26,7 @@ static void RunClient(const Args args)
     units = Units_GenerateTestZone(units, map, grid, data.graphics);
     Units floats = Units_New(grid, video.cpu_count, 16);
     Stream stream = Stream_Init();
+    Packets packets = Packets_Init();
     if(DEMO == 1)
     {
         // The demo renderer shows a preview of all unit and interface graphics.
@@ -47,10 +49,26 @@ static void RunClient(const Args args)
 
             // The server returns all client overviews.
             stream = Stream_Flow(stream, sock);
+            if(stream.packet.turn != 0)
+            {
+                packets = Packets_Queue(packets, stream.packet);
+                printf("%d :: QUEUE %d\n", stream.packet.index, Packets_Size(packets));
+            }
 
             // Client units are updated according to all client overviews.
             const Field field = Units_Field(units, map);
-            units = Units_PacketService(units, data.graphics, stream.packet, grid, map, field);
+
+            if(Packets_Size(packets) > 0)
+            {
+                const Packet peek = Packets_Peek(packets);
+                if(cycles == peek.exec_cycle)
+                {
+                    Packet dequeued;
+                    packets = Packets_Dequeue(packets, &dequeued);
+                    units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+                }
+            }
+
             units = Units_Caretake(units, data.graphics, grid, map, field);
             floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
             cycles++;
@@ -97,6 +115,7 @@ static void RunClient(const Args args)
     Map_Free(map);
     Data_Free(data);
     Video_Free(video);
+    Packets_Free(packets);
     SDL_Quit();
 }
 
@@ -114,7 +133,6 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
-    printf("%ld\n", sizeof(Packet));
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server

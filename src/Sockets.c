@@ -111,11 +111,11 @@ static void Print(const Sockets sockets, const int32_t setpoint)
         const uint64_t parity = sockets.parity[i];
         const int32_t cycles = sockets.cycles[i];
         const char control = sockets.control[i];
-        printf("0x%016lX :: %c :: %d\n", parity, control, cycles);
+        printf("%d :: 0x%016lX :: %c :: %d\n", i, parity, control, cycles);
     }
 }
 
-static void Send(const Sockets sockets)
+static void Send(const Sockets sockets, const int32_t setpoint)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
@@ -125,6 +125,8 @@ static void Send(const Sockets sockets)
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
+            packet.exec_cycle = setpoint + 5;
+            packet.index = i;
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
     }
@@ -142,7 +144,7 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         const int32_t setpoint = GetCycleSetpoint(sockets);
         sockets = CalculateControlChars(sockets, setpoint);
         Print(sockets, setpoint);
-        Send(sockets);
+        Send(sockets, setpoint);
         sockets.turn++;
         return Clear(sockets);
     }

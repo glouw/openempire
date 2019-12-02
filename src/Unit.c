@@ -174,9 +174,12 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;
-    unit.entropy = Point_Rand();
-    unit.entropy_static = Util_Rand();
     unit.is_floating = is_floating;
+    if(!is_floating)
+    {
+        unit.entropy = Point_Rand();
+        unit.entropy_static = Util_Rand();
+    }
     if(at_center)
     {
         const Point center = Point_Div(unit.trait.dimensions, 2);
