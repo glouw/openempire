@@ -52,8 +52,3 @@ bool Packets_Active(const Packets packets)
 {
     return Packets_Size(packets) > 0;
 }
-
-Packets Packets_Stream(const Packets packets, const Stream stream)
-{
-    return (stream.packet.turn != 0) ? Packets_Queue(packets, stream.packet) : packets;
-}

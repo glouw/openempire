@@ -41,7 +41,8 @@ static void RunClient(const Args args)
             Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
             Sock_Send(sock, overview);
             stream = Stream_Flow(stream, sock);
-            packets = Packets_Stream(packets, stream);
+            if(stream.packet.turn > 0)
+                packets = Packets_Queue(packets, stream.packet);
             const Field field = Units_Field(units, map);
             if(Packets_Active(packets))
             {
