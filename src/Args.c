@@ -28,7 +28,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Check(arg, "-p", "--path"  )) args.path = next;
         if(Check(arg, "-s", "--server")) args.is_server = true;
         if(Check(arg, "-x", "--xres"  )) args.xres = atoi(next);
-        if(Check(arg, "-y", "--yres"  )) args.xres = atoi(next);
+        if(Check(arg, "-y", "--yres"  )) args.yres = atoi(next);
     }
     assert(args.path);
     return args;
