@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Packet.h"
+#include "Stream.h"
 
 #include <stdint.h>
 
@@ -24,3 +25,7 @@ Packets Packets_Dequeue(Packets, Packet*);
 void Packets_Free(const Packets);
 
 int32_t Packets_Size(const Packets);
+
+bool Packets_Active(const Packets);
+
+Packets Packets_Stream(const Packets, const Stream);

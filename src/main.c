@@ -16,7 +16,7 @@ static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
     const Color color = args.color;
-    const Video video = Video_Setup(640, 480, "Open Empires");
+    const Video video = Video_Setup(args.xres, args.yres, "Open Empires");
     Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
@@ -24,16 +24,11 @@ static void RunClient(const Args args)
     Overview overview = Overview_Init(color, video.xres, video.yres);
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
     units = Units_GenerateTestZone(units, map, grid, data.graphics);
-    Units floats = Units_New(grid, video.cpu_count, 16);
+    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
     Stream stream = Stream_Init();
     Packets packets = Packets_Init();
     if(DEMO == 1)
-    {
-        // The demo renderer shows a preview of all unit and interface graphics.
-        // A constant is used to compile in the demo renderer. Choosing
-        // to set DEMO to 0 will remove the demo renderer from the final binary.
         Video_RenderDataDemo(video, data, args.color);
-    }
     else
     {
         const Sock sock = Sock_Connect(args.host, args.port);
@@ -41,24 +36,14 @@ static void RunClient(const Args args)
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
             const int32_t t0 = SDL_GetTicks();
-
-            // The client is responsible for only updating the server with its own overview.
             const uint64_t parity = Units_Xor(units);
             overview = Overview_Update(overview, input, parity, cycles);
+            Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
             Sock_Send(sock, overview);
-
-            // The server returns all client overviews.
             stream = Stream_Flow(stream, sock);
-            if(stream.packet.turn != 0)
-            {
-                packets = Packets_Queue(packets, stream.packet);
-                printf("%d :: QUEUE %d\n", stream.packet.index, Packets_Size(packets));
-            }
-
-            // Client units are updated according to all client overviews.
+            packets = Packets_Stream(packets, stream);
             const Field field = Units_Field(units, map);
-
-            if(Packets_Size(packets) > 0)
+            if(Packets_Active(packets))
             {
                 const Packet peek = Packets_Peek(packets);
                 if(cycles == peek.exec_cycle)
@@ -67,44 +52,24 @@ static void RunClient(const Args args)
                     packets = Packets_Dequeue(packets, &dequeued);
                     units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
                 }
+                if(cycles > peek.exec_cycle) 
+                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n", peek.index);
             }
-
             units = Units_Caretake(units, data.graphics, grid, map, field);
             floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
-            cycles++;
-
-            // XXX. Just for fun right now.
-            Map_Edit(map, overview, grid);
-
-            // The server will send a speed up control character if the client falls behind.
-            // The quickest way for the client to catch up with the other clients
-            // is to skip renderering the current scene.
+            cycles += 1;
             if(stream.packet.control == PACKET_CONTROL_SPEED_UP)
                 continue;
-
             const int32_t t1 = SDL_GetTicks();
-            Video_Render(video, data, map, units, floats, overview, grid);
+            Video_Draw(video, data, map, units, floats, overview, grid);
             const int32_t t2 = SDL_GetTicks();
-
-            Video_CopyCanvas(video);
-            Log_Dump();
-            Video_PrintPerformanceMonitor(video, units, t2 - t0, cycles);
-            Video_PrintResources(video, units);
-            Video_PrintHotkeys(video);
-            Video_Present(video);
+            const int32_t dt = t2 - t0;
+            Video_Render(video, units, dt, cycles);
             Field_Free(field);
-
-            // The client will attempt to roughly maintain a 60 FPS game loop,
-            // regardless of screen vertical sync rates.
             const int32_t t3 = SDL_GetTicks();
             const int32_t ms = 15 - (t3 - t0);
             if(ms > 0)
                 SDL_Delay(ms);
-
-            // The server will send a slow down character if the client is too fast.
-            // The client will slow down the amount of time taken by the renderer for this frame,
-            // which is roughly equal to the time that would've been taken to speed up this frame
-            // with a speed up control character.
             if(stream.packet.control == PACKET_CONTROL_SLOW_DOWN)
                 SDL_Delay(t3 - t1);
         }
@@ -125,8 +90,8 @@ static void RunServer(const Args args)
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
-        sockets = Sockets_Service(sockets, 1);
-        sockets = Sockets_Relay(sockets, cycles, 100);
+        sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT);
+        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED);
     }
     Sockets_Free(sockets);
 }

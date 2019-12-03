@@ -3,6 +3,7 @@
 #include "Surface.h"
 #include "Window.h"
 #include "Icon.h"
+#include "Log.h"
 #include "Config.h"
 #include "Vram.h"
 
@@ -54,17 +55,17 @@ void Video_Free(const Video video)
     SDL_Quit();
 }
 
-void Video_CopyCanvas(const Video video)
+static void CopyCanvas(const Video video)
 {
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
 }
 
-void Video_Present(const Video video)
+static void Present(const Video video)
 {
     SDL_RenderPresent(video.renderer);
 }
 
-void Video_PrintHotkeys(const Video video)
+static void PrintHotkeys(const Video video)
 {
     const char* hotkeys = Icon_GetHotkeys();
     const int32_t len = Icon_GetHotkeysLen();
@@ -76,7 +77,7 @@ void Video_PrintHotkeys(const Video video)
     }
 }
 
-void Video_Render(const Video video, const Data data, const Map map, const Units units, const Units floats, const Overview overview, const Grid grid)
+void Video_Draw(const Video video, const Data data, const Map map, const Units units, const Units floats, const Overview overview, const Grid grid)
 {
     const Window window = Window_Make(overview, grid);
     const Vram vram = Vram_Lock(video.canvas, video.xres, video.yres, video.cpu_count);
@@ -108,7 +109,7 @@ void Video_Render(const Video video, const Data data, const Map map, const Units
     Window_Free(window);
 }
 
-void Video_PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles)
+static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles)
 {
     static int32_t dt_hold;
     if(cycles % 10 == 0)
@@ -120,7 +121,7 @@ void Video_PrintPerformanceMonitor(const Video video, const Units units, const i
             "cycles        : %6d\n", units.count, dt_hold, cycles);
 }
 
-void Video_PrintResources(const Video video, const Units units)
+static void PrintResources(const Video video, const Units units)
 {
     const int32_t space = 77;
     const int32_t x0 = 27;
@@ -135,4 +136,14 @@ void Video_PrintResources(const Video video, const Units units)
     Text_Printf(video.text_small, video.renderer, c, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.gold);
     Text_Printf(video.text_small, video.renderer, d, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.stone);
     Text_Printf(video.text_small, video.renderer, e, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.population);
+}
+
+void Video_Render(const Video video, const Units units, const int32_t dt, const int32_t cycles)
+{
+    CopyCanvas(video);
+    Log_Dump();
+    PrintPerformanceMonitor(video, units, dt, cycles);
+    PrintResources(video, units);
+    PrintHotkeys(video);
+    Present(video);
 }
