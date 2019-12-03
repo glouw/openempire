@@ -59,3 +59,5 @@
 #define CONFIG_SOCKETS_SERVER_TIMEOUT (1) // ms.
 
 #define CONFIG_SOCKETS_SERVER_UPDATE_SPEED (50) // ms.
+
+#define CONFIG_MAIN_LOOP_SPEED (15) // ms.

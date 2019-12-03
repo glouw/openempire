@@ -10,7 +10,7 @@
 #include "Args.h"
 #include "Util.h"
 
-#define DEMO (0)
+#define DEMO (true)
 
 static void RunClient(const Args args)
 {
@@ -27,7 +27,7 @@ static void RunClient(const Args args)
     Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
     Stream stream = Stream_Init();
     Packets packets = Packets_Init();
-    if(DEMO == 1)
+    if(DEMO == true)
         Video_RenderDataDemo(video, data, args.color);
     else
     {
@@ -67,7 +67,7 @@ static void RunClient(const Args args)
             Video_Render(video, units, dt, cycles);
             Field_Free(field);
             const int32_t t3 = SDL_GetTicks();
-            const int32_t ms = 15 - (t3 - t0);
+            const int32_t ms = CONFIG_MAIN_LOOP_SPEED- (t3 - t0);
             if(ms > 0)
                 SDL_Delay(ms);
             if(stream.packet.control == PACKET_CONTROL_SLOW_DOWN)
