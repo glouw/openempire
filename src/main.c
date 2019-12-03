@@ -10,7 +10,7 @@
 #include "Args.h"
 #include "Util.h"
 
-#define DEMO (true)
+#define DEMO (false)
 
 static void RunClient(const Args args)
 {
@@ -52,14 +52,14 @@ static void RunClient(const Args args)
                     packets = Packets_Dequeue(packets, &dequeued);
                     units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
                 }
-                if(cycles > peek.exec_cycle) 
+                if(cycles > peek.exec_cycle)
                     Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n", peek.index);
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
-            floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
             cycles += 1;
             if(stream.packet.control == PACKET_CONTROL_SPEED_UP)
                 continue;
+            floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
             const int32_t t1 = SDL_GetTicks();
             Video_Draw(video, data, map, units, floats, overview, grid);
             const int32_t t2 = SDL_GetTicks();
