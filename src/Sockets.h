@@ -9,6 +9,7 @@
 typedef struct
 {
     int32_t cycles[COLOR_COUNT];
+    int32_t queue_size[COLOR_COUNT];
     uint64_t parity[COLOR_COUNT];
     TCPsocket socket[COLOR_COUNT];
     char control[COLOR_COUNT];
@@ -16,6 +17,7 @@ typedef struct
     Packet packet;
     SDLNet_SocketSet set;
     int32_t turn;
+    bool is_stable;
 }
 Sockets;
 

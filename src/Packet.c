@@ -18,3 +18,11 @@ Packet Packet_Get(const Sock sock)
     }
     return zero;
 }
+
+Packet Packet_ZeroOverviews(Packet packet)
+{
+    static Overview zero;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        packet.overview[i] = zero;
+    return packet;
+}

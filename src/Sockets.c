@@ -57,6 +57,7 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                 {
                     sockets.cycles[i] = overview.cycles;
                     sockets.parity[i] = overview.parity;
+                    sockets.queue_size[i] = overview.queue_size;
                     if(Overview_UsedAction(overview))
                         sockets.packet.overview[i] = overview;
                 }
@@ -69,6 +70,7 @@ static Sockets Clear(Sockets sockets)
 {
     static Packet zero;
     sockets.packet = zero;
+    sockets.turn++;
     return sockets;
 }
 
@@ -86,6 +88,31 @@ static int32_t GetCycleSetpoint(const Sockets sockets)
         }
     }
     return (count > 0) ? (setpoint / count) : 0;
+}
+
+static int32_t GetCycleMax(const Sockets sockets)
+{
+    int32_t max = 0;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t cycles = sockets.cycles[i];
+        if(cycles > max)
+            max = cycles;
+    }
+    return max;
+}
+
+static int32_t GetCycleMin(const Sockets sockets)
+{
+    int32_t min = INT32_MAX;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t cycles = sockets.cycles[i];
+        if(cycles != 0)
+            if(cycles < min)
+                min = cycles;
+    }
+    return min;
 }
 
 static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
@@ -111,22 +138,28 @@ static void Print(const Sockets sockets, const int32_t setpoint)
         const uint64_t parity = sockets.parity[i];
         const int32_t cycles = sockets.cycles[i];
         const char control = sockets.control[i];
-        printf("%d :: 0x%016lX :: %c :: %d\n", i, parity, control, cycles);
+        const char queue_size = sockets.queue_size[i];
+        const char parity_symbol = sockets.is_stable ? '!' : '?';
+        printf("%d :: %c :: 0x%016lX :: %c :: %d :: %d\n",
+                i, parity_symbol, parity, control, cycles, queue_size);
     }
 }
 
-static void Send(const Sockets sockets, const int32_t setpoint)
+static void Send(const Sockets sockets, const int32_t max)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         TCPsocket socket = sockets.socket[i];
         if(socket)
         {
+            const int32_t offset = 2; // XXX. Make this ping dependent.
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
-            packet.exec_cycle = setpoint + 5;
+            packet.exec_cycle = max + offset;
             packet.index = i;
+            if(!sockets.is_stable)
+                packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
     }
@@ -137,15 +170,51 @@ static bool ShouldRelay(const int32_t cycles, const int32_t interval)
     return (cycles % interval) == 0;
 }
 
+// ----- max
+//   a
+// ----- setpoint (must be above threshold)
+//   b
+// ----- min
+static Sockets CheckStability(Sockets sockets, const int32_t setpoint, const int32_t min, const int32_t max)
+{
+    const int32_t a = max - setpoint;
+    const int32_t b = setpoint - min;
+    const int32_t window = 2;
+    const int32_t threshold = 60;
+    sockets.is_stable = setpoint > threshold && a < window && b < window;
+    return sockets;
+}
+
+static void CheckParity(const Sockets sockets)
+{
+    if(sockets.is_stable)
+        for(int32_t j = 0; j < COLOR_COUNT; j++)
+        {
+            const int32_t cycles_check = sockets.cycles[j];
+            const int32_t parity_check = sockets.parity[j];
+            for(int32_t i = 0; i < COLOR_COUNT; i++)
+            {
+                const int32_t cycles = sockets.cycles[i];
+                const int32_t parity = sockets.parity[i];
+                if((cycles == cycles_check)
+                && (parity != parity_check)) // XXX. Make this kill the client.
+                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - PARITY MISMATCH BETWEEN CLIENTS\n");
+            }
+        }
+}
+
 Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval)
 {
     if(ShouldRelay(cycles, interval))
     {
         const int32_t setpoint = GetCycleSetpoint(sockets);
+        const int32_t min = GetCycleMin(sockets);
+        const int32_t max = GetCycleMax(sockets);
         sockets = CalculateControlChars(sockets, setpoint);
+        sockets = CheckStability(sockets, setpoint, min, max);
         Print(sockets, setpoint);
-        Send(sockets, setpoint);
-        sockets.turn++;
+        CheckParity(sockets);
+        Send(sockets, max);
         return Clear(sockets);
     }
     return sockets;

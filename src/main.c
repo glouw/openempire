@@ -37,8 +37,8 @@ static void RunClient(const Args args)
         {
             const int32_t t0 = SDL_GetTicks();
             const uint64_t parity = Units_Xor(units);
-            overview = Overview_Update(overview, input, parity, cycles);
             Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
+            overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
             Sock_Send(sock, overview);
             stream = Stream_Flow(stream, sock);
             if(stream.packet.turn > 0)
@@ -46,15 +46,16 @@ static void RunClient(const Args args)
             const Field field = Units_Field(units, map);
             if(Packets_Active(packets))
             {
-                const Packet peek = Packets_Peek(packets);
-                if(cycles == peek.exec_cycle)
+                if(cycles > Packets_Peek(packets).exec_cycle)
+                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n");
+                while(true)
                 {
+                    if(cycles != Packets_Peek(packets).exec_cycle)
+                        break;
                     Packet dequeued;
                     packets = Packets_Dequeue(packets, &dequeued);
                     units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
                 }
-                if(cycles > peek.exec_cycle)
-                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n", peek.index);
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
             cycles += 1;

@@ -21,12 +21,13 @@ typedef struct
     Event event;
     uint64_t parity;
     int32_t cycles;
+    int32_t queue_size;
 }
 Overview;
 
 Overview Overview_Init(const Color, const int32_t xres, const int32_t yres);
 
-Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles);
+Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size);
 
 Point Overview_IsoToCart(const Overview, const Grid, const Point, const bool raw);
 

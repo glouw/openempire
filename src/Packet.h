@@ -22,3 +22,5 @@ typedef struct
 Packet;
 
 Packet Packet_Get(const Sock);
+
+Packet Packet_ZeroOverviews(Packet);

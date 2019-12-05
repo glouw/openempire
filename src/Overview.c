@@ -73,7 +73,7 @@ static Overview UpdatePan(Overview overview)
     return overview;
 }
 
-Overview Overview_Update(Overview overview, const Input input, const uint64_t parity, const int32_t cycles)
+Overview Overview_Update(Overview overview, const Input input, const uint64_t parity, const int32_t cycles, const int32_t queue_size)
 {
     overview = UpdateMouse(overview, input);
     overview = UpdateKeys(overview, input);
@@ -81,6 +81,7 @@ Overview Overview_Update(Overview overview, const Input input, const uint64_t pa
     overview = UpdateSelectionBox(overview);
     overview.parity = parity;
     overview.cycles = cycles;
+    overview.queue_size = queue_size;
     return overview;
 }
 
