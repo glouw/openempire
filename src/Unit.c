@@ -2,7 +2,6 @@
 
 #include "Rect.h"
 #include "Util.h"
-#include "Log.h"
 #include "Resource.h"
 #include "Config.h"
 
@@ -211,34 +210,32 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
 
 void Unit_Print(Unit* const unit)
 {
-#define PRINT Log_Append
-    PRINT("action                :: %d\n",    unit->trait.action);
-    PRINT("type                  :: %d\n",    unit->trait.type);
-    PRINT("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
-    PRINT("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
-    PRINT("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
-    PRINT("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
-    PRINT("max_speed             :: %d\n",    unit->trait.max_speed);
-    PRINT("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
-    PRINT("path_index_timer      :: %d\n",    unit->path_index_timer);
-    PRINT("path_index            :: %d\n",    unit->path_index);
-    PRINT("path.count            :: %d\n",    unit->path.count);
-    PRINT("selected              :: %d\n",    unit->is_selected);
-    PRINT("file                  :: %d\n",    unit->file);
-    PRINT("file_name             :: %s\n",    unit->trait.file_name);
-    PRINT("id                    :: %d\n",    unit->id);
-    PRINT("parent_id             :: %d\n",    unit->parent_id);
-    PRINT("command_group         :: %d\n",    unit->command_group);
-    PRINT("health                :: %d\n",    unit->health);
-    PRINT("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
-    PRINT("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
-    PRINT("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
-    PRINT("can_expire            :: %d\n",    unit->trait.can_expire);
-    PRINT("expire_frames         :: %d\n",    unit->expire_frames);
-    PRINT("state_timer           :: %d\n",    unit->state_timer);
-    PRINT("must_garbage_collect  :: %d\n",    unit->must_garbage_collect);
-    PRINT("");
-#undef PRINT
+    printf("action                :: %d\n",    unit->trait.action);
+    printf("type                  :: %d\n",    unit->trait.type);
+    printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
+    printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+    printf("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
+    printf("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
+    printf("max_speed             :: %d\n",    unit->trait.max_speed);
+    printf("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
+    printf("path_index_timer      :: %d\n",    unit->path_index_timer);
+    printf("path_index            :: %d\n",    unit->path_index);
+    printf("path.count            :: %d\n",    unit->path.count);
+    printf("selected              :: %d\n",    unit->is_selected);
+    printf("file                  :: %d\n",    unit->file);
+    printf("file_name             :: %s\n",    unit->trait.file_name);
+    printf("id                    :: %d\n",    unit->id);
+    printf("parent_id             :: %d\n",    unit->parent_id);
+    printf("command_group         :: %d\n",    unit->command_group);
+    printf("health                :: %d\n",    unit->health);
+    printf("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
+    printf("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
+    printf("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
+    printf("can_expire            :: %d\n",    unit->trait.can_expire);
+    printf("expire_frames         :: %d\n",    unit->expire_frames);
+    printf("state_timer           :: %d\n",    unit->state_timer);
+    printf("must_garbage_collect  :: %d\n",    unit->must_garbage_collect);
+    printf("\n");
 }
 
 void ApplyStressors(Unit* const unit)

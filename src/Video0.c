@@ -3,7 +3,6 @@
 #include "Surface.h"
 #include "Window.h"
 #include "Icon.h"
-#include "Log.h"
 #include "Config.h"
 #include "Vram.h"
 
@@ -141,7 +140,6 @@ static void PrintResources(const Video video, const Units units)
 void Video_Render(const Video video, const Units units, const int32_t dt, const int32_t cycles)
 {
     CopyCanvas(video);
-    Log_Dump();
     PrintPerformanceMonitor(video, units, dt, cycles);
     PrintResources(video, units);
     PrintHotkeys(video);

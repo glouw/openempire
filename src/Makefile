@@ -22,7 +22,6 @@ SRCS += Image.c
 SRCS += Input.c
 SRCS += Interfac.c
 SRCS += Lines.c
-SRCS += Log.c
 SRCS += main.c
 SRCS += Map.c
 SRCS += Meap.c

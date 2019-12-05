@@ -5,7 +5,6 @@
 #include "Sockets.h"
 #include "Stream.h"
 #include "Overview.h"
-#include "Log.h"
 #include "Units.h"
 #include "Args.h"
 #include "Util.h"
@@ -17,7 +16,6 @@ static void RunClient(const Args args)
     SDL_Init(SDL_INIT_VIDEO);
     const Color color = args.color;
     const Video video = Video_Setup(args.xres, args.yres, "Open Empires");
-    Log_Init(video);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(60, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
