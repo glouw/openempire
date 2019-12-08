@@ -84,19 +84,6 @@ static Units GenerateTreeZone(Units units, const Map map, const Grid grid, const
     return units;
 }
 
-Units Units_SpawnSlot(Units units, const Map map, const Grid grid, const Registrar graphics, const Color color, const Point slot)
-{
-    const Point none = { 0,0 };
-    units = Units_SpawnTownCenter(units, slot, grid, color, graphics, map, false);
-    for(int32_t i = 0; i < 5; i++)
-    {
-        const Point aa = { -2, +3 };
-        const Point a = Point_Add(slot, aa);
-        units = Units_Spawn(units, a, none, grid, FILE_MALE_VILLAGER_IDLE, color, graphics, map, false);
-    }
-    return units;
-}
-
 static Units GenerateGameZone(Units units, const Map map, const Grid grid, const Registrar graphics)
 {
     const Point none = { 0,0 };
@@ -126,6 +113,19 @@ static Units GenerateGameZone(Units units, const Map map, const Grid grid, const
     units = Units_Spawn(units, d, none, grid, FILE_STONE_MINE, COLOR_GAIA, graphics, map, false);
     units = Units_Spawn(units, e, none, grid, FILE_BERRY_BUSH, COLOR_GAIA, graphics, map, false);
     units = Units_Spawn(units, f, none, grid, FILE_GOLD_MINE, COLOR_GAIA, graphics, map, false);
+    return units;
+}
+
+Units Units_SpawnSlot(Units units, const Map map, const Grid grid, const Registrar graphics, const Color color, const Point slot)
+{
+    const Point none = { 0,0 };
+    units = Units_SpawnTownCenter(units, slot, grid, color, graphics, map, false);
+    for(int32_t i = 0; i < 5; i++)
+    {
+        const Point aa = { -2, +3 };
+        const Point a = Point_Add(slot, aa);
+        units = Units_Spawn(units, a, none, grid, FILE_MALE_VILLAGER_IDLE, color, graphics, map, false);
+    }
     return units;
 }
 
@@ -163,15 +163,14 @@ static Units GenerateSlotZone(Units units, const Map map, const Grid grid, const
     return units;
 }
 
-Units Units_GenerateTestZone(const Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color colors[])
+Units Units_GenerateTestZone(const Units units, const Map map, const Grid grid, const Registrar graphics)
 {
-    switch(4)
+    switch(3)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
     case 1: return GenerateInanimateZone(units, map, grid, graphics);
     case 2: return GenerateTreeZone(units, map, grid, graphics);
     case 3: return GenerateGameZone(units, map, grid, graphics);
-    case 4: return GenerateSlotZone(units, map, grid, graphics, users, colors);
     }
 }
