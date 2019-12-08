@@ -17,10 +17,13 @@ typedef struct
     char control;
     int32_t turn;
     int32_t exec_cycle;
-    int32_t index;
+    int32_t client_id;
+    bool is_stable;
 }
 Packet;
 
 Packet Packet_Get(const Sock);
 
 Packet Packet_ZeroOverviews(Packet);
+
+bool Packet_IsStable(const Packet);

@@ -51,6 +51,8 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                     SDLNet_TCP_DelSocket(sockets.set, socket);
                     sockets.cycles[i] = 0;
                     sockets.parity[i] = 0;
+                    sockets.queue_size[i] = 0;
+                    sockets.packet.overview[i] = zero;
                     sockets.socket[i] = NULL;
                 }
                 if(bytes == max)
@@ -157,7 +159,8 @@ static void Send(const Sockets sockets, const int32_t max)
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
             packet.exec_cycle = max + offset;
-            packet.index = i;
+            packet.client_id = i;
+            packet.is_stable = sockets.is_stable;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
@@ -179,7 +182,7 @@ static Sockets CheckStability(Sockets sockets, const int32_t setpoint, const int
 {
     const int32_t a = max - setpoint;
     const int32_t b = setpoint - min;
-    const int32_t window = 2;
+    const int32_t window = 3;
     const int32_t threshold = 60;
     sockets.is_stable = setpoint > threshold && a < window && b < window;
     return sockets;
@@ -198,7 +201,7 @@ static void CheckParity(const Sockets sockets)
                 const int32_t parity = sockets.parity[i];
                 if((cycles == cycles_check)
                 && (parity != parity_check)) // XXX. Make this kill the client.
-                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - PARITY MISMATCH BETWEEN CLIENTS\n");
+                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - PARITY MISMATCH BETWEEN CLIENTS\n", i);
             }
         }
 }

@@ -39,17 +39,16 @@ static void RunClient(const Args args)
             overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
             Sock_Send(sock, overview);
             stream = Stream_Flow(stream, sock);
-            if(stream.packet.turn > 0)
+            if(Packet_IsStable(stream.packet))
                 packets = Packets_Queue(packets, stream.packet);
             const Field field = Units_Field(units, map);
             if(Packets_Active(packets))
             {
-                if(cycles > Packets_Peek(packets).exec_cycle)
-                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n");
-                while(true)
+                const Packet peek = Packets_Peek(packets);
+                if(cycles > peek.exec_cycle)
+                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n", peek.client_id);
+                while(cycles == Packets_Peek(packets).exec_cycle) // FLUSH.
                 {
-                    if(cycles != Packets_Peek(packets).exec_cycle)
-                        break;
                     Packet dequeued;
                     packets = Packets_Dequeue(packets, &dequeued);
                     units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);

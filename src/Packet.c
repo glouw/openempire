@@ -26,3 +26,8 @@ Packet Packet_ZeroOverviews(Packet packet)
         packet.overview[i] = zero;
     return packet;
 }
+
+bool Packet_IsStable(const Packet packet)
+{
+    return packet.turn > 0 && packet.is_stable;
+}
