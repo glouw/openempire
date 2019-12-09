@@ -1,9 +1,31 @@
-./openempires -x 1000 -y 700 &
-./openempires -x  950 -y 650 &
-./openempires -x  900 -y 600 &
-./openempires -x  850 -y 550 &
-./openempires -x  800 -y 500 &
-./openempires -x  750 -y 450 &
-./openempires -x  700 -y 400 &
-./openempires -x  650 -y 350 &
-./openempires -x  600 -y 300
+# BATCH SIM.
+# NUMBER A NUMBER OF USERS (INCLUDING GAIA PLAYER 9) TO A LOCALHOST SERVER.
+main()
+{
+    BIN=openempires
+    XRES=1000
+    YRES=700
+    USERS=9
+
+    # START THE LOCALHOST SERVER. MARK DOWN ITS PID.
+    ./$BIN --server --users $USERS &
+    SERVER_PID=$!
+
+    # INSTANTIATE A NUMBER OF USER CLIENTS TO CONNECT TO THE LOCALHOST SERVER.
+    for (( i = 0; i < $USERS; i++ ))
+    do
+        # USER CLIENTS WILL HAVE DIFFERENT SCREEN RESOLUTIONS FOR TESTING AND VISIBILITY PURPOSES.
+        D=20
+        X=$(($XRES - $D * i))
+        Y=$(($YRES - $D * i))
+        ./$BIN --xres $X --yres $Y &
+        sleep 0.1
+    done
+
+    # WAIT FOR THE MOST RECENT USER CLIENT PID TO EXIT. KILL THE SERVER PID IMMEDIATELY AFTER.
+    LAST_PID=$!
+    wait $LAST_PID
+    kill $SERVER_PID
+}
+
+main
