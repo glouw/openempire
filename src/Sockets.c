@@ -213,7 +213,7 @@ static Sockets CountConnectedPlayers(Sockets sockets)
     {
         TCPsocket socket = sockets.socket[i];
         if(socket != NULL)
-            count += 1;
+            count++;
     }
     sockets.users_connected = count;
     return sockets;

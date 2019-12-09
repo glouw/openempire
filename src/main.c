@@ -62,7 +62,7 @@ static void RunClient(const Args args)
                 }
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
-            cycles += 1;
+            cycles++;
             if(packet.control == PACKET_CONTROL_SPEED_UP)
                 continue;
             floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
