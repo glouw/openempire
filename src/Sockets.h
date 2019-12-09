@@ -17,11 +17,13 @@ typedef struct
     Packet packet;
     SDLNet_SocketSet set;
     int32_t turn;
+    int32_t users_connected;
+    int32_t users;
     bool is_stable;
 }
 Sockets;
 
-Sockets Sockets_Init(const int32_t port);
+Sockets Sockets_Init(const int32_t port, const int32_t users);
 
 void Sockets_Free(Sockets);
 

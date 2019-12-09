@@ -19,6 +19,7 @@ typedef struct
     int32_t exec_cycle;
     int32_t client_id;
     bool is_stable;
+    bool game_running;
 }
 Packet;
 

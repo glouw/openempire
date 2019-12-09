@@ -5,12 +5,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-Sockets Sockets_Init(const int32_t port)
+Sockets Sockets_Init(const int32_t port, const int32_t users)
 {
     IPaddress ip;
     SDLNet_ResolveHost(&ip, NULL, port);
     static Sockets zero;
     Sockets sockets = zero;
+    sockets.users = users;
     sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     return sockets;
@@ -122,12 +123,9 @@ static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const int32_t cycles = sockets.cycles[i];
-        if(cycles > setpoint)
-            sockets.control[i] = PACKET_CONTROL_SLOW_DOWN;
-        if(cycles == setpoint)
-            sockets.control[i] = PACKET_CONTROL_STEADY;
-        if(cycles < setpoint)
-            sockets.control[i] = PACKET_CONTROL_SPEED_UP;
+        if(cycles  > setpoint) sockets.control[i] = PACKET_CONTROL_SLOW_DOWN;
+        if(cycles == setpoint) sockets.control[i] = PACKET_CONTROL_STEADY;
+        if(cycles  < setpoint) sockets.control[i] = PACKET_CONTROL_SPEED_UP;
     }
     return sockets;
 }
@@ -142,12 +140,13 @@ static void Print(const Sockets sockets, const int32_t setpoint)
         const char control = sockets.control[i];
         const char queue_size = sockets.queue_size[i];
         const char parity_symbol = sockets.is_stable ? '!' : '?';
-        printf("%d :: %c :: 0x%016lX :: %c :: %d :: %d\n",
-                i, parity_symbol, parity, control, cycles, queue_size);
+        TCPsocket socket = sockets.socket[i];
+        printf("%d :: %d :: %c :: 0x%016lX :: %c :: %d :: %d\n",
+                i, socket != NULL, parity_symbol, parity, control, cycles, queue_size);
     }
 }
 
-static void Send(const Sockets sockets, const int32_t max)
+static void Send(const Sockets sockets, const int32_t max, const bool game_running)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
@@ -161,6 +160,7 @@ static void Send(const Sockets sockets, const int32_t max)
             packet.exec_cycle = max + offset;
             packet.client_id = i;
             packet.is_stable = sockets.is_stable;
+            packet.game_running = game_running;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
@@ -206,6 +206,24 @@ static void CheckParity(const Sockets sockets)
         }
 }
 
+static Sockets CountConnectedPlayers(Sockets sockets)
+{
+    int32_t count = 0;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        TCPsocket socket = sockets.socket[i];
+        if(socket != NULL)
+            count += 1;
+    }
+    sockets.users_connected = count;
+    return sockets;
+}
+
+static bool GetGameRunning(const Sockets sockets)
+{
+    return sockets.users_connected == sockets.users;
+}
+
 Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval)
 {
     if(ShouldRelay(cycles, interval))
@@ -215,9 +233,11 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         const int32_t max = GetCycleMax(sockets);
         sockets = CalculateControlChars(sockets, setpoint);
         sockets = CheckStability(sockets, setpoint, min, max);
+        sockets = CountConnectedPlayers(sockets);
+        const bool game_running = GetGameRunning(sockets);
         Print(sockets, setpoint);
         CheckParity(sockets);
-        Send(sockets, max);
+        Send(sockets, max, game_running);
         return Clear(sockets);
     }
     return sockets;

@@ -1,5 +1,7 @@
 #pragma once
 
+#define CONFIG_MAIN_GAME_NAME ("Open Empires")
+
 #define CONFIG_GRID_CELL_SIZE (100)
 
 #define CONFIG_DIRECTION_COUNT_NOT_MIRRORED (5)

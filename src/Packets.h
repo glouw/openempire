@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Packet.h"
-#include "Stream.h"
 
 #include <stdint.h>
 

@@ -3,7 +3,6 @@
 #include "Config.h"
 #include "Packets.h"
 #include "Sockets.h"
-#include "Stream.h"
 #include "Overview.h"
 #include "Units.h"
 #include "Args.h"
@@ -14,22 +13,30 @@
 static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
-    const Color color = args.color;
-    const Video video = Video_Setup(args.xres, args.yres, "Open Empires");
+    const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(60, data.terrain);
+    const Map map = Map_Make(100, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
-    Overview overview = Overview_Init(color, video.xres, video.yres);
-    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
-    units = Units_GenerateTestZone(units, map, grid, data.graphics);
-    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
-    Stream stream = Stream_Init();
-    Packets packets = Packets_Init();
-    if(DEMO == true)
+    if(DEMO)
         Video_RenderDataDemo(video, data, args.color);
     else
     {
+        // -- LOBBY.
+        Overview overview = Overview_Init(args.color, video.xres, video.yres);
         const Sock sock = Sock_Connect(args.host, args.port);
+        for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
+        {
+            Sock_Send(sock, overview);
+            const Packet packet = Packet_Get(sock);
+            if(packet.game_running)
+                break;
+            SDL_Delay(10);
+        }
+        // -- GAME.
+        Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
+        units = Units_GenerateTestZone(units, map, grid, data.graphics);
+        Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
+        Packets packets = Packets_Init();
         int32_t cycles = 0;
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
@@ -38,9 +45,9 @@ static void RunClient(const Args args)
             Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
             overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
             Sock_Send(sock, overview);
-            stream = Stream_Flow(stream, sock);
-            if(Packet_IsStable(stream.packet))
-                packets = Packets_Queue(packets, stream.packet);
+            const Packet packet = Packet_Get(sock);
+            if(Packet_IsStable(packet))
+                packets = Packets_Queue(packets, packet);
             const Field field = Units_Field(units, map);
             if(Packets_Active(packets))
             {
@@ -56,7 +63,7 @@ static void RunClient(const Args args)
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
             cycles += 1;
-            if(stream.packet.control == PACKET_CONTROL_SPEED_UP)
+            if(packet.control == PACKET_CONTROL_SPEED_UP)
                 continue;
             floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
             const int32_t t1 = SDL_GetTicks();
@@ -66,26 +73,26 @@ static void RunClient(const Args args)
             Video_Render(video, units, dt, cycles);
             Field_Free(field);
             const int32_t t3 = SDL_GetTicks();
-            const int32_t ms = CONFIG_MAIN_LOOP_SPEED- (t3 - t0);
+            const int32_t ms = CONFIG_MAIN_LOOP_SPEED - (t3 - t0);
             if(ms > 0)
                 SDL_Delay(ms);
-            if(stream.packet.control == PACKET_CONTROL_SLOW_DOWN)
+            if(packet.control == PACKET_CONTROL_SLOW_DOWN)
                 SDL_Delay(t3 - t1);
         }
         Sock_Disconnect(sock);
+        Packets_Free(packets);
+        Units_Free(floats);
+        Units_Free(units);
     }
-    Units_Free(units);
-    Units_Free(floats);
     Map_Free(map);
     Data_Free(data);
     Video_Free(video);
-    Packets_Free(packets);
     SDL_Quit();
 }
 
 static void RunServer(const Args args)
 {
-    Sockets sockets = Sockets_Init(args.port);
+    Sockets sockets = Sockets_Init(args.port, args.users);
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);

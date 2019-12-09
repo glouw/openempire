@@ -14,6 +14,7 @@ typedef struct
     int32_t port;
     int32_t xres;
     int32_t yres;
+    int32_t users;
 }
 Args;
 
