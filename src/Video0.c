@@ -8,10 +8,23 @@
 
 #include "Util.h"
 
-static void PrintTitle(const Video video)
+static void Present(const Video video)
 {
-    Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 0, video.title);
     SDL_RenderPresent(video.renderer);
+}
+
+static void QuickClear(const Video video)
+{
+    SDL_SetRenderDrawColor(video.renderer, 0, 0, 0, 0);
+    SDL_RenderClear(video.renderer);
+}
+
+void Video_PrintLobby(const Video video, const int32_t users_connected, const int32_t users)
+{
+    QuickClear(video);
+    Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 0, video.title);
+    Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 1, "%d / %d", users_connected, users);
+    Present(video);
 }
 
 Video Video_Setup(const int32_t xres, const int32_t yres, const char* const title)
@@ -38,7 +51,6 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.top_rite = top_rite;
     video.top_left = top_left;
     video.cpu_count = SDL_GetCPUCount();
-    PrintTitle(video);
     SDL_SetCursor(video.cursor);
     return video;
 }
@@ -57,11 +69,6 @@ void Video_Free(const Video video)
 static void CopyCanvas(const Video video)
 {
     SDL_RenderCopy(video.renderer, video.canvas, NULL, NULL);
-}
-
-static void Present(const Video video)
-{
-    SDL_RenderPresent(video.renderer);
 }
 
 static void PrintHotkeys(const Video video)

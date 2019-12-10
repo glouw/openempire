@@ -14,6 +14,7 @@ static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
+    Video_PrintLobby(video, 0, 0);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(100, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
@@ -30,7 +31,9 @@ static void RunClient(const Args args)
             const Packet packet = Packet_Get(sock);
             if(packet.game_running)
                 break;
-            SDL_Delay(10);
+            if(packet.turn > 0)
+                Video_PrintLobby(video, packet.users_connected, packet.users);
+            SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
         }
         // -- GAME.
         Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
