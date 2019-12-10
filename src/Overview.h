@@ -25,7 +25,7 @@ typedef struct
 }
 Overview;
 
-Overview Overview_Init(const Color, const int32_t xres, const int32_t yres);
+Overview Overview_Init(const int32_t xres, const int32_t yres);
 
 Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size);
 

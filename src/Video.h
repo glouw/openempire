@@ -42,4 +42,4 @@ void Video_PrintPerformanceMonitor(const Video, const Units, const int32_t dt, c
 
 void Video_Render(const Video, const Units, const int32_t dt, const int32_t cycles);
 
-void Video_PrintLobby(const Video, const int32_t users_connected, const int32_t users);
+void Video_PrintLobby(const Video, const int32_t users_connected, const int32_t users, const Color);

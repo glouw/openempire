@@ -16,3 +16,5 @@ typedef enum
     COLOR_COUNT,
 }
 Color;
+
+const char* Color_ToString(const Color);

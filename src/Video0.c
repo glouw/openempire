@@ -19,11 +19,13 @@ static void QuickClear(const Video video)
     SDL_RenderClear(video.renderer);
 }
 
-void Video_PrintLobby(const Video video, const int32_t users_connected, const int32_t users)
+void Video_PrintLobby(const Video video, const int32_t users_connected, const int32_t users, const Color color)
 {
+    const char* const string = Color_ToString(color);
     QuickClear(video);
     Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 0, video.title);
     Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 1, "%d / %d", users_connected, users);
+    Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 2, "%s", string);
     Present(video);
 }
 

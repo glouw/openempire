@@ -14,7 +14,7 @@ static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
-    Video_PrintLobby(video, 0, 0);
+    Video_PrintLobby(video, 0, 0, -1);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(100, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
@@ -23,7 +23,7 @@ static void RunClient(const Args args)
     else
     {
         // -- LOBBY.
-        Overview overview = Overview_Init(args.color, video.xres, video.yres);
+        Overview overview = Overview_Init(video.xres, video.yres);
         const Sock sock = Sock_Connect(args.host, args.port);
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
@@ -32,7 +32,10 @@ static void RunClient(const Args args)
             if(packet.game_running)
                 break;
             if(packet.turn > 0)
-                Video_PrintLobby(video, packet.users_connected, packet.users);
+            {
+                overview.color = (Color) packet.client_id;
+                Video_PrintLobby(video, packet.users_connected, packet.users, overview.color);
+            }
             SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
         }
         // -- GAME.
