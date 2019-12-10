@@ -161,6 +161,8 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
             packet.client_id = i;
             packet.is_stable = sockets.is_stable;
             packet.game_running = game_running;
+            packet.users_connected = sockets.users_connected;
+            packet.users = sockets.users;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));

@@ -20,6 +20,8 @@ typedef struct
     int32_t client_id;
     bool is_stable;
     bool game_running;
+    int32_t users_connected;
+    int32_t users;
 }
 Packet;
 

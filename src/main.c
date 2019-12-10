@@ -73,7 +73,7 @@ static void RunClient(const Args args)
             Video_Render(video, units, dt, cycles);
             Field_Free(field);
             const int32_t t3 = SDL_GetTicks();
-            const int32_t ms = CONFIG_MAIN_LOOP_SPEED - (t3 - t0);
+            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t3 - t0);
             if(ms > 0)
                 SDL_Delay(ms);
             if(packet.control == PACKET_CONTROL_SLOW_DOWN)
@@ -96,8 +96,8 @@ static void RunServer(const Args args)
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
-        sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT);
-        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED);
+        sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
+        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES);
     }
     Sockets_Free(sockets);
 }
