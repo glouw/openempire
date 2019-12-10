@@ -16,33 +16,37 @@ static void RunClient(const Args args)
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, -1);
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(100, data.terrain);
+    const Map map = Map_Make(40, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
     if(DEMO)
         Video_RenderDataDemo(video, data, args.color);
     else
     {
         // -- LOBBY.
+        int32_t users = 0;
         Overview overview = Overview_Init(video.xres, video.yres);
         const Sock sock = Sock_Connect(args.host, args.port);
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
             Sock_Send(sock, overview);
             const Packet packet = Packet_Get(sock);
-            if(packet.game_running)
-                break;
             if(packet.turn > 0)
             {
                 overview.color = (Color) packet.client_id;
                 Video_PrintLobby(video, packet.users_connected, packet.users, overview.color);
+                if(packet.game_running)
+                {
+                    users = packet.users;
+                    break;
+                }
             }
             SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
         }
         // -- GAME.
         Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
-        units = Units_GenerateTestZone(units, map, grid, data.graphics);
         Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
         Packets packets = Packets_Init();
+        units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
         int32_t cycles = 0;
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
@@ -59,7 +63,7 @@ static void RunClient(const Args args)
             {
                 const Packet peek = Packets_Peek(packets);
                 if(cycles > peek.exec_cycle)
-                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - CLIENT MISSED PACKET EXECUTION\n", peek.client_id);
+                    Util_Bomb("CLIENT - CLIENT_ID %d :: OUT OF SYNC\n", peek.client_id);
                 while(cycles == Packets_Peek(packets).exec_cycle) // FLUSH.
                 {
                     Packet dequeued;

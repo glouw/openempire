@@ -47,7 +47,7 @@ Field Units_Field(const Units, const Map);
 
 void Units_ResetTiled(const Units);
 
-Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar);
+Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar, const int32_t users);
 
 Units Units_Spawn(Units, const Point, const Point offset, const Grid, const Graphics, const Color, const Registrar, const Map, const bool is_floating);
 

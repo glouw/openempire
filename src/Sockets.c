@@ -202,8 +202,8 @@ static void CheckParity(const Sockets sockets)
                 const int32_t cycles = sockets.cycles[i];
                 const int32_t parity = sockets.parity[i];
                 if((cycles == cycles_check)
-                && (parity != parity_check)) // XXX. Make this kill the client.
-                    Util_Bomb("CLIENT_ID %d :: OUT OF SYNC - PARITY MISMATCH BETWEEN CLIENTS\n", i);
+                && (parity != parity_check)) // XXX. Make this kill the client instead of killing the server.
+                    Util_Bomb("SERVER - CLIENT_ID %d :: OUT OF SYNC\n", i);
             }
         }
 }

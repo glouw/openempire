@@ -129,7 +129,7 @@ Units Units_SpawnSlot(Units units, const Map map, const Grid grid, const Registr
     return units;
 }
 
-static Units GenerateSlotZone(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color colors[]) // XXX. SERVER NEEDS TO SEND HOW MANY USERS ARE PLAYED.
+static Units GenerateSlotZone(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
     if(users > 0)
     {
@@ -151,26 +151,26 @@ static Units GenerateSlotZone(Units units, const Map map, const Grid grid, const
             { middle.x + dx, middle.y - dy }, // NE.
         };
         const int32_t len = UTIL_LEN(slots);
-        const int32_t div = len / users;
-        int32_t index = 0;
-        for(int32_t i = 0; i < len; i += div)
+        for(int32_t i = 0; i < users; i++)
         {
-            const Point slot = slots[i];
-            const Color color = colors[index++];
+            const int32_t index = (i * len) / users;
+            const Point slot = slots[index];
+            const Color color = (Color) i;
             units = Units_SpawnSlot(units, map, grid, graphics, color, slot);
         }
     }
     return units;
 }
 
-Units Units_GenerateTestZone(const Units units, const Map map, const Grid grid, const Registrar graphics)
+Units Units_GenerateTestZone(const Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
-    switch(3)
+    switch(4)
     {
     default:
     case 0: return GenerateBattleZone(units, map, grid, graphics);
     case 1: return GenerateInanimateZone(units, map, grid, graphics);
     case 2: return GenerateTreeZone(units, map, grid, graphics);
     case 3: return GenerateGameZone(units, map, grid, graphics);
+    case 4: return GenerateSlotZone(units, map, grid, graphics, users);
     }
 }
