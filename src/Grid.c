@@ -86,3 +86,35 @@ Point Grid_OffsetToCell(const Point offset)
 {
     return Point_Mul(offset, CONFIG_GRID_CELL_SIZE);
 }
+
+static Point GetCenterTile(const Grid grid)
+{
+    const Point out = {
+        (grid.cols * grid.tile_cart_width) / 2,
+        (grid.rows * grid.tile_cart_height) / 2,
+    };
+    return out;
+}
+
+Point Grid_PanToCart(const Grid grid, const Point pan)
+{
+    const Point cart = Point_ToCart(pan);
+    const Point center = GetCenterTile(grid);
+    const Point shift = Point_Add(cart, center);
+    const Point out = {
+        shift.x / grid.tile_cart_width,
+        shift.y / grid.tile_cart_height,
+    };
+    return out;
+}
+
+Point Grid_CartToPan(const Grid grid, const Point cart)
+{
+    const Point out = {
+        cart.x * grid.tile_cart_width,
+        cart.y * grid.tile_cart_height,
+    };
+    const Point center = GetCenterTile(grid);
+    const Point shift = Point_Sub(out, center);
+    return Point_ToIso(shift);
+}

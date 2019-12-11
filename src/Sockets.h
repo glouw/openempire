@@ -29,6 +29,6 @@ void Sockets_Free(Sockets);
 
 Sockets Sockets_Service(const Sockets, const int32_t timeout);
 
-Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval);
+Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval, const bool quiet);
 
 Sockets Sockets_Accept(const Sockets);

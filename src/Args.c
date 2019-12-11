@@ -21,6 +21,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
     args.xres = 640;
     args.yres = 480;
     args.users = 1;
+    args.quiet = false;
     for(int32_t i = 0; i < argc; i++)
     {
         const char* const arg = argv[i];
@@ -31,6 +32,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Check(arg, "-x", "--xres"  )) args.xres = atoi(next);
         if(Check(arg, "-y", "--yres"  )) args.yres = atoi(next);
         if(Check(arg, "-u", "--users" )) args.users = atoi(next);
+        if(Check(arg, "-q", "--quiet" )) args.quiet = true;
     }
     assert(args.path);
     return args;

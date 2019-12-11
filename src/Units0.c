@@ -826,3 +826,26 @@ uint64_t Units_Xor(const Units units)
     }
     return parity;
 }
+
+static Unit* GetFirstTownCenter(const Units units, const Color color)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->color == color && unit->trait.type == TYPE_TOWN_CENTER)
+            return unit;
+    }
+    return NULL;
+}
+
+Point Units_GetFirstTownCenterPan(const Units units, const Grid grid, const Color color)
+{
+    static Point zero;
+    Unit* const unit = GetFirstTownCenter(units, color);
+    if(unit)
+    {
+        const Point cart = Unit_GetShift(unit, unit->cart);
+        return Grid_CartToPan(grid, cart);
+    }
+    return zero;
+}

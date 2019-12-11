@@ -226,7 +226,7 @@ static bool GetGameRunning(const Sockets sockets)
     return sockets.users_connected == sockets.users;
 }
 
-Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval)
+Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval, const bool quiet)
 {
     if(ShouldRelay(cycles, interval))
     {
@@ -237,7 +237,8 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         sockets = CheckStability(sockets, setpoint, min, max);
         sockets = CountConnectedPlayers(sockets);
         const bool game_running = GetGameRunning(sockets);
-        Print(sockets, setpoint);
+        if(!quiet)
+            Print(sockets, setpoint);
         CheckParity(sockets);
         Send(sockets, max, game_running);
         return Clear(sockets);

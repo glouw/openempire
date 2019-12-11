@@ -47,6 +47,7 @@ static void RunClient(const Args args)
         Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
         Packets packets = Packets_Init();
         units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
+        overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
         int32_t cycles = 0;
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
         {
@@ -107,7 +108,7 @@ static void RunServer(const Args args)
     {
         sockets = Sockets_Accept(sockets);
         sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
-        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES);
+        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES, args.quiet);
     }
     Sockets_Free(sockets);
 }

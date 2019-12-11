@@ -70,3 +70,5 @@ Units Units_Float(Units, const Registrar, const Overview, const Grid, const Map,
 Units Units_PacketService(Units, const Registrar, const Packet, const Grid, const Map, const Field);
 
 uint64_t Units_Xor(const Units);
+
+Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
