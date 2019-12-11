@@ -131,3 +131,28 @@ void Units_ManageStacks(const Units units)
     Units_ResetStacks(units);
     Units_StackStacks(units);
 }
+
+Units Units_SpawnSlot(Units units, const Map map, const Grid grid, const Registrar graphics, const Color color, const Point slot)
+{
+    const Point none = { 0,0 };
+    units = Units_SpawnTownCenter(units, slot, grid, color, graphics, map, false);
+    for(int32_t i = 0; i < 5; i++)
+    {
+        const Point aa = { -2, 2 };
+        const Point a = Point_Add(slot, aa);
+        units = Units_Spawn(units, a, none, grid, FILE_MALE_VILLAGER_IDLE, color, graphics, map, false);
+    }
+    const Point bb = { 3, 3 };
+    const Point b = Point_Add(slot, bb);
+    const Point cc = { -3, -3 };
+    const Point c = Point_Add(slot, cc);
+    const Point dd = { 3, -3 };
+    const Point d = Point_Add(slot, dd);
+    const Point ee = { 4, -5 };
+    const Point e = Point_Add(slot, ee);
+    units = Units_Spawn(units, b, none, grid, FILE_BERRY_BUSH, COLOR_GAIA, graphics, map, false);
+    units = Units_Spawn(units, c, none, grid, FILE_STONE_MINE, COLOR_GAIA, graphics, map, false);
+    units = Units_Spawn(units, d, none, grid, FILE_GOLD_MINE, COLOR_GAIA, graphics, map, false);
+    units = Units_SpawnWithChild(units, e, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
+    return units;
+}

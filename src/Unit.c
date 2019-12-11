@@ -318,7 +318,7 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
-static bool ShouldEngage(Unit* const unit, const Grid grid)
+static bool MustEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(
             unit->interest->trait.is_inanimate
@@ -366,18 +366,24 @@ static Resource CollectResource(Unit* const unit)
     return resource;
 }
 
+static bool MustDisengage(Unit* const unit)
+{
+    return unit->state == STATE_ATTACK
+        && unit->state_timer >= Unit_GetLastAttackTick(unit);
+}
+
 Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
     if(unit->interest != NULL
     && !Unit_IsExempt(unit)
     && !Unit_IsExempt(unit->interest))
     {
-        if(ShouldEngage(unit, grid))
+        if(MustEngage(unit, grid))
         {
             Unit_SetState(unit, STATE_ATTACK, true);
             Unit_Lock(unit);
         }
-        if(unit->state == STATE_ATTACK && unit->state_timer >= Unit_GetLastAttackTick(unit))
+        if(MustDisengage(unit))
         {
             if(!Unit_IsDead(unit->interest))
             {
@@ -409,7 +415,7 @@ void Unit_Repath(Unit* const unit, const Field field)
 
 static Point Nudge(Unit* const unit)
 {
-    const uint32_t mag = UINT16_MAX;
+    const int32_t mag = UINT16_MAX;
     const Point half = { mag / 2, mag / 2 };
     return Point_Mul(Point_Sub(unit->entropy, half), mag);
 }

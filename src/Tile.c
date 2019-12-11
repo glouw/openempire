@@ -93,20 +93,29 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
 {
     Dynamics dynamics = { 0, false };
     if(reference->trait.is_single_frame)
-        dynamics.index = reference->entropy_static % animation.count; // XXX. cannot use entropy... trees and shadows do not align!
+    {
+        const bool parent_exists = reference->parent_id != -1;
+        int32_t id = parent_exists
+            ? reference->parent_id
+            : reference->id;
+        if(reference->is_floating)
+            id = 0;
+        dynamics.index = id % animation.count;
+    }
     else
     if(reference->trait.is_multi_state)
     {
         const int32_t frames_per_direction = Animation_GetFramesPerDirection(animation);
         const Direction fixed_dir = Direction_Fix(reference->dir, &dynamics.flip_vert);
-        const int32_t divisor = (reference->state == STATE_DECAY)
+        const bool is_decaying = reference->state == STATE_DECAY;
+        const int32_t divisor = is_decaying
             ? CONFIG_ANIMATION_DECAY_DIVISOR
             : CONFIG_ANIMATION_DIVISOR;
         const int32_t ticks = reference->state_timer / divisor;
         const int32_t frame = ticks % frames_per_direction;
         dynamics.index = frames_per_direction * fixed_dir + frame;
     }
-    else // Many frames, but not multi-state.
+    else
     {
         const int32_t ticks = reference->state_timer / CONFIG_ANIMATION_DIVISOR;
         dynamics.index = ticks % animation.count;

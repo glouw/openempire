@@ -116,19 +116,6 @@ static Units GenerateGameZone(Units units, const Map map, const Grid grid, const
     return units;
 }
 
-Units Units_SpawnSlot(Units units, const Map map, const Grid grid, const Registrar graphics, const Color color, const Point slot)
-{
-    const Point none = { 0,0 };
-    units = Units_SpawnTownCenter(units, slot, grid, color, graphics, map, false);
-    for(int32_t i = 0; i < 5; i++)
-    {
-        const Point aa = { -2, +3 };
-        const Point a = Point_Add(slot, aa);
-        units = Units_Spawn(units, a, none, grid, FILE_MALE_VILLAGER_IDLE, color, graphics, map, false);
-    }
-    return units;
-}
-
 static Units GenerateSlotZone(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
     if(users > 0)

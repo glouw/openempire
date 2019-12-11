@@ -5,7 +5,7 @@ main()
     BIN=openempires
     XRES=1000
     YRES=700
-    USERS=8
+    USERS=3
 
     # START THE LOCALHOST SERVER. MARK DOWN ITS PID.
     ./$BIN --server --users $USERS --quiet &
