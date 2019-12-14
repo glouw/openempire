@@ -2,10 +2,19 @@
 
 #include "Util.h"
 
-Parts Parts_GetVillager(void)
+Parts Parts_GetMaleVillager(void)
 {
     static const Part part[] = {
         { {0,0}, false, FILE_MALE_VILLAGER_IDLE },
+    };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
+Parts Parts_GetFemaleVillager(void)
+{
+    static const Part part[] = {
+        { {0,0}, false, FILE_FEMALE_VILLAGER_IDLE },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -155,15 +164,16 @@ Parts Parts_FromIcon(const Icon icon)
     switch(icon)
     {
         // DO NOT USE DEFAULt - COMPILER WILL WARN OF MISSING CASES.
-        case ICON_BUILD_TOWN_CENTER  : return Parts_GetTownCenterAge1();
-        case ICON_BUILD_BARRACKS     : return GetBarracks();
-        case ICON_BUILD_MILL         : return GetMill();
-        case ICON_BUILD_HOUSE        : return GetHouse();
-        case ICON_BUILD_OUTPOST      : return GetOutpost();
-        case ICON_BUILD_STONE_CAMP   : return GetStoneCamp();
-        case ICON_BUILD_LUMBER_CAMP  : return GetLumberCamp();
-        case ICON_UNIT_MILITIA       : return GetMilitia();
-        case ICON_UNIT_MALE_VILLAGER : return Parts_GetVillager();
+        case ICON_BUILD_TOWN_CENTER    : return Parts_GetTownCenterAge1();
+        case ICON_BUILD_BARRACKS       : return GetBarracks();
+        case ICON_BUILD_MILL           : return GetMill();
+        case ICON_BUILD_HOUSE          : return GetHouse();
+        case ICON_BUILD_OUTPOST        : return GetOutpost();
+        case ICON_BUILD_STONE_CAMP     : return GetStoneCamp();
+        case ICON_BUILD_LUMBER_CAMP    : return GetLumberCamp();
+        case ICON_UNIT_MILITIA         : return GetMilitia();
+        case ICON_UNIT_MALE_VILLAGER   : return Parts_GetMaleVillager();
+        case ICON_UNIT_FEMALE_VILLAGER : return Parts_GetFemaleVillager();
         case ICON_NONE:
             return none;
     }

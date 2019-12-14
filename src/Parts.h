@@ -12,7 +12,9 @@ typedef struct
 }
 Parts;
 
-Parts Parts_GetVillager(void);
+Parts Parts_GetMaleVillager(void);
+
+Parts Parts_GetFemaleVillager(void);
 
 Parts Parts_GetRedArrows(void);
 

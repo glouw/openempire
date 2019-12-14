@@ -38,7 +38,7 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
             {
                 const Point shift = { -3, 3 };
                 const Point cart = Point_Add(slot, shift);
-                units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, Parts_GetVillager());
+                units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, Parts_GetMaleVillager());
             }
         }
     }
