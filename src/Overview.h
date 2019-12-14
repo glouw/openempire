@@ -10,6 +10,8 @@
 
 #include <SDL2/SDL_net.h>
 
+#define OVERVIEW_AGE_COUNT (4)
+
 typedef struct
 {
     Point pan;
@@ -22,6 +24,7 @@ typedef struct
     uint64_t parity;
     int32_t cycles;
     int32_t queue_size;
+    int32_t age;
 }
 Overview;
 

@@ -2,6 +2,8 @@
 
 #include "Icon.h"
 
+#include "Motive.h"
+
 #include <stdint.h>
 
 typedef struct
@@ -12,3 +14,5 @@ typedef struct
 Icons;
 
 Icons Icons_FromMotive(const Motive, const int32_t age);
+
+bool Icons_IsIndexValid(const Icons, const int32_t index);

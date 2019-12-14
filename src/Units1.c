@@ -55,12 +55,12 @@ static Units GenerateInanimateZone(Units units, const Map map, const Grid grid, 
     const Point e = { grid.cols / 2 - 8, grid.cols / 2 - 8 };
     const Point f = { grid.cols / 2 + 9, grid.cols / 2 + 9 };
     const Point g = { grid.cols / 2 + 10, grid.cols / 2 + 16 };
-    units = Units_Spawn(units, a, none, grid, FILE_FEUDAL_BARRACKS_NORTH_EUROPEAN, COLOR_BLU, graphics, map, false);
-    units = Units_Spawn(units, c, none, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_RED, graphics, map, false);
-    units = Units_Spawn(units, d, none, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics, map, false);
+    units = Units_Spawn(units, a, none, grid, FILE_AGE_2_BARRACKS_NORTH_EUROPE, COLOR_BLU, graphics, map, false);
+    units = Units_Spawn(units, c, none, grid, FILE_AGE_2_HOUSE_NORTH_EUROPE, COLOR_RED, graphics, map, false);
+    units = Units_Spawn(units, d, none, grid, FILE_AGE_2_HOUSE_NORTH_EUROPE, COLOR_BLU, graphics, map, false);
     units = Units_Spawn(units, e, none, grid, FILE_WONDER_BRITONS, COLOR_BLU, graphics, map, false);
-    units = Units_Spawn(units, f, none, grid, FILE_FEUDAL_HOUSE_NORTH_EUROPEAN, COLOR_BLU, graphics, map, false);
-    units = Units_SpawnWithChild(units, g, grid, FILE_NORTH_EUROPEAN_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPEAN_CASTLE_SHADOW, map, false);
+    units = Units_Spawn(units, f, none, grid, FILE_AGE_2_HOUSE_NORTH_EUROPE, COLOR_BLU, graphics, map, false);
+    units = Units_SpawnWithChild(units, g, grid, FILE_NORTH_EUROPE_CASTLE, COLOR_BLU, graphics, FILE_NORTH_EUROPE_CASTLE_SHADOW, map, false);
     for(int32_t i = 0; i < 300; i++)
         units = Units_Spawn(units, b, none, grid, FILE_TEUTONIC_KNIGHT_IDLE, COLOR_BLU, graphics, map, false);
     for(int32_t j = 0; j < 10; j++)

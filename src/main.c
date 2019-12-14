@@ -14,7 +14,7 @@ static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
-    Video_PrintLobby(video, 0, 0, -1);
+    Video_PrintLobby(video, 0, 0, (Color) -1);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(40, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
@@ -55,6 +55,10 @@ static void RunClient(const Args args)
             const uint64_t parity = Units_Xor(units);
             Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
             overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
+#if 1
+            if((cycles % 180) == 0 && overview.age < OVERVIEW_AGE_COUNT) // XXX. USING RIGHT NOW TO SIMULATE AGING UP.
+                overview.age++;
+#endif
             Sock_Send(sock, overview);
             const Packet packet = Packet_Get(sock);
             if(Packet_IsStable(packet))

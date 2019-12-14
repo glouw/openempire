@@ -520,9 +520,8 @@ typedef struct
 }
 Pack;
 
-static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color)
+static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color, const int32_t age)
 {
-    const int32_t age = 0; // XXX. SHOULD BE TOP LEVEL.
     static Pack zero;
     Pack pack = zero;
     pack.icons = Icons_FromMotive(motive, age);
@@ -552,9 +551,9 @@ static void DrawPack(const Vram vram, const Pack pack)
     }
 }
 
-void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color)
+void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color, const int32_t age)
 {
-    const Pack pack = GetPackFromMotive(interfac, motive, color);
+    const Pack pack = GetPackFromMotive(interfac, motive, color, age);
     DrawPack(vram, pack);
 }
 

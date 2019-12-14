@@ -2,7 +2,6 @@
 
 #include "Motive.h"
 #include "Overview.h"
-#include "Input.h"
 
 #include <stdint.h>
 
@@ -25,17 +24,8 @@ typedef enum
 }
 Icon;
 
-const char* Icon_GetHotkeys(void);
-int32_t Icon_GetHotkeysLen(void);
-
-const Icon* Icon_GetBuilding(const int32_t age);
-int32_t Icon_GetBuildingLen(const int32_t age);
-
-const Icon* Icon_GetBarracks(const int32_t age);
-int32_t Icon_GetBarracksLen(const int32_t age);
-
-const Icon* Icon_GetTownCenter(const int32_t age);
-int32_t Icon_GetTownCenterLen(const int32_t age);
-
 Icon Icon_FromOverview(const Overview, const Motive);
 
+const char* Icon_GetHotkeys(void);
+
+int32_t Icon_GetHotkeysLen(void);
