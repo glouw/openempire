@@ -139,7 +139,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
-            units = Units_Spawn(units, cart_goal, cart_grid_offset_goal, grid, FILE_RIGHT_CLICK_RED_ARROWS, COLOR_GAIA, graphics, map, false);
+            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, Parts_GetRedArrows());
         }
     }
     return units;
@@ -275,39 +275,31 @@ static bool EqualDimension(Point dimensions, const Graphics file)
 
 static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Map map)
 {
-    const Graphics fires[] = {
-        FILE_FIRE_SMALL_A,
-        FILE_FIRE_SMALL_B,
-        FILE_FIRE_SMALL_C,
-        FILE_FIRE_MEDIUM_A,
-        FILE_FIRE_MEDIUM_B,
-    };
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
         const Point offset = { x, y };
         const Point cart = Point_Add(unit->cart, offset);
-        const int32_t index = Util_Rand() % UTIL_LEN(fires);
         const int32_t w = grid.tile_cart_width;
         const int32_t h = grid.tile_cart_height;
         const Point grid_offset = {
             Util_Rand() % w - w / 2,
             Util_Rand() % h - h / 2,
         };
-        units = Units_Spawn(units, cart, grid_offset, grid, fires[index], COLOR_GAIA, graphics, map, false);
+        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, Parts_GetFire());
     }
     return units;
 }
 
 static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Map map)
 {
-    const Point none = { 0,0 };
+    const Point zero = { 0,0 };
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
     {
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
-        units = Units_Spawn(units, cart, none, grid, FILE_SMALLER_EXPLOSION_SMOKE, COLOR_GAIA, graphics, map, false);
+        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, Parts_GetSmoke());
     }
     return units;
 }
@@ -728,22 +720,11 @@ static Units CountPopulation(Units units)
 
 static Units IconLookup(const Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Icon icon, const Point cart, const bool is_floating)
 {
-    static Point none;
-    switch(icon)
-    {
-        case ICON_BUILD_HOUSE        : return Units_Spawn          (units, cart, none, grid, FILE_AGE_1_HOUSE,                    overview.color, graphics,                            map, is_floating);
-        case ICON_BUILD_MILL         : return Units_SpawnWithChild (units, cart,       grid, FILE_AGE_1_MILL,                     overview.color, graphics, FILE_AGE_1_MILL_DONKEY,    map, is_floating);
-        case ICON_BUILD_STONE_CAMP   : return Units_Spawn          (units, cart, none, grid, FILE_NORTH_EUROPE_STONE_MINING_CAMP, overview.color, graphics,                            map, is_floating);
-        case ICON_BUILD_LUMBER_CAMP  : return Units_Spawn          (units, cart, none, grid, FILE_NORTH_EUROPE_LUMBER_CAMP,       overview.color, graphics,                            map, is_floating);
-        case ICON_BUILD_BARRACKS     : return Units_Spawn          (units, cart, none, grid, FILE_AGE_1_BARRACKS,                 overview.color, graphics,                            map, is_floating);
-        case ICON_BUILD_OUTPOST      : return Units_SpawnWithChild (units, cart,       grid, FILE_AGE_1_OUTPOST,                  overview.color, graphics, FILE_AGE_1_OUTPOST_SHADOW, map, is_floating);
-        case ICON_BUILD_TOWN_CENTER  : return Units_SpawnTownCenter(units, cart,       grid,                                      overview.color, graphics,                            map, is_floating);
-        case ICON_UNIT_MILITIA       : return Units_Spawn          (units, cart, none, grid, FILE_MILITIA_IDLE,                   overview.color, graphics,                            map, is_floating);
-        case ICON_UNIT_MALE_VILLAGER : return Units_Spawn          (units, cart, none, grid, FILE_MALE_VILLAGER_IDLE,             overview.color, graphics,                            map, is_floating);
-        default:
-           break;
-    }
-    return units;
+    const Point zero = { 0,0 };
+    const Parts parts = Parts_FromIcon(icon);
+    return (parts.part != NULL)
+        ? Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts)
+        : units;
 }
 
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)

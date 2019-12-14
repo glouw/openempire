@@ -30,6 +30,7 @@ SRCS += Mode.c
 SRCS += Outline.c
 SRCS += Overview.c
 SRCS += Window.c
+SRCS += Parts.c
 SRCS += Packet.c
 SRCS += Packets.c
 SRCS += Palette.c

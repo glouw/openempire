@@ -2,6 +2,7 @@
 
 #include "Unit.h"
 #include "Overview.h"
+#include "Parts.h"
 #include "Grid.h"
 #include "Grid.h"
 #include "Motive.h"
@@ -49,11 +50,7 @@ void Units_ResetTiled(const Units);
 
 Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar, const int32_t users);
 
-Units Units_Spawn(Units, const Point, const Point offset, const Grid, const Graphics, const Color, const Registrar, const Map, const bool is_floating);
-
-Units Units_SpawnWithChild(Units, const Point, const Grid, const Graphics, const Color, const Registrar, const Graphics, const Map, const bool is_floating);
-
-Units Units_SpawnTownCenter(Units units, const Point, const Grid, const Color, const Registrar, const Map, const bool is_floating);
+Units Units_SpawnParts(Units, const Point, const Point offset, const Grid, const Color, const Registrar, const Map, const bool is_floating, const Parts);
 
 void Units_ManageStacks(const Units);
 
@@ -72,5 +69,3 @@ Units Units_PacketService(Units, const Registrar, const Packet, const Grid, cons
 uint64_t Units_Xor(const Units);
 
 Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
-
-Units Units_SpawnSlot(Units, const Map, const Grid, const Registrar, const Color, const Point);

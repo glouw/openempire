@@ -12,14 +12,6 @@ static Units Append(Units units, const Unit unit)
     return units;
 }
 
-Units Units_Spawn(Units units, const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Map map, const bool is_floating)
-{
-    Unit unit = Unit_Make(cart, offset, grid, file, color, graphics, true, is_floating);
-    return Units_CanBuild(units, map, &unit)
-        ? Append(units, unit)
-        : units;
-}
-
 static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len)
 {
     for(int32_t i = 0; i < len; i++)
@@ -30,45 +22,33 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t l
     return units;
 }
 
-Units Units_SpawnWithChild(Units units, const Point cart, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const Graphics child, const Map map, const bool is_floating)
+void SetChildren(Unit unit[], const int32_t count)
 {
-    const Point offset = { 0,0 };
-    Unit temp[] = {
-        Unit_Make(cart, offset, grid, file,  color, graphics, true, is_floating),
-        Unit_Make(cart, offset, grid, child, color, graphics, true, is_floating),
-    };
-    temp[0].has_children = true;
-    temp[1].parent_id = temp[0].id;
-    return BulkAppend(units, map, temp, UTIL_LEN(temp));
+    if(count > 1)
+    {
+        unit[0].has_children = true;
+        for(int32_t i = 1; i < count; i++)
+            unit[i].parent_id = unit[0].id;
+    }
 }
 
-Units Units_SpawnTownCenter(Units units, const Point cart, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating)
+Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts)
 {
-    const Point offset = {
-        +grid.tile_cart_mid.x,
-        -grid.tile_cart_mid.y
-    };
-    const Point zero = { 0,0 };
-    const Point b = { cart.x + 0, cart.y + 0 };
-    const Point c = { cart.x - 1, cart.y + 1 };
-    const Point a = { cart.x - 3, cart.y + 2 };
-    const Point d = { cart.x - 1, cart.y + 1 };
-    const Point e = { cart.x - 2, cart.y + 2 };
-    Unit temp[] = {
-        Unit_Make(b, zero,   grid, FILE_AGE_1_TOWN_CENTER_TOP,                 color, graphics, true,  is_floating),
-        Unit_Make(c, zero,   grid, FILE_AGE_1_TOWN_CENTER_SHADOW,              color, graphics, true,  is_floating),
-        Unit_Make(a, zero,   grid, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT,           color, graphics, false, is_floating),
-        Unit_Make(e, offset, grid, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A, color, graphics, false, is_floating),
-        Unit_Make(d, zero,   grid, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B, color, graphics, false, is_floating),
-        Unit_Make(a, zero,   grid, FILE_AGE_1_TOWN_CENTER_ROOF_RITE,           color, graphics, false, is_floating),
-        Unit_Make(e, offset, grid, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A, color, graphics, false, is_floating),
-        Unit_Make(d, zero,   grid, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B, color, graphics, false, is_floating),
-    };
-    const int32_t len = UTIL_LEN(temp);
-    temp[0].has_children = true;
-    for(int32_t i = 1; i < len; i++)
-        temp[i].parent_id = temp[0].id;
-    return BulkAppend(units, map, temp, len);
+    const Point mid = { grid.tile_cart_mid.x, -grid.tile_cart_mid.y };
+    Unit* const temp = UTIL_ALLOC(Unit, parts.count);
+    for(int32_t i = 0; i < parts.count; i++)
+    {
+        const Part part = parts.part[i];
+        const bool requires_midding  = // SPECIAL CASES OVERRIDE OFFSET VALUE.
+            part.file == FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A ||
+            part.file == FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A;
+        const Point cart_part = Point_Add(cart, part.cart);
+        temp[i] = Unit_Make(cart_part, requires_midding ? mid : offset, grid, part.file, color, graphics, part.at_center, is_floating);
+    }
+    SetChildren(temp, parts.count);
+    units = BulkAppend(units, map, temp, parts.count);
+    free(temp);
+    return units;
 }
 
 void Units_ResetTiled(const Units units)
@@ -130,29 +110,4 @@ void Units_ManageStacks(const Units units)
 {
     Units_ResetStacks(units);
     Units_StackStacks(units);
-}
-
-Units Units_SpawnSlot(Units units, const Map map, const Grid grid, const Registrar graphics, const Color color, const Point slot)
-{
-    const Point none = { 0,0 };
-    units = Units_SpawnTownCenter(units, slot, grid, color, graphics, map, false);
-    for(int32_t i = 0; i < 5; i++)
-    {
-        const Point aa = { -2, 2 };
-        const Point a = Point_Add(slot, aa);
-        units = Units_Spawn(units, a, none, grid, FILE_MALE_VILLAGER_IDLE, color, graphics, map, false);
-    }
-    const Point bb = { 3, 3 };
-    const Point b = Point_Add(slot, bb);
-    const Point cc = { -3, -3 };
-    const Point c = Point_Add(slot, cc);
-    const Point dd = { 3, -3 };
-    const Point d = Point_Add(slot, dd);
-    const Point ee = { 4, -5 };
-    const Point e = Point_Add(slot, ee);
-    units = Units_Spawn(units, b, none, grid, FILE_BERRY_BUSH, COLOR_GAIA, graphics, map, false);
-    units = Units_Spawn(units, c, none, grid, FILE_STONE_MINE, COLOR_GAIA, graphics, map, false);
-    units = Units_Spawn(units, d, none, grid, FILE_GOLD_MINE, COLOR_GAIA, graphics, map, false);
-    units = Units_SpawnWithChild(units, e, grid, FILE_FOREST_TREE, COLOR_GAIA, graphics, FILE_FOREST_TREE_SHADOW, map, false);
-    return units;
 }
