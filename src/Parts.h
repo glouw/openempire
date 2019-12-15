@@ -22,12 +22,6 @@ Parts Parts_GetSmoke(void);
 
 Parts Parts_GetFire(void);
 
-Parts Parts_GetTownCenterAge1(void);
-
-Parts Parts_GetTownCenterAge2(void);
-
-Parts Parts_GetTownCenterAge3(void);
-
-Parts Parts_GetTownCenterAge4(void);
+Parts Parts_GetTownCenter(const int32_t age);
 
 Parts Parts_FromIcon(const Icon);

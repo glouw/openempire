@@ -10,7 +10,11 @@
 
 #include <SDL2/SDL_net.h>
 
-#define OVERVIEW_AGE_COUNT (4)
+// 0: Dark
+// 1: Feudal
+// 2: Castle
+// 3: Imperial
+#define OVERVIEW_MAX_AGE (3)
 
 typedef struct
 {

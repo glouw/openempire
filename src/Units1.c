@@ -33,7 +33,7 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
             const int32_t index = (i * len) / users;
             const Point slot = slots[index];
             const Color color = (Color) i;
-            units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, Parts_GetTownCenterAge1());
+            units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, Parts_GetTownCenter(0));
             for(int32_t j = 0; j < starting_villagers; j++)
             {
                 const Point shift = { -3, 3 };

@@ -16,20 +16,20 @@ static const Icon build_age2[] = { BUILD_AGE_1 };
 static const Icon build_age3[] = { BUILD_AGE_1 };
 static const Icon build_age4[] = { BUILD_AGE_1 };
 
-static const Icon* GetBuilding(const int32_t age_index)
+static const Icon* GetBuilding(const int32_t age)
 {
     const Icon* ages[] = {
         build_age1, build_age2, build_age3, build_age4
     };
-    return ages[age_index];
+    return ages[age];
 }
 
-static int32_t GetBuildingLen(const int32_t age_index)
+static int32_t GetBuildingLen(const int32_t age)
 {
     const int32_t lens[] = {
         UTIL_LEN(build_age1), UTIL_LEN(build_age2), UTIL_LEN(build_age3), UTIL_LEN(build_age4)
     };
-    return lens[age_index];
+    return lens[age];
 }
 
 /* Barracks */
@@ -44,20 +44,20 @@ static const Icon barracks_age2[] = { BARRACKS_AGE_1 };
 static const Icon barracks_age3[] = { BARRACKS_AGE_1 };
 static const Icon barracks_age4[] = { BARRACKS_AGE_1 };
 
-static const Icon* GetBarracks(const int32_t age_index)
+static const Icon* GetBarracks(const int32_t age)
 {
     const Icon* ages[] = {
         barracks_age1, barracks_age2, barracks_age3, barracks_age4
     };
-    return ages[age_index];
+    return ages[age];
 }
 
-static int32_t GetBarracksLen(const int32_t age_index)
+static int32_t GetBarracksLen(const int32_t age)
 {
     const int32_t lens[] = {
         UTIL_LEN(barracks_age1), UTIL_LEN(barracks_age2), UTIL_LEN(barracks_age3), UTIL_LEN(barracks_age4)
     };
-    return lens[age_index];
+    return lens[age];
 }
 
 /* Town Center */
@@ -72,25 +72,24 @@ static const Icon town_center_age2[] = { TOWN_CENTER_AGE_1 };
 static const Icon town_center_age3[] = { TOWN_CENTER_AGE_1 };
 static const Icon town_center_age4[] = { TOWN_CENTER_AGE_1 };
 
-static const Icon* GetTownCenter(const int32_t age_index)
+static const Icon* GetTownCenter(const int32_t age)
 {
     const Icon* ages[] = {
         town_center_age1, town_center_age2, town_center_age3, town_center_age4
     };
-    return ages[age_index];
+    return ages[age];
 }
 
-static int32_t GetTownCenterLen(const int32_t age_index)
+static int32_t GetTownCenterLen(const int32_t age)
 {
     const int32_t lens[] = {
         UTIL_LEN(town_center_age1), UTIL_LEN(town_center_age2), UTIL_LEN(town_center_age3), UTIL_LEN(town_center_age4)
     };
-    return lens[age_index];
+    return lens[age];
 }
 
 Icons Icons_FromMotive(const Motive motive, const int32_t age)
 {
-    const int32_t age_index = age - 1;
     static Icons zero;
     Icons icons = zero;
     icons.icon = NULL;
@@ -98,19 +97,19 @@ Icons Icons_FromMotive(const Motive motive, const int32_t age)
     switch(motive.action)
     {
     case ACTION_BUILD:
-        icons.icon = GetBuilding(age_index);
-        icons.count = GetBuildingLen(age_index);
+        icons.icon = GetBuilding(age);
+        icons.count = GetBuildingLen(age);
         break;
     case ACTION_UNIT_TECH:
         switch(motive.type)
         {
         case TYPE_BARRACKS:
-            icons.icon = GetBarracks(age_index);
-            icons.count = GetBarracksLen(age_index);
+            icons.icon = GetBarracks(age);
+            icons.count = GetBarracksLen(age);
             break;
         case TYPE_TOWN_CENTER:
-            icons.icon = GetTownCenter(age_index);
-            icons.count = GetTownCenterLen(age_index);
+            icons.icon = GetTownCenter(age);
+            icons.count = GetTownCenterLen(age);
             break;
         default:
             break;

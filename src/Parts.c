@@ -5,7 +5,7 @@
 Parts Parts_GetMaleVillager(void)
 {
     static const Part part[] = {
-        { {0,0}, false, FILE_MALE_VILLAGER_IDLE },
+        { {0,0}, true, FILE_MALE_VILLAGER_IDLE },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -14,7 +14,7 @@ Parts Parts_GetMaleVillager(void)
 Parts Parts_GetFemaleVillager(void)
 {
     static const Part part[] = {
-        { {0,0}, false, FILE_FEMALE_VILLAGER_IDLE },
+        { {0,0}, true, FILE_FEMALE_VILLAGER_IDLE },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -23,7 +23,7 @@ Parts Parts_GetFemaleVillager(void)
 Parts Parts_GetRedArrows(void)
 {
     static const Part part[] = {
-        { {0,0}, false, FILE_RIGHT_CLICK_RED_ARROWS },
+        { {0,0}, true, FILE_RIGHT_CLICK_RED_ARROWS },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -32,7 +32,7 @@ Parts Parts_GetRedArrows(void)
 Parts Parts_GetSmoke(void)
 {
     static const Part part[] = {
-        { {0,0}, false, FILE_SMALLER_EXPLOSION_SMOKE },
+        { {0,0}, true, FILE_SMALLER_EXPLOSION_SMOKE },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -40,16 +40,26 @@ Parts Parts_GetSmoke(void)
 
 Parts Parts_GetFire(void)
 {
-    static const Part part[] = {
-        { {0,0}, false, FILE_FIRE_SMALL_A },
-    };
-    const Parts parts = { part, UTIL_LEN(part) };
+    static const Part a[] = { { {0,0}, true, FILE_FIRE_SMALL_A  } };
+    static const Part b[] = { { {0,0}, true, FILE_FIRE_SMALL_B  } };
+    static const Part c[] = { { {0,0}, true, FILE_FIRE_SMALL_C  } };
+    static const Part d[] = { { {0,0}, true, FILE_FIRE_MEDIUM_A } };
+    static const Part e[] = { { {0,0}, true, FILE_FIRE_MEDIUM_B } };
+    Parts parts = { NULL, 1 };
+    switch(Util_Rand() % 5)
+    {
+        case 0: parts.part = a; break;
+        case 1: parts.part = b; break;
+        case 2: parts.part = c; break;
+        case 3: parts.part = d; break;
+        case 4: parts.part = e; break;
+    }
     return parts;
 }
 
-Parts Parts_GetTownCenterAge1(void)
+Parts Parts_GetTownCenter(const int32_t age)
 {
-    static const Part part[] = {
+    static const Part age1[] = {
         { {-0,0}, true,  FILE_AGE_1_TOWN_CENTER_TOP },
         { {-1,1}, true,  FILE_AGE_1_TOWN_CENTER_SHADOW },
         { {-3,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT },
@@ -59,37 +69,38 @@ Parts Parts_GetTownCenterAge1(void)
         { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
         { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
     };
-    const Parts parts = { part, UTIL_LEN(part) };
-    return parts;
-}
-
-Parts Parts_GetTownCenterAge2(void)
-{
-    static const Part part[] = {
+    static const Part age2[] = {
         { {-0,0}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
         { {-1,1}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
     };
-    const Parts parts = { part, UTIL_LEN(part) };
-    return parts;
-}
-
-Parts Parts_GetTownCenterAge3(void)
-{
-    static const Part part[] = {
+    static const Part age3[] = {
         { {-0,0}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_TOP },
         { {-1,1}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_SHADOW },
     };
-    const Parts parts = { part, UTIL_LEN(part) };
-    return parts;
-}
-
-Parts Parts_GetTownCenterAge4(void)
-{
-    static const Part part[] = {
+    static const Part age4[] = {
         { {-0,0}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_TOP },
         { {-1,1}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_SHADOW },
     };
-    const Parts parts = { part, UTIL_LEN(part) };
+    Parts parts = { NULL, 0 };
+    switch(age)
+    {
+    case 0:
+        parts.part = age1;
+        parts.count = UTIL_LEN(age1);
+        break;
+    case 1:
+        parts.part = age2;
+        parts.count = UTIL_LEN(age2);
+        break;
+    case 2:
+        parts.part = age3;
+        parts.count = UTIL_LEN(age3);
+        break;
+    case 3:
+        parts.part = age4;
+        parts.count = UTIL_LEN(age4);
+        break;
+    }
     return parts;
 }
 
@@ -164,7 +175,7 @@ Parts Parts_FromIcon(const Icon icon)
     switch(icon)
     {
         // DO NOT USE DEFAULt - COMPILER WILL WARN OF MISSING CASES.
-        case ICON_BUILD_TOWN_CENTER    : return Parts_GetTownCenterAge1();
+        case ICON_BUILD_TOWN_CENTER    : return Parts_GetTownCenter(0);
         case ICON_BUILD_BARRACKS       : return GetBarracks();
         case ICON_BUILD_MILL           : return GetMill();
         case ICON_BUILD_HOUSE          : return GetHouse();
