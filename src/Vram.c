@@ -153,7 +153,6 @@ static int32_t DrawBatchNeedle(void* data)
 static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
 {
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
-    UTIL_CHECK(needles);
     const int32_t width = terrain_tiles.count / vram.cpu_count;
     const int32_t remainder = terrain_tiles.count % vram.cpu_count;
     for(int32_t i = 0; i < vram.cpu_count; i++)
@@ -165,7 +164,6 @@ static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
     }
     needles[vram.cpu_count - 1].b += remainder;
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
-    UTIL_CHECK(threads);
     for(int32_t i = 0; i < vram.cpu_count; i++) threads[i] = SDL_CreateThread(DrawBatchNeedle, "N/A", &needles[i]);
     for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);
@@ -287,7 +285,6 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
 static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Lines blend_lines, const Blendomatic blendomatic)
 {
     BlendNeedle* const needles = UTIL_ALLOC(BlendNeedle, vram.cpu_count);
-    UTIL_CHECK(needles);
     for(int32_t i = 0; i < vram.cpu_count; i++)
     {
         needles[i].vram = vram;
@@ -301,7 +298,6 @@ static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Ma
         needles[i].b = GetNextBestBlendTile(blend_lines, i + 1, vram.cpu_count);
     }
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, vram.cpu_count);
-    UTIL_CHECK(threads);
     for(int32_t i = 0; i < vram.cpu_count; i++) threads[i] = SDL_CreateThread(DrawBlendNeedle, "N/A", &needles[i]);
     for(int32_t i = 0; i < vram.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
     free(needles);

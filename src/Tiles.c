@@ -55,7 +55,6 @@ void Tiles_SortByHeight(const Tiles tiles)
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Grid grid, const Units units, const Points points)
 {
     Tile* const tile = UTIL_ALLOC(Tile, units.count);
-    UTIL_CHECK(tile);
     int32_t unit_count = 0;
     for(int32_t i = 0; i < points.count; i++)
     {
@@ -100,7 +99,6 @@ static void SortByTileSurface(const Tiles tiles)
 Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Points points)
 {
     Tile* const tile = UTIL_ALLOC(Tile, points.count);
-    UTIL_CHECK(tile);
     for(int32_t i = 0; i < points.count; i++)
     {
         const Point point = points.point[i];

@@ -12,7 +12,6 @@ Table Table_Load(FILE* const fp)
     UTIL_FREAD(&table.file_info_offset, 1, fp);
     UTIL_FREAD(&table.num_files, 1, fp);
     table.file = UTIL_ALLOC(File, table.num_files);
-    UTIL_CHECK(table.file);
     return table;
 }
 

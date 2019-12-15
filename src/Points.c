@@ -7,7 +7,6 @@
 Points Points_New(const int32_t max)
 {
     Point* point = UTIL_ALLOC(Point, max);
-    UTIL_CHECK(point);
     const Points points = { point, 0, max };
     return points;
 }
@@ -27,7 +26,6 @@ Points Points_Append(Points points, const Point point)
     {
         points.max *= 2;
         Point* const temp = UTIL_REALLOC(points.point, Point, points.max);
-        UTIL_CHECK(temp);
         points.point = temp;
     }
     points.point[points.count++] = point;
@@ -40,7 +38,6 @@ Points Points_Cat(Points a, const Points b)
     if(new_size > 0)
     {
         Point* const temp = UTIL_REALLOC(a.point, Point, new_size);
-        UTIL_CHECK(temp);
         a.point = temp;
         a.max = new_size;
         for(int32_t i  = 0; i < b.count; i++)

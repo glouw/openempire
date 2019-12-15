@@ -10,7 +10,6 @@ static Scanline New(const int32_t max)
     scanline.palette_index = UTIL_ALLOC(int32_t, max);
     scanline.count = 0;
     scanline.max = max;
-    UTIL_CHECK(scanline.palette_index);
     return scanline;
 }
 
@@ -25,7 +24,6 @@ static Scanline Append(Scanline scanline, const int32_t index)
     {
         scanline.max *= 2;
         int32_t* const palette_index = UTIL_REALLOC(scanline.palette_index, int32_t, scanline.max);
-        UTIL_CHECK(palette_index);
         scanline.palette_index = palette_index;
     }
     scanline.palette_index[scanline.count++] = index;

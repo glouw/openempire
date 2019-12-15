@@ -7,7 +7,6 @@
 Lines Lines_New(const int32_t max)
 {
     Line* const line = UTIL_ALLOC(Line, max);
-    UTIL_CHECK(line);
     const Lines lines = { line, 0, max };
     return lines;
 }

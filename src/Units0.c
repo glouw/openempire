@@ -62,8 +62,6 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max)
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
-    UTIL_CHECK(unit);
-    UTIL_CHECK(stack);
     for(int32_t i = 0; i < area; i++)
         stack[i] = Stack_Build(8);
     static Units zero;
@@ -514,8 +512,6 @@ static void Process(const Units units, const Map map, const Grid grid, int32_t R
 {
     Needle* const needles = UTIL_ALLOC(Needle, units.cpu_count);
     SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, units.cpu_count);
-    UTIL_CHECK(needles);
-    UTIL_CHECK(threads);
     const int32_t width = units.count / units.cpu_count;
     const int32_t remainder = units.count % units.cpu_count;
     for(int32_t i = 0; i < units.cpu_count; i++)

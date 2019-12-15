@@ -43,11 +43,9 @@ Slp Slp_Load(const Drs drs, const int32_t table_index, const int32_t file_index)
     UTIL_FREAD(&slp.num_frames, 1, drs.fp);
     UTIL_FREAD(slp.comment, sizeof(slp.comment) - 1, drs.fp);
     slp.frame = UTIL_ALLOC(Frame, slp.num_frames);
-    UTIL_CHECK(slp.frame);
     for(uint32_t i = 0; i < slp.num_frames; i++)
         slp.frame[i] = Frame_Load(drs.fp);
     slp.image = UTIL_ALLOC(Image, slp.num_frames);
-    UTIL_CHECK(slp.image);
     for(uint32_t i = 0; i < slp.num_frames; i++)
     {
         static Image dummy;

@@ -18,7 +18,6 @@ Blendomatic Blendomatic_Load(const char* const path, const Registrar terrain)
     UTIL_FREAD(&blendomatic.nr_blending_modes, 1, fp);
     UTIL_FREAD(&blendomatic.nr_tiles, 1, fp);
     blendomatic.mode = UTIL_ALLOC(Mode, blendomatic.nr_blending_modes);
-    UTIL_CHECK(blendomatic.mode);
     for(int32_t i = 0; i < (int32_t) blendomatic.nr_blending_modes; i++)
         blendomatic.mode[i] = Mode_Load(fp, blendomatic.nr_tiles, frame, image.outline_table);
     fclose(fp);

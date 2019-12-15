@@ -15,9 +15,6 @@ static Image New(const int32_t height, const int32_t size)
     image.data = UTIL_ALLOC(uint8_t, size);
     image.height = height;
     image.size = size;
-    UTIL_CHECK(image.outline_table);
-    UTIL_CHECK(image.cmd_table);
-    UTIL_CHECK(image.data);
     return image;
 }
 

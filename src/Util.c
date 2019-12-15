@@ -18,7 +18,6 @@ char* Util_StringJoin(const char* const a, const char* const b)
 {
     const int32_t len = strlen(a) + strlen(b) + 1;
     char* const joined = UTIL_ALLOC(char, len);
-    UTIL_CHECK(joined);
     strcat(joined, a);
     strcat(joined, b);
     return joined;
@@ -28,7 +27,6 @@ char* Util_StringDup(const char* s)
 {
     const int32_t len = strlen(s) + 1;
     char* const d = UTIL_ALLOC(char, len);
-    UTIL_CHECK(d);
     strcpy(d, s);
     return d;
 }

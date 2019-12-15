@@ -32,8 +32,6 @@ static Mode ConvertAllByteMasks(Mode mode, Outline* const outline_table, const i
 {
     mode.mask_real = UTIL_ALLOC(SDL_Surface*, nr_tiles);
     mode.mask_demo = UTIL_ALLOC(SDL_Surface*, nr_tiles);
-    UTIL_CHECK(mode.mask_real);
-    UTIL_CHECK(mode.mask_demo);
     // Both a demo and real mask are generated. The real mask is a pure alpha channel used for actual blending.
     // The demo mask converts the alpha value to a grey scale so the alpha channel can be visualized in the demo renderer, eg. ./openempires --demo
     for(int32_t which_tile = 0; which_tile < nr_tiles; which_tile++)
@@ -50,7 +48,6 @@ static Mode LoadHeader(FILE* const fp, const int32_t nr_tiles)
     Mode mode = zero;
     UTIL_FREAD(&mode.tile_size, 1, fp);
     mode.tile_flags = UTIL_ALLOC(uint8_t, nr_tiles);
-    UTIL_CHECK(mode.tile_flags);
     UTIL_FREAD(mode.tile_flags, nr_tiles, fp);
     return mode;
 }
@@ -59,7 +56,6 @@ static Mode LoadBitMasks(Mode mode, FILE* const fp, const int32_t nr_tiles)
 {
     const int32_t size = (nr_tiles + 1) * mode.tile_size / 8;
     mode.tile_bit_mask = UTIL_ALLOC(uint8_t, size);
-    UTIL_CHECK(mode.tile_bit_mask);
     UTIL_FREAD(mode.tile_bit_mask, size, fp);
     return mode;
 }
@@ -68,7 +64,6 @@ static Mode LoadByteMasks(Mode mode, FILE* const fp, const int32_t nr_tiles)
 {
     const int32_t size = nr_tiles * mode.tile_size;
     mode.tile_byte_mask =  UTIL_ALLOC(uint8_t, size);
-    UTIL_CHECK(mode.tile_byte_mask);
     UTIL_FREAD(mode.tile_byte_mask, size, fp);
     return mode;
 }

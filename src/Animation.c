@@ -12,9 +12,6 @@ Animation Animation_Get(const Slp slp, const Palette palette, const Color color)
     animation.surface = UTIL_ALLOC(SDL_Surface*, slp.num_frames);
     animation.frame = UTIL_ALLOC(Frame, slp.num_frames);
     animation.image = UTIL_ALLOC(Image, slp.num_frames);
-    UTIL_CHECK(animation.surface);
-    UTIL_CHECK(animation.frame);
-    UTIL_CHECK(animation.image);
     for(int32_t i = 0; i < animation.count; i++)
     {
         const Image image = Image_Copy(slp.image[i]);

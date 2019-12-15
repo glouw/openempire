@@ -11,7 +11,6 @@
 
 #define UTIL_REALLOC(pointer, type, count) ((type*) realloc(pointer, sizeof(type) * count))
 
-#define UTIL_CHECK(pointer) if(pointer == NULL) fprintf(stderr, "Pointer was NULL: file %s: line %d", __FILE__, __LINE__), exit(1)
 
 #define UTIL_LEN(array) ((int32_t) (sizeof(array) / sizeof(*array)))
 

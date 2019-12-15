@@ -14,7 +14,6 @@ static Registrar New(const int32_t count, const int32_t files[], const int32_t f
     for(int32_t i = 0; i < (int32_t) COLOR_COUNT; i++)
     {
         registrar.animation[i] = UTIL_ALLOC(Animation, count);
-        UTIL_CHECK(registrar.animation[i]);
     }
     registrar.files = files;
     registrar.file_count = file_count;

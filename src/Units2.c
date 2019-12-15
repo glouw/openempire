@@ -41,7 +41,9 @@ Units Units_SpawnParts(Units units, const Point cart, const Point offset, const 
         const Part part = parts.part[i];
         const bool requires_midding  = // SPECIAL CASES OVERRIDE OFFSET VALUE.
             part.file == FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A ||
-            part.file == FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A;
+            part.file == FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A ||
+            part.file == FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A ||
+            part.file == FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A;
         const Point cart_part = Point_Add(cart, part.cart);
         temp[i] = Unit_Make(cart_part, requires_midding ? mid : offset, grid, part.file, color, graphics, true, is_floating);
     }

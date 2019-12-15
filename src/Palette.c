@@ -25,7 +25,6 @@ Palette Palette_Load(const Drs interfac, const int32_t palette_offset)
     fscanf(interfac.fp, "%7s\n", palette.version);
     fscanf(interfac.fp, "%d\n", &palette.count);
     palette.color = UTIL_ALLOC(uint32_t, palette.count);
-    UTIL_CHECK(palette.color);
     for(int32_t i = 0; i < palette.count; i++)
     {
         int32_t r = 0;

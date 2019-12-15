@@ -95,7 +95,6 @@ int32_t Text_Printf(const Text text, SDL_Renderer* const renderer, const Point p
     va_end(args);
     va_start(args, format);
     char* const string = UTIL_ALLOC(char, len + 1);
-    UTIL_CHECK(string);
     vsprintf(string, format, args);
     va_end(args);
     const int32_t newlines = Text_Puts(text, renderer, point, position, alpha, line, string);
