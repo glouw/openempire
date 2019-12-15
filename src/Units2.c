@@ -43,7 +43,7 @@ Units Units_SpawnParts(Units units, const Point cart, const Point offset, const 
             part.file == FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A ||
             part.file == FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A;
         const Point cart_part = Point_Add(cart, part.cart);
-        temp[i] = Unit_Make(cart_part, requires_midding ? mid : offset, grid, part.file, color, graphics, part.at_center, is_floating);
+        temp[i] = Unit_Make(cart_part, requires_midding ? mid : offset, grid, part.file, color, graphics, true, is_floating);
     }
     SetChildren(temp, parts.count);
     units = BulkAppend(units, map, temp, parts.count);

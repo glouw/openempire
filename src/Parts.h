@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Age.h"
 #include "Part.h"
 #include "Icon.h"
 
@@ -22,6 +23,6 @@ Parts Parts_GetSmoke(void);
 
 Parts Parts_GetFire(void);
 
-Parts Parts_GetTownCenter(const int32_t age);
+Parts Parts_GetTownCenter(const Age age);
 
 Parts Parts_FromIcon(const Icon);

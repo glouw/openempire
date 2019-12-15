@@ -520,7 +520,7 @@ typedef struct
 }
 Pack;
 
-static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color, const int32_t age)
+static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color, const Age age)
 {
     static Pack zero;
     Pack pack = zero;
@@ -551,7 +551,7 @@ static void DrawPack(const Vram vram, const Pack pack)
     }
 }
 
-void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color, const int32_t age)
+void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color, const Age age)
 {
     const Pack pack = GetPackFromMotive(interfac, motive, color, age);
     DrawPack(vram, pack);

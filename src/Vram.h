@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Point.h"
+#include "Age.h"
 #include "Frame.h"
 #include "Lines.h"
 #include "Color.h"
@@ -49,7 +50,7 @@ void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, con
 
 void Vram_DrawUnitHealthBars(const Vram, const Tiles);
 
-void Vram_DrawMotiveRow(const Vram, const Registrar, const Motive, const Color, const int32_t age);
+void Vram_DrawMotiveRow(const Vram, const Registrar, const Motive, const Color, const Age);
 
 void Vram_DrawHud(const Vram, const Registrar);
 

@@ -8,7 +8,6 @@
 typedef struct
 {
     Point cart;
-    bool at_center;
     Graphics file;
 }
 Part;

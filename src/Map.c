@@ -11,7 +11,7 @@ static void GenerateTestZone(const Map map)
     for(int32_t x = 0; x < map.cols; x++)
     {
         const Point point = { x, y };
-        Map_SetTerrainFile(map, point, FILE_DIRT);
+        Map_SetTerrainFile(map, point, FILE_GRASS);
     }
 }
 

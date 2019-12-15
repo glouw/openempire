@@ -204,18 +204,13 @@ bool Graphics_GetDetail(const Graphics graphics)
     return false;
 }
 
-Graphics Graphics_GetUpgrade(const Graphics graphics, const Civ civ)
+Graphics Graphics_GetUpgrade(const Graphics graphics)
 {
     switch(graphics)
     {
 #define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, dimensions, action, detail) \
         case name: \
-        { \
-            static const Graphics upgrades[] = upgrade; /* Compiler may remove duplicates if static? */ \
-            assert(UTIL_LEN(upgrades) == CIV_COUNT); \
-            const int32_t index = (int32_t) civ; \
-            return upgrades[index]; \
-        }
+            return upgrade;
         FILE_X_GRAPHICS
 #undef FILE_X
     }

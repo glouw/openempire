@@ -56,7 +56,7 @@ static void RunClient(const Args args)
             Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
             overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
 #if 1
-            if((cycles % 180) == 0 && overview.age < OVERVIEW_MAX_AGE) // XXX. USING RIGHT NOW TO SIMULATE AGING UP.
+            if((cycles % 180) == 0 && overview.age < AGE_4) // XXX. USING RIGHT NOW TO SIMULATE AGING UP.
                 overview.age++;
 #endif
             Sock_Send(sock, overview);

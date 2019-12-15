@@ -6,15 +6,10 @@
 #include "Event.h"
 #include "Color.h"
 #include "Rect.h"
+#include "Age.h"
 #include "Quad.h"
 
 #include <SDL2/SDL_net.h>
-
-// 0: Dark
-// 1: Feudal
-// 2: Castle
-// 3: Imperial
-#define OVERVIEW_MAX_AGE (3)
 
 typedef struct
 {
@@ -28,7 +23,7 @@ typedef struct
     uint64_t parity;
     int32_t cycles;
     int32_t queue_size;
-    int32_t age;
+    Age age;
 }
 Overview;
 

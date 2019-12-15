@@ -139,7 +139,8 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         {
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
-            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, Parts_GetRedArrows());
+            const Parts parts = Parts_GetRedArrows();
+            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts);
         }
     }
     return units;
@@ -286,7 +287,8 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % w - w / 2,
             Util_Rand() % h - h / 2,
         };
-        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, Parts_GetFire());
+        const Parts parts = Parts_GetFire();
+        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts);
     }
     return units;
 }
@@ -299,7 +301,8 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
     {
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
-        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, Parts_GetSmoke());
+        const Parts parts = Parts_GetSmoke();
+        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts);
     }
     return units;
 }
@@ -636,10 +639,7 @@ static Units RemoveGarbage(const Units units)
 static void UpdateEntropy(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        unit->entropy = Point_Rand();
-    }
+        units.unit[i].entropy = Point_Rand();
 }
 
 static void Zero(int32_t array[], const int32_t size)

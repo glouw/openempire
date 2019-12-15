@@ -3,6 +3,7 @@
 #include "Icon.h"
 
 #include "Motive.h"
+#include "Age.h"
 
 #include <stdint.h>
 
@@ -13,6 +14,6 @@ typedef struct
 }
 Icons;
 
-Icons Icons_FromMotive(const Motive, const int32_t age);
+Icons Icons_FromMotive(const Motive, const Age);
 
 bool Icons_IsIndexValid(const Icons, const int32_t index);

@@ -46,4 +46,4 @@ Action Graphics_GetAction(const Graphics);
 
 bool Graphics_GetDetail(const Graphics);
 
-Graphics Graphics_GetUpgrade(const Graphics, const Civ);
+Graphics Graphics_GetUpgrade(const Graphics);
