@@ -4,7 +4,7 @@
 
 #include "Util.h"
 
-Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
+Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const Age age, const int32_t users)
 {
     if(users > 0)
     {
@@ -33,7 +33,7 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
             const int32_t index = (i * len) / users;
             const Point slot = slots[index];
             const Color color = (Color) i;
-            const Parts towncenter = Parts_GetTownCenter(0);
+            const Parts towncenter = Parts_GetTownCenter(age);
             units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter);
             for(int32_t j = 0; j < starting_villagers; j++)
             {

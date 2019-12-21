@@ -72,6 +72,12 @@ Parts Parts_GetTownCenter(const Age age)
     static const Part age2[] = {
         { {-0,0}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
         { {-1,1}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
+        { {-2,2}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
+        { {-2,2}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+        { {-1,1}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+        { {-2,2}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
+        { {-2,2}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+        { {-1,1}, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
     };
     static const Part age3[] = {
         { {-0,0}, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_TOP },
@@ -195,9 +201,8 @@ static Parts GetMilitia(void)
     return parts;
 }
 
-Parts Parts_FromIcon(const Icon icon)
+Parts Parts_FromIcon(const Icon icon, const Age age)
 {
-    const Age age = AGE_4;
     static Parts none;
     switch(icon)
     {

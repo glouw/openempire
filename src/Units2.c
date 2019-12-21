@@ -32,6 +32,16 @@ void SetChildren(Unit unit[], const int32_t count)
     }
 }
 
+static bool RequiresMidding(const Graphics file)
+{
+    return file == FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A
+        || file == FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A
+        || file == FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A
+        || file == FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A
+        || file == FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A
+        || file == FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A;
+}
+
 Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts)
 {
     const Point mid = { grid.tile_cart_mid.x, -grid.tile_cart_mid.y };
@@ -39,11 +49,7 @@ Units Units_SpawnParts(Units units, const Point cart, const Point offset, const 
     for(int32_t i = 0; i < parts.count; i++)
     {
         const Part part = parts.part[i];
-        const bool requires_midding  = // SPECIAL CASES OVERRIDE OFFSET VALUE.
-            part.file == FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A ||
-            part.file == FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A ||
-            part.file == FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A ||
-            part.file == FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A;
+        const bool requires_midding = RequiresMidding(part.file);
         const Point cart_part = Point_Add(cart, part.cart);
         temp[i] = Unit_Make(cart_part, requires_midding ? mid : offset, grid, part.file, color, graphics, true, is_floating);
     }

@@ -25,4 +25,4 @@ Parts Parts_GetFire(void);
 
 Parts Parts_GetTownCenter(const Age age);
 
-Parts Parts_FromIcon(const Icon);
+Parts Parts_FromIcon(const Icon, const Age);

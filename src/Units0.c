@@ -717,7 +717,7 @@ static Units CountPopulation(Units units)
 static Units IconLookup(const Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Icon icon, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromIcon(icon);
+    const Parts parts = Parts_FromIcon(icon, overview.age);
     return (parts.part != NULL)
         ? Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts)
         : units;

@@ -46,7 +46,7 @@ static void RunClient(const Args args)
         Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
         Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
         Packets packets = Packets_Init();
-        units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
+        units = Units_GenerateTestZone(units, map, grid, data.graphics, overview.age, users);
         overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
         int32_t cycles = 0;
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
@@ -55,10 +55,6 @@ static void RunClient(const Args args)
             const uint64_t parity = Units_Xor(units);
             Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
             overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
-#if 1
-            if((cycles % 180) == 0 && overview.age < AGE_4) // XXX. USING RIGHT NOW TO SIMULATE AGING UP.
-                overview.age++;
-#endif
             Sock_Send(sock, overview);
             const Packet packet = Packet_Get(sock);
             if(Packet_IsStable(packet))
