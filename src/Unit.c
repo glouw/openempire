@@ -193,7 +193,10 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
         };
         unit.cell = Point_Sub(unit.cell, shift);
     }
-    unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
+    const Point mid = { grid.tile_cart_mid.x, -grid.tile_cart_mid.y };
+    unit.cell = unit.trait.needs_midding
+        ? Point_Add(unit.cell, Grid_OffsetToCell(mid))
+        : Point_Add(unit.cell, Grid_OffsetToCell(offset));
     UpdateCart(&unit, grid);
     if(unit.trait.can_expire)
         unit.expire_frames = GetExpireFrames(&unit, graphics);

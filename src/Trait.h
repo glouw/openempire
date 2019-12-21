@@ -24,6 +24,7 @@ typedef struct
     bool is_inanimate;
     bool can_expire;
     bool is_detail;
+    bool needs_midding;
 }
 Trait;
 
