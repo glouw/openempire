@@ -8,7 +8,7 @@
 #include "Args.h"
 #include "Util.h"
 
-#define DEMO (false)
+#define DEMO (0)
 
 static void RunClient(const Args args)
 {

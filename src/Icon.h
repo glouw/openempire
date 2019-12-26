@@ -7,7 +7,6 @@
 
 typedef enum
 {
-    // Building Icons.
     ICON_NONE = -1,
     ICON_BUILD_BARRACKS = 2,
     ICON_BUILD_MILL = 19,
@@ -17,10 +16,13 @@ typedef enum
     ICON_BUILD_STONE_CAMP = 39,
     ICON_BUILD_LUMBER_CAMP = 40,
 
-    // Unit Icons.
     ICON_UNIT_MILITIA = 8,
     ICON_UNIT_MALE_VILLAGER = 15,
     ICON_UNIT_FEMALE_VILLAGER = 16,
+
+    ICON_TECH_AGE_2 = 30,
+    ICON_TECH_AGE_3 = 31,
+    ICON_TECH_AGE_4 = 32,
 }
 Icon;
 
