@@ -14,10 +14,6 @@
 #include "Registrar.h"
 #include "Stack.h"
 
-// Units are arranged in a linear array, but also referenced with
-// a 2D tile array for quick point lookups.
-// Given multiple units occupy the same tile, a unit stack
-// can reference multiple units per tile.
 typedef struct
 {
     Unit* unit;

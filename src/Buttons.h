@@ -19,8 +19,8 @@ typedef struct
     const Button* button;
     int32_t count;
 }
-Icons;
+Buttons;
 
-Icons Icons_FromMotive(const Motive, const Age);
+Buttons Buttons_FromMotive(const Motive, const Age);
 
-bool Icons_IsIndexValid(const Icons, const int32_t index);
+bool Buttons_IsIndexValid(const Buttons, const int32_t index);

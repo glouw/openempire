@@ -8,7 +8,7 @@
 #include "Rect.h"
 #include "Quad.h"
 #include "Interfac.h"
-#include "Icons.h"
+#include "Buttons.h"
 
 static Rects GetChannelRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
 {
@@ -512,16 +512,16 @@ static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point of
 typedef struct
 {
     Animation animation[ICONTYPE_COUNT];
-    Icons icons;
+    Buttons buttons;
 }
 Pack;
 
 static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color, const Age age)
 {
+    const Animation* const base = interfac.animation[color];
     static Pack zero;
     Pack pack = zero;
-    pack.icons = Icons_FromMotive(motive, age);
-    Animation* const base = interfac.animation[color];
+    pack.buttons = Buttons_FromMotive(motive, age);
     pack.animation[ICONTYPE_BUILDING] = base[FILE_INTERFAC_BUILDING_ICONS];
     pack.animation[ICONTYPE_UNIT] = base[FILE_INTERFAC_UNIT_ICONS];
     pack.animation[ICONTYPE_TECH] = base[FILE_INTERFAC_TECH_ICONS];
@@ -530,9 +530,9 @@ static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, con
 
 static void DrawPack(const Vram vram, const Pack pack)
 {
-    for(int32_t index = 0; index < pack.icons.count; index++)
+    for(int32_t index = 0; index < pack.buttons.count; index++)
     {
-        const Button button = pack.icons.button[index];
+        const Button button = pack.buttons.button[index];
         SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.icon];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         DrawWithBounds(vram, surface, offset, 0, surface->h);

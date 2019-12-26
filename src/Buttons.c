@@ -1,4 +1,4 @@
-#include "Icons.h"
+#include "Buttons.h"
 
 #include "Util.h"
 
@@ -89,26 +89,26 @@ static int32_t GetTownCenterLen(const Age age)
     return lens[age];
 }
 
-Icons Icons_FromMotive(const Motive motive, const Age age)
+Buttons Buttons_FromMotive(const Motive motive, const Age age)
 {
-    static Icons zero;
-    Icons icons = zero;
+    static Buttons zero;
+    Buttons buttons = zero;
     switch(motive.action)
     {
     case ACTION_BUILD:
-        icons.button = GetBuilding(age);
-        icons.count = GetBuildingLen(age);
+        buttons.button = GetBuilding(age);
+        buttons.count = GetBuildingLen(age);
         break;
     case ACTION_UNIT_TECH:
         switch(motive.type)
         {
         case TYPE_BARRACKS:
-            icons.button = GetBarracks(age);
-            icons.count = GetBarracksLen(age);
+            buttons.button = GetBarracks(age);
+            buttons.count = GetBarracksLen(age);
             break;
         case TYPE_TOWN_CENTER:
-            icons.button = GetTownCenter(age);
-            icons.count = GetTownCenterLen(age);
+            buttons.button = GetTownCenter(age);
+            buttons.count = GetTownCenterLen(age);
             break;
         default:
             break;
@@ -117,10 +117,10 @@ Icons Icons_FromMotive(const Motive motive, const Age age)
     default:
         break;
     }
-    return icons;
+    return buttons;
 }
 
-bool Icons_IsIndexValid(const Icons icons, const int32_t index)
+bool Buttons_IsIndexValid(const Buttons buttons, const int32_t index)
 {
-    return index != -1 && icons.button != NULL && index < icons.count;
+    return index != -1 && buttons.button != NULL && index < buttons.count;
 }

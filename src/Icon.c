@@ -1,11 +1,11 @@
 #include "Icon.h"
 
 #include "Util.h"
-#include "Icons.h"
+#include "Buttons.h"
 
 Icon Icon_FromOverview(const Overview overview, const Motive motive)
 {
-    const Icons icons = Icons_FromMotive(motive, overview.age);
+    const Buttons buttons = Buttons_FromMotive(motive, overview.age);
     int32_t index = -1;
     if(overview.event.key_q) index =  0;
     if(overview.event.key_w) index =  1;
@@ -22,7 +22,7 @@ Icon Icon_FromOverview(const Overview overview, const Motive motive)
     if(overview.event.key_c) index = 12;
     if(overview.event.key_v) index = 13;
     if(overview.event.key_b) index = 14;
-    return Icons_IsIndexValid(icons, index) ? icons.button[index].icon : ICON_NONE;
+    return Buttons_IsIndexValid(buttons, index) ? buttons.button[index].icon : ICON_NONE;
 }
 
 static const char hotkeys[] = {
