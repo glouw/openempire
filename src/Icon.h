@@ -24,6 +24,15 @@ typedef enum
 }
 Icon;
 
+typedef enum
+{
+    ICONTYPE_BUILDING,
+    ICONTYPE_UNIT,
+    ICONTYPE_TECH,
+    ICONTYPE_COUNT,
+}
+IconType;
+
 Icon Icon_FromOverview(const Overview, const Motive);
 
 const char* Icon_GetHotkeys(void);

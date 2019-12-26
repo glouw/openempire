@@ -22,7 +22,7 @@ Icon Icon_FromOverview(const Overview overview, const Motive motive)
     if(overview.event.key_c) index = 12;
     if(overview.event.key_v) index = 13;
     if(overview.event.key_b) index = 14;
-    return Icons_IsIndexValid(icons, index) ? icons.icon[index] : ICON_NONE;
+    return Icons_IsIndexValid(icons, index) ? icons.button[index].icon : ICON_NONE;
 }
 
 static const char hotkeys[] = {

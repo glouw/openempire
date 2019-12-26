@@ -9,7 +9,14 @@
 
 typedef struct
 {
-    const Icon* icon;
+    IconType icon_type;
+    Icon icon;
+}
+Button;
+
+typedef struct
+{
+    const Button* button;
     int32_t count;
 }
 Icons;
