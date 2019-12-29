@@ -4,7 +4,7 @@
 
 #include "Util.h"
 
-Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const Age age, const int32_t users)
+Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const Age age, const Civ civ, const int32_t users)
 {
     if(users > 0)
     {
@@ -27,22 +27,24 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
             { middle.x,      middle.y - dy }, // N.
             { middle.x + dx, middle.y - dy }, // NE.
         };
+        const Parts towncenter = Parts_FromIcon(ICON_BUILD_TOWN_CENTER, age, civ);
+        const Parts villager = Parts_FromIcon(ICON_UNIT_MALE_VILLAGER, age, civ);
         const int32_t len = UTIL_LEN(slots);
         for(int32_t i = 0; i < users; i++)
         {
             const int32_t index = (i * len) / users;
             const Point slot = slots[index];
             const Color color = (Color) i;
-            const Parts towncenter = Parts_GetTownCenter(age);
             units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter);
             for(int32_t j = 0; j < starting_villagers; j++)
             {
                 const Point shift = { -3, 3 };
                 const Point cart = Point_Add(slot, shift);
-                const Parts villager = Parts_GetMaleVillager();
                 units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager);
             }
         }
+        Parts_Free(towncenter);
+        Parts_Free(villager);
     }
     return units;
 }

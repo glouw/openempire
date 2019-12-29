@@ -3,7 +3,7 @@
 #include "Graphics.h"
 #include "Util.h"
 
-Parts Parts_GetMaleVillager(void)
+static Parts GetMaleVillager(void)
 {
     static Part part[] = {
         { {0,0}, false, FILE_MALE_VILLAGER_IDLE },
@@ -12,7 +12,7 @@ Parts Parts_GetMaleVillager(void)
     return parts;
 }
 
-Parts Parts_GetFemaleVillager(void)
+static Parts GetFemaleVillager(void)
 {
     static Part part[] = {
         { {0,0}, false, FILE_FEMALE_VILLAGER_IDLE },
@@ -58,17 +58,17 @@ Parts Parts_GetFire(void)
     return parts;
 }
 
-Parts Parts_GetTownCenter(const Age age)
+static Parts GetTownCenter(const Age age)
 {
     static Part age1[] = {
-        { {-0,0}, true, FILE_AGE_1_TOWN_CENTER_TOP },
-        { {-1,1}, true, FILE_AGE_1_TOWN_CENTER_SHADOW },
-        { {-2,2}, true, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT },
-        { {-2,2}, true, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {-1,1}, true, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {-2,2}, true, FILE_AGE_1_TOWN_CENTER_ROOF_RITE },
-        { {-2,2}, true, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {-1,1}, true, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {-0,0}, false, FILE_AGE_1_TOWN_CENTER_TOP },
+        { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_SHADOW },
+        { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT },
+        { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+        { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+        { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE },
+        { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+        { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
     };
     static Part age2[] = {
         { {-0,0}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
@@ -114,9 +114,9 @@ Parts Parts_GetTownCenter(const Age age)
 
 static Parts GetBarracks(const Age age)
 {
-    static Part age1[] = { { {0,0}, true, FILE_AGE_1_BARRACKS } };
-    static Part age2[] = { { {0,0}, true, FILE_AGE_2_NORTH_EUROPE_BARRACKS } };
-    static Part age3[] = { { {0,0}, true, FILE_AGE_3_NORTH_EUROPE_BARRACKS } };
+    static Part age1[] = { { {0,0}, false, FILE_AGE_1_BARRACKS } };
+    static Part age2[] = { { {0,0}, true,  FILE_AGE_2_NORTH_EUROPE_BARRACKS } };
+    static Part age3[] = { { {0,0}, true,  FILE_AGE_3_NORTH_EUROPE_BARRACKS } };
     Parts parts = { NULL, 0 };
     switch(age)
     {
@@ -131,8 +131,8 @@ static Parts GetBarracks(const Age age)
 static Parts GetMill(const Age age)
 {
     static Part age1[] = {
-        { {0,0}, true, FILE_AGE_1_MILL },
-        { {0,0}, true, FILE_AGE_1_MILL_DONKEY },
+        { {0,0}, false, FILE_AGE_1_MILL },
+        { {0,0}, false, FILE_AGE_1_MILL_DONKEY },
     };
     static Part age2[] = {
         { {0,0}, true, FILE_AGE_2_NORTH_EUROPE_MILL },
@@ -157,9 +157,9 @@ static Parts GetMill(const Age age)
 
 static Parts GetHouse(const Age age)
 {
-    static Part age1[] = { { {0,0}, true, FILE_AGE_1_HOUSE } };
-    static Part age2[] = { { {0,0}, true, FILE_AGE_2_NORTH_EUROPE_HOUSE } };
-    static Part age3[] = { { {0,0}, true, FILE_AGE_3_NORTH_EUROPE_HOUSE } };
+    static Part age1[] = { { {0,0}, false, FILE_AGE_1_HOUSE } };
+    static Part age2[] = { { {0,0}, true,  FILE_AGE_2_NORTH_EUROPE_HOUSE } };
+    static Part age3[] = { { {0,0}, true,  FILE_AGE_3_NORTH_EUROPE_HOUSE } };
     Parts parts = { NULL, 0 };
     switch(age)
     {
@@ -174,8 +174,8 @@ static Parts GetHouse(const Age age)
 static Parts GetOutpost(void)
 {
     static Part part[] = {
-        { {0,0}, true, FILE_AGE_1_OUTPOST },
-        { {0,0}, true, FILE_AGE_1_OUTPOST_SHADOW },
+        { {0,0}, false, FILE_AGE_1_OUTPOST },
+        { {0,0}, false, FILE_AGE_1_OUTPOST_SHADOW },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -234,16 +234,16 @@ Parts Parts_FromIcon(const Icon icon, const Age age, const Civ civ)
     Parts parts = zero;
     switch(icon)
     {
-        case ICON_BUILD_BARRACKS       : parts = GetBarracks            (age); break;
-        case ICON_BUILD_MILL           : parts = GetMill                (age); break;
-        case ICON_BUILD_HOUSE          : parts = GetHouse               (age); break;
-        case ICON_BUILD_OUTPOST        : parts = GetOutpost             (   ); break;
-        case ICON_BUILD_STONE_CAMP     : parts = GetStoneCamp           (   ); break;
-        case ICON_BUILD_LUMBER_CAMP    : parts = GetLumberCamp          (   ); break;
-        case ICON_UNIT_MILITIA         : parts = GetMilitia             (   ); break;
-        case ICON_BUILD_TOWN_CENTER    : parts = Parts_GetTownCenter    (age); break;
-        case ICON_UNIT_MALE_VILLAGER   : parts = Parts_GetMaleVillager  (   ); break;
-        case ICON_UNIT_FEMALE_VILLAGER : parts = Parts_GetFemaleVillager(   ); break;
+        case ICON_BUILD_BARRACKS       : parts = GetBarracks      (age); break;
+        case ICON_BUILD_MILL           : parts = GetMill          (age); break;
+        case ICON_BUILD_HOUSE          : parts = GetHouse         (age); break;
+        case ICON_BUILD_OUTPOST        : parts = GetOutpost       (   ); break;
+        case ICON_BUILD_STONE_CAMP     : parts = GetStoneCamp     (   ); break;
+        case ICON_BUILD_LUMBER_CAMP    : parts = GetLumberCamp    (   ); break;
+        case ICON_UNIT_MILITIA         : parts = GetMilitia       (   ); break;
+        case ICON_BUILD_TOWN_CENTER    : parts = GetTownCenter    (age); break;
+        case ICON_UNIT_MALE_VILLAGER   : parts = GetMaleVillager  (   ); break;
+        case ICON_UNIT_FEMALE_VILLAGER : parts = GetFemaleVillager(   ); break;
         case ICON_NONE: // DO NOT USE DEFAULT. COMPILER NEEDS TO CATCH MISSING PARTS.
             break;
     }

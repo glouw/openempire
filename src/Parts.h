@@ -14,17 +14,11 @@ typedef struct
 }
 Parts;
 
-Parts Parts_GetMaleVillager(void);
-
-Parts Parts_GetFemaleVillager(void);
-
 Parts Parts_GetRedArrows(void);
 
 Parts Parts_GetSmoke(void);
 
 Parts Parts_GetFire(void);
-
-Parts Parts_GetTownCenter(const Age age);
 
 Parts Parts_FromIcon(const Icon, const Age, const Civ);
 
