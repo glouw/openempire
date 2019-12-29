@@ -128,7 +128,7 @@ static Parts GetBarracks(const Age age)
     return parts;
 }
 
-static Parts GetMill(const Age age)
+static Parts GetMill(const Age age, const Civ civ)
 {
     static Part age1[] = {
         { {0,0}, false, FILE_AGE_1_MILL },
@@ -151,6 +151,17 @@ static Parts GetMill(const Age age)
         case AGE_2: parts.part = age2; parts.count = UTIL_LEN(age2); break;
         case AGE_3:
         case AGE_4: parts.part = age3; parts.count = UTIL_LEN(age3); break;
+    }
+    // Asian mills do not have shadows, so their part count is dropped by 1.
+    const bool is_asian = civ == CIV_ASIA;
+    switch(age)
+    {
+    case AGE_3:
+    case AGE_4:
+        parts.count -= (is_asian ? 1 : 0);
+        break;
+    default:
+        break;
     }
     return parts;
 }
@@ -235,7 +246,7 @@ Parts Parts_FromIcon(const Icon icon, const Age age, const Civ civ)
     switch(icon)
     {
         case ICON_BUILD_BARRACKS       : parts = GetBarracks      (age); break;
-        case ICON_BUILD_MILL           : parts = GetMill          (age); break;
+        case ICON_BUILD_MILL           : parts = GetMill          (age, civ); break;
         case ICON_BUILD_HOUSE          : parts = GetHouse         (age); break;
         case ICON_BUILD_OUTPOST        : parts = GetOutpost       (   ); break;
         case ICON_BUILD_STONE_CAMP     : parts = GetStoneCamp     (   ); break;
