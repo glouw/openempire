@@ -1,3 +1,5 @@
+// NOTE: SHADOWS MUST BE DEFINED LAST IN PARTS.
+
 #include "Parts.h"
 
 #include "Graphics.h"
@@ -62,37 +64,36 @@ static Parts GetTownCenter(const Age age)
 {
     static Part age1[] = {
         { {-0,0}, false, FILE_AGE_1_TOWN_CENTER_TOP },
-        { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_SHADOW },
         { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT },
         { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
         { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
         { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE },
         { {-2,2}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
         { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {-1,1}, false, FILE_AGE_1_TOWN_CENTER_SHADOW },
     };
     static Part age2[] = {
         { {-0,0}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
-        { {-1,1}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
         { {-2,2}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
         { {-2,2}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
         { {-1,1}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
         { {-2,2}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
         { {-2,2}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
         { {-1,1}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {-1,1}, true, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
     };
     static Part age3[] = {
         { {-0,0}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_TOP },
-        { {-1,1}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_SHADOW },
         { {-2,2}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
         { {-2,2}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
         { {-1,1}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
         { {-2,2}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
         { {-2,2}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
         { {-1,1}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {-1,1}, true, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_SHADOW },
     };
     static Part age4[] = {
         { {-0,0}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_TOP },
-        { {-1,1}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_SHADOW },
         { {-1,1}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_FLOORING },
         { {-2,2}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
         { {-2,2}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
@@ -100,6 +101,7 @@ static Parts GetTownCenter(const Age age)
         { {-2,2}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
         { {-2,2}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
         { {-1,1}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+        { {-1,1}, true, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_SHADOW },
     };
     Parts parts = { NULL, 0 };
     switch(age)
@@ -153,16 +155,9 @@ static Parts GetMill(const Age age, const Civ civ)
         case AGE_4: parts.part = age3; parts.count = UTIL_LEN(age3); break;
     }
     // Asian mills do not have shadows, so their part count is dropped by 1.
-    const bool is_asian = civ == CIV_ASIA;
-    switch(age)
-    {
-    case AGE_3:
-    case AGE_4:
-        parts.count -= (is_asian ? 1 : 0);
-        break;
-    default:
-        break;
-    }
+    if(civ == CIV_ASIA)
+        if(age == AGE_3 || age == AGE_4)
+            parts.count -= 1;
     return parts;
 }
 
