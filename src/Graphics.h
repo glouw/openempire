@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Civ.h"
 #include "File.h"
 #include "Type.h"
 #include "Point.h"

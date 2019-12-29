@@ -3,12 +3,13 @@
 #include "Age.h"
 #include "Part.h"
 #include "Icon.h"
+#include "Civ.h"
 
 #include <stdint.h>
 
 typedef struct
 {
-    const Part* part;
+    Part* part;
     int32_t count;
 }
 Parts;
@@ -25,4 +26,6 @@ Parts Parts_GetFire(void);
 
 Parts Parts_GetTownCenter(const Age age);
 
-Parts Parts_FromIcon(const Icon, const Age);
+Parts Parts_FromIcon(const Icon, const Age, const Civ);
+
+void Parts_Free(const Parts);

@@ -714,13 +714,14 @@ static Units CountPopulation(Units units)
     return units;
 }
 
-static Units IconLookup(const Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Icon icon, const Point cart, const bool is_floating)
+static Units IconLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Icon icon, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromIcon(icon, overview.age);
-    return (parts.part != NULL)
-        ? Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts)
-        : units;
+    const Parts parts = Parts_FromIcon(icon, overview.age, overview.civ);
+    if(parts.part != NULL)
+        units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts);
+    Parts_Free(parts);
+    return units;
 }
 
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
@@ -732,16 +733,16 @@ static Units UseIcon(Units units, const Overview overview, const Grid grid, cons
 
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(overview.event.key_left_shift && overview.event.mouse_lu)
-        return UseIcon(units, overview, grid, graphics, map, false);
-    return units;
+    return (overview.event.key_left_shift && overview.event.mouse_lu)
+        ? UseIcon(units, overview, grid, graphics, map, false)
+        : units;
 }
 
 static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(overview.event.key_left_shift)
-        return UseIcon(floats, overview, grid, graphics, map, true);
-    return floats;
+    return overview.event.key_left_shift
+        ? UseIcon(floats, overview, grid, graphics, map, true)
+        : floats;
 }
 
 Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)

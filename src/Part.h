@@ -8,6 +8,7 @@
 typedef struct
 {
     Point cart;
+    bool can_civ;
     Graphics file;
 }
 Part;

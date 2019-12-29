@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "Point.h"
 #include "Grid.h"
+#include "Civ.h"
 #include "Event.h"
 #include "Color.h"
 #include "Rect.h"
@@ -24,6 +25,7 @@ typedef struct
     int32_t cycles;
     int32_t queue_size;
     Age age;
+    Civ civ;
 }
 Overview;
 
