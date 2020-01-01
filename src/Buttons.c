@@ -35,10 +35,10 @@ static int32_t GetBuildingLen(const Age age)
     return lens[age];
 }
 
-/* Barracks */
+// BARRACKS
 
 #define BARRACKS_AGE_1 \
-    { ICONTYPE_UNIT, ICON_UNIT_MILITIA },
+    { ICONTYPE_UNIT, ICON_UNIT_MILITIA }
 #define BARRACKS_AGE_2 ICON_NONE
 #define BARRACKS_AGE_3 ICON_NONE
 #define BARRACKS_AGE_4 ICON_NONE
@@ -60,22 +60,25 @@ static int32_t GetBarracksLen(const Age age)
     return lens[age];
 }
 
-/* Town Center */
+// TOWN CENTER
 
 #define TOWN_CENTER_AGE_1 \
     { ICONTYPE_UNIT, ICON_UNIT_MALE_VILLAGER   }, \
     { ICONTYPE_UNIT, ICON_UNIT_FEMALE_VILLAGER }, \
-    { ICONTYPE_TECH, ICON_TECH_AGE_2           }, \
-    { ICONTYPE_TECH, ICON_TECH_AGE_3           }, \
-    { ICONTYPE_TECH, ICON_TECH_AGE_4           },
-#define TOWN_CENTER_AGE_2 ICON_NONE
-#define TOWN_CENTER_AGE_3 ICON_NONE
+    { ICONTYPE_TECH, ICON_TECH_AGE_2           }
+
+#define TOWN_CENTER_AGE_2 \
+    { ICONTYPE_TECH, ICON_TECH_AGE_3 }
+
+#define TOWN_CENTER_AGE_3 \
+    { ICONTYPE_TECH, ICON_TECH_AGE_4 }
+
 #define TOWN_CENTER_AGE_4 ICON_NONE
 
 static const Button towncenter_age1[] = { TOWN_CENTER_AGE_1 };
-static const Button towncenter_age2[] = { TOWN_CENTER_AGE_1 };
-static const Button towncenter_age3[] = { TOWN_CENTER_AGE_1 };
-static const Button towncenter_age4[] = { TOWN_CENTER_AGE_1 };
+static const Button towncenter_age2[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2 };
+static const Button towncenter_age3[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2, TOWN_CENTER_AGE_3 };
+static const Button towncenter_age4[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2, TOWN_CENTER_AGE_3 };
 
 static const Button* GetTownCenter(const Age age)
 {

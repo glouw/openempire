@@ -24,6 +24,7 @@ typedef enum
     TYPE_RUBBLE,
     TYPE_MILITIA,
     TYPE_TREE,
+    TYPE_FLAG,
 
     // Resources.
     TYPE_FOOD,

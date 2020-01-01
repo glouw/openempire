@@ -12,8 +12,8 @@ Overview Overview_Init(const int32_t xres, const int32_t yres)
     Overview overview = zero;
     overview.xres = xres;
     overview.yres = yres;
-    overview.age = AGE_3;
-    overview.civ = CIV_WEST_EUROPE;
+    overview.age = AGE_1;
+    overview.civ = CIV_ASIA;
     return overview;
 }
 
@@ -92,16 +92,14 @@ bool Overview_IsSelectionBoxBigEnough(const Overview overview)
 }
 
 /*      +
- *     /d\
- *    /c h\      +--------+
- *   /b g l\     |a b c d |
- *  +a f k p+ -> |e f g h |
- *   \e j o/     |i j k l |
- *    \i n/      |m n o p |
- *     \m/       +--------+
+ *     /D\
+ *    /C H\      +--------+
+ *   /B G L\     |A B C D |
+ *  +A F K P+ -> |E F G H |
+ *   \E J O/     |I J K L |
+ *    \I N/      |M N O P |
+ *     \M/       +--------+
  *      +
- *
- * This isometric to cartesian projection preserves integer rounding errors.
  */
 Point Overview_IsoToCart(const Overview overview, const Grid grid, const Point iso, const bool raw)
 {
@@ -124,13 +122,13 @@ Point Overview_IsoToCart(const Overview overview, const Grid grid, const Point i
 }
 
 /*                     +
- *                    /d\
- *  +--------+       /c h\
- *  |a b c d |      /b g l\
- *  |e f g h | --> +a f k p+
- *  |i j k l |      \e j o/
- *  |m n o p |       \i n/
- *  +--------+        \m/
+ *                    /D\
+ *  +--------+       /C H\
+ *  |A B C D |      /B G L\
+ *  |E F G H | --> +A F K P+
+ *  |I J K L |      \E J O/
+ *  |M N O P |       \I N/
+ *  +--------+        \M/
  *                     +
  */
 Point Overview_CartToIso(const Overview overview, const Grid grid, const Point cart)

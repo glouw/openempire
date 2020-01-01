@@ -1,5 +1,6 @@
 #include "Sockets.h"
 
+#include "Config.h"
 #include "Util.h"
 
 #include <stdlib.h>
@@ -184,8 +185,8 @@ static Sockets CheckStability(Sockets sockets, const int32_t setpoint, const int
 {
     const int32_t a = max - setpoint;
     const int32_t b = setpoint - min;
-    const int32_t window = 3;
-    const int32_t threshold = 60;
+    const int32_t window = CONFIG_SOCKETS_LATENCY_WINDOW;
+    const int32_t threshold = CONFIG_SOCKETS_THRESHOLD_START;
     sockets.is_stable = setpoint > threshold && a < window && b < window;
     return sockets;
 }
@@ -202,7 +203,7 @@ static void CheckParity(const Sockets sockets)
                 const int32_t cycles = sockets.cycles[i];
                 const int32_t parity = sockets.parity[i];
                 if((cycles == cycles_check)
-                && (parity != parity_check)) // XXX. Make this kill the client instead of killing the server.
+                && (parity != parity_check)) // XXX. MAKE THIS KILL THE CLIENT INSTEAD OF KILLING THE SERVER.
                     Util_Bomb("SERVER - CLIENT_ID %d :: OUT OF SYNC\n", i);
             }
         }

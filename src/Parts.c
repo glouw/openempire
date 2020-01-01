@@ -5,6 +5,15 @@
 #include "Graphics.h"
 #include "Util.h"
 
+static Parts GetFlag(void)
+{
+    static Part part[] = {
+        { {0,0}, false, false, FILE_FLAG_TALL },
+    };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
 static Parts GetMaleVillager(void)
 {
     static Part part[] = {
@@ -133,7 +142,9 @@ static Parts GetBarracks(const Age age)
 static Parts DropAsianMillShadow(Parts parts, const Civ civ, const Age age)
 {
     if(civ == CIV_ASIA)
-        if(age == AGE_3 || age == AGE_4)
+        if(age == AGE_2
+        || age == AGE_3
+        || age == AGE_4)
             parts.count -= 1;
     return parts;
 }
@@ -212,7 +223,7 @@ static Parts GetLumberCamp(void)
 static Parts GetMilitia(void)
 {
     static Part part[] = {
-        { {0,0}, true, false, FILE_MILITIA_IDLE },
+        { {0,0}, false, false, FILE_MILITIA_IDLE },
     };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
@@ -259,6 +270,9 @@ Parts Parts_FromIcon(const Icon icon, const Age age, const Civ civ)
         case ICON_BUILD_TOWN_CENTER    : parts = GetTownCenter    (age     ); break;
         case ICON_UNIT_MALE_VILLAGER   : parts = GetMaleVillager  (        ); break;
         case ICON_UNIT_FEMALE_VILLAGER : parts = GetFemaleVillager(        ); break;
+        case ICON_TECH_AGE_2           :
+        case ICON_TECH_AGE_3           :
+        case ICON_TECH_AGE_4           : parts = GetFlag          (        ); break;
         case ICON_NONE: // DO NOT USE DEFAULT. COMPILER NEEDS TO CATCH MISSING PARTS.
             break;
     }
