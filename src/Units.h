@@ -33,6 +33,8 @@ typedef struct
     int32_t stone;
     int32_t wood;
     int32_t population;
+    Civ civ;
+    Age age;
 }
 Units;
 
@@ -46,7 +48,7 @@ Field Units_Field(const Units, const Map);
 
 void Units_ResetTiled(const Units);
 
-Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar, const Age age, const Civ civ, const int32_t users);
+Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar, const int32_t users);
 
 Units Units_SpawnParts(Units, const Point, const Point offset, const Grid, const Color, const Registrar, const Map, const bool is_floating, const Parts);
 

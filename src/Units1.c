@@ -4,7 +4,7 @@
 
 #include "Util.h"
 
-Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const Age age, const Civ civ, const int32_t users)
+Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
     if(users > 0)
     {
@@ -27,8 +27,8 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
             { middle.x,      middle.y - dy }, // N.
             { middle.x + dx, middle.y - dy }, // NE.
         };
-        const Parts towncenter = Parts_FromIcon(ICON_BUILD_TOWN_CENTER, age, civ);
-        const Parts villager = Parts_FromIcon(ICON_UNIT_MALE_VILLAGER, age, civ);
+        const Parts towncenter = Parts_FromIcon(ICON_BUILD_TOWN_CENTER, units.age, units.civ);
+        const Parts villager = Parts_FromIcon(ICON_UNIT_MALE_VILLAGER, units.age, units.civ);
         const int32_t len = UTIL_LEN(slots);
         for(int32_t i = 0; i < users; i++)
         {

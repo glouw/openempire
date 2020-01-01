@@ -46,7 +46,7 @@ static void RunClient(const Args args)
         Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
         Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
         Packets packets = Packets_Init();
-        units = Units_GenerateTestZone(units, map, grid, data.graphics, overview.age, overview.civ, users);
+        units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
         overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
         int32_t cycles = 0;
         for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))

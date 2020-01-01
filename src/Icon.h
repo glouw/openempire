@@ -2,6 +2,7 @@
 
 #include "Motive.h"
 #include "Overview.h"
+#include "Age.h"
 
 #include <stdint.h>
 
@@ -35,7 +36,7 @@ typedef enum
 }
 IconType;
 
-Icon Icon_FromOverview(const Overview, const Motive);
+Icon Icon_FromOverview(const Overview, const Motive, const Age);
 
 const char* Icon_GetHotkeys(void);
 

@@ -12,8 +12,6 @@ Overview Overview_Init(const int32_t xres, const int32_t yres)
     Overview overview = zero;
     overview.xres = xres;
     overview.yres = yres;
-    overview.age = AGE_3;
-    overview.civ = CIV_ASIA;
     return overview;
 }
 
