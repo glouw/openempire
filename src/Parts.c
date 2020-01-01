@@ -4,7 +4,6 @@
 
 #include "Parts.h"
 
-#include "Graphics.h"
 #include "Util.h"
 
 static Parts GetFlag(void)
@@ -247,9 +246,12 @@ static void SetCiv(const Parts parts, const Civ civ)
     {
         Part* const part = &parts.part[i];
         if(part->can_civ)
-            part->file += Part_MustSubtractIndex(part, civ)
-                ? (Graphics) ((int32_t) civ - 1)
-                : (Graphics) civ;
+        {
+            const int32_t offset = Part_MustSubtractIndex(part, civ)
+                ? civ - 1
+                : civ;
+            part->file = (Graphics) (part->file + offset);
+        }
     }
 }
 
