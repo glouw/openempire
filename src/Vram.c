@@ -435,9 +435,9 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
     }
 }
 
-static void DrawHealthBar(const Vram vram, const Point top, const int32_t health, const int32_t max_health)
+static void DrawHealthBar(const Vram vram, const Point top, const int32_t health, const int32_t max_health, const bool is_inanimate)
 {
-    const int32_t w = 30;
+    const int32_t w = is_inanimate ? 90 : 30;
     const int32_t h = 2;
     const int32_t hh =  h / 2;
     const int32_t hw =  w / 2;
@@ -468,7 +468,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
         };
         Unit* const unit = tile.reference;
         if(unit->is_selected)
-            DrawHealthBar(vram, top, unit->health, unit->trait.max_health);
+            DrawHealthBar(vram, top, unit->health, unit->trait.max_health, unit->trait.is_inanimate);
     }
 }
 
