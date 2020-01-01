@@ -1,4 +1,6 @@
-// NOTE: SHADOWS MUST BE DEFINED LAST IN PARTS.
+// * SHADOWS MUST BE DEFINED LAST FOR PARTS SUCH THAT SHADOWS MAY BE TOGGLED BY SUBTRACTING 1 FROM PART COUNT.
+// * PARTS MUST ONLY BE DEFINED AS NORTH EUROPEAN; CIV OFFSETS (+1, +2, +3) CHANGE BUILDING SKINS TO ASIA, ARAB, AND WEST EUROPE, RESPECTIVELY.
+// * SOME PART COLLECTIONS, LIKE THE ASIAN MILL, DO NOT PATTERN MATCH OTHER PART COLLECTIONS (EG. NO SHADOW UNLIKE OTHER MILLS) AND REQUIRE SPECIAL CARE.
 
 #include "Parts.h"
 
@@ -239,9 +241,6 @@ static Parts Copy(const Parts parts)
     return copy;
 }
 
-// IF A CIV DOES NOT REQUIRE A PART, ES DID NOT PACK THE PART (EG. ASIAN MILL SHADOWS).
-// THE ONLY WORK AROUND IS THIS UGLY INDEX SUBTRACTION HACK.
-
 static void SetCiv(const Parts parts, const Civ civ)
 {
     for(int32_t i = 0; i < parts.count; i++)
@@ -260,6 +259,9 @@ Parts Parts_FromIcon(const Icon icon, const Age age, const Civ civ)
     Parts parts = zero;
     switch(icon)
     {
+        case ICON_TECH_AGE_2           :
+        case ICON_TECH_AGE_3           :
+        case ICON_TECH_AGE_4           : parts = GetFlag          (        ); break;
         case ICON_BUILD_BARRACKS       : parts = GetBarracks      (age     ); break;
         case ICON_BUILD_MILL           : parts = GetMill          (age, civ); break;
         case ICON_BUILD_HOUSE          : parts = GetHouse         (age     ); break;
@@ -270,9 +272,6 @@ Parts Parts_FromIcon(const Icon icon, const Age age, const Civ civ)
         case ICON_BUILD_TOWN_CENTER    : parts = GetTownCenter    (age     ); break;
         case ICON_UNIT_MALE_VILLAGER   : parts = GetMaleVillager  (        ); break;
         case ICON_UNIT_FEMALE_VILLAGER : parts = GetFemaleVillager(        ); break;
-        case ICON_TECH_AGE_2           :
-        case ICON_TECH_AGE_3           :
-        case ICON_TECH_AGE_4           : parts = GetFlag          (        ); break;
         case ICON_NONE: // DO NOT USE DEFAULT. COMPILER NEEDS TO CATCH MISSING PARTS.
             break;
     }
