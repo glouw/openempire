@@ -747,17 +747,25 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static void AgeUp(const Units units)
+static Units AgeUp(Units units, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->trait.upgrade != FILE_GRAPHICS_NONE)
-            unit->file = unit->trait.upgrade;
+        {
+            static Point zero;
+            const Graphics upgrade = (units.age == AGE_1)
+                ? (Graphics) (unit->trait.upgrade + units.civ)
+                : (Graphics) (unit->trait.upgrade);
+            *unit = Unit_Make(unit->cart, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+        }
     }
+    units.age++;
+    return units;
 }
 
-static void TriggerTriggers(const Units units)
+static Units TriggerTriggers(Units units, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -767,11 +775,12 @@ static void TriggerTriggers(const Units units)
             switch(unit->trigger)
             {
             case TRIGGER_NONE   : break;
-            case TRIGGER_AGE_UP : AgeUp(units); break;
+            case TRIGGER_AGE_UP : units = AgeUp(units, grid, graphics); break;
             }
             unit->is_triggered = true;
         }
     }
+    return units;
 }
 
 Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
@@ -782,7 +791,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
-    TriggerTriggers(units);
+    units = TriggerTriggers(units, grid, graphics);
     units = Kill(units, grid, graphics, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
@@ -790,9 +799,10 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     return units;
 }
 
-Units Units_Float(Units floats, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
+Units Units_Float(Units floats, const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
 {
     floats.count = 0;
+    floats.age = units.age;
     floats.motive = motive;
     Units_ResetStacks(floats);
     floats = FloatUsingIcons(floats, overview, grid, graphics, map);

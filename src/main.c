@@ -76,7 +76,7 @@ static void RunClient(const Args args)
             cycles++;
             if(packet.control == PACKET_CONTROL_SPEED_UP)
                 continue;
-            floats = Units_Float(floats, data.graphics, overview, grid, map, units.motive);
+            floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.motive);
             const int32_t t1 = SDL_GetTicks();
             Video_Draw(video, data, map, units, floats, overview, grid);
             const int32_t t2 = SDL_GetTicks();

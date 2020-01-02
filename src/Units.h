@@ -62,7 +62,7 @@ void Units_StackStacks(const Units);
 
 void Units_ResetStacks(const Units);
 
-Units Units_Float(Units, const Registrar, const Overview, const Grid, const Map, const Motive);
+Units Units_Float(Units, const Units, const Registrar, const Overview, const Grid, const Map, const Motive);
 
 Units Units_PacketService(Units, const Registrar, const Packet, const Grid, const Map, const Field);
 
