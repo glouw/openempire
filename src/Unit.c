@@ -161,7 +161,7 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
     return graphics.animation[unit->color][unit->file].count;
 }
 
-Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating)
+Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger trigger)
 {
     static int32_t id;
     static Unit zero;
@@ -174,6 +174,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;
     unit.is_floating = is_floating;
+    unit.trigger = trigger;
     if(!is_floating)
     {
         unit.entropy = Point_Rand();
@@ -206,7 +207,8 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
         unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
-    if(unit.trait.type == TYPE_FIRE || unit.trait.type == TYPE_RUBBLE)
+    if(unit.trait.type == TYPE_FIRE
+    || unit.trait.type == TYPE_RUBBLE)
         unit.timing_to_collect = true;
     return unit;
 }

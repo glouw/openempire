@@ -39,7 +39,7 @@ Units Units_SpawnParts(Units units, const Point cart, const Point offset, const 
     {
         const Part part = parts.part[i];
         const Point cart_part = Point_Add(cart, part.cart);
-        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating);
+        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, part.trigger);
     }
     SetChildren(temp, parts.count);
     units = BulkAppend(units, map, temp, parts.count);

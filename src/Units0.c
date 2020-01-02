@@ -325,7 +325,7 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
             file = rubble;
     }
     if(file != FILE_NONE)
-        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false);
+        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE);
 }
 
 static void KillChildren(const Units units, Unit* const unit)
@@ -747,6 +747,33 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
+static void AgeUp(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->trait.upgrade != FILE_GRAPHICS_NONE)
+            unit->file = unit->trait.upgrade;
+    }
+}
+
+static void TriggerTriggers(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(!unit->is_triggered)
+        {
+            switch(unit->trigger)
+            {
+            case TRIGGER_NONE   : break;
+            case TRIGGER_AGE_UP : AgeUp(units); break;
+            }
+            unit->is_triggered = true;
+        }
+    }
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
@@ -755,6 +782,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
+    TriggerTriggers(units);
     units = Kill(units, grid, graphics, map);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
