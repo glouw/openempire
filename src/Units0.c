@@ -721,7 +721,11 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
     const Point zero = { 0,0 };
     const Parts parts = Parts_FromButton(button, units.age, units.civ);
     if(parts.part != NULL)
+    {
         units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts);
+        // XXX. MUST APPEND BUTTONS HERE FOR ALREADY RESEARCH BUTTONS.
+        //      THIS WILL PREVENT THE SAME TECH FROM BEING RESEARCHED TWICE.
+    }
     Parts_Free(parts);
     return units;
 }
