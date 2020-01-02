@@ -255,29 +255,49 @@ static void SetCiv(const Parts parts, const Civ civ)
     }
 }
 
-Parts Parts_FromIcon(const Icon icon, const Age age, const Civ civ)
+static Parts Lookup(const Button button, const Age age, const Civ civ)
 {
-    static Parts zero;
-    Parts parts = zero;
-    switch(icon)
+    switch(button.icon_type)
     {
-        case ICON_TECH_AGE_2           :
-        case ICON_TECH_AGE_3           :
-        case ICON_TECH_AGE_4           : parts = GetFlag          (        ); break;
-        case ICON_BUILD_BARRACKS       : parts = GetBarracks      (age     ); break;
-        case ICON_BUILD_MILL           : parts = GetMill          (age, civ); break;
-        case ICON_BUILD_HOUSE          : parts = GetHouse         (age     ); break;
-        case ICON_BUILD_OUTPOST        : parts = GetOutpost       (        ); break;
-        case ICON_BUILD_STONE_CAMP     : parts = GetStoneCamp     (        ); break;
-        case ICON_BUILD_LUMBER_CAMP    : parts = GetLumberCamp    (        ); break;
-        case ICON_UNIT_MILITIA         : parts = GetMilitia       (        ); break;
-        case ICON_BUILD_TOWN_CENTER    : parts = GetTownCenter    (age     ); break;
-        case ICON_UNIT_MALE_VILLAGER   : parts = GetMaleVillager  (        ); break;
-        case ICON_UNIT_FEMALE_VILLAGER : parts = GetFemaleVillager(        ); break;
-        case ICON_NONE: // DO NOT USE DEFAULT. COMPILER NEEDS TO CATCH MISSING PARTS.
-            break;
+    case ICONTYPE_BUILD:
+        switch(button.uni.icon_build)
+        {
+        case ICONBUILD_BARRACKS    : return GetBarracks  (age     );
+        case ICONBUILD_MILL        : return GetMill      (age, civ);
+        case ICONBUILD_HOUSE       : return GetHouse     (age     );
+        case ICONBUILD_OUTPOST     : return GetOutpost   (        );
+        case ICONBUILD_STONE_CAMP  : return GetStoneCamp (        );
+        case ICONBUILD_LUMBER_CAMP : return GetLumberCamp(        );
+        case ICONBUILD_TOWN_CENTER : return GetTownCenter(age     );
+        }
+        break;
+    case ICONTYPE_TECH:
+        switch(button.uni.icon_tech)
+        {
+        case ICONTECH_AGE_2 :
+        case ICONTECH_AGE_3 :
+        case ICONTECH_AGE_4 : return GetFlag();
+        }
+        break;
+    case ICONTYPE_UNIT:
+        switch(button.uni.icon_unit)
+        {
+        case ICONUNIT_MILITIA         : return GetMilitia       ();
+        case ICONUNIT_MALE_VILLAGER   : return GetMaleVillager  ();
+        case ICONUNIT_FEMALE_VILLAGER : return GetFemaleVillager();
+        }
+        break;
+    case ICONTYPE_NONE:
+    case ICONTYPE_COUNT:
+        break;
     }
-    const Parts copy = Copy(parts);
+    static Parts zero;
+    return zero;
+}
+
+Parts Parts_FromButton(const Button button, const Age age, const Civ civ)
+{
+    const Parts copy = Copy(Lookup(button, age, civ));
     SetCiv(copy, civ);
     return copy;
 }

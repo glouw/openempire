@@ -716,10 +716,10 @@ static Units CountPopulation(Units units)
     return units;
 }
 
-static Units IconLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Icon icon, const Point cart, const bool is_floating)
+static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromIcon(icon, units.age, units.civ);
+    const Parts parts = Parts_FromButton(button, units.age, units.civ);
     if(parts.part != NULL)
         units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts);
     Parts_Free(parts);
@@ -729,8 +729,8 @@ static Units IconLookup(Units units, const Overview overview, const Grid grid, c
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-    const Icon icon = Icon_FromOverview(overview, units.motive, units.age);
-    return IconLookup(units, overview, grid, graphics, map, icon, cart, is_floating);
+    const Button button = Button_FromOverview(overview, units.motive, units.age);
+    return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating);
 }
 
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)

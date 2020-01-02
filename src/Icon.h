@@ -8,36 +8,38 @@
 
 typedef enum
 {
-    ICON_NONE = -1,
-    ICON_BUILD_BARRACKS = 2,
-    ICON_BUILD_MILL = 19,
-    ICON_BUILD_TOWN_CENTER = 28,
-    ICON_BUILD_HOUSE = 34,
-    ICON_BUILD_OUTPOST = 38,
-    ICON_BUILD_STONE_CAMP = 39,
-    ICON_BUILD_LUMBER_CAMP = 40,
-
-    ICON_UNIT_MILITIA = 8,
-    ICON_UNIT_MALE_VILLAGER = 15,
-    ICON_UNIT_FEMALE_VILLAGER = 16,
-
-    ICON_TECH_AGE_2 = 30,
-    ICON_TECH_AGE_3 = 31,
-    ICON_TECH_AGE_4 = 32,
+    ICONBUILD_BARRACKS = 2,
+    ICONBUILD_MILL = 19,
+    ICONBUILD_TOWN_CENTER = 28,
+    ICONBUILD_HOUSE = 34,
+    ICONBUILD_OUTPOST = 38,
+    ICONBUILD_STONE_CAMP = 39,
+    ICONBUILD_LUMBER_CAMP = 40,
 }
-Icon;
+IconBuild;
 
 typedef enum
 {
-    ICONTYPE_BUILDING,
-    ICONTYPE_UNIT,
+    ICONTECH_AGE_2 = 30,
+    ICONTECH_AGE_3 = 31,
+    ICONTECH_AGE_4 = 32,
+}
+IconTech;
+
+typedef enum
+{
+    ICONUNIT_MILITIA = 8,
+    ICONUNIT_MALE_VILLAGER = 15,
+    ICONUNIT_FEMALE_VILLAGER = 16,
+}
+IconUnit;
+
+typedef enum
+{
+    ICONTYPE_NONE,
+    ICONTYPE_BUILD,
     ICONTYPE_TECH,
+    ICONTYPE_UNIT,
     ICONTYPE_COUNT,
 }
 IconType;
-
-Icon Icon_FromOverview(const Overview, const Motive, const Age);
-
-const char* Icon_GetHotkeys(void);
-
-int32_t Icon_GetHotkeysLen(void);

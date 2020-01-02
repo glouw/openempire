@@ -2,8 +2,8 @@
 
 #include "Age.h"
 #include "Part.h"
-#include "Icon.h"
 #include "Civ.h"
+#include "Button.h"
 
 #include <stdint.h>
 
@@ -20,6 +20,6 @@ Parts Parts_GetSmoke(void);
 
 Parts Parts_GetFire(void);
 
-Parts Parts_FromIcon(const Icon, const Age, const Civ);
+Parts Parts_FromButton(const Button, const Age, const Civ);
 
 void Parts_Free(const Parts);

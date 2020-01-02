@@ -4,19 +4,16 @@
 
 #include <stdlib.h>
 
-/* Buildings */
+// Buildings
 
 #define BUILD_AGE_1 \
-    { ICONTYPE_BUILDING, ICON_BUILD_BARRACKS    }, \
-    { ICONTYPE_BUILDING, ICON_BUILD_MILL        }, \
-    { ICONTYPE_BUILDING, ICON_BUILD_TOWN_CENTER }, \
-    { ICONTYPE_BUILDING, ICON_BUILD_HOUSE       }, \
-    { ICONTYPE_BUILDING, ICON_BUILD_OUTPOST     }, \
-    { ICONTYPE_BUILDING, ICON_BUILD_STONE_CAMP  }, \
-    { ICONTYPE_BUILDING, ICON_BUILD_LUMBER_CAMP }
-#define BUILD_AGE_2 ICON_NONE
-#define BUILD_AGE_3 ICON_NONE
-#define BUILD_AGE_4 ICON_NONE
+    { ICONTYPE_BUILD, { ICONBUILD_BARRACKS    } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_MILL        } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_HOUSE       } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_OUTPOST     } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_STONE_CAMP  } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_LUMBER_CAMP } }
 
 static const Button build_age1[] = { BUILD_AGE_1 };
 static const Button build_age2[] = { BUILD_AGE_1 };
@@ -38,10 +35,7 @@ static int32_t GetBuildingLen(const Age age)
 // BARRACKS
 
 #define BARRACKS_AGE_1 \
-    { ICONTYPE_UNIT, ICON_UNIT_MILITIA }
-#define BARRACKS_AGE_2 ICON_NONE
-#define BARRACKS_AGE_3 ICON_NONE
-#define BARRACKS_AGE_4 ICON_NONE
+    { ICONTYPE_UNIT, { ICONUNIT_MILITIA } }
 
 static const Button barracks_age1[] = { BARRACKS_AGE_1 };
 static const Button barracks_age2[] = { BARRACKS_AGE_1 };
@@ -63,17 +57,15 @@ static int32_t GetBarracksLen(const Age age)
 // TOWN CENTER
 
 #define TOWN_CENTER_AGE_1 \
-    { ICONTYPE_UNIT, ICON_UNIT_MALE_VILLAGER   }, \
-    { ICONTYPE_UNIT, ICON_UNIT_FEMALE_VILLAGER }, \
-    { ICONTYPE_TECH, ICON_TECH_AGE_2           }
+    { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER   } }, \
+    { ICONTYPE_UNIT, { ICONUNIT_FEMALE_VILLAGER } }, \
+    { ICONTYPE_TECH, { ICONTECH_AGE_2           } }
 
 #define TOWN_CENTER_AGE_2 \
-    { ICONTYPE_TECH, ICON_TECH_AGE_3 }
+    { ICONTYPE_TECH, { ICONTECH_AGE_3 } }
 
 #define TOWN_CENTER_AGE_3 \
-    { ICONTYPE_TECH, ICON_TECH_AGE_4 }
-
-#define TOWN_CENTER_AGE_4 ICON_NONE
+    { ICONTYPE_TECH, { ICONTECH_AGE_4 } }
 
 static const Button towncenter_age1[] = { TOWN_CENTER_AGE_1 };
 static const Button towncenter_age2[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2 };

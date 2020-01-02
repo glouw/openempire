@@ -522,9 +522,9 @@ static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, con
     static Pack zero;
     Pack pack = zero;
     pack.buttons = Buttons_FromMotive(motive, age);
-    pack.animation[ICONTYPE_BUILDING] = base[FILE_INTERFAC_BUILDING_ICONS];
-    pack.animation[ICONTYPE_UNIT] = base[FILE_INTERFAC_UNIT_ICONS];
-    pack.animation[ICONTYPE_TECH] = base[FILE_INTERFAC_TECH_ICONS];
+    pack.animation[ICONTYPE_BUILD] = base[FILE_INTERFAC_BUILDING_ICONS];
+    pack.animation[ICONTYPE_UNIT]  = base[FILE_INTERFAC_UNIT_ICONS];
+    pack.animation[ICONTYPE_TECH]  = base[FILE_INTERFAC_TECH_ICONS];
     return pack;
 }
 
@@ -533,7 +533,7 @@ static void DrawPack(const Vram vram, const Pack pack)
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
         const Button button = pack.buttons.button[index];
-        SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.icon];
+        SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.uni.index];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         DrawWithBounds(vram, surface, offset, 0, surface->h);
     }

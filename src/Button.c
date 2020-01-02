@@ -1,9 +1,11 @@
-#include "Icon.h"
+#include "Button.h"
 
-#include "Util.h"
 #include "Buttons.h"
+#include "Util.h"
 
-Icon Icon_FromOverview(const Overview overview, const Motive motive, const Age age)
+static const char hotkeys[] = { 'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B' };
+
+Button Button_FromOverview(const Overview overview, const Motive motive, const Age age)
 {
     const Buttons buttons = Buttons_FromMotive(motive, age);
     int32_t index = -1;
@@ -22,19 +24,16 @@ Icon Icon_FromOverview(const Overview overview, const Motive motive, const Age a
     if(overview.event.key_c) index = 12;
     if(overview.event.key_v) index = 13;
     if(overview.event.key_b) index = 14;
-    return Buttons_IsIndexValid(buttons, index) ? buttons.button[index].icon : ICON_NONE;
+    static Button zero;
+    return Buttons_IsIndexValid(buttons, index) ? buttons.button[index] : zero;
 }
 
-static const char hotkeys[] = {
-    'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B'
-};
-
-const char* Icon_GetHotkeys(void)
+const char* Button_GetHotkeys(void)
 {
     return hotkeys;
 }
 
-int32_t Icon_GetHotkeysLen(void)
+int32_t Button_GetHotkeysLen(void)
 {
     return UTIL_LEN(hotkeys);
 }

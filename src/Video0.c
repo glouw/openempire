@@ -2,7 +2,7 @@
 
 #include "Surface.h"
 #include "Window.h"
-#include "Icon.h"
+#include "Button.h"
 #include "Config.h"
 #include "Vram.h"
 
@@ -75,8 +75,8 @@ static void CopyCanvas(const Video video)
 
 static void PrintHotkeys(const Video video)
 {
-    const char* hotkeys = Icon_GetHotkeys();
-    const int32_t len = Icon_GetHotkeysLen();
+    const char* hotkeys = Button_GetHotkeys();
+    const int32_t len = Button_GetHotkeysLen();
     for(int32_t index = 0; index < len; index++)
     {
         const char hotkey = hotkeys[index];

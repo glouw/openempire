@@ -1,18 +1,11 @@
 #pragma once
 
-#include "Icon.h"
+#include "Button.h"
 
 #include "Motive.h"
 #include "Age.h"
 
 #include <stdint.h>
-
-typedef struct
-{
-    IconType icon_type;
-    Icon icon;
-}
-Button;
 
 typedef struct
 {
