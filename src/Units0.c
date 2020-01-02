@@ -747,7 +747,7 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static Units AgeUp(Units units, const Grid grid, const Registrar graphics)
+static Units AgeUp(Units units, const Grid grid, const Registrar graphics, const Age age)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -761,7 +761,7 @@ static Units AgeUp(Units units, const Grid grid, const Registrar graphics)
             *unit = Unit_Make(unit->cart, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
         }
     }
-    units.age++;
+    units.age = age;
     return units;
 }
 
@@ -774,8 +774,10 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
         {
             switch(unit->trigger)
             {
-            case TRIGGER_NONE   : break;
-            case TRIGGER_AGE_UP : units = AgeUp(units, grid, graphics); break;
+            case TRIGGER_NONE     : break;
+            case TRIGGER_AGE_UP_2 : units = AgeUp(units, grid, graphics, AGE_2); break;
+            case TRIGGER_AGE_UP_3 : units = AgeUp(units, grid, graphics, AGE_3); break;
+            case TRIGGER_AGE_UP_4 : units = AgeUp(units, grid, graphics, AGE_4); break;
             }
             unit->is_triggered = true;
         }
