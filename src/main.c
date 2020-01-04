@@ -10,6 +10,82 @@
 
 #define DEMO (0)
 
+static Overview WaitInLobby(const Video video, const Sock sock)
+{
+    Overview overview = Overview_Init(video.xres, video.yres);
+    for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
+    {
+        Sock_Send(sock, overview);
+        const Packet packet = Packet_Get(sock);
+        if(packet.turn > 0)
+        {
+            overview.color = (Color) packet.client_id;
+            Video_PrintLobby(video, packet.users_connected, packet.users, overview.color);
+            if(packet.game_running)
+            {
+                overview.users = packet.users;
+                break;
+            }
+        }
+        SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
+    }
+    return overview;
+}
+
+static void Play(const Sock sock, const Video video, const Data data, const Map map, Overview overview, const Grid grid)
+{
+    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
+    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
+    units = Units_GenerateTestZone(units, map, grid, data.graphics, overview.users);
+    overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
+    Packets packets = Packets_Init();
+    int32_t cycles = 0;
+    for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
+    {
+        const int32_t t0 = SDL_GetTicks();
+        const uint64_t parity = Units_Xor(units);
+        Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
+        overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
+        Sock_Send(sock, overview);
+        const Packet packet = Packet_Get(sock);
+        if(Packet_IsStable(packet))
+            packets = Packets_Queue(packets, packet);
+        const Field field = Units_Field(units, map);
+        if(Packets_Active(packets))
+        {
+            const Packet peek = Packets_Peek(packets);
+            if(cycles > peek.exec_cycle)
+                Util_Bomb("CLIENT - CLIENT_ID %d :: OUT OF SYNC\n", peek.client_id);
+            while(cycles == Packets_Peek(packets).exec_cycle) // FLUSH.
+            {
+                Packet dequeued;
+                packets = Packets_Dequeue(packets, &dequeued);
+                units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+            }
+        }
+        units = Units_Caretake(units, data.graphics, grid, map, field);
+        cycles++;
+        if(packet.control == PACKET_CONTROL_SPEED_UP)
+            continue;
+        floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.motive);
+        const int32_t t1 = SDL_GetTicks();
+        Video_Draw(video, data, map, units, floats, overview, grid);
+        const int32_t t2 = SDL_GetTicks();
+        const int32_t dt = t2 - t0;
+        Video_Render(video, units, dt, cycles);
+        Field_Free(field);
+        const int32_t t3 = SDL_GetTicks();
+        const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t3 - t0);
+        if(ms > 0)
+            SDL_Delay(ms);
+        if(packet.control == PACKET_CONTROL_SLOW_DOWN)
+            SDL_Delay(t3 - t1);
+    }
+    Units_Free(floats);
+    Units_Free(units);
+    Packets_Free(packets);
+}
+
 static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -22,78 +98,10 @@ static void RunClient(const Args args)
         Video_RenderDataDemo(video, data, args.color);
     else
     {
-        // -- LOBBY.
-        int32_t users = 0;
-        Overview overview = Overview_Init(video.xres, video.yres);
         const Sock sock = Sock_Connect(args.host, args.port);
-        for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
-        {
-            Sock_Send(sock, overview);
-            const Packet packet = Packet_Get(sock);
-            if(packet.turn > 0)
-            {
-                overview.color = (Color) packet.client_id;
-                Video_PrintLobby(video, packet.users_connected, packet.users, overview.color);
-                if(packet.game_running)
-                {
-                    users = packet.users;
-                    break;
-                }
-            }
-            SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
-        }
-        // -- GAME.
-        Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
-        Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
-        Packets packets = Packets_Init();
-        units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
-        overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
-        int32_t cycles = 0;
-        for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
-        {
-            const int32_t t0 = SDL_GetTicks();
-            const uint64_t parity = Units_Xor(units);
-            Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
-            overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
-            Sock_Send(sock, overview);
-            const Packet packet = Packet_Get(sock);
-            if(Packet_IsStable(packet))
-                packets = Packets_Queue(packets, packet);
-            const Field field = Units_Field(units, map);
-            if(Packets_Active(packets))
-            {
-                const Packet peek = Packets_Peek(packets);
-                if(cycles > peek.exec_cycle)
-                    Util_Bomb("CLIENT - CLIENT_ID %d :: OUT OF SYNC\n", peek.client_id);
-                while(cycles == Packets_Peek(packets).exec_cycle) // FLUSH.
-                {
-                    Packet dequeued;
-                    packets = Packets_Dequeue(packets, &dequeued);
-                    units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-                }
-            }
-            units = Units_Caretake(units, data.graphics, grid, map, field);
-            cycles++;
-            if(packet.control == PACKET_CONTROL_SPEED_UP)
-                continue;
-            floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.motive);
-            const int32_t t1 = SDL_GetTicks();
-            Video_Draw(video, data, map, units, floats, overview, grid);
-            const int32_t t2 = SDL_GetTicks();
-            const int32_t dt = t2 - t0;
-            Video_Render(video, units, dt, cycles);
-            Field_Free(field);
-            const int32_t t3 = SDL_GetTicks();
-            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t3 - t0);
-            if(ms > 0)
-                SDL_Delay(ms);
-            if(packet.control == PACKET_CONTROL_SLOW_DOWN)
-                SDL_Delay(t3 - t1);
-        }
+        const Overview overview = WaitInLobby(video, sock);
+        Play(sock, video, data, map, overview, grid);
         Sock_Disconnect(sock);
-        Packets_Free(packets);
-        Units_Free(floats);
-        Units_Free(units);
     }
     Map_Free(map);
     Data_Free(data);
