@@ -32,8 +32,9 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     return overview;
 }
 
-static void Play(const Sock sock, const Video video, const Data data, const Map map, Overview overview, const Grid grid)
+static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid)
 {
+    Overview overview = WaitInLobby(video, sock);
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
     Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
     units = Units_GenerateTestZone(units, map, grid, data.graphics, overview.users);
@@ -44,7 +45,6 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
     {
         const int32_t t0 = SDL_GetTicks();
         const uint64_t parity = Units_Xor(units);
-        Map_Edit(map, overview, grid); // XXX. FOR FUN. REMOVE IN FUTURE.
         overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
@@ -99,8 +99,7 @@ static void RunClient(const Args args)
     else
     {
         const Sock sock = Sock_Connect(args.host, args.port);
-        const Overview overview = WaitInLobby(video, sock);
-        Play(sock, video, data, map, overview, grid);
+        Play(sock, video, data, map, grid);
         Sock_Disconnect(sock);
     }
     Map_Free(map);

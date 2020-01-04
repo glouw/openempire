@@ -56,23 +56,6 @@ void Map_Free(const Map map)
     free(map.file);
 }
 
-void Map_Edit(const Map map, const Overview overview, const Grid grid)
-{
-    if(overview.event.key_left_shift)
-    {
-        Terrain file = FILE_DIRT;
-        if(overview.event.key_1) file = FILE_GRASS;
-        if(overview.event.key_2) file = FILE_WATER;
-        if(overview.event.key_3) file = FILE_FARM;
-        if(overview.event.mouse_l)
-        {
-            const Point cartesian = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-            if(InBounds(map, cartesian))
-                Map_SetTerrainFile(map, cartesian, file);
-        }
-    }
-}
-
 Points Map_GetBlendBox(const Map map, const Point inner)
 {
     const int32_t width = 1;
