@@ -140,7 +140,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             units.command_group_next++;
             FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
             const Parts parts = Parts_GetRedArrows();
-            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts);
+            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false);
         }
     }
     return units;
@@ -288,7 +288,7 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % h - h / 2,
         };
         const Parts parts = Parts_GetFire();
-        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts);
+        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, false);
     }
     return units;
 }
@@ -302,7 +302,7 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const Parts parts = Parts_GetSmoke();
-        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts);
+        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, false);
     }
     return units;
 }
@@ -338,24 +338,28 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
+static void Anakin(const Units units, Unit* const unit)
+{
+    Unit_Kill(unit);
+    if(unit->has_children)
+        KillChildren(units, unit);
+}
+
 static Units Kill(Units units, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(!Unit_IsExempt(unit))
-            if(Unit_IsDead(unit))
+        if(!Unit_IsExempt(unit) && Unit_IsDead(unit))
+        {
+            Anakin(units, unit);
+            if(unit->trait.is_inanimate)
             {
-                Unit_Kill(unit);
-                if(unit->has_children)
-                    KillChildren(units, unit);
-                if(unit->trait.is_inanimate)
-                {
-                    MakeRubble(unit, grid, graphics);
-                    units = SpamFire(units, unit, grid, graphics, map);
-                    units = SpamSmoke(units, unit, grid, graphics, map);
-                }
+                MakeRubble(unit, grid, graphics);
+                units = SpamFire(units, unit, grid, graphics, map);
+                units = SpamSmoke(units, unit, grid, graphics, map);
             }
+        }
     }
     return units;
 }
@@ -722,7 +726,7 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
     const Parts parts = Parts_FromButton(button, units.age, units.civ);
     if(parts.part != NULL)
     {
-        units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts);
+        units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false);
         // XXX. MUST APPEND BUTTONS HERE FOR ALREADY RESEARCH BUTTONS.
         //      THIS WILL PREVENT THE SAME TECH FROM BEING RESEARCHED TWICE.
     }
@@ -751,21 +755,20 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static Units AgeUp(Units units, const Grid grid, const Registrar graphics, const Age age)
+static Units AgeUpInitial(Units units, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->trait.upgrade != FILE_GRAPHICS_NONE)
         {
-            static Point zero;
             const Graphics upgrade = (units.age == AGE_1)
                 ? (Graphics) (unit->trait.upgrade + units.civ)
                 : (Graphics) (unit->trait.upgrade);
-            *unit = Unit_Make(unit->cart, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+            *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
         }
     }
-    units.age = age;
+    units.age++;
     return units;
 }
 
@@ -778,10 +781,11 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
         {
             switch(unit->trigger)
             {
-            case TRIGGER_NONE     : break;
-            case TRIGGER_AGE_UP_2 : units = AgeUp(units, grid, graphics, AGE_2); break;
-            case TRIGGER_AGE_UP_3 : units = AgeUp(units, grid, graphics, AGE_3); break;
-            case TRIGGER_AGE_UP_4 : units = AgeUp(units, grid, graphics, AGE_4); break;
+            case TRIGGER_NONE:
+                break;
+            case TRIGGER_AGE_UP:
+                units = AgeUpInitial(units, grid, graphics);
+                break;
             }
             unit->is_triggered = true;
         }
@@ -797,8 +801,8 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = UpdateMotive(units);
     Decay(units);
     Expire(units);
-    units = TriggerTriggers(units, grid, graphics);
     units = Kill(units, grid, graphics, map);
+    units = TriggerTriggers(units, grid, graphics);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);

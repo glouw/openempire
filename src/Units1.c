@@ -37,12 +37,12 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
             const int32_t index = (i * len) / users;
             const Point slot = slots[index];
             const Color color = (Color) i;
-            units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter);
+            units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false);
             for(int32_t j = 0; j < starting_villagers; j++)
             {
                 const Point shift = { -3, 3 };
                 const Point cart = Point_Add(slot, shift);
-                units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager);
+                units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false);
             }
         }
         Parts_Free(towncenter);

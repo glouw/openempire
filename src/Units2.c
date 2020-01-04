@@ -12,11 +12,12 @@ static Units Append(Units units, const Unit unit)
     return units;
 }
 
-static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len)
+static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len, const bool ignore_collisions)
 {
-    for(int32_t i = 0; i < len; i++)
-        if(!Units_CanBuild(units, map, &unit[i]))
-            return units;
+    if(!ignore_collisions)
+        for(int32_t i = 0; i < len; i++)
+            if(!Units_CanBuild(units, map, &unit[i]))
+                return units;
     for(int32_t i = 0; i < len; i++)
         units = Append(units, unit[i]);
     return units;
@@ -32,7 +33,7 @@ void SetChildren(Unit unit[], const int32_t count)
     }
 }
 
-Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts)
+Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions)
 {
     Unit* const temp = UTIL_ALLOC(Unit, parts.count);
     for(int32_t i = 0; i < parts.count; i++)
@@ -42,7 +43,7 @@ Units Units_SpawnParts(Units units, const Point cart, const Point offset, const 
         temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, part.trigger);
     }
     SetChildren(temp, parts.count);
-    units = BulkAppend(units, map, temp, parts.count);
+    units = BulkAppend(units, map, temp, parts.count, ignore_collisions);
     free(temp);
     return units;
 }
