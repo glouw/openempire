@@ -19,7 +19,7 @@ typedef struct
 }
 Button;
 
-Button Button_FromOverview(const Overview, const Motive, const Age);
+Button Button_FromOverview(const Overview);
 
 const char* Button_GetHotkeys(void);
 

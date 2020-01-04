@@ -29,8 +29,8 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
         };
         const Button a = { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER  } };
         const Button b = { ICONTYPE_UNIT,  { ICONUNIT_MALE_VILLAGER } };
-        const Parts towncenter = Parts_FromButton(a, units.age, units.civ);
-        const Parts villager   = Parts_FromButton(b, units.age, units.civ);
+        const Parts towncenter = Parts_FromButton(a, units.status.age, units.status.civ);
+        const Parts villager   = Parts_FromButton(b, units.status.age, units.status.civ);
         const int32_t len = UTIL_LEN(slots);
         for(int32_t i = 0; i < users; i++)
         {

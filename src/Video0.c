@@ -106,7 +106,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawUnitSelections(vram, graphics_tiles);
     const bool should_draw = overview.event.mouse_l && !overview.event.key_left_shift;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
-    Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color, units.age);
+    Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color, units.status.age);
     Vram_DrawHud(vram, data.interfac);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
@@ -140,11 +140,11 @@ static void PrintResources(const Video video, const Units units)
     const Point c = { x0 + 2 * space, y0 };
     const Point d = { x0 + 3 * space, y0 };
     const Point e = { x0 + 4 * space, y0 };
-    Text_Printf(video.text_small, video.renderer, a, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.wood);
-    Text_Printf(video.text_small, video.renderer, b, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.food);
-    Text_Printf(video.text_small, video.renderer, c, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.gold);
-    Text_Printf(video.text_small, video.renderer, d, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.stone);
-    Text_Printf(video.text_small, video.renderer, e, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.population);
+    Text_Printf(video.text_small, video.renderer, a, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.wood);
+    Text_Printf(video.text_small, video.renderer, b, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.food);
+    Text_Printf(video.text_small, video.renderer, c, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.gold);
+    Text_Printf(video.text_small, video.renderer, d, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.stone);
+    Text_Printf(video.text_small, video.renderer, e, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.population);
 }
 
 void Video_Render(const Video video, const Units units, const int32_t dt, const int32_t cycles)

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Age.h"
-#include "Civ.h"
 #include "Unit.h"
 #include "Overview.h"
 #include "Parts.h"
@@ -14,6 +12,7 @@
 #include "Packet.h"
 #include "Registrar.h"
 #include "Stack.h"
+#include "Status.h"
 
 typedef struct
 {
@@ -28,13 +27,7 @@ typedef struct
     int32_t cpu_count;
     int32_t repath_index;
     Motive motive;
-    int32_t food;
-    int32_t gold;
-    int32_t stone;
-    int32_t wood;
-    int32_t population;
-    Civ civ;
-    Age age;
+    Status status;
 }
 Units;
 

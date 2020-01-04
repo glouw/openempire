@@ -72,8 +72,10 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max)
     units.rows = grid.rows;
     units.cols = grid.cols;
     units.cpu_count = cpu_count;
-    units.age = AGE_1;
-    units.civ = CIV_ASIA;
+    units.status.age = AGE_1;
+    units.status.civ = CIV_ASIA;
+    units.motive.action = ACTION_NONE;
+    units.motive.type = TYPE_NONE;
     return units;
 }
 
@@ -477,16 +479,16 @@ static Units ProcessHardRules(Units units, const Field field, const Grid grid)
             default:
                 break;
             case TYPE_FOOD:
-                units.food += resource.amount;
+                units.status.food += resource.amount;
                 break;
             case TYPE_WOOD:
-                units.wood += resource.amount;
+                units.status.wood += resource.amount;
                 break;
             case TYPE_GOLD:
-                units.gold += resource.amount;
+                units.status.gold += resource.amount;
                 break;
             case TYPE_STONE:
-                units.stone += resource.amount;
+                units.status.stone += resource.amount;
                 break;
             }
     }
@@ -716,14 +718,14 @@ static Units CountPopulation(Units units)
         && !unit->trait.is_inanimate)
             count++;
     }
-    units.population = count;
+    units.status.population = count;
     return units;
 }
 
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromButton(button, units.age, units.civ);
+    const Parts parts = Parts_FromButton(button, overview.status.age, overview.status.civ);
     if(parts.part != NULL)
     {
         units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false);
@@ -737,7 +739,7 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-    const Button button = Button_FromOverview(overview, units.motive, units.age);
+    const Button button = Button_FromOverview(overview);
     return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating);
 }
 
@@ -762,13 +764,13 @@ static Units AgeUpInitial(Units units, const Grid grid, const Registrar graphics
         Unit* const unit = &units.unit[i];
         if(unit->trait.upgrade != FILE_GRAPHICS_NONE)
         {
-            const Graphics upgrade = (units.age == AGE_1)
-                ? (Graphics) (unit->trait.upgrade + units.civ)
+            const Graphics upgrade = (units.status.age == AGE_1)
+                ? (Graphics) (unit->trait.upgrade + units.status.civ)
                 : (Graphics) (unit->trait.upgrade);
             *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
         }
     }
-    units.age++;
+    units.status.age++;
     return units;
 }
 
@@ -812,7 +814,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
 Units Units_Float(Units floats, const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
 {
     floats.count = 0;
-    floats.age = units.age;
+    floats.status.age = units.status.age;
     floats.motive = motive;
     Units_ResetStacks(floats);
     floats = FloatUsingIcons(floats, overview, grid, graphics, map);

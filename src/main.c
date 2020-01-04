@@ -45,7 +45,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
     {
         const int32_t t0 = SDL_GetTicks();
         const uint64_t parity = Units_Xor(units);
-        overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets));
+        overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets), units.status, units.motive);
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
@@ -56,7 +56,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
             const Packet peek = Packets_Peek(packets);
             if(cycles > peek.exec_cycle)
                 Util_Bomb("CLIENT - CLIENT_ID %d :: OUT OF SYNC\n", peek.client_id);
-            while(cycles == Packets_Peek(packets).exec_cycle) // FLUSH.
+            while(cycles == Packets_Peek(packets).exec_cycle)
             {
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);

@@ -6,7 +6,9 @@
 #include "Event.h"
 #include "Color.h"
 #include "Rect.h"
+#include "Motive.h"
 #include "Quad.h"
+#include "Status.h"
 
 #include <SDL2/SDL_net.h>
 
@@ -23,12 +25,14 @@ typedef struct
     int32_t cycles;
     int32_t queue_size;
     int32_t users;
+    Status status;
+    Motive motive;
 }
 Overview;
 
 Overview Overview_Init(const int32_t xres, const int32_t yres);
 
-Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size);
+Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Status, const Motive);
 
 Point Overview_IsoToCart(const Overview, const Grid, const Point, const bool raw);
 
