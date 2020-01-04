@@ -1,4 +1,4 @@
-![](art/logo.png)
+![](art/screenshot.png)
 
 This is a custom game engine for Age of Empires II written in C99 and SDL2 built for fast network play.
 
