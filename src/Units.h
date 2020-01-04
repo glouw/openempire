@@ -54,7 +54,7 @@ void Units_ManageStacks(const Units);
 
 bool Units_CanBuild(const Units, const Map, Unit* const);
 
-Units Units_Caretake(Units, const Overview, const Registrar, const Grid, const Map, const Field);
+Units Units_Caretake(Units, const Registrar, const Grid, const Map, const Field);
 
 void Units_StackStacks(const Units);
 

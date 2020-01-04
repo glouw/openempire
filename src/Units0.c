@@ -72,7 +72,7 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, con
     units.rows = grid.rows;
     units.cols = grid.cols;
     units.cpu_count = cpu_count;
-    units.status.age = AGE_2;
+    units.status.age = AGE_1;
     units.status.civ = CIV_ASIA;
     units.motive.action = ACTION_NONE;
     units.motive.type = TYPE_NONE;
@@ -758,47 +758,46 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static void AgeUpInitial(Units units, const Grid grid, const Registrar graphics, const Color color)
+static void AgeUpInitial(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
 {
+    static Point zero;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->color == color && unit->trait.upgrade != FILE_GRAPHICS_NONE)
         {
-            const Graphics upgrade = (units.status.age == AGE_1)
-                ? (Graphics) (unit->trait.upgrade + units.status.civ)
-                : (Graphics) (unit->trait.upgrade);
-            *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+            Graphics upgrade = unit->trait.upgrade;
+            if(overview.status.age == AGE_1)
+                upgrade += (Graphics) overview.status.civ;
+            *unit = Unit_Make(unit->cart, zero, grid, upgrade, color, graphics, false, false, TRIGGER_NONE);
         }
     }
 }
 
-static Units TriggerTriggers(Units units, const Grid grid, const Registrar graphics)
+static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(!unit->is_triggered)
+        if(!unit->is_triggered && unit->trigger != TRIGGER_NONE)
         {
             switch(unit->trigger)
             {
             case TRIGGER_NONE:
                 break;
             case TRIGGER_AGE_UP:
-                AgeUpInitial(units, grid, graphics, unit->color);
+                AgeUpInitial(units, overview, grid, graphics, unit->color);
                 if(unit->color == units.color)
                     units.status.age++;
                 break;
             }
             unit->is_triggered = true;
-            // ONLY ONE TRIGGER IS PROCESSED PER TURN TO AVOID ACCIDENTAL UNIT UPGRADES FROM REMOVING TRIGGERS.
-            break;
         }
     }
     return units;
 }
 
-Units Units_Caretake(Units units, const Overview overview, const Registrar graphics, const Grid grid, const Map map, const Field field)
+Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
     Tick(units);
@@ -807,7 +806,6 @@ Units Units_Caretake(Units units, const Overview overview, const Registrar graph
     Decay(units);
     Expire(units);
     units = Kill(units, grid, graphics, map);
-    units = TriggerTriggers(units, grid, graphics);
     units = RemoveGarbage(units);
     Units_ManageStacks(units);
     units = CountPopulation(units);
@@ -833,6 +831,7 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
         units = Select(units, overview, grid, graphics, window.units);
         units = Command(units, overview, grid, graphics, map, field);
         units = SpawnUsingIcons(units, overview, grid, graphics, map);
+        units = TriggerTriggers(units, overview, grid, graphics);
         Window_Free(window);
     }
     return units;

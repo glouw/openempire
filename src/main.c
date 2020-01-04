@@ -60,7 +60,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
         }
-        units = Units_Caretake(units, overview, data.graphics, grid, map, field);
+        units = Units_Caretake(units, data.graphics, grid, map, field);
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)
             continue;
