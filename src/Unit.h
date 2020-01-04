@@ -51,9 +51,9 @@ typedef struct Unit
     bool is_selected;
     bool must_garbage_collect;
     bool is_state_locked;
-    bool already_tiled;
+    bool is_already_tiled;
     bool was_wall_pushed;
-    bool timing_to_collect;
+    bool is_timing_to_collect;
     bool has_children;
     bool is_floating;
     bool is_triggered;

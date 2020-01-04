@@ -18,13 +18,15 @@ typedef struct
     Rect selection_box;
     int32_t xres;
     int32_t yres;
-    Color color;
     Point mouse_cursor;
     Event event;
     uint64_t parity;
     int32_t cycles;
     int32_t queue_size;
-    int32_t users;
+
+    // CAN BE ANY CLIENT FROM SERVER, INCLUDING SELF.
+
+    Color color;
     Status status;
     Motive motive;
 }

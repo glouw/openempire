@@ -209,7 +209,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     }
     if(unit.trait.type == TYPE_FIRE
     || unit.trait.type == TYPE_RUBBLE)
-        unit.timing_to_collect = true;
+        unit.is_timing_to_collect = true;
     return unit;
 }
 

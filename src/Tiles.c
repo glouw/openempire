@@ -63,13 +63,13 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
         for(int32_t j = 0; j < stack.count; j++)
         {
             Unit* const ref = stack.reference[j];
-            if(!ref->already_tiled)
+            if(!ref->is_already_tiled)
             {
                 const Animation animation = graphics.animation[ref->color][ref->file];
                 const Point overrider = ref->trait.is_inanimate ? ref->cart : point;
                 tile[unit_count] = Tile_GetGraphics(overview, grid, overrider, ref->cart_grid_offset, animation, ref);
                 unit_count++;
-                ref->already_tiled = true;
+                ref->is_already_tiled = true;
             }
         }
     }

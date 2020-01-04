@@ -57,7 +57,7 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max)
+Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, const Color color)
 {
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
@@ -72,10 +72,11 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max)
     units.rows = grid.rows;
     units.cols = grid.cols;
     units.cpu_count = cpu_count;
-    units.status.age = AGE_1;
+    units.status.age = AGE_2;
     units.status.civ = CIV_ASIA;
     units.motive.action = ACTION_NONE;
     units.motive.type = TYPE_NONE;
+    units.color = color;
     return units;
 }
 
@@ -116,12 +117,12 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static void FindPathForSelected(const Units units, const Overview overview, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->trait.max_speed > 0)
+        if(unit->color == overview.color && unit->is_selected && unit->trait.max_speed > 0)
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
@@ -140,7 +141,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         if(CanWalk(units, map, cart_goal))
         {
             units.command_group_next++;
-            FindPathForSelected(units, cart_goal, cart_grid_offset_goal, field);
+            FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
             const Parts parts = Parts_GetRedArrows();
             units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false);
         }
@@ -569,7 +570,7 @@ static void Tick(const Units units)
         unit->state_timer++;
         unit->dir_timer++;
         unit->path_index_timer++;
-        if(unit->timing_to_collect)
+        if(unit->is_timing_to_collect)
             unit->garbage_collection_timer++;
     }
 }
@@ -608,7 +609,7 @@ static void FlagGarbage(const Units units)
         const int32_t last_tick = Unit_GetLastDecayTick(unit);
         if(unit->state == STATE_DECAY && unit->state_timer == last_tick)
             unit->must_garbage_collect = true;
-        if(unit->timing_to_collect)
+        if(unit->is_timing_to_collect)
         {
             const int32_t time = (unit->trait.type == TYPE_FIRE)
                 ? CONFIG_UNITS_CLEANUP_FIRE
@@ -673,7 +674,7 @@ static Action GetAction(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
+        if(unit->is_selected && unit->color == units.color)
         {
             const int32_t index = (int32_t) unit->trait.action + 1;
             counts[index]++;
@@ -690,7 +691,7 @@ static Type GetType(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
+        if(unit->is_selected && unit->color == units.color)
         {
             const int32_t index = (int32_t) unit->trait.type + 1;
             counts[index]++;
@@ -757,12 +758,12 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static Units AgeUpInitial(Units units, const Grid grid, const Registrar graphics)
+static void AgeUpInitial(Units units, const Grid grid, const Registrar graphics, const Color color)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->trait.upgrade != FILE_GRAPHICS_NONE)
+        if(unit->color == color && unit->trait.upgrade != FILE_GRAPHICS_NONE)
         {
             const Graphics upgrade = (units.status.age == AGE_1)
                 ? (Graphics) (unit->trait.upgrade + units.status.civ)
@@ -770,8 +771,6 @@ static Units AgeUpInitial(Units units, const Grid grid, const Registrar graphics
             *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
         }
     }
-    units.status.age++;
-    return units;
 }
 
 static Units TriggerTriggers(Units units, const Grid grid, const Registrar graphics)
@@ -786,16 +785,20 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
             case TRIGGER_NONE:
                 break;
             case TRIGGER_AGE_UP:
-                units = AgeUpInitial(units, grid, graphics);
+                AgeUpInitial(units, grid, graphics, unit->color);
+                if(unit->color == units.color)
+                    units.status.age++;
                 break;
             }
             unit->is_triggered = true;
+            // ONLY ONE TRIGGER IS PROCESSED PER TURN TO AVOID ACCIDENTAL UNIT UPGRADES FROM REMOVING TRIGGERS.
+            break;
         }
     }
     return units;
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
+Units Units_Caretake(Units units, const Overview overview, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
     Tick(units);
@@ -853,6 +856,7 @@ uint64_t Units_Xor(const Units units)
         const uint64_t xx = i * x;
         const uint64_t yy = i * y;
         parity ^= (yy << 32) | xx;
+        parity += (int32_t) unit->file;
     }
     return parity;
 }

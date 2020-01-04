@@ -51,7 +51,7 @@ Units Units_SpawnParts(Units units, const Point cart, const Point offset, const 
 void Units_ResetTiled(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
-        units.unit[i].already_tiled = false;
+        units.unit[i].is_already_tiled = false;
 }
 
 static bool OutOfBounds(const Units units, const Point point)

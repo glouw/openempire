@@ -10,8 +10,10 @@
 
 #define DEMO (0)
 
-static Overview WaitInLobby(const Video video, const Sock sock)
+static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid)
 {
+    // LOBBY.
+    int32_t users = 0;
     Overview overview = Overview_Init(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -23,21 +25,16 @@ static Overview WaitInLobby(const Video video, const Sock sock)
             Video_PrintLobby(video, packet.users_connected, packet.users, overview.color);
             if(packet.game_running)
             {
-                overview.users = packet.users;
+                users = packet.users;
                 break;
             }
         }
         SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
     }
-    return overview;
-}
-
-static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid)
-{
-    Overview overview = WaitInLobby(video, sock);
-    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX);
-    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER);
-    units = Units_GenerateTestZone(units, map, grid, data.graphics, overview.users);
+    // PLAY.
+    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.color);
+    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color);
+    units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
     Packets packets = Packets_Init();
     int32_t cycles = 0;
@@ -63,7 +60,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
         }
-        units = Units_Caretake(units, data.graphics, grid, map, field);
+        units = Units_Caretake(units, overview, data.graphics, grid, map, field);
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)
             continue;

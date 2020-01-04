@@ -2,6 +2,7 @@
 
 #include "Unit.h"
 #include "Overview.h"
+#include "Color.h"
 #include "Parts.h"
 #include "Grid.h"
 #include "Grid.h"
@@ -26,12 +27,16 @@ typedef struct
     int32_t select_count;
     int32_t cpu_count;
     int32_t repath_index;
-    Motive motive;
+
+    // CLIENT PRIVATE.
+
+    Color color;
     Status status;
+    Motive motive;
 }
 Units;
 
-Units Units_New(const Grid, const int32_t cpu_count, const int32_t max);
+Units Units_New(const Grid, const int32_t cpu_count, const int32_t max, const Color);
 
 void Units_Free(const Units);
 
@@ -49,7 +54,7 @@ void Units_ManageStacks(const Units);
 
 bool Units_CanBuild(const Units, const Map, Unit* const);
 
-Units Units_Caretake(Units, const Registrar, const Grid, const Map, const Field);
+Units Units_Caretake(Units, const Overview, const Registrar, const Grid, const Map, const Field);
 
 void Units_StackStacks(const Units);
 
