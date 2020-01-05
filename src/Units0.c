@@ -856,8 +856,10 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
             {
-            case TRIGGER_NONE            : return units;
-            case TRIGGER_AGE_UP          : return AgeUp(units, flag, overview, grid, graphics, map);
+            case TRIGGER_NONE     : return units;
+            case TRIGGER_AGE_UP_2 :
+            case TRIGGER_AGE_UP_3 :
+            case TRIGGER_AGE_UP_4 : return AgeUp(units, flag, overview, grid, graphics, map);
             case TRIGGER_UPGRADE_MILITIA : return UpgradeMilitia(units, flag, grid, graphics);
             }
         }

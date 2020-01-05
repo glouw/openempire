@@ -6,9 +6,23 @@
 
 #include "Util.h"
 
-static Parts GetAgeUpFlag(void)
+static Parts GetAge2UpFlag(void)
 {
-    static Part part[] = { { {0,0}, TRIGGER_AGE_UP, false, false, FILE_FLAG_TALL } };
+    static Part part[] = { { {0,0}, TRIGGER_AGE_UP_2, false, false, FILE_FLAG_TALL } };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
+static Parts GetAge3UpFlag(void)
+{
+    static Part part[] = { { {0,0}, TRIGGER_AGE_UP_3, false, false, FILE_FLAG_TALL } };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
+static Parts GetAge4UpFlag(void)
+{
+    static Part part[] = { { {0,0}, TRIGGER_AGE_UP_4, false, false, FILE_FLAG_TALL } };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
 }
@@ -290,9 +304,9 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
     case ICONTYPE_TECH:
         switch(button.uni.icon_tech)
         {
-        case ICONTECH_AGE_2 : return GetAgeUpFlag();
-        case ICONTECH_AGE_3 : return GetAgeUpFlag();
-        case ICONTECH_AGE_4 : return GetAgeUpFlag();
+        case ICONTECH_AGE_2 : return GetAge2UpFlag();
+        case ICONTECH_AGE_3 : return GetAge3UpFlag();
+        case ICONTECH_AGE_4 : return GetAge4UpFlag();
         case ICONTECH_RESEARCH_MAN_AT_ARMS : return GetManAtArmsFlag();
         }
         break;
