@@ -219,6 +219,16 @@ static Parts GetLumberCamp(void)
     return parts;
 }
 
+static Parts GetCastle(void)
+{
+    static Part part[] = {
+        { {0,0}, TRIGGER_NONE, true, false, FILE_NORTH_EUROPE_CASTLE },
+        { {0,0}, TRIGGER_NONE, true, false, FILE_NORTH_EUROPE_CASTLE_SHADOW },
+    };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
 static Parts GetMilitia(void)
 {
     static Part part[] = {
@@ -267,6 +277,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         case ICONBUILD_STONE_CAMP  : return GetStoneCamp (        );
         case ICONBUILD_LUMBER_CAMP : return GetLumberCamp(        );
         case ICONBUILD_TOWN_CENTER : return GetTownCenter(age     );
+        case ICONBUILD_CASTLE      : return GetCastle    (        );
         }
         break;
     case ICONTYPE_TECH:

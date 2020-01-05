@@ -18,6 +18,7 @@ typedef struct
     int32_t yres;
     int32_t users;
     bool quiet;
+    bool demo;
 }
 Args;
 

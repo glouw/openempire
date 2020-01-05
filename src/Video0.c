@@ -135,20 +135,24 @@ static void PrintResources(const Video video, const Units units)
     const int32_t space = 77;
     const int32_t x0 = 27;
     const int32_t y0 = 11;
-    struct
+    typedef struct
     {
         Point point;
         int32_t amount;
     }
-    display[] = {
-        { { x0 + 0 * space, y0 }, units.share.status.wood       },
-        { { x0 + 1 * space, y0 }, units.share.status.food       },
-        { { x0 + 2 * space, y0 }, units.share.status.gold       },
-        { { x0 + 3 * space, y0 }, units.share.status.stone      },
+    Display;
+    const Display displays[] = {
+        { { x0 + 0 * space, y0 }, units.share.status.wood  },
+        { { x0 + 1 * space, y0 }, units.share.status.food  },
+        { { x0 + 2 * space, y0 }, units.share.status.gold  },
+        { { x0 + 3 * space, y0 }, units.share.status.stone },
         { { x0 + 4 * space, y0 }, units.share.status.population },
     };
-    for(int32_t i = 0; i < UTIL_LEN(display); i++)
-        Text_Printf(video.text_small, video.renderer, display[i].point, POSITION_TOP_LEFT, 0xFF, 0, "%6d", display[i].amount);
+    for(int32_t i = 0; i < UTIL_LEN(displays); i++)
+    {
+        const Display display = displays[i];
+        Text_Printf(video.text_small, video.renderer, display.point, POSITION_TOP_LEFT, 0xFF, 0, "%6d", display.amount);
+    }
 }
 
 void Video_Render(const Video video, const Units units, const int32_t dt, const int32_t cycles)

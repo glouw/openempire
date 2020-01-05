@@ -52,3 +52,5 @@ Thanks to:
 * SFTech OpenAge team for their fantastic reverse engineering documentation (https://github.com/SFTtech/openage)
 * Ensemble Studios for many gifted childhood memories
 * Forgotten Empires for keeping the spirit of Age of Empires II alive
+
+Dedicated to Ondrej who I met walking across England as he hiked from Scotland to Spain.

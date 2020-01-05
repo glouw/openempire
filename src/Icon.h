@@ -15,6 +15,7 @@ typedef enum
     ICONBUILD_OUTPOST = 38,
     ICONBUILD_STONE_CAMP = 39,
     ICONBUILD_LUMBER_CAMP = 40,
+    ICONBUILD_CASTLE = 7,
 }
 IconBuild;
 

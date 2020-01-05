@@ -8,8 +8,6 @@
 #include "Args.h"
 #include "Util.h"
 
-#define DEMO (0)
-
 static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid, const Args args )
 {
     // LOBBY.
@@ -91,7 +89,7 @@ static void RunClient(const Args args)
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(40, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);
-    if(DEMO)
+    if(args.demo)
         Video_RenderDataDemo(video, data, args.color);
     else
     {

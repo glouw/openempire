@@ -15,10 +15,13 @@
     { ICONTYPE_BUILD, { ICONBUILD_STONE_CAMP  } }, \
     { ICONTYPE_BUILD, { ICONBUILD_LUMBER_CAMP } }
 
+#define BUILD_AGE_3 \
+    { ICONTYPE_BUILD, { ICONBUILD_CASTLE } }
+
 static const Button build_age1[] = { BUILD_AGE_1 };
 static const Button build_age2[] = { BUILD_AGE_1 };
-static const Button build_age3[] = { BUILD_AGE_1 };
-static const Button build_age4[] = { BUILD_AGE_1 };
+static const Button build_age3[] = { BUILD_AGE_1, BUILD_AGE_3 };
+static const Button build_age4[] = { BUILD_AGE_1, BUILD_AGE_3 };
 
 static const Button* GetBuilding(const Age age)
 {
