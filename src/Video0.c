@@ -123,7 +123,7 @@ static void PrintPerformanceMonitor(const Video video, const Units units, const 
     static int32_t dt_hold;
     if(cycles % 10 == 0)
         dt_hold = dt;
-    const Point top_rite = { video.xres, CONFIG_VIDEO_TEXT_START_TOP };
+    const Point top_rite = { video.xres, 0 };
     Text_Printf(video.text_small, video.renderer, top_rite, POSITION_TOP_RITE, 0xFF, 0,
             "units.count   : %6d\n"
             "dt (ms) video : %6d\n"

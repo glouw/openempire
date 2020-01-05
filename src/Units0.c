@@ -758,7 +758,6 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-
 static void AgeUpUnit(Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics)
 {
     static Point zero;
@@ -769,8 +768,9 @@ static void AgeUpUnit(Unit* const unit, const Overview overview, const Grid grid
     const int32_t id = unit->id;
     const int32_t parent_id = unit->parent_id;
     const bool has_children = unit->has_children;
+    // ... SUCH THAT WHEN THE PART IS UPGRADED...
     *unit = Unit_Make(unit->cart, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
-    // ... AND RESTORED.
+    // ... THE IDS ARE RESTORED.
     unit->id = id;
     unit->parent_id = parent_id;
     unit->has_children = has_children;
@@ -792,15 +792,19 @@ static Age GetNextAge(const Status status)
 }
 
 // TOWN CENTERS DO NOT PLAY NICELY WITH AGING UP - NEW TOWN CENTERS HAVE MORE PARTS, ETC.
-
+// THIS FUNCTION REMOVES OLD TOWN CENTERS AND PLACES NEW TOWN CENTERS WITH THE NEXT AGE.
 static Units AgeUpTownCenters(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Color color)
 {
     static Point zero;
     const Button button = {
-        ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }
+        ICONTYPE_BUILD, {
+            ICONBUILD_TOWN_CENTER
+        }
     };
-    const Parts towncenter = Parts_FromButton(button, GetNextAge(overview.status), overview.status.civ);
+    const Age age = GetNextAge(overview.status);
+    const Parts towncenter = Parts_FromButton(button, age, overview.status.civ);
     Points points = Points_New(COLOR_COUNT);
+    // REMOVE.
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -813,35 +817,35 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
             unit->must_skip_debris = true;
         }
     }
+    // CREATE.
     for(int32_t i = 0; i < points.count; i++)
         units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, towncenter, true);
     Points_Free(points);
     return units;
 }
 
-static Units AgeUp(Units units, Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(unit->color == units.color)
+    if(flag->color == units.color)
         units.status.age = GetNextAge(units.status);
-    AgeUpInitial(units, overview, grid, graphics, unit->color);
-    return AgeUpTownCenters(units, overview, grid, graphics, map, unit->color);
+    AgeUpInitial(units, overview, grid, graphics, flag->color);
+    return AgeUpTownCenters(units, overview, grid, graphics, map, flag->color);
 }
 
 static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        Unit* const unit = &units.unit[i];
-        if(!unit->is_triggered && unit->trigger != TRIGGER_NONE)
+        Unit* const flag = &units.unit[i];
+        if(!flag->is_triggered && flag->trigger != TRIGGER_NONE)
         {
-            unit->is_triggered = true;
-            switch(unit->trigger)
+            flag->is_triggered = true;
+            // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
+            switch(flag->trigger)
             {
-            case TRIGGER_NONE   : break;
-            case TRIGGER_AGE_UP : return AgeUp(units, unit, overview, grid, graphics, map);
+            case TRIGGER_NONE   : return units;
+            case TRIGGER_AGE_UP : return AgeUp(units, flag, overview, grid, graphics, map);
             }
-            // ONLY ONE TRIGGER CAN RUN AT A TIME.
-            break;
         }
     }
     return units;

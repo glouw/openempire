@@ -496,10 +496,10 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Ov
     }
 }
 
-static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const int32_t y0, const int32_t y1)
+static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const Rect rect)
 {
-    for(int32_t y = y0; y < y1; y++)
-    for(int32_t x =  0; x < surface->w; x++)
+    for(int32_t y = rect.a.y; y < rect.b.y; y++)
+    for(int32_t x = rect.a.x; x < rect.b.x; x++)
     {
         const uint32_t pixel = Surface_GetPixel(surface, x, y);
         const int32_t xx = offset.x + x;
@@ -535,7 +535,11 @@ static void DrawPack(const Vram vram, const Pack pack)
         const Button button = pack.buttons.button[index];
         SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.uni.index];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
-        DrawWithBounds(vram, surface, offset, 0, surface->h);
+        const Rect rect = {
+            { 0, 0 },
+            { surface->w, surface->h }
+        };
+        DrawWithBounds(vram, surface, offset, rect);
     }
 }
 
@@ -547,11 +551,13 @@ void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive 
 
 void Vram_DrawHud(const Vram vram, const Registrar interfac)
 {
-    const int32_t y0 = 0;
-    const int32_t y1 = 50;
+    const Rect rect = {
+        {   0,  0 },
+        { 393, 50 },
+    };
     const Point corner = { 0, 0 };
     const Animation animation = interfac.animation[COLOR_GAIA][FILE_INTERFAC_HUD_0];
-    DrawWithBounds(vram, animation.surface[0], corner, y0, y1);
+    DrawWithBounds(vram, animation.surface[0], corner, rect);
 }
 
 void Vram_Free(const Vram vram)
