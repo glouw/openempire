@@ -800,7 +800,7 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
         ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }
     };
     const Parts towncenter = Parts_FromButton(button, GetNextAge(overview.status), overview.status.civ);
-    Points points = Points_New(8);
+    Points points = Points_New(COLOR_COUNT);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -815,6 +815,7 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     }
     for(int32_t i = 0; i < points.count; i++)
         units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, towncenter, true);
+    Points_Free(points);
     return units;
 }
 
