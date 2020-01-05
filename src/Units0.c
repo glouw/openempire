@@ -901,8 +901,8 @@ uint64_t Units_Xor(const Units units)
         Unit* const unit = &units.unit[i];
         const uint64_t x = (uint64_t) unit->cell.x;
         const uint64_t y = (uint64_t) unit->cell.y;
-        const uint64_t xx = i * x;
-        const uint64_t yy = i * y;
+        const uint64_t xx = unit->id * x;
+        const uint64_t yy = unit->id * y;
         parity ^= (yy << 32) | xx;
         parity += (int32_t) unit->file;
     }
