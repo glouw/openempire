@@ -46,7 +46,7 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     return Points_Append(path, start);
 }
 
-Points Field_PathGreedyBest(const Field field, const Point start, const Point goal) // XXX: May get stuck in place if greedy best as the path finder runs every half a second or so (two best paths can be found).
+Points Field_PathGreedyBest(const Field field, const Point start, const Point goal) // XXX: MAY GET STUCK IN PLACE IF GREEDY BEST AS THE PATH FINDER RUNS EVERY HALF A SECOND OR SO (TWO BEST PATHS CAN BE FOUND).
 {
     Meap frontier = Meap_Init();
     Meap_Insert(&frontier, 0, start);
@@ -57,10 +57,10 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
     for(int32_t tries = 0; frontier.size > 0; tries++)
     {
         Step current = Meap_Delete(&frontier);
-        // Early exit - goal reached.
+        // EARLY EXIT - GOAL REACHED.
         if(Point_Equal(current.point, goal))
             break;
-        // Early exit - impossible goal.
+        // EARLY EXIT - IMPOSSIBLE GOAL.
         if(tries > CONFIG_FIELD_MAX_PATHING_TRIES)
         {
             static Points zero;
@@ -77,7 +77,7 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
             const Point vert = { current.point.x + delta.x, current.point.y };
             const Point horz = { current.point.x, current.point.y + delta.y };
             const Point next = Point_Add(current.point, delta);
-            // Check all three so corners are not cut with buildings.
+            // CHECK ALL THREE SO CORNERS ARE NOT CUT WITH BUILDINGS.
             if(IsWalkable(field, next)
             && IsWalkable(field, vert)
             && IsWalkable(field, horz))

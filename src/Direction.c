@@ -1,7 +1,7 @@
 #include "Direction.h"
 
-// Unit sprites are only packed with 5 directions in the SLP files.
-// The remaining 3 directions are improvised by flipping 3 of the 5 directions.
+// UNIT SPRITES ARE ONLY PACKED WITH 5 DIRECTIONS IN THE SLP FILES.
+// THE REMAINING 3 DIRECTIONS ARE IMPROVISED BY FLIPPING 3 OF THE 5 DIRECTIONS.
 Direction Direction_Fix(const Direction dir, bool* const flip_vert)
 {
     if(dir > DIRECTION_N)
@@ -35,7 +35,7 @@ Direction Direction_CartToIso(const Direction dir)
 {
     const int32_t index = (int32_t) dir;
     const Direction dirs[] = {
-        DIRECTION_SE, // Notice how south east is now first instead of last - this is essentially a 45 degree rotation, eg. cart to iso.
+        DIRECTION_SE, // NOTICE HOW SOUTH EAST IS NOW FIRST INSTEAD OF LAST - THIS IS ESSENTIALLY A 45 DEGREE ROTATION, EG. CART TO ISO.
         DIRECTION_S,
         DIRECTION_SW,
         DIRECTION_W,

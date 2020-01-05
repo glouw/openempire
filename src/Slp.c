@@ -15,23 +15,23 @@ void Slp_Print(const Slp slp)
     }
 }
 
-// ---------------------- outline_table_offset
+// ---------------------- OUTLINE_TABLE_OFFSET
 // |         0          |
-// ---------------------- cmd_table_offset
+// ---------------------- CMD_TABLE_OFFSET
 // |         0          |
-// ---------------------- data_offset
+// ---------------------- DATA_OFFSET
 // |                    |
 // |         0          |
-// |     data_size      |
-// ---------------------- outline_table_offset
+// |     DATA_SIZE      |
+// ---------------------- OUTLINE_TABLE_OFFSET
 // |         1          |
-// ---------------------- cmd_table_offset
+// ---------------------- CMD_TABLE_OFFSET
 // |         1          |
-// ---------------------- data_offset
+// ---------------------- DATA_OFFSET
 // |                    |
 // |         1          |
-// |     data_size      |
-// ---------------------- file.size
+// |     DATA_SIZE      |
+// ---------------------- FILE.SIZE
 Slp Slp_Load(const Drs drs, const int32_t table_index, const int32_t file_index)
 {
     const Table table = Drs_GetSlpTable(drs, table_index);

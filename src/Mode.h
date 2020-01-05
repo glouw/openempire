@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 #include <stdint.h>
 
-// Modes define blendomatic blend styles.
+// MODES DEFINE BLENDOMATIC BLEND STYLES.
 
 typedef struct
 {

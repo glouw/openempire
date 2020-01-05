@@ -36,9 +36,9 @@ File File_Load(FILE* const);
 #define FILE_DIMENSIONS_5X5 {5,5}
 #define FILE_DIMENSIONS_6X6 {6,6}
 
-// For more details about X-Macros: https://en.wikipedia.org/wiki/X_Macro
-// This X-Macro is used in: Interfac.[ch]. Graphics.[ch], Terrain.[ch], Registrar.c
-// To get an idea of how the X-Macro expands in Graphics.c, for instance, run: gcc -E Graphics.c | clang-format
+// FOR MORE DETAILS ABOUT X-MACROS: HTTPS://EN.WIKIPEDIA.ORG/WIKI/X_MACRO
+// THIS X-MACRO IS USED IN: INTERFAC.[CH]. GRAPHICS.[CH], TERRAIN.[CH], REGISTRAR.C
+// TO GET AN IDEA OF HOW THE X-MACRO EXPANDS IN GRAPHICS.C, FOR INSTANCE, RUN: GCC -E GRAPHICS.C | CLANG-FORMAT
 //  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //                                                             |           |                                                        |                  | W  |                       |       |         |        |         |  S  |  M  |  E  |  I  |                    |                 | D  | M
 //                                                             |           |                                                        |                  | A  |                       |       |         |        |         |  I  |  U  |  X  |  N  |                    |                 | E  | I

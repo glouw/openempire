@@ -32,8 +32,8 @@ static Mode ConvertAllByteMasks(Mode mode, Outline* const outline_table, const i
 {
     mode.mask_real = UTIL_ALLOC(SDL_Surface*, nr_tiles);
     mode.mask_demo = UTIL_ALLOC(SDL_Surface*, nr_tiles);
-    // Both a demo and real mask are generated. The real mask is a pure alpha channel used for actual blending.
-    // The demo mask converts the alpha value to a grey scale so the alpha channel can be visualized in the demo renderer, eg. ./openempires --demo
+    // BOTH A DEMO AND REAL MASK ARE GENERATED. THE REAL MASK IS A PURE ALPHA CHANNEL USED FOR ACTUAL BLENDING.
+    // THE DEMO MASK CONVERTS THE ALPHA VALUE TO A GREY SCALE SO THE ALPHA CHANNEL CAN BE VISUALIZED IN THE DEMO RENDERER, EG. ./OPENEMPIRES --DEMO
     for(int32_t which_tile = 0; which_tile < nr_tiles; which_tile++)
     {
         mode.mask_demo[which_tile] = ConvertByteMask(mode, outline_table, which_tile, true);
@@ -92,12 +92,11 @@ void Mode_Free(const Mode mode, const int32_t nr_tiles)
     free(mode.mask_demo);
 }
 
-/* See:
- *     https://github.com/sfttech/openage/docs/media
+/* SEE: HTTPS://GITHUB.COM/SFTTECH/OPENAGE/DOCS/MEDIA
  *
- * For each mode there are 31 blend ids.
- * The first 16 blend ids are variations in pairs of 4. This was done to prevent repeating blends.
- * The last 16 blend ids are unique, providing thinning layouts for something like a path.
+ * FOR EACH MODE THERE ARE 31 BLEND IDS.
+ * THE FIRST 16 BLEND IDS ARE VARIATIONS IN PAIRS OF 4. THIS WAS DONE TO PREVENT REPEATING BLENDS.
+ * THE LAST 16 BLEND IDS ARE UNIQUE, PROVIDING THINNING LAYOUTS FOR SOMETHING LIKE A PATH.
  *
  *    [0 : 3]        [4 : 7]        [8 : 11]      [12 : 15]         [16]           [17]           [18]           [19]           [20]
  *

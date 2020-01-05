@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 
-// Buildings
+// BUILDINGS
 
 #define BUILD_AGE_1 \
     { ICONTYPE_BUILD, { ICONBUILD_BARRACKS    } }, \

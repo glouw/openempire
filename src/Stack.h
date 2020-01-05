@@ -2,10 +2,10 @@
 
 #include "Unit.h"
 
-// Units, when alligned in a grid, must be referenced
-// to their true linear unit array (defined in Units.[ch]).
-// Sometimes, more than one unit will occupy a single grid location,
-// and so the unit stack can reference any number of units on a single tile.
+// UNITS, WHEN ALLIGNED IN A GRID, MUST BE REFERENCED
+// TO THEIR TRUE LINEAR UNIT ARRAY (DEFINED IN UNITS.[CH]).
+// SOMETIMES, MORE THAN ONE UNIT WILL OCCUPY A SINGLE GRID LOCATION,
+// AND SO THE UNIT STACK CAN REFERENCE ANY NUMBER OF UNITS ON A SINGLE TILE.
 
 typedef struct
 {

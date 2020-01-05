@@ -62,7 +62,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
         const uint8_t lower_nibble = command & 0x0F;
         const uint8_t upper_nibble = command & 0xF0;
 
-        // End of scanline.
+        // END OF SCANLINE
         if(lower_nibble == 0x0F)
             break;
 
@@ -72,7 +72,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             Util_Bomb("Regular command 0x%02X not implemented\n", lower_nibble);
             break;
 
-        // Lesser Block Copy.
+        // LESSER BLOCK COPY
         case 0x0: case 0x4: case 0x8: case 0xC:
         {
             const int32_t count = command >> 2;
@@ -81,7 +81,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Lesser Skip.
+        // LESSER SKIP
         case 0x1: case 0x5: case 0x9: case 0xD:
         {
             const int32_t shift = command >> 2;
@@ -91,7 +91,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Greater Block Copy.
+        // GREATER BLOCK COPY
         case 0x2:
         {
             const int32_t count = (upper_nibble << 4) + Feed(image.data, &index);
@@ -100,7 +100,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Greater Skip.
+        // GREATER SKIP
         case 0x3:
         {
             const int32_t count = (upper_nibble << 4) + Feed(image.data, &index);
@@ -109,7 +109,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Player Color Block Copy.
+        // PLAYER COLOR BLOCK COPY
         case 0x6:
         {
             const int32_t shift = command >> 4;
@@ -122,7 +122,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Fill.
+        // FILL
         case 0x7:
         {
             const int32_t shift = command >> 4;
@@ -133,7 +133,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Fill Player Color.
+        // FILL PLAYER COLOR
         case 0xA:
         {
             const int32_t shift = command >> 4;
@@ -144,7 +144,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Draw Shadow.
+        // DRAW SHADOW
         case 0xB:
         {
             const int32_t shift = command >> 4;
@@ -154,7 +154,7 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
             break;
         }
 
-        // Extended Commands.
+        // EXTENDED COMMANDS
         case 0xE:
             switch(command)
             {
@@ -162,30 +162,30 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
                 Util_Bomb("Extended command 0x%02X not implemented\n", command);
                 break;
 
-            // Render Hint XFLIP.
+            // RENDER HINT XFLIP
             case 0x0E:
                 break;
 
-             // Render Hint Not XFLIP.
+             // RENDER HINT NOT XFLIP
             case 0x1E:
                 break;
 
-            // Table Use Normal.
+            // TABLE USE NORMAL
             case 0x2E:
                 break;
 
-            // Table Use Alternate.
+            // TABLE USE ALTERNATE
             case 0x3E:
                 break;
 
-            // Outline Player Color.
+            // OUTLINE PLAYER COLOR
             case 0x4E:
             {
                 scanline = Append(scanline, player_palette_index);
                 break;
             }
 
-            // Fill Player Color.
+            // FILL PLAYER COLOR
             case 0x5E:
             {
                 const int32_t count = Feed(image.data, &index);
@@ -194,14 +194,14 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
                 break;
             }
 
-            // Outline Player Color 2.
+            // OUTLINE PLAYER COLOR 2
             case 0x6E:
             {
                 scanline = Append(scanline, 0);
                 break;
             }
 
-            // Fill Player Color 2.
+            // FILL PLAYER COLOR 2
             case 0x7E:
             {
                 const int32_t count = Feed(image.data, &index);
@@ -210,15 +210,15 @@ Scanline Scanline_Get(const Image image, const Frame frame, const int32_t y, con
                 break;
             }
 
-            // Dither.
+            // DITHER
             case 0x8E:
                 break;
 
-            // Premultiplied alpha
+            // PREMULTIPLIED ALPHA
             case 0x9E:
                 break;
 
-            // Original Alpha.
+            // ORIGINAL ALPHA
             case 0xAE:
                 break;
             }

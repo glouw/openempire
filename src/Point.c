@@ -100,7 +100,7 @@ Point Point_Dot(const Point a, const Point b)
     return out;
 }
 
-// Rough approximate to 1 as the limit of X goes to zero.
+// ROUGH APPROXIMATE TO 1 AS THE LIMIT OF X GOES TO ZERO.
 int32_t Point_Slope(const Point point)
 {
     return point.y / (point.x == 0 ? 1 : point.x);

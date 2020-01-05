@@ -154,7 +154,7 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
         TCPsocket socket = sockets.socket[i];
         if(socket)
         {
-            const int32_t offset = 2; // XXX. Make this ping dependent.
+            const int32_t offset = 2; // XXX. MAKE THIS PING DEPENDENT.
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
@@ -176,11 +176,11 @@ static bool ShouldRelay(const int32_t cycles, const int32_t interval)
     return (cycles % interval) == 0;
 }
 
-// ----- max
-//   a
-// ----- setpoint (must be above threshold)
-//   b
-// ----- min
+// ----- MAX
+//   A
+// ----- SETPOINT (MUST BE ABOVE THRESHOLD)
+//   B
+// ----- MIN
 static Sockets CheckStability(Sockets sockets, const int32_t setpoint, const int32_t min, const int32_t max)
 {
     const int32_t a = max - setpoint;

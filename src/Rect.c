@@ -2,14 +2,14 @@
 
 #include <stdlib.h>
 
-// (-w/2, -h/2)
+// (-W/2, -H/2)
 // +---------+
 // |         |
 // |         |
 // |    +    |
 // |         |
 // |         |
-// +---------+ (w/2, h/2)
+// +---------+ (W/2, H/2)
 Rect Rect_GetGridCenter(const Grid grid)
 {
     const int32_t half_width = grid.tile_cart_width / 2;
@@ -34,15 +34,15 @@ int32_t Rect_GetArea(const Rect rect)
     return abs(rect.b.x - rect.a.x) * abs(rect.b.y - rect.a.y);
 }
 
-// +---a
+// +---A
 // | A | --+
-// b---+   |
-// b---+   |    a---+
+// B---+   |
+// B---+   |    A---+
 // | B | --+--> |   |
-// +---a   |    +---b
-// +---b   |
+// +---A   |    +---B
+// +---B   |
 // | C | --+
-// a---+
+// A---+
 Rect Rect_CorrectOrientation(const Rect rect)
 {
     const Rect a = {
@@ -73,9 +73,9 @@ bool Rect_SeesRect(const Rect out, const Rect in)
 
 // A-------------------+
 // |                   |
-// |       a------+    |
+// |       A------+    |
 // |       |      |    |
-// |       +------b    |
+// |       +------B    |
 // |                   |
 // +-------------------B
 bool Rect_OnScreen(const Rect outline, const Rect rect)
@@ -89,9 +89,9 @@ bool Rect_OnScreen(const Rect outline, const Rect rect)
 // A-------------------+
 // |                   |
 // |                   |
-// |                   | a------+
+// |                   | A------+
 // |                   | |      |
-// |                   | +------b
+// |                   | +------B
 // +-------------------B
 bool Rect_TotallyOffScreen(const Rect outline, const Rect rect)
 {
