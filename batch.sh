@@ -1,7 +1,7 @@
 BIN=openempires
 XRES=1300
 YRES=720
-USERS=3
+USERS=2
 ./$BIN --quiet --server --users $USERS &
 SERVER_PID=$!
 for (( i = 0; i < $USERS; i++ ))

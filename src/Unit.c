@@ -168,7 +168,9 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     Unit unit = zero;
     unit.trait = Trait_Build(file);
     unit.file = file;
-    unit.id = id++;
+    unit.id = id;
+    if(!is_floating)
+        id += 1;
     unit.parent_id = -1;
     unit.color = color;
     unit.state = STATE_IDLE;

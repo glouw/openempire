@@ -291,7 +291,7 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % h - h / 2,
         };
         const Parts parts = Parts_GetFire();
-        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, false);
+        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true);
     }
     return units;
 }
@@ -305,14 +305,14 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const Parts parts = Parts_GetSmoke();
-        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, false);
+        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true);
     }
     return units;
 }
 
 void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
 {
-    const Point none = { 0,0 };
+    static Point none;
     const Graphics rubbles[] = {
         FILE_RUBBLE_1X1,
         FILE_RUBBLE_2X2,
@@ -320,14 +320,14 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         FILE_RUBBLE_4X4,
         FILE_RUBBLE_5X5,
     };
-    Graphics file = (Graphics) FILE_NONE;
+    Graphics file = FILE_GRAPHICS_NONE;
     for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
     {
         const Graphics rubble = rubbles[i];
         if(EqualDimension(unit->trait.dimensions, rubble))
             file = rubble;
     }
-    if(file != FILE_NONE)
+    if(file != FILE_GRAPHICS_NONE)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE);
 }
 
@@ -758,19 +758,31 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static void AgeUpInitial(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
+
+static void AgeUpUnit(Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics)
 {
     static Point zero;
+    Graphics upgrade = unit->trait.upgrade;
+    if(overview.status.age == AGE_1)
+        upgrade = (Graphics) ((int32_t) upgrade + (int32_t) overview.status.civ);
+    // SINCE THIS IS A PART UPGRADE, IDS MUST BE SAVED...
+    const int32_t id = unit->id;
+    const int32_t parent_id = unit->parent_id;
+    const bool has_children = unit->has_children;
+    *unit = Unit_Make(unit->cart, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+    // ... AND RESTORED.
+    unit->id = id;
+    unit->parent_id = parent_id;
+    unit->has_children = has_children;
+}
+
+static void AgeUpInitial(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
+{
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->color == color && unit->trait.upgrade != FILE_GRAPHICS_NONE)
-        {
-            Graphics upgrade = unit->trait.upgrade;
-            if(overview.status.age == AGE_1)
-                upgrade = (Graphics) ((int32_t) upgrade + (int32_t) overview.status.civ);
-            *unit = Unit_Make(unit->cart, zero, grid, upgrade, color, graphics, false, false, TRIGGER_NONE);
-        }
+            AgeUpUnit(unit, overview, grid, graphics);
     }
 }
 
