@@ -36,7 +36,7 @@ typedef struct
 }
 Units;
 
-Units Units_New(const Grid, const int32_t cpu_count, const int32_t max, const Color);
+Units Units_New(const Grid, const int32_t cpu_count, const int32_t max, const Color, const Civ);
 
 void Units_Free(const Units);
 

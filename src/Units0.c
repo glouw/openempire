@@ -57,7 +57,7 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, const Color color)
+Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
 {
     const int32_t area = grid.rows * grid.cols;
     Unit* const unit = UTIL_ALLOC(Unit, max);
@@ -73,7 +73,7 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, con
     units.cols = grid.cols;
     units.cpu_count = cpu_count;
     units.status.age = AGE_1;
-    units.status.civ = CIV_ASIA;
+    units.status.civ = civ;
     units.motive.action = ACTION_NONE;
     units.motive.type = TYPE_NONE;
     units.color = color;

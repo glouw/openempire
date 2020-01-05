@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Civ.h"
 #include "Color.h"
 
 #include <stdbool.h>
@@ -9,6 +10,7 @@ typedef struct
 {
     const char* path;
     Color color;
+    Civ civ;
     bool is_server;
     const char* host;
     int32_t port;

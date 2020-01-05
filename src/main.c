@@ -10,7 +10,7 @@
 
 #define DEMO (0)
 
-static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid)
+static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid, const Args args )
 {
     // LOBBY.
     int32_t users = 0;
@@ -32,8 +32,8 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
     }
     // PLAY.
-    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.color);
-    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color);
+    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
+    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
     units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
     Packets packets = Packets_Init();
@@ -96,7 +96,7 @@ static void RunClient(const Args args)
     else
     {
         const Sock sock = Sock_Connect(args.host, args.port);
-        Play(sock, video, data, map, grid);
+        Play(sock, video, data, map, grid, args);
         Sock_Disconnect(sock);
     }
     Map_Free(map);
