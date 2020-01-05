@@ -57,6 +57,7 @@ typedef struct Unit
     bool has_children;
     bool is_floating;
     bool is_triggered;
+    bool must_skip_debris;
 }
 Unit;
 

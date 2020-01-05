@@ -356,6 +356,8 @@ static Units Kill(Units units, const Grid grid, const Registrar graphics, const 
         if(!Unit_IsExempt(unit) && Unit_IsDead(unit))
         {
             Anakin(units, unit);
+            if(unit->must_skip_debris)
+                continue;
             if(unit->trait.is_inanimate)
             {
                 MakeRubble(unit, grid, graphics);
@@ -793,6 +795,7 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
             const Point cart = Point_Add(unit->cart, Point_Div(unit->trait.dimensions, 2));
             points = Points_Append(points, cart);
             Anakin(units, unit);
+            unit->must_skip_debris = true;
         }
     }
     for(int32_t i = 0; i < points.count; i++)
