@@ -766,7 +766,7 @@ static void AgeUpInitial(Units units, const Overview overview, const Grid grid, 
         {
             Graphics upgrade = unit->trait.upgrade;
             if(overview.status.age == AGE_1)
-                upgrade += (Graphics) overview.status.civ;
+                upgrade = (Graphics) ((int32_t) upgrade + (int32_t) overview.status.civ);
             *unit = Unit_Make(unit->cart, zero, grid, upgrade, color, graphics, false, false, TRIGGER_NONE);
         }
     }
@@ -786,7 +786,7 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             case TRIGGER_AGE_UP:
                 AgeUpInitial(units, overview, grid, graphics, unit->color);
                 if(unit->color == units.color)
-                    units.status.age++;
+                    units.status.age = (Age) ((int32_t) units.status.age + 1);
                 break;
             }
             unit->is_triggered = true;

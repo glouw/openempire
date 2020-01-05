@@ -10,10 +10,10 @@ typedef struct
     IconType icon_type;
     union
     {
+        int32_t index;
         IconBuild icon_build;
         IconUnit icon_unit;
         IconTech icon_tech;
-        int32_t index;
     }
     uni;
 }
