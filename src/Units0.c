@@ -790,7 +790,8 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
         Unit* const unit = &units.unit[i];
         if(Unit_IsTownCenter(unit, color))
         {
-            points = Points_Append(points, unit->cart);
+            const Point cart = Point_Add(unit->cart, Point_Div(unit->trait.dimensions, 2));
+            points = Points_Append(points, cart);
             Anakin(units, unit);
         }
     }
@@ -804,7 +805,7 @@ static Units AgeUp(Units units, Unit* const unit, const Overview overview, const
     if(unit->color == units.color)
         units.status.age = GetNextAge(units.status);
     AgeUpInitial(units, overview, grid, graphics, unit->color);
-    return RemoveGarbage(AgeUpTownCenters(units, overview, grid, graphics, map, unit->color));
+    return AgeUpTownCenters(units, overview, grid, graphics, map, unit->color);
 }
 
 static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
