@@ -34,7 +34,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Check(arg, "-y", "--yres"  )) args.yres = atoi(next);
         if(Check(arg, "-u", "--users" )) args.users = atoi(next);
         if(Check(arg, "-q", "--quiet" )) args.quiet = true;
-        if(Check(arg, "-v", "--civ"   )) args.civ = atoi(next);
+        if(Check(arg, "-v", "--civ"   )) args.civ = (Civ) atoi(next);
     }
     assert(args.path);
     return args;
