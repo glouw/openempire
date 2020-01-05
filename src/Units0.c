@@ -779,6 +779,8 @@ static Age GetNextAge(const Status status)
     return (Age) ((int32_t) status.age + 1);
 }
 
+// TOWN CENTERS DO NOT PLAY NICELY WITH AGING UP - NEW TOWN CENTERS HAVE MORE PARTS, ETC.
+
 static Units AgeUpTownCenters(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Color color)
 {
     static Point zero;
@@ -792,7 +794,8 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
         Unit* const unit = &units.unit[i];
         if(Unit_IsTownCenter(unit, color))
         {
-            const Point cart = Point_Add(unit->cart, Point_Div(unit->trait.dimensions, 2));
+            const Point half = Point_Div(unit->trait.dimensions, 2);
+            const Point cart = Point_Add(unit->cart, half);
             points = Points_Append(points, cart);
             Anakin(units, unit);
             unit->must_skip_debris = true;
