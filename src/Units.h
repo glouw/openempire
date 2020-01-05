@@ -13,7 +13,7 @@
 #include "Packet.h"
 #include "Registrar.h"
 #include "Stack.h"
-#include "Status.h"
+#include "Share.h"
 
 typedef struct
 {
@@ -27,12 +27,7 @@ typedef struct
     int32_t select_count;
     int32_t cpu_count;
     int32_t repath_index;
-
-    // CLIENT PRIVATE.
-
-    Color color;
-    Status status;
-    Motive motive;
+    Share share;
 }
 Units;
 

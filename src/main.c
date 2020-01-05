@@ -21,8 +21,8 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         const Packet packet = Packet_Get(sock);
         if(packet.turn > 0)
         {
-            overview.color = (Color) packet.client_id;
-            Video_PrintLobby(video, packet.users_connected, packet.users, overview.color);
+            overview.share.color = (Color) packet.client_id;
+            Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color);
             if(packet.game_running)
             {
                 users = packet.users;
@@ -32,17 +32,17 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
     }
     // PLAY.
-    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
-    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
+    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
+    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
     units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
-    overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.color);
+    overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
         const uint64_t parity = Units_Xor(units);
-        overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets), units.status, units.motive);
+        overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets), units.share);
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
@@ -64,7 +64,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)
             continue;
-        floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.motive);
+        floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
         const int32_t t1 = SDL_GetTicks();
         Video_Draw(video, data, map, units, floats, overview, grid);
         const int32_t t2 = SDL_GetTicks();

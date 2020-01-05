@@ -7,7 +7,7 @@ static const char hotkeys[] = { 'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G'
 
 Button Button_FromOverview(const Overview overview)
 {
-    const Buttons buttons = Buttons_FromMotive(overview.motive, overview.status.age);
+    const Buttons buttons = Buttons_FromMotive(overview.share.motive, overview.share.status.age);
     int32_t index = -1;
     if(overview.event.key_q) index =  0;
     if(overview.event.key_w) index =  1;

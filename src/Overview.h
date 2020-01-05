@@ -9,6 +9,7 @@
 #include "Motive.h"
 #include "Quad.h"
 #include "Status.h"
+#include "Share.h"
 
 #include <SDL2/SDL_net.h>
 
@@ -23,18 +24,13 @@ typedef struct
     uint64_t parity;
     int32_t cycles;
     int32_t queue_size;
-
-    // CAN BE ANY CLIENT FROM SERVER, INCLUDING SELF.
-
-    Color color;
-    Status status;
-    Motive motive;
+    Share share;
 }
 Overview;
 
 Overview Overview_Init(const int32_t xres, const int32_t yres);
 
-Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Status, const Motive);
+Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Share);
 
 Point Overview_IsoToCart(const Overview, const Grid, const Point, const bool raw);
 

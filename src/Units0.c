@@ -72,11 +72,11 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, con
     units.rows = grid.rows;
     units.cols = grid.cols;
     units.cpu_count = cpu_count;
-    units.status.age = AGE_1;
-    units.status.civ = civ;
-    units.motive.action = ACTION_NONE;
-    units.motive.type = TYPE_NONE;
-    units.color = color;
+    units.share.status.age = AGE_1;
+    units.share.status.civ = civ;
+    units.share.motive.action = ACTION_NONE;
+    units.share.motive.type = TYPE_NONE;
+    units.share.color = color;
     return units;
 }
 
@@ -122,7 +122,7 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == overview.color && unit->is_selected && unit->trait.max_speed > 0)
+        if(unit->color == overview.share.color && unit->is_selected && unit->trait.max_speed > 0)
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
@@ -482,16 +482,16 @@ static Units ProcessHardRules(Units units, const Field field, const Grid grid)
             default:
                 break;
             case TYPE_FOOD:
-                units.status.food += resource.amount;
+                units.share.status.food += resource.amount;
                 break;
             case TYPE_WOOD:
-                units.status.wood += resource.amount;
+                units.share.status.wood += resource.amount;
                 break;
             case TYPE_GOLD:
-                units.status.gold += resource.amount;
+                units.share.status.gold += resource.amount;
                 break;
             case TYPE_STONE:
-                units.status.stone += resource.amount;
+                units.share.status.stone += resource.amount;
                 break;
             }
     }
@@ -676,7 +676,7 @@ static Action GetAction(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == units.color)
+        if(unit->is_selected && unit->color == units.share.color)
         {
             const int32_t index = (int32_t) unit->trait.action + 1;
             counts[index]++;
@@ -693,7 +693,7 @@ static Type GetType(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == units.color)
+        if(unit->is_selected && unit->color == units.share.color)
         {
             const int32_t index = (int32_t) unit->trait.type + 1;
             counts[index]++;
@@ -705,9 +705,9 @@ static Type GetType(const Units units)
 static Units UpdateMotive(Units units)
 {
     static Motive zero;
-    units.motive = zero;
-    units.motive.action = GetAction(units);
-    units.motive.type = GetType(units);
+    units.share.motive = zero;
+    units.share.motive.action = GetAction(units);
+    units.share.motive.type = GetType(units);
     return units;
 }
 
@@ -721,18 +721,18 @@ static Units CountPopulation(Units units)
         && !unit->trait.is_inanimate)
             count++;
     }
-    units.status.population = count;
+    units.share.status.population = count;
     return units;
 }
 
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromButton(button, overview.status.age, overview.status.civ);
+    const Parts parts = Parts_FromButton(button, overview.share.status.age, overview.share.status.civ);
     // XXX. MUST APPEND BUTTONS HERE FOR ALREADY RESEARCH BUTTONS.
     //      THIS WILL PREVENT THE SAME TECH FROM BEING RESEARCHED TWICE.
     if(parts.part != NULL)
-        units = Units_SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false);
+        units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false);
     Parts_Free(parts);
     return units;
 }
@@ -762,8 +762,8 @@ static void AgeUpUnit(Unit* const unit, const Overview overview, const Grid grid
 {
     static Point zero;
     Graphics upgrade = unit->trait.upgrade;
-    if(overview.status.age == AGE_1)
-        upgrade = (Graphics) ((int32_t) upgrade + (int32_t) overview.status.civ);
+    if(overview.share.status.age == AGE_1)
+        upgrade = (Graphics) ((int32_t) upgrade + (int32_t) overview.share.status.civ);
     // SINCE THIS IS A PART UPGRADE, IDS MUST BE SAVED...
     const int32_t id = unit->id;
     const int32_t parent_id = unit->parent_id;
@@ -801,8 +801,8 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
             ICONBUILD_TOWN_CENTER
         }
     };
-    const Age age = GetNextAge(overview.status);
-    const Parts towncenter = Parts_FromButton(button, age, overview.status.civ);
+    const Age age = GetNextAge(overview.share.status);
+    const Parts towncenter = Parts_FromButton(button, age, overview.share.status.civ);
     Points points = Points_New(COLOR_COUNT);
     // REMOVE.
     for(int32_t i = 0; i < units.count; i++)
@@ -826,8 +826,8 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
 
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(flag->color == units.color)
-        units.status.age = GetNextAge(units.status);
+    if(flag->color == units.share.color)
+        units.share.status.age = GetNextAge(units.share.status);
     AgeUpInitial(units, overview, grid, graphics, flag->color);
     return AgeUpTownCenters(units, overview, grid, graphics, map, flag->color);
 }
@@ -869,8 +869,8 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
 Units Units_Float(Units floats, const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
 {
     floats.count = 0;
-    floats.status.age = units.status.age;
-    floats.motive = motive;
+    floats.share.status.age = units.share.status.age;
+    floats.share.motive = motive;
     Units_ResetStacks(floats);
     floats = FloatUsingIcons(floats, overview, grid, graphics, map);
     Units_StackStacks(floats);

@@ -106,7 +106,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawUnitSelections(vram, graphics_tiles);
     const bool should_draw = overview.event.mouse_l && !overview.event.key_left_shift;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
-    Vram_DrawMotiveRow(vram, data.interfac, units.motive, overview.color, units.status.age);
+    Vram_DrawMotiveRow(vram, data.interfac, units.share.motive, overview.share.color, units.share.status.age);
     Vram_DrawHud(vram, data.interfac);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
@@ -135,16 +135,20 @@ static void PrintResources(const Video video, const Units units)
     const int32_t space = 77;
     const int32_t x0 = 27;
     const int32_t y0 = 11;
-    const Point a = { x0 + 0 * space, y0 };
-    const Point b = { x0 + 1 * space, y0 };
-    const Point c = { x0 + 2 * space, y0 };
-    const Point d = { x0 + 3 * space, y0 };
-    const Point e = { x0 + 4 * space, y0 };
-    Text_Printf(video.text_small, video.renderer, a, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.wood);
-    Text_Printf(video.text_small, video.renderer, b, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.food);
-    Text_Printf(video.text_small, video.renderer, c, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.gold);
-    Text_Printf(video.text_small, video.renderer, d, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.stone);
-    Text_Printf(video.text_small, video.renderer, e, POSITION_TOP_LEFT, 0xFF, 0, "%6d", units.status.population);
+    struct
+    {
+        Point point;
+        int32_t amount;
+    }
+    display[] = {
+        { { x0 + 0 * space, y0 }, units.share.status.wood       },
+        { { x0 + 1 * space, y0 }, units.share.status.food       },
+        { { x0 + 2 * space, y0 }, units.share.status.gold       },
+        { { x0 + 3 * space, y0 }, units.share.status.stone      },
+        { { x0 + 4 * space, y0 }, units.share.status.population },
+    };
+    for(int32_t i = 0; i < UTIL_LEN(display); i++)
+        Text_Printf(video.text_small, video.renderer, display[i].point, POSITION_TOP_LEFT, 0xFF, 0, "%6d", display[i].amount);
 }
 
 void Video_Render(const Video video, const Units units, const int32_t dt, const int32_t cycles)
