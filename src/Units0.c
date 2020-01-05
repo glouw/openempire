@@ -772,24 +772,56 @@ static void AgeUpInitial(Units units, const Overview overview, const Grid grid, 
     }
 }
 
-static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics)
+static Age GetNextAge(const Status status)
+{
+    return (Age) ((int32_t) status.age + 1);
+}
+
+static Units AgeUpTownCenters(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Color color)
+{
+    static Point zero;
+    const Button button = {
+        ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }
+    };
+    const Parts towncenter = Parts_FromButton(button, GetNextAge(overview.status), overview.status.civ);
+    Points points = Points_New(8);
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(Unit_IsTownCenter(unit, color))
+        {
+            points = Points_Append(points, unit->cart);
+            Anakin(units, unit);
+        }
+    }
+    for(int32_t i = 0; i < points.count; i++)
+        units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, towncenter, true);
+    return units;
+}
+
+static Units AgeUp(Units units, Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+{
+    if(unit->color == units.color)
+        units.status.age = GetNextAge(units.status);
+    AgeUpInitial(units, overview, grid, graphics, unit->color);
+    return RemoveGarbage(AgeUpTownCenters(units, overview, grid, graphics, map, unit->color));
+}
+
+static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!unit->is_triggered && unit->trigger != TRIGGER_NONE)
         {
+            unit->is_triggered = true;
             switch(unit->trigger)
             {
-            case TRIGGER_NONE:
-                break;
-            case TRIGGER_AGE_UP:
-                AgeUpInitial(units, overview, grid, graphics, unit->color);
-                if(unit->color == units.color)
-                    units.status.age = (Age) ((int32_t) units.status.age + 1);
-                break;
+            case TRIGGER_NONE   : break;
+            case TRIGGER_AGE_UP : return AgeUp(units, unit, overview, grid, graphics, map);
             }
-            unit->is_triggered = true;
+            // ONLY ONE TRIGGER CAN RUN AT A TIME.
+            break;
         }
     }
     return units;
@@ -829,7 +861,7 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
         units = Select(units, overview, grid, graphics, window.units);
         units = Command(units, overview, grid, graphics, map, field);
         units = SpawnUsingIcons(units, overview, grid, graphics, map);
-        units = TriggerTriggers(units, overview, grid, graphics);
+        units = TriggerTriggers(units, overview, grid, graphics, map);
         Window_Free(window);
     }
     return units;

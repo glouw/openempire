@@ -113,3 +113,5 @@ Point Unit_GetShift(Unit* const, const Point);
 bool Unit_IsDifferent(Unit* const, Unit* const);
 
 bool Unit_HasNoPath(Unit* const);
+
+bool Unit_IsTownCenter(Unit* const, const Color);

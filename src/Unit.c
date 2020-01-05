@@ -466,3 +466,8 @@ bool Unit_HasNoPath(Unit* const unit)
 {
     return unit->path.count == 0;
 }
+
+bool Unit_IsTownCenter(Unit* const unit, const Color color)
+{
+    return unit->color == color && !Unit_IsExempt(unit) && unit->trait.type == TYPE_TOWN_CENTER;
+}
