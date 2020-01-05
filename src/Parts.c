@@ -13,6 +13,13 @@ static Parts GetAgeUpFlag(void)
     return parts;
 }
 
+static Parts GetManAtArmsFlag(void)
+{
+    static Part part[] = { { {0,0}, TRIGGER_UPGRADE_MILITIA, false, false, FILE_FLAG_MEDIUM } };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
 static Parts GetMaleVillager(void)
 {
     static Part part[] = {
@@ -286,6 +293,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         case ICONTECH_AGE_2 : return GetAgeUpFlag();
         case ICONTECH_AGE_3 : return GetAgeUpFlag();
         case ICONTECH_AGE_4 : return GetAgeUpFlag();
+        case ICONTECH_RESEARCH_MAN_AT_ARMS : return GetManAtArmsFlag();
         }
         break;
     case ICONTYPE_UNIT:

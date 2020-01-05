@@ -24,6 +24,7 @@ typedef enum
     ICONTECH_AGE_2 = 30,
     ICONTECH_AGE_3 = 31,
     ICONTECH_AGE_4 = 32,
+    ICONTECH_RESEARCH_MAN_AT_ARMS = 85,
 }
 IconTech;
 

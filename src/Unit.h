@@ -116,3 +116,5 @@ bool Unit_IsDifferent(Unit* const, Unit* const);
 bool Unit_HasNoPath(Unit* const);
 
 bool Unit_IsTownCenter(Unit* const, const Color);
+
+bool Unit_IsMilitia(Unit* const, const Color);

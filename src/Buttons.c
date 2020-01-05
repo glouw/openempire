@@ -9,14 +9,13 @@
 #define BUILD_AGE_1 \
     { ICONTYPE_BUILD, { ICONBUILD_BARRACKS    } }, \
     { ICONTYPE_BUILD, { ICONBUILD_MILL        } }, \
-    { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER } }, \
     { ICONTYPE_BUILD, { ICONBUILD_HOUSE       } }, \
     { ICONTYPE_BUILD, { ICONBUILD_OUTPOST     } }, \
     { ICONTYPE_BUILD, { ICONBUILD_STONE_CAMP  } }, \
     { ICONTYPE_BUILD, { ICONBUILD_LUMBER_CAMP } }
-
 #define BUILD_AGE_3 \
-    { ICONTYPE_BUILD, { ICONBUILD_CASTLE } }
+    { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER } }, \
+    { ICONTYPE_BUILD, { ICONBUILD_CASTLE      } }
 
 static const Button build_age1[] = { BUILD_AGE_1 };
 static const Button build_age2[] = { BUILD_AGE_1 };
@@ -39,11 +38,13 @@ static int32_t GetBuildingLen(const Age age)
 
 #define BARRACKS_AGE_1 \
     { ICONTYPE_UNIT, { ICONUNIT_MILITIA } }
+#define BARRACKS_AGE_2 \
+    { ICONTYPE_TECH, { ICONTECH_RESEARCH_MAN_AT_ARMS } }
 
 static const Button barracks_age1[] = { BARRACKS_AGE_1 };
-static const Button barracks_age2[] = { BARRACKS_AGE_1 };
-static const Button barracks_age3[] = { BARRACKS_AGE_1 };
-static const Button barracks_age4[] = { BARRACKS_AGE_1 };
+static const Button barracks_age2[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
+static const Button barracks_age3[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
+static const Button barracks_age4[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
 
 static const Button* GetBarracks(const Age age)
 {
@@ -63,10 +64,8 @@ static int32_t GetBarracksLen(const Age age)
     { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER   } }, \
     { ICONTYPE_UNIT, { ICONUNIT_FEMALE_VILLAGER } }, \
     { ICONTYPE_TECH, { ICONTECH_AGE_2           } }
-
 #define TOWN_CENTER_AGE_2 \
     { ICONTYPE_TECH, { ICONTECH_AGE_3 } }
-
 #define TOWN_CENTER_AGE_3 \
     { ICONTYPE_TECH, { ICONTECH_AGE_4 } }
 

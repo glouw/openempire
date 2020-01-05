@@ -781,7 +781,9 @@ static void AgeUpInitial(Units units, const Overview overview, const Grid grid, 
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == color && unit->trait.upgrade != FILE_GRAPHICS_NONE)
+        if(unit->color == color
+        && unit->trait.upgrade != FILE_GRAPHICS_NONE
+        && unit->trait.is_inanimate)
             AgeUpUnit(unit, overview, grid, graphics);
     }
 }
@@ -824,6 +826,17 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     return units;
 }
 
+static Units UpgradeMilitia(const Units units, Unit* const flag, const Grid grid, const Registrar graphics)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(Unit_IsMilitia(unit, flag->color))
+            *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, unit->trait.upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+    }
+    return units;
+}
+
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     if(flag->color == units.share.color)
@@ -843,8 +856,9 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
             {
-            case TRIGGER_NONE   : return units;
-            case TRIGGER_AGE_UP : return AgeUp(units, flag, overview, grid, graphics, map);
+            case TRIGGER_NONE            : return units;
+            case TRIGGER_AGE_UP          : return AgeUp(units, flag, overview, grid, graphics, map);
+            case TRIGGER_UPGRADE_MILITIA : return UpgradeMilitia(units, flag, grid, graphics);
             }
         }
     }

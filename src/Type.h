@@ -23,6 +23,7 @@ typedef enum
     TYPE_HOUSE,
     TYPE_RUBBLE,
     TYPE_MILITIA,
+    TYPE_MAN_AT_ARMS,
     TYPE_TREE,
     TYPE_FLAG,
 
