@@ -728,11 +728,12 @@ static Units CountPopulation(Units units)
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromButton(button, overview.share.status.age, overview.share.status.civ);
+    const Button next = Button_Advance(button, overview.share.bits);
+    const Parts parts = Parts_FromButton(next, overview.share.status.age, overview.share.status.civ);
     if(parts.part != NULL)
     {
-        if(!Bits_Get(overview.share.bits, button.trigger))
-            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
+        if(!Bits_Get(overview.share.bits, next.trigger))
+            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, next.trigger);
         Parts_Free(parts);
     }
     return units;

@@ -36,36 +36,28 @@ static Parts GetManAtArmsFlag(void)
 
 static Parts GetMaleVillager(void)
 {
-    static Part part[] = {
-        { {0,0}, false, false, FILE_MALE_VILLAGER_IDLE },
-    };
+    static Part part[] = { { {0,0}, false, false, FILE_MALE_VILLAGER_IDLE } };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
 }
 
 static Parts GetFemaleVillager(void)
 {
-    static Part part[] = {
-        { {0,0}, false, false, FILE_FEMALE_VILLAGER_IDLE },
-    };
+    static Part part[] = { { {0,0}, false, false, FILE_FEMALE_VILLAGER_IDLE } };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
 }
 
 Parts Parts_GetRedArrows(void)
 {
-    static Part part[] = {
-        { {0,0}, false, false, FILE_RIGHT_CLICK_RED_ARROWS },
-    };
+    static Part part[] = { { {0,0}, false, false, FILE_RIGHT_CLICK_RED_ARROWS } };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
 }
 
 Parts Parts_GetSmoke(void)
 {
-    static Part part[] = {
-        { {0,0}, false, false, FILE_SMALLER_EXPLOSION_SMOKE },
-    };
+    static Part part[] = { { {0,0}, false, false, FILE_SMALLER_EXPLOSION_SMOKE } };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
 }
@@ -252,9 +244,14 @@ static Parts GetCastle(void)
 
 static Parts GetMilitia(void)
 {
-    static Part part[] = {
-        { {0,0}, false, false, FILE_MILITIA_IDLE },
-    };
+    static Part part[] = { { {0,0}, false, false, FILE_MILITIA_IDLE } };
+    const Parts parts = { part, UTIL_LEN(part) };
+    return parts;
+}
+
+static Parts GetManAtArms(void)
+{
+    static Part part[] = { { {0,0}, false, false, FILE_MAN_AT_ARMS_IDLE } };
     const Parts parts = { part, UTIL_LEN(part) };
     return parts;
 }
@@ -314,6 +311,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         switch(button.uni.icon_unit)
         {
         case ICONUNIT_MILITIA         : return GetMilitia       ();
+        case ICONUNIT_MAN_AT_ARMS     : return GetManAtArms     ();
         case ICONUNIT_MALE_VILLAGER   : return GetMaleVillager  ();
         case ICONUNIT_FEMALE_VILLAGER : return GetFemaleVillager();
         }

@@ -2,6 +2,7 @@
 
 #include "Icon.h"
 #include "Motive.h"
+#include "Bits.h"
 #include "Overview.h"
 #include "Trigger.h"
 
@@ -25,3 +26,5 @@ Button Button_FromOverview(const Overview);
 const char* Button_GetHotkeys(void);
 
 int32_t Button_GetHotkeysLen(void);
+
+Button Button_Advance(Button, const Bits);

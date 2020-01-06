@@ -64,15 +64,11 @@ static int32_t GetBarracksLen(const Age age)
     { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER   }, TRIGGER_NONE     }, \
     { ICONTYPE_UNIT, { ICONUNIT_FEMALE_VILLAGER }, TRIGGER_NONE     }, \
     { ICONTYPE_TECH, { ICONTECH_AGE_2           }, TRIGGER_AGE_UP_2 }
-#define TOWN_CENTER_AGE_2 \
-    { ICONTYPE_TECH, { ICONTECH_AGE_3           }, TRIGGER_AGE_UP_3 }
-#define TOWN_CENTER_AGE_3 \
-    { ICONTYPE_TECH, { ICONTECH_AGE_4           }, TRIGGER_AGE_UP_4 }
 
 static const Button towncenter_age1[] = { TOWN_CENTER_AGE_1 };
-static const Button towncenter_age2[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2 };
-static const Button towncenter_age3[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2, TOWN_CENTER_AGE_3 };
-static const Button towncenter_age4[] = { TOWN_CENTER_AGE_1, TOWN_CENTER_AGE_2, TOWN_CENTER_AGE_3 };
+static const Button towncenter_age2[] = { TOWN_CENTER_AGE_1 };
+static const Button towncenter_age3[] = { TOWN_CENTER_AGE_1 };
+static const Button towncenter_age4[] = { TOWN_CENTER_AGE_1 };
 
 static const Button* GetTownCenter(const Age age)
 {
