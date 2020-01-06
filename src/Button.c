@@ -48,7 +48,7 @@ Button Next(Button button, const Bits bits, const Trigger a, const Trigger b, co
     return button;
 }
 
-Button Button_Advance(Button button, const Bits bits)
+Button Button_Upgrade(Button button, const Bits bits)
 {
     switch(button.icon_type)
     {

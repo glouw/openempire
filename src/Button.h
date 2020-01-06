@@ -27,4 +27,4 @@ const char* Button_GetHotkeys(void);
 
 int32_t Button_GetHotkeysLen(void);
 
-Button Button_Advance(Button, const Bits);
+Button Button_Upgrade(Button, const Bits);

@@ -728,7 +728,7 @@ static Units CountPopulation(Units units)
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Button next = Button_Advance(button, overview.share.bits);
+    const Button next = Button_Upgrade(button, overview.share.bits);
     const Parts parts = Parts_FromButton(next, overview.share.status.age, overview.share.status.civ);
     if(parts.part != NULL)
     {
@@ -813,7 +813,7 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(Unit_IsTownCenter(unit, color))
+        if(Unit_IsType(unit, color, TYPE_TOWN_CENTER))
         {
             const Point half = Point_Div(unit->trait.dimensions, 2);
             const Point cart = Point_Add(unit->cart, half);
@@ -829,12 +829,12 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     return units;
 }
 
-static Units UpgradeMilitia(const Units units, Unit* const flag, const Grid grid, const Registrar graphics)
+static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Type type)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(Unit_IsMilitia(unit, flag->color))
+        if(Unit_IsType(unit, flag->color, type))
             *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, unit->trait.upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
     }
     return units;
@@ -876,7 +876,7 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             case TRIGGER_AGE_UP_2        :
             case TRIGGER_AGE_UP_3        :
             case TRIGGER_AGE_UP_4        : return AgeUp(units, flag, overview, grid, graphics, map);
-            case TRIGGER_UPGRADE_MILITIA : return UpgradeMilitia(units, flag, grid, graphics);
+            case TRIGGER_UPGRADE_MILITIA : return UpgradeByType(units, flag, grid, graphics, TYPE_MILITIA);
             }
         }
     }

@@ -537,7 +537,7 @@ static void DrawPack(const Vram vram, const Pack pack, const Bits bits)
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
         const Button button = pack.buttons.button[index];
-        const Button next = Button_Advance(button, bits);
+        const Button next = Button_Upgrade(button, bits);
         SDL_Surface* const surface = pack.animation[next.icon_type].surface[next.uni.index];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         const Rect rect = {

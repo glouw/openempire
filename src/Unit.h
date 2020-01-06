@@ -11,6 +11,7 @@
 #include "Grid.h"
 #include "Trait.h"
 #include "Direction.h"
+#include "Type.h"
 
 typedef struct Unit
 {
@@ -115,8 +116,6 @@ bool Unit_IsDifferent(Unit* const, Unit* const);
 
 bool Unit_HasNoPath(Unit* const);
 
-bool Unit_IsTownCenter(Unit* const, const Color);
-
-bool Unit_IsMilitia(Unit* const, const Color);
+bool Unit_IsType(Unit* const, const Color, const Type);
 
 bool Unit_IsTriggerValid(Unit* const);

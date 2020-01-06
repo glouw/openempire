@@ -1,3 +1,5 @@
+// * THESE BUTTON COLLECTIONS MUST BE BASE TEMPLATES WITHOUT UPGRADES.
+
 #include "Buttons.h"
 
 #include "Util.h"
