@@ -118,3 +118,5 @@ bool Unit_HasNoPath(Unit* const);
 bool Unit_IsTownCenter(Unit* const, const Color);
 
 bool Unit_IsMilitia(Unit* const, const Color);
+
+bool Unit_IsTriggerValid(Unit* const);

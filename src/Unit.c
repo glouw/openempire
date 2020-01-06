@@ -478,3 +478,8 @@ bool Unit_IsMilitia(Unit* const unit, const Color color)
 {
     return unit->color == color && !Unit_IsExempt(unit) && unit->trait.type == TYPE_MILITIA;
 }
+
+bool Unit_IsTriggerValid(Unit* const flag)
+{
+    return !flag->is_triggered && flag->trigger != TRIGGER_NONE;
+}

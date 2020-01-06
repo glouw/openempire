@@ -729,11 +729,13 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
 {
     const Point zero = { 0,0 };
     const Parts parts = Parts_FromButton(button, overview.share.status.age, overview.share.status.civ);
-    // XXX. MUST APPEND BUTTONS HERE FOR ALREADY RESEARCH BUTTONS.
-    //      THIS WILL PREVENT THE SAME TECH FROM BEING RESEARCHED TWICE.
     if(parts.part != NULL)
-        units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false);
-    Parts_Free(parts);
+    {
+        const Trigger trigger = parts.part[0].trigger;
+        if(!Bits_Get(overview.share.bits, trigger))
+            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false);
+        Parts_Free(parts);
+    }
     return units;
 }
 
@@ -837,12 +839,24 @@ static Units UpgradeMilitia(const Units units, Unit* const flag, const Grid grid
     return units;
 }
 
+static bool IsMyFlag(const Units units, Unit* const flag)
+{
+    return flag->color == units.share.color;
+}
+
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(flag->color == units.share.color)
+    if(IsMyFlag(units, flag))
         units.share.status.age = GetNextAge(units.share.status);
     AgeUpInitial(units, overview, grid, graphics, flag->color);
     return AgeUpTownCenters(units, overview, grid, graphics, map, flag->color);
+}
+
+static Units UpdateBits(Units units, Unit* const flag)
+{
+    if(IsMyFlag(units, flag))
+        units.share.bits = Bits_Set(units.share.bits, flag->trigger);
+    return units;
 }
 
 static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
@@ -850,13 +864,14 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const flag = &units.unit[i];
-        if(!flag->is_triggered && flag->trigger != TRIGGER_NONE)
+        if(Unit_IsTriggerValid(flag))
         {
+            units = UpdateBits(units, flag);
             flag->is_triggered = true;
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
             {
-            case TRIGGER_NONE            : return units;
+            case TRIGGER_NONE            : return units; // KEEP COMPILER QUIET.
             case TRIGGER_AGE_UP_2        :
             case TRIGGER_AGE_UP_3        :
             case TRIGGER_AGE_UP_4        : return AgeUp(units, flag, overview, grid, graphics, map);
