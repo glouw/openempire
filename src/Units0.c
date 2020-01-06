@@ -143,7 +143,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             units.command_group_next++;
             FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
             const Parts parts = Parts_GetRedArrows();
-            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false);
+            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
         }
     }
     return units;
@@ -291,7 +291,7 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % h - h / 2,
         };
         const Parts parts = Parts_GetFire();
-        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true);
+        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
     }
     return units;
 }
@@ -305,7 +305,7 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const Parts parts = Parts_GetSmoke();
-        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true);
+        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
     }
     return units;
 }
@@ -731,9 +731,8 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
     const Parts parts = Parts_FromButton(button, overview.share.status.age, overview.share.status.civ);
     if(parts.part != NULL)
     {
-        const Trigger trigger = parts.part[0].trigger;
-        if(!Bits_Get(overview.share.bits, trigger))
-            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false);
+        if(!Bits_Get(overview.share.bits, button.trigger))
+            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
         Parts_Free(parts);
     }
     return units;
@@ -803,7 +802,8 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     const Button button = {
         ICONTYPE_BUILD, {
             ICONBUILD_TOWN_CENTER
-        }
+        },
+        TRIGGER_NONE
     };
     const Age age = GetNextAge(overview.share.status);
     const Parts towncenter = Parts_FromButton(button, age, overview.share.status.civ);
@@ -823,7 +823,7 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     }
     // CREATE.
     for(int32_t i = 0; i < points.count; i++)
-        units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, towncenter, true);
+        units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, towncenter, true, TRIGGER_NONE);
     Points_Free(points);
     return units;
 }

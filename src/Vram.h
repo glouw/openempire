@@ -7,8 +7,8 @@
 #include "Color.h"
 #include "Registrar.h"
 #include "Motive.h"
-#include "Units.h"
 #include "Rects.h"
+#include "Share.h"
 #include "Map.h"
 #include "Overview.h"
 #include "Tiles.h"
@@ -50,7 +50,7 @@ void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, con
 
 void Vram_DrawUnitHealthBars(const Vram, const Tiles);
 
-void Vram_DrawMotiveRow(const Vram, const Registrar, const Motive, const Color, const Age);
+void Vram_DrawMotiveRow(const Vram, const Registrar, const Share);
 
 void Vram_DrawHud(const Vram, const Registrar);
 

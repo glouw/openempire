@@ -3,6 +3,7 @@
 #include "Unit.h"
 #include "Overview.h"
 #include "Color.h"
+#include "Trigger.h"
 #include "Parts.h"
 #include "Grid.h"
 #include "Grid.h"
@@ -43,7 +44,7 @@ void Units_ResetTiled(const Units);
 
 Units Units_GenerateTestZone(Units, const Map, const Grid, const Registrar, const int32_t users);
 
-Units Units_SpawnParts(Units, const Point, const Point offset, const Grid, const Color, const Registrar, const Map, const bool is_floating, const Parts, const bool ignore_collisions);
+Units Units_SpawnParts(Units, const Point, const Point offset, const Grid, const Color, const Registrar, const Map, const bool is_floating, const Parts, const bool ignore_collisions, const Trigger);
 
 void Units_ManageStacks(const Units);
 

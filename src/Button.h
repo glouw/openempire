@@ -3,7 +3,7 @@
 #include "Icon.h"
 #include "Motive.h"
 #include "Overview.h"
-#include "Age.h"
+#include "Trigger.h"
 
 typedef struct
 {
@@ -16,6 +16,7 @@ typedef struct
         IconTech icon_tech;
     }
     uni;
+    Trigger trigger;
 }
 Button;
 

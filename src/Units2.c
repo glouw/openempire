@@ -33,14 +33,14 @@ void SetChildren(Unit unit[], const int32_t count)
     }
 }
 
-Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions)
+Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions, const Trigger trigger)
 {
     Unit* const temp = UTIL_ALLOC(Unit, parts.count);
     for(int32_t i = 0; i < parts.count; i++)
     {
         const Part part = parts.part[i];
         const Point cart_part = Point_Add(cart, part.cart);
-        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, part.trigger);
+        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, trigger);
     }
     SetChildren(temp, parts.count);
     units = BulkAppend(units, map, temp, parts.count, ignore_collisions);

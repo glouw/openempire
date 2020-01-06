@@ -496,16 +496,20 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Ov
     }
 }
 
-static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const Rect rect)
+static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const Rect rect, const bool red_out)
 {
     for(int32_t y = rect.a.y; y < rect.b.y; y++)
     for(int32_t x = rect.a.x; x < rect.b.x; x++)
     {
-        const uint32_t pixel = Surface_GetPixel(surface, x, y);
+        uint32_t pixel = Surface_GetPixel(surface, x, y);
         const int32_t xx = offset.x + x;
         const int32_t yy = offset.y + y;
         if(pixel != SURFACE_COLOR_KEY)
+        {
+            if(red_out)
+                pixel &= 0xFFFF0000;
             Put(vram, xx, yy, pixel);
+        }
     }
 }
 
@@ -528,7 +532,7 @@ static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, con
     return pack;
 }
 
-static void DrawPack(const Vram vram, const Pack pack)
+static void DrawPack(const Vram vram, const Pack pack, const Bits bits)
 {
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
@@ -539,14 +543,15 @@ static void DrawPack(const Vram vram, const Pack pack)
             { 0, 0 },
             { surface->w, surface->h }
         };
-        DrawWithBounds(vram, surface, offset, rect);
+        const bool red_out = Bits_Get(bits, button.trigger);
+        DrawWithBounds(vram, surface, offset, rect, red_out);
     }
 }
 
-void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Motive motive, const Color color, const Age age)
+void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Share share)
 {
-    const Pack pack = GetPackFromMotive(interfac, motive, color, age);
-    DrawPack(vram, pack);
+    const Pack pack = GetPackFromMotive(interfac, share.motive, share.color, share.status.age);
+    DrawPack(vram, pack, share.bits);
 }
 
 void Vram_DrawHud(const Vram vram, const Registrar interfac)
@@ -557,7 +562,7 @@ void Vram_DrawHud(const Vram vram, const Registrar interfac)
     };
     const Point corner = { 0, 0 };
     const Animation animation = interfac.animation[COLOR_GAIA][FILE_INTERFAC_HUD_0];
-    DrawWithBounds(vram, animation.surface[0], corner, rect);
+    DrawWithBounds(vram, animation.surface[0], corner, rect, false);
 }
 
 void Vram_Free(const Vram vram)
