@@ -6,147 +6,184 @@
 
 #include "Util.h"
 
-static Parts GetAge2UpFlag(void)
-{
-    static Part part[] = { { {0,0}, false, false, FILE_FLAG_TALL } };
-    const Parts parts = { part, UTIL_LEN(part) };
-    return parts;
-}
+static Part flag_a[] = {
+    { {0,0}, false, false, FILE_FLAG_TALL }
+};
+static Part flag_b[] = {
+    { {0,0}, false, false, FILE_FLAG_MEDIUM }
+};
+static Part villager_male[] = {
+    { {0,0}, false, false, FILE_MALE_VILLAGER_IDLE }
+};
+static Part villager_female[] = {
+    { {0,0}, false, false, FILE_FEMALE_VILLAGER_IDLE }
+};
+static Part red_arrows[] = {
+    { {0,0}, false, false, FILE_RIGHT_CLICK_RED_ARROWS }
+};
+static Part smoke_a[] = {
+    { {0,0}, false, false, FILE_SMALLER_EXPLOSION_SMOKE }
+};
+static Part fire_a[] = { { {0,0}, false, false, FILE_FIRE_SMALL_A  } };
+static Part fire_b[] = { { {0,0}, false, false, FILE_FIRE_SMALL_B  } };
+static Part fire_c[] = { { {0,0}, false, false, FILE_FIRE_SMALL_C  } };
+static Part fire_d[] = { { {0,0}, false, false, FILE_FIRE_MEDIUM_A } };
+static Part fire_e[] = { { {0,0}, false, false, FILE_FIRE_MEDIUM_B } };
 
-static Parts GetAge3UpFlag(void)
-{
-    static Part part[] = { { {0,0}, false, false, FILE_FLAG_TALL } };
-    const Parts parts = { part, UTIL_LEN(part) };
-    return parts;
-}
+static Part town_center_age1[] = {
+    { {-0,0}, false, false, FILE_AGE_1_TOWN_CENTER_TOP },
+    { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, false, false, FILE_AGE_1_TOWN_CENTER_SHADOW },
+};
+static Part town_center_age2[] = {
+    { {-0,0}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
+    { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
+};
+static Part town_center_age3[] = {
+    { {-0,0}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_TOP },
+    { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_SHADOW },
+};
+static Part town_center_age4[] = {
+    { {-0,0}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_TOP },
+    { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_FLOORING },
+    { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_SHADOW },
+};
+static Part barracks_age1[] = { { {0,0}, false, false, FILE_AGE_1_BARRACKS } };
+static Part barracks_age2[] = { { {0,0}, true,  false, FILE_AGE_2_NORTH_EUROPE_BARRACKS } };
+static Part barracks_age3[] = { { {0,0}, true,  false, FILE_AGE_3_NORTH_EUROPE_BARRACKS } };
+static Part mill_age1[] = {
+    { {0,0}, false, false, FILE_AGE_1_MILL },
+    { {0,0}, false, false, FILE_AGE_1_MILL_DONKEY },
+};
+static Part mill_age2[] = {
+    { {0,0}, true, false, FILE_AGE_2_NORTH_EUROPE_MILL },
+    { {0,0}, true, false, FILE_AGE_2_NORTH_EUROPE_MILL_ANIMATION },
+    { {0,0}, true, true,  FILE_AGE_2_NORTH_EUROPE_MILL_SHADOW },
+};
+static Part mill_age3[] = {
+    { {0,0}, true, false, FILE_AGE_3_NORTH_EUROPE_MILL },
+    { {0,0}, true, false, FILE_AGE_3_NORTH_EUROPE_MILL_ANIMATION },
+    { {0,0}, true, true,  FILE_AGE_3_NORTH_EUROPE_MILL_SHADOW },
+};
+static Part house_age1[] = { { {0,0}, false, false, FILE_AGE_1_HOUSE } };
+static Part house_age2[] = { { {0,0}, true,  false, FILE_AGE_2_NORTH_EUROPE_HOUSE } };
+static Part house_age3[] = { { {0,0}, true,  false, FILE_AGE_3_NORTH_EUROPE_HOUSE } };
+static Part outpost[] = {
+    { {0,0}, false, false, FILE_OUTPOST },
+    { {0,0}, false, false, FILE_OUTPOST_SHADOW },
+};
+static Part stone_camp[] = {
+    { {0,0}, true, false, FILE_NORTH_EUROPE_STONE_MINING_CAMP },
+};
+static Part lumber_camp[] = {
+    { {0,0}, true, false, FILE_NORTH_EUROPE_LUMBER_CAMP },
+};
+static Part castle[] = {
+    { {0,0}, true, false, FILE_NORTH_EUROPE_CASTLE },
+    { {0,0}, true, false, FILE_NORTH_EUROPE_CASTLE_SHADOW },
+};
+static Part militia[] = {
+    { {0,0}, false, false, FILE_MILITIA_IDLE }
+};
+static Part man_at_arms[] = {
+    { {0,0}, false, false, FILE_MAN_AT_ARMS_IDLE }
+};
 
-static Parts GetAge4UpFlag(void)
+static Parts GetAgeUpFlag(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_FLAG_TALL } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { flag_a, UTIL_LEN(flag_a) };
     return parts;
 }
 
 static Parts GetManAtArmsFlag(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_FLAG_MEDIUM } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { flag_b, UTIL_LEN(flag_b) };
     return parts;
 }
 
 static Parts GetMaleVillager(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_MALE_VILLAGER_IDLE } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { villager_male, UTIL_LEN(villager_male) };
     return parts;
 }
 
 static Parts GetFemaleVillager(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_FEMALE_VILLAGER_IDLE } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { villager_female, UTIL_LEN(villager_female) };
     return parts;
 }
 
 Parts Parts_GetRedArrows(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_RIGHT_CLICK_RED_ARROWS } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { red_arrows, UTIL_LEN(red_arrows) };
     return parts;
 }
 
 Parts Parts_GetSmoke(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_SMALLER_EXPLOSION_SMOKE } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { smoke_a, UTIL_LEN(smoke_a) };
     return parts;
 }
 
 Parts Parts_GetFire(void)
 {
-    static Part a[] = { { {0,0}, false, false, FILE_FIRE_SMALL_A  } };
-    static Part b[] = { { {0,0}, false, false, FILE_FIRE_SMALL_B  } };
-    static Part c[] = { { {0,0}, false, false, FILE_FIRE_SMALL_C  } };
-    static Part d[] = { { {0,0}, false, false, FILE_FIRE_MEDIUM_A } };
-    static Part e[] = { { {0,0}, false, false, FILE_FIRE_MEDIUM_B } };
     Parts parts = { NULL, 1 };
     switch(Util_Rand() % 5)
     {
-        case 0: parts.part = a; break;
-        case 1: parts.part = b; break;
-        case 2: parts.part = c; break;
-        case 3: parts.part = d; break;
-        case 4: parts.part = e; break;
+        case 0: parts.part = fire_a; break;
+        case 1: parts.part = fire_b; break;
+        case 2: parts.part = fire_c; break;
+        case 3: parts.part = fire_d; break;
+        case 4: parts.part = fire_e; break;
     }
     return parts;
 }
 
 static Parts GetTownCenter(const Age age)
 {
-    static Part age1[] = {
-        { {-0,0}, false, false, FILE_AGE_1_TOWN_CENTER_TOP },
-        { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT },
-        { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {-1,1}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE },
-        { {-2,2}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {-1,1}, false, false, FILE_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-        { {-1,1}, false, false, FILE_AGE_1_TOWN_CENTER_SHADOW },
-    };
-    static Part age2[] = {
-        { {-0,0}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
-        { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
-        { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {-1,1}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
-        { {-2,2}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {-1,1}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-        { {-1,1}, true, false, FILE_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
-    };
-    static Part age3[] = {
-        { {-0,0}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_TOP },
-        { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
-        { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {-1,1}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
-        { {-2,2}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {-1,1}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-        { {-1,1}, true, false, FILE_AGE_3_NORTH_EUROPE_TOWN_CENTER_SHADOW },
-    };
-    static Part age4[] = {
-        { {-0,0}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_TOP },
-        { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_FLOORING },
-        { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
-        { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-        { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-        { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
-        { {-2,2}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-        { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-        { {-1,1}, true, false, FILE_AGE_4_NORTH_EUROPE_TOWN_CENTER_SHADOW },
-    };
     Parts parts = { NULL, 0 };
     switch(age)
     {
-    case AGE_1: parts.part = age1; parts.count = UTIL_LEN(age1); break;
-    case AGE_2: parts.part = age2; parts.count = UTIL_LEN(age2); break;
-    case AGE_3: parts.part = age3; parts.count = UTIL_LEN(age3); break;
-    case AGE_4: parts.part = age4; parts.count = UTIL_LEN(age4); break;
+    case AGE_1: parts.part = town_center_age1; parts.count = UTIL_LEN(town_center_age1); break;
+    case AGE_2: parts.part = town_center_age2; parts.count = UTIL_LEN(town_center_age2); break;
+    case AGE_3: parts.part = town_center_age3; parts.count = UTIL_LEN(town_center_age3); break;
+    case AGE_4: parts.part = town_center_age4; parts.count = UTIL_LEN(town_center_age4); break;
     }
     return parts;
 }
 
 static Parts GetBarracks(const Age age)
 {
-    static Part age1[] = { { {0,0}, false, false, FILE_AGE_1_BARRACKS } };
-    static Part age2[] = { { {0,0}, true,  false, FILE_AGE_2_NORTH_EUROPE_BARRACKS } };
-    static Part age3[] = { { {0,0}, true,  false, FILE_AGE_3_NORTH_EUROPE_BARRACKS } };
     Parts parts = { NULL, 0 };
     switch(age)
     {
-    case AGE_1: parts.part = age1; parts.count = UTIL_LEN(age1); break;
-    case AGE_2: parts.part = age2; parts.count = UTIL_LEN(age2); break;
+    case AGE_1: parts.part = barracks_age1; parts.count = UTIL_LEN(barracks_age1); break;
+    case AGE_2: parts.part = barracks_age2; parts.count = UTIL_LEN(barracks_age2); break;
     case AGE_3:
-    case AGE_4: parts.part = age3; parts.count = UTIL_LEN(age3); break;
+    case AGE_4: parts.part = barracks_age3; parts.count = UTIL_LEN(barracks_age3); break;
     }
     return parts;
 }
@@ -163,106 +200,72 @@ static Parts DropAsianMillShadow(Parts parts, const Civ civ, const Age age)
 
 static Parts GetMill(const Age age, const Civ civ)
 {
-    static Part age1[] = {
-        { {0,0}, false, false, FILE_AGE_1_MILL },
-        { {0,0}, false, false, FILE_AGE_1_MILL_DONKEY },
-    };
-    static Part age2[] = {
-        { {0,0}, true, false, FILE_AGE_2_NORTH_EUROPE_MILL },
-        { {0,0}, true, false, FILE_AGE_2_NORTH_EUROPE_MILL_ANIMATION },
-        { {0,0}, true, true,  FILE_AGE_2_NORTH_EUROPE_MILL_SHADOW },
-    };
-    static Part age3[] = {
-        { {0,0}, true, false, FILE_AGE_3_NORTH_EUROPE_MILL },
-        { {0,0}, true, false, FILE_AGE_3_NORTH_EUROPE_MILL_ANIMATION },
-        { {0,0}, true, true,  FILE_AGE_3_NORTH_EUROPE_MILL_SHADOW },
-    };
     Parts parts = { NULL, 0 };
     switch(age)
     {
-        case AGE_1: parts.part = age1; parts.count = UTIL_LEN(age1); break;
-        case AGE_2: parts.part = age2; parts.count = UTIL_LEN(age2); break;
+        case AGE_1: parts.part = mill_age1; parts.count = UTIL_LEN(mill_age1); break;
+        case AGE_2: parts.part = mill_age2; parts.count = UTIL_LEN(mill_age2); break;
         case AGE_3:
-        case AGE_4: parts.part = age3; parts.count = UTIL_LEN(age3); break;
+        case AGE_4: parts.part = mill_age3; parts.count = UTIL_LEN(mill_age3); break;
     }
     return DropAsianMillShadow(parts, civ, age);
 }
 
 static Parts GetHouse(const Age age)
 {
-    static Part age1[] = { { {0,0}, false, false, FILE_AGE_1_HOUSE } };
-    static Part age2[] = { { {0,0}, true,  false, FILE_AGE_2_NORTH_EUROPE_HOUSE } };
-    static Part age3[] = { { {0,0}, true,  false, FILE_AGE_3_NORTH_EUROPE_HOUSE } };
     Parts parts = { NULL, 0 };
     switch(age)
     {
-        case AGE_1: parts.part = age1; parts.count = UTIL_LEN(age1); break;
-        case AGE_2: parts.part = age2; parts.count = UTIL_LEN(age2); break;
+        case AGE_1: parts.part = house_age1; parts.count = UTIL_LEN(house_age1); break;
+        case AGE_2: parts.part = house_age2; parts.count = UTIL_LEN(house_age2); break;
         case AGE_3:
-        case AGE_4: parts.part = age3; parts.count = UTIL_LEN(age3); break;
+        case AGE_4: parts.part = house_age3; parts.count = UTIL_LEN(house_age3); break;
     }
     return parts;
 }
 
 static Parts GetOutpost(void)
 {
-    static Part part[] = {
-        { {0,0}, false, false, FILE_OUTPOST },
-        { {0,0}, false, false, FILE_OUTPOST_SHADOW },
-    };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { outpost, UTIL_LEN(outpost) };
     return parts;
 }
 
 static Parts GetStoneCamp(void)
 {
-    static Part part[] = {
-        { {0,0}, true, false, FILE_NORTH_EUROPE_STONE_MINING_CAMP },
-    };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { stone_camp, UTIL_LEN(stone_camp) };
     return parts;
 }
 
 static Parts GetLumberCamp(void)
 {
-    static Part part[] = {
-        { {0,0}, true, false, FILE_NORTH_EUROPE_LUMBER_CAMP },
-    };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { lumber_camp, UTIL_LEN(lumber_camp) };
     return parts;
 }
 
 static Parts GetCastle(void)
 {
-    static Part part[] = {
-        { {0,0}, true, false, FILE_NORTH_EUROPE_CASTLE },
-        { {0,0}, true, false, FILE_NORTH_EUROPE_CASTLE_SHADOW },
-    };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { castle, UTIL_LEN(castle) };
     return parts;
 }
 
 static Parts GetMilitia(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_MILITIA_IDLE } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { militia, UTIL_LEN(militia) };
     return parts;
 }
 
 static Parts GetManAtArms(void)
 {
-    static Part part[] = { { {0,0}, false, false, FILE_MAN_AT_ARMS_IDLE } };
-    const Parts parts = { part, UTIL_LEN(part) };
+    const Parts parts = { man_at_arms, UTIL_LEN(man_at_arms) };
     return parts;
 }
 
 static Parts Copy(const Parts parts)
 {
-    Parts copy;
-    copy.count = parts.count;
-    copy.part = UTIL_ALLOC(Part, copy.count);
-    for(int32_t i = 0; i < copy.count; i++)
-        copy.part[i] = parts.part[i];
+    Part* part = UTIL_ALLOC(Part, parts.count);
+    for(int32_t i = 0; i < parts.count; i++)
+        part[i] = parts.part[i];
+    const Parts copy = { part, parts.count };
     return copy;
 }
 
@@ -301,9 +304,9 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
     case ICONTYPE_TECH:
         switch(button.icon_tech)
         {
-        case ICONTECH_AGE_2 : return GetAge2UpFlag();
-        case ICONTECH_AGE_3 : return GetAge3UpFlag();
-        case ICONTECH_AGE_4 : return GetAge4UpFlag();
+        case ICONTECH_AGE_2 :
+        case ICONTECH_AGE_3 :
+        case ICONTECH_AGE_4 : return GetAgeUpFlag();
         case ICONTECH_RESEARCH_MAN_AT_ARMS : return GetManAtArmsFlag();
         }
         break;
