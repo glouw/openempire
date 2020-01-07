@@ -102,7 +102,7 @@ endif
 FLAGS += -Wall -Wextra -Wshadow -Wpedantic
 
 ifeq (00, $(CLANG)$(CPP))
-COMPILER = gcc -std=c99
+COMPILER = gcc -std=c11
 endif
 
 ifeq (01, $(CLANG)$(CPP))

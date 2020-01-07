@@ -728,12 +728,11 @@ static Units CountPopulation(Units units)
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Button next = Button_Upgrade(button, overview.share.bits);
-    const Parts parts = Parts_FromButton(next, overview.share.status.age, overview.share.status.civ);
+    const Parts parts = Parts_FromButton(button, overview.share.status.age, overview.share.status.civ);
     if(parts.part != NULL)
     {
-        if(!Bits_Get(overview.share.bits, next.trigger))
-            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, next.trigger);
+        if(!Bits_Get(overview.share.bits, button.trigger))
+            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
         Parts_Free(parts);
     }
     return units;
@@ -742,7 +741,7 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-    const Button button = Button_FromOverview(overview);
+    const Button button = Button_Upgrade(Button_FromOverview(overview), overview.share.bits);
     return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating);
 }
 
@@ -872,11 +871,11 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
             {
-            case TRIGGER_NONE            : return units; // KEEP COMPILER QUIET.
             case TRIGGER_AGE_UP_2        :
             case TRIGGER_AGE_UP_3        :
             case TRIGGER_AGE_UP_4        : return AgeUp(units, flag, overview, grid, graphics, map);
             case TRIGGER_UPGRADE_MILITIA : return UpgradeByType(units, flag, grid, graphics, TYPE_MILITIA);
+            case TRIGGER_NONE            : return units; // KEEP COMPILER QUIET.
             }
         }
     }

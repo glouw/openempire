@@ -42,7 +42,7 @@ Button Next(Button button, const Bits bits, const Trigger a, const Trigger b, co
 {
     if(Bits_Get(bits, a))
     {
-        button.uni.index = index;
+        button.index = index;
         button.trigger = b;
     }
     return button;
@@ -53,14 +53,14 @@ Button Button_Upgrade(Button button, const Bits bits)
     switch(button.icon_type)
     {
     case ICONTYPE_TECH:
-        if(button.uni.index == ICONTECH_AGE_2)
+        if(button.index == ICONTECH_AGE_2)
         {
             button = Next(button, bits, TRIGGER_AGE_UP_2, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
             button = Next(button, bits, TRIGGER_AGE_UP_3, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
         }
         break;
     case ICONTYPE_UNIT:
-        if(button.uni.index == ICONUNIT_MILITIA)
+        if(button.index == ICONUNIT_MILITIA)
         {
             button = Next(button, bits, TRIGGER_UPGRADE_MILITIA, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
         }

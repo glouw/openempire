@@ -536,15 +536,14 @@ static void DrawPack(const Vram vram, const Pack pack, const Bits bits)
 {
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
-        const Button button = pack.buttons.button[index];
-        const Button next = Button_Upgrade(button, bits);
-        SDL_Surface* const surface = pack.animation[next.icon_type].surface[next.uni.index];
+        const Button button = Button_Upgrade(pack.buttons.button[index], bits);
+        SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.index];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         const Rect rect = {
             { 0, 0 },
             { surface->w, surface->h }
         };
-        const bool red_out = Bits_Get(bits, next.trigger);
+        const bool red_out = Bits_Get(bits, button.trigger);
         DrawWithBounds(vram, surface, offset, rect, red_out);
     }
 }

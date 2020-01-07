@@ -4,8 +4,7 @@
 
 Bits Bits_Set(Bits bits, const Trigger trigger)
 {
-    bits |= (1 << (int32_t) trigger);
-    return bits;
+    return bits |= (1 << (int32_t) trigger);
 }
 
 bool Bits_Get(const Bits bits, const Trigger trigger)

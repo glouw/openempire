@@ -286,7 +286,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
     switch(button.icon_type)
     {
     case ICONTYPE_BUILD:
-        switch(button.uni.icon_build)
+        switch(button.icon_build)
         {
         case ICONBUILD_BARRACKS    : return GetBarracks  (age     );
         case ICONBUILD_MILL        : return GetMill      (age, civ);
@@ -299,7 +299,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         }
         break;
     case ICONTYPE_TECH:
-        switch(button.uni.icon_tech)
+        switch(button.icon_tech)
         {
         case ICONTECH_AGE_2 : return GetAge2UpFlag();
         case ICONTECH_AGE_3 : return GetAge3UpFlag();
@@ -308,7 +308,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         }
         break;
     case ICONTYPE_UNIT:
-        switch(button.uni.icon_unit)
+        switch(button.icon_unit)
         {
         case ICONUNIT_MILITIA         : return GetMilitia       ();
         case ICONUNIT_MAN_AT_ARMS     : return GetManAtArms     ();

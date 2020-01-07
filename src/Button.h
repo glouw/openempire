@@ -15,8 +15,7 @@ typedef struct
         IconBuild icon_build;
         IconUnit icon_unit;
         IconTech icon_tech;
-    }
-    uni;
+    };
     Trigger trigger;
 }
 Button;
