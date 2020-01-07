@@ -114,42 +114,55 @@ static Part man_at_arms[] = {
 
 static Parts GetAgeUpFlag(void)
 {
-    const Parts parts = { flag_a, UTIL_LEN(flag_a) };
+    const Parts parts = {
+        flag_a, UTIL_LEN(flag_a)
+    };
     return parts;
 }
 
 static Parts GetManAtArmsFlag(void)
 {
-    const Parts parts = { flag_b, UTIL_LEN(flag_b) };
+    const Parts parts = {
+        flag_b, UTIL_LEN(flag_b)
+    };
     return parts;
 }
 
 static Parts GetMaleVillager(void)
 {
-    const Parts parts = { villager_male, UTIL_LEN(villager_male) };
+    const Parts parts = {
+        villager_male, UTIL_LEN(villager_male)
+    };
     return parts;
 }
 
 static Parts GetFemaleVillager(void)
 {
-    const Parts parts = { villager_female, UTIL_LEN(villager_female) };
+    const Parts parts = {
+        villager_female, UTIL_LEN(villager_female)
+    };
     return parts;
 }
 
 Parts Parts_GetRedArrows(void)
 {
-    const Parts parts = { red_arrows, UTIL_LEN(red_arrows) };
+    const Parts parts = {
+        red_arrows, UTIL_LEN(red_arrows)
+    };
     return parts;
 }
 
 Parts Parts_GetSmoke(void)
 {
-    const Parts parts = { smoke_a, UTIL_LEN(smoke_a) };
+    const Parts parts = {
+        smoke_a, UTIL_LEN(smoke_a)
+    };
     return parts;
 }
 
 Parts Parts_GetFire(void)
 {
+    // NOTICE THE 1 PART - RANDOM FIRE IS CHOSEN.
     Parts parts = { NULL, 1 };
     switch(Util_Rand() % 5)
     {
@@ -226,37 +239,49 @@ static Parts GetHouse(const Age age)
 
 static Parts GetOutpost(void)
 {
-    const Parts parts = { outpost, UTIL_LEN(outpost) };
+    const Parts parts = {
+        outpost, UTIL_LEN(outpost)
+    };
     return parts;
 }
 
 static Parts GetStoneCamp(void)
 {
-    const Parts parts = { stone_camp, UTIL_LEN(stone_camp) };
+    const Parts parts = {
+        stone_camp, UTIL_LEN(stone_camp)
+    };
     return parts;
 }
 
 static Parts GetLumberCamp(void)
 {
-    const Parts parts = { lumber_camp, UTIL_LEN(lumber_camp) };
+    const Parts parts = {
+        lumber_camp, UTIL_LEN(lumber_camp)
+    };
     return parts;
 }
 
 static Parts GetCastle(void)
 {
-    const Parts parts = { castle, UTIL_LEN(castle) };
+    const Parts parts = {
+        castle, UTIL_LEN(castle)
+    };
     return parts;
 }
 
 static Parts GetMilitia(void)
 {
-    const Parts parts = { militia, UTIL_LEN(militia) };
+    const Parts parts = {
+        militia, UTIL_LEN(militia)
+    };
     return parts;
 }
 
 static Parts GetManAtArms(void)
 {
-    const Parts parts = { man_at_arms, UTIL_LEN(man_at_arms) };
+    const Parts parts = {
+        man_at_arms, UTIL_LEN(man_at_arms)
+    };
     return parts;
 }
 
