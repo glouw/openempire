@@ -24,6 +24,7 @@ typedef enum
     TYPE_RUBBLE,
     TYPE_MILITIA,
     TYPE_MAN_AT_ARMS,
+    TYPE_LONG_SWORDSMAN,
     TYPE_TREE,
     TYPE_FLAG,
 

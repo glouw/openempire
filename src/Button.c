@@ -38,16 +38,14 @@ int32_t Button_GetHotkeysLen(void)
     return UTIL_LEN(hotkeys);
 }
 
-Button Next(Button button, const Bits bits, const Trigger a, const Trigger b, const int32_t index)
+Button Next(Button button, const Trigger trigger, const int32_t index)
 {
-    if(Bits_Get(bits, a))
-    {
-        button.index = index;
-        button.trigger = b;
-    }
+    button.index = index;
+    button.trigger = trigger;
     return button;
 }
 
+// BUTTON INDEX REFERENCES DEFAULT BUTTON STARTING POINT DEFINED IN BUTTONS.C
 Button Button_Upgrade(Button button, const Bits bits)
 {
     switch(button.icon_type)
@@ -55,14 +53,19 @@ Button Button_Upgrade(Button button, const Bits bits)
     case ICONTYPE_TECH:
         if(button.index == ICONTECH_AGE_2)
         {
-            button = Next(button, bits, TRIGGER_AGE_UP_2, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
-            button = Next(button, bits, TRIGGER_AGE_UP_3, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
+            if(Bits_Get(bits, TRIGGER_AGE_UP_2)) button = Next(button, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
+            if(Bits_Get(bits, TRIGGER_AGE_UP_3)) button = Next(button, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
+        }
+        if(button.index == ICONTECH_RESEARCH_MAN_AT_ARMS)
+        {
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA) && Bits_Get(bits, TRIGGER_AGE_UP_3)) button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS, ICONTECH_RESEARCH_LONG_SWORDSMAN);
         }
         break;
     case ICONTYPE_UNIT:
         if(button.index == ICONUNIT_MILITIA)
         {
-            button = Next(button, bits, TRIGGER_UPGRADE_MILITIA, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA))     button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS)) button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
         }
         break;
     }

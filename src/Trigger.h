@@ -7,5 +7,6 @@ typedef enum
     TRIGGER_AGE_UP_3,
     TRIGGER_AGE_UP_4,
     TRIGGER_UPGRADE_MILITIA,
+    TRIGGER_UPGRADE_MAN_AT_ARMS,
 }
 Trigger;

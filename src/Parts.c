@@ -108,6 +108,9 @@ static Part castle[] = {
 static Part militia[] = {
     { {0,0}, false, false, FILE_MILITIA_IDLE }
 };
+static Part long_swordsman[] = {
+    { {0,0}, false, false, FILE_LONG_SWORDSMAN_IDLE }
+};
 static Part man_at_arms[] = {
     { {0,0}, false, false, FILE_MAN_AT_ARMS_IDLE }
 };
@@ -120,7 +123,7 @@ static Parts GetAgeUpFlag(void)
     return parts;
 }
 
-static Parts GetManAtArmsFlag(void)
+static Parts GetBarracksResearchFlag(void)
 {
     const Parts parts = {
         flag_b, UTIL_LEN(flag_b)
@@ -285,6 +288,14 @@ static Parts GetManAtArms(void)
     return parts;
 }
 
+static Parts GetLongSwordsMan(void)
+{
+    const Parts parts = {
+        long_swordsman, UTIL_LEN(long_swordsman)
+    };
+    return parts;
+}
+
 static Parts Copy(const Parts parts)
 {
     Part* part = UTIL_ALLOC(Part, parts.count);
@@ -332,7 +343,8 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         case ICONTECH_AGE_2 :
         case ICONTECH_AGE_3 :
         case ICONTECH_AGE_4 : return GetAgeUpFlag();
-        case ICONTECH_RESEARCH_MAN_AT_ARMS : return GetManAtArmsFlag();
+        case ICONTECH_RESEARCH_MAN_AT_ARMS    :
+        case ICONTECH_RESEARCH_LONG_SWORDSMAN : return GetBarracksResearchFlag();
         }
         break;
     case ICONTYPE_UNIT:
@@ -340,6 +352,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         {
         case ICONUNIT_MILITIA         : return GetMilitia       ();
         case ICONUNIT_MAN_AT_ARMS     : return GetManAtArms     ();
+        case ICONUNIT_LONG_SWORDSMAN  : return GetLongSwordsMan ();
         case ICONUNIT_MALE_VILLAGER   : return GetMaleVillager  ();
         case ICONUNIT_FEMALE_VILLAGER : return GetFemaleVillager();
         }
