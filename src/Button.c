@@ -58,16 +58,18 @@ Button Button_Upgrade(Button button, const Bits bits)
         }
         if(button.index == ICONTECH_RESEARCH_MAN_AT_ARMS)
         {
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA)     && Bits_Get(bits, TRIGGER_AGE_UP_3)) button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS,    ICONTECH_RESEARCH_LONG_SWORDSMAN);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS) && Bits_Get(bits, TRIGGER_AGE_UP_4)) button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN, ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA)        && Bits_Get(bits, TRIGGER_AGE_UP_3)) button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS,          ICONTECH_RESEARCH_LONG_SWORDSMAN);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS)    && Bits_Get(bits, TRIGGER_AGE_UP_4)) button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN,       ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_LONG_SWORDSMAN) && Bits_Get(bits, TRIGGER_AGE_UP_4)) button = Next(button, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN, ICONTECH_RESEARCH_CHAMPION);
         }
         break;
     case ICONTYPE_UNIT:
         if(button.index == ICONUNIT_MILITIA)
         {
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA))        button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS))    button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_LONG_SWORDSMAN)) button = Next(button, TRIGGER_NONE, ICONUNIT_TWO_HANDED_SWORDSMAN);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA))              button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS))          button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_LONG_SWORDSMAN))       button = Next(button, TRIGGER_NONE, ICONUNIT_TWO_HANDED_SWORDSMAN);
+            if(Bits_Get(bits, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN)) button = Next(button, TRIGGER_NONE, ICONUNIT_CHAMPION);
         }
         break;
     }

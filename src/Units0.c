@@ -871,13 +871,14 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
             {
-            case TRIGGER_AGE_UP_2               :
-            case TRIGGER_AGE_UP_3               :
-            case TRIGGER_AGE_UP_4               : return AgeUp(units, flag, overview, grid, graphics, map);
-            case TRIGGER_UPGRADE_MILITIA        : return UpgradeByType(units, flag, grid, graphics, TYPE_MILITIA);
-            case TRIGGER_UPGRADE_MAN_AT_ARMS    : return UpgradeByType(units, flag, grid, graphics, TYPE_MAN_AT_ARMS);
-            case TRIGGER_UPGRADE_LONG_SWORDSMAN : return UpgradeByType(units, flag, grid, graphics, TYPE_LONG_SWORDSMAN);
-            case TRIGGER_NONE                   : return units; // KEEP COMPILER QUIET.
+            case TRIGGER_AGE_UP_2                     :
+            case TRIGGER_AGE_UP_3                     :
+            case TRIGGER_AGE_UP_4                     : return AgeUp(units, flag, overview, grid, graphics, map);
+            case TRIGGER_UPGRADE_MILITIA              : return UpgradeByType(units, flag, grid, graphics, TYPE_MILITIA);
+            case TRIGGER_UPGRADE_MAN_AT_ARMS          : return UpgradeByType(units, flag, grid, graphics, TYPE_MAN_AT_ARMS);
+            case TRIGGER_UPGRADE_LONG_SWORDSMAN       : return UpgradeByType(units, flag, grid, graphics, TYPE_LONG_SWORDSMAN);
+            case TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN : return UpgradeByType(units, flag, grid, graphics, TYPE_TWO_HANDED_SWORDSMAN);
+            case TRIGGER_NONE                         : return units; // KEEP COMPILER QUIET.
             }
         }
     }

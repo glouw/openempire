@@ -108,14 +108,17 @@ static Part castle[] = {
 static Part militia[] = {
     { {0,0}, false, false, FILE_MILITIA_IDLE }
 };
+static Part man_at_arms[] = {
+    { {0,0}, false, false, FILE_MAN_AT_ARMS_IDLE }
+};
 static Part long_swordsman[] = {
     { {0,0}, false, false, FILE_LONG_SWORDSMAN_IDLE }
 };
 static Part two_handed_swordsman[] = {
     { {0,0}, false, false, FILE_TWO_HANDED_SWORDSMAN_IDLE }
 };
-static Part man_at_arms[] = {
-    { {0,0}, false, false, FILE_MAN_AT_ARMS_IDLE }
+static Part champion[] = {
+    { {0,0}, false, false, FILE_CHAMPION_IDLE }
 };
 
 static Parts GetAgeUpFlag(void)
@@ -126,7 +129,7 @@ static Parts GetAgeUpFlag(void)
     return parts;
 }
 
-static Parts GetBarracksResearchFlag(void)
+static Parts GetMilitiaResearchFlag(void)
 {
     const Parts parts = {
         flag_b, UTIL_LEN(flag_b)
@@ -307,6 +310,14 @@ static Parts GetTwoHandedSwordsMan(void)
     return parts;
 }
 
+static Parts GetChampion(void)
+{
+    const Parts parts = {
+        champion, UTIL_LEN(champion)
+    };
+    return parts;
+}
+
 static Parts Copy(const Parts parts)
 {
     Part* part = UTIL_ALLOC(Part, parts.count);
@@ -351,12 +362,13 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
     case ICONTYPE_TECH:
         switch(button.icon_tech)
         {
-        case ICONTECH_AGE_2 :
-        case ICONTECH_AGE_3 :
-        case ICONTECH_AGE_4 : return GetAgeUpFlag();
+        case ICONTECH_AGE_2                         :
+        case ICONTECH_AGE_3                         :
+        case ICONTECH_AGE_4                         : return GetAgeUpFlag();
         case ICONTECH_RESEARCH_MAN_AT_ARMS          :
         case ICONTECH_RESEARCH_LONG_SWORDSMAN       :
-        case ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN : return GetBarracksResearchFlag();
+        case ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN :
+        case ICONTECH_RESEARCH_CHAMPION             : return GetMilitiaResearchFlag();
         }
         break;
     case ICONTYPE_UNIT:
@@ -366,6 +378,7 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
         case ICONUNIT_MAN_AT_ARMS          : return GetManAtArms         ();
         case ICONUNIT_LONG_SWORDSMAN       : return GetLongSwordsMan     ();
         case ICONUNIT_TWO_HANDED_SWORDSMAN : return GetTwoHandedSwordsMan();
+        case ICONUNIT_CHAMPION             : return GetChampion          ();
         case ICONUNIT_MALE_VILLAGER        : return GetMaleVillager      ();
         case ICONUNIT_FEMALE_VILLAGER      : return GetFemaleVillager    ();
         }
