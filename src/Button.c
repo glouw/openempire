@@ -33,6 +33,7 @@ static const Trigger icon_two_handed_swordsman[] = {
 static const Trigger icon_champion[] = {
     TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN
 };
+
 static const char hotkeys[] = {
     'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B'
 };
@@ -122,6 +123,10 @@ Button Button_Upgrade(Button button, const Bits bits)
             if(TRIGGERED(bits, icon_champion))
                 button = Next(button, TRIGGER_NONE, ICONUNIT_CHAMPION);
         }
+        break;
+    case ICONTYPE_NONE:
+    case ICONTYPE_BUILD:
+    case ICONTYPE_COUNT:
         break;
     }
     return button;
