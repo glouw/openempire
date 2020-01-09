@@ -3,7 +3,49 @@
 #include "Buttons.h"
 #include "Util.h"
 
-static const char hotkeys[] = { 'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B' };
+static const Trigger research_long_swordsman[] = {
+    TRIGGER_UPGRADE_MILITIA,
+    TRIGGER_AGE_UP_3
+};
+static const Trigger research_two_handed_swordsman[] = {
+    TRIGGER_UPGRADE_MAN_AT_ARMS,
+    TRIGGER_AGE_UP_4
+};
+static const Trigger research_champion[] = {
+    TRIGGER_UPGRADE_LONG_SWORDSMAN,
+    TRIGGER_AGE_UP_4
+};
+static const Trigger icon_age_3[] = {
+    TRIGGER_AGE_UP_2
+};
+static const Trigger icon_age_4[] = {
+    TRIGGER_AGE_UP_3
+};
+static const Trigger icon_man_at_arms[] = {
+    TRIGGER_UPGRADE_MILITIA
+};
+static const Trigger icon_long_swordsman[] = {
+    TRIGGER_UPGRADE_MAN_AT_ARMS
+};
+static const Trigger icon_two_handed_swordsman[] = {
+    TRIGGER_UPGRADE_LONG_SWORDSMAN
+};
+static const Trigger icon_champion[] = {
+    TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN
+};
+static const char hotkeys[] = {
+    'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B'
+};
+
+static bool Triggered(const Bits bits, const Trigger triggers[], const int32_t len)
+{
+    for(int32_t i = 0; i < len; i++)
+        if(!Bits_Get(bits, triggers[i]))
+            return false;
+    return true;
+}
+
+#define TRIGGERED(bits, triggers) Triggered(bits, triggers, UTIL_LEN(triggers))
 
 Button Button_FromOverview(const Overview overview)
 {
@@ -53,23 +95,32 @@ Button Button_Upgrade(Button button, const Bits bits)
     case ICONTYPE_TECH:
         if(button.index == ICONTECH_AGE_2)
         {
-            if(Bits_Get(bits, TRIGGER_AGE_UP_2)) button = Next(button, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
-            if(Bits_Get(bits, TRIGGER_AGE_UP_3)) button = Next(button, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
+            if(TRIGGERED(bits, icon_age_3))
+                button = Next(button, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
+            if(TRIGGERED(bits, icon_age_4))
+                button = Next(button, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
         }
         if(button.index == ICONTECH_RESEARCH_MAN_AT_ARMS)
         {
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA)        && Bits_Get(bits, TRIGGER_AGE_UP_3)) button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS,          ICONTECH_RESEARCH_LONG_SWORDSMAN);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS)    && Bits_Get(bits, TRIGGER_AGE_UP_4)) button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN,       ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_LONG_SWORDSMAN) && Bits_Get(bits, TRIGGER_AGE_UP_4)) button = Next(button, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN, ICONTECH_RESEARCH_CHAMPION);
+            if(TRIGGERED(bits, research_long_swordsman))
+                button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS, ICONTECH_RESEARCH_LONG_SWORDSMAN);
+            if(TRIGGERED(bits, research_two_handed_swordsman))
+                button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN, ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN);
+            if(TRIGGERED(bits, research_champion))
+                button = Next(button, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN, ICONTECH_RESEARCH_CHAMPION);
         }
         break;
     case ICONTYPE_UNIT:
         if(button.index == ICONUNIT_MILITIA)
         {
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MILITIA))              button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_MAN_AT_ARMS))          button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_LONG_SWORDSMAN))       button = Next(button, TRIGGER_NONE, ICONUNIT_TWO_HANDED_SWORDSMAN);
-            if(Bits_Get(bits, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN)) button = Next(button, TRIGGER_NONE, ICONUNIT_CHAMPION);
+            if(TRIGGERED(bits, icon_man_at_arms))
+                button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
+            if(TRIGGERED(bits, icon_long_swordsman))
+                button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
+            if(TRIGGERED(bits, icon_two_handed_swordsman))
+                button = Next(button, TRIGGER_NONE, ICONUNIT_TWO_HANDED_SWORDSMAN);
+            if(TRIGGERED(bits, icon_champion))
+                button = Next(button, TRIGGER_NONE, ICONUNIT_CHAMPION);
         }
         break;
     }
