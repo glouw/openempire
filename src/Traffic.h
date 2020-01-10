@@ -3,7 +3,6 @@
 #include <stdint.h>
 
 #include "Color.h"
-#include "Packet.h"
 
 typedef struct
 {
@@ -12,4 +11,4 @@ typedef struct
 }
 Traffic;
 
-Traffic Traffic_Make(const Packet);
+void Traffic_Print(const Traffic);

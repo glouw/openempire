@@ -63,7 +63,8 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-                traffics = Traffics_Queue(traffics, Traffic_Make(dequeued));
+                Traffic_Print(dequeued.traffic);
+                traffics = Traffics_Queue(traffics, dequeued.traffic);
             }
         }
         units = Units_Caretake(units, data.graphics, grid, map, field);

@@ -164,7 +164,9 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
             packet.game_running = game_running;
             packet.users_connected = sockets.users_connected;
             packet.users = sockets.users;
-            packet.setpoint = setpoint;
+            for(int32_t j = 0; j < COLOR_COUNT; j++)
+                packet.traffic.cycles[j] = sockets.cycles[j];
+            packet.traffic.setpoint = setpoint;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));

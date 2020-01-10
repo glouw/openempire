@@ -1,11 +1,11 @@
 #include "Traffic.h"
 
-Traffic Traffic_Make(const Packet packet)
+#include "Util.h"
+
+void Traffic_Print(const Traffic traffic)
 {
-    static Traffic zero;
-    Traffic traffic = zero;
+    printf("%5d :: ", traffic.setpoint);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        traffic.cycles[i] = packet.overview[i].cycles;
-    traffic.setpoint = packet.setpoint;
-    return traffic;
+        printf("%5d ", traffic.cycles[i]);
+    putchar('\n');
 }
