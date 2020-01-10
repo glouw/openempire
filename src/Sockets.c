@@ -147,7 +147,7 @@ static void Print(const Sockets sockets, const int32_t setpoint)
     }
 }
 
-static void Send(const Sockets sockets, const int32_t max, const bool game_running, const int32_t setpoint)
+static void Send(const Sockets sockets, const int32_t max, const bool game_running)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
@@ -164,9 +164,6 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
             packet.game_running = game_running;
             packet.users_connected = sockets.users_connected;
             packet.users = sockets.users;
-            for(int32_t j = 0; j < COLOR_COUNT; j++)
-                packet.traffic.cycles[j] = sockets.cycles[j];
-            packet.traffic.setpoint = setpoint;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
@@ -244,7 +241,7 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         if(!quiet)
             Print(sockets, setpoint);
         CheckParity(sockets);
-        Send(sockets, max, game_running, setpoint);
+        Send(sockets, max, game_running);
         return Clear(sockets);
     }
     return sockets;

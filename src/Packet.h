@@ -2,7 +2,6 @@
 
 #include "Overview.h"
 #include "Sock.h"
-#include "Traffic.h"
 #include "Color.h"
 
 #include <stdbool.h>
@@ -25,7 +24,6 @@ typedef struct
     bool game_running;
     int32_t users_connected;
     int32_t users;
-    Traffic traffic;
 }
 Packet;
 

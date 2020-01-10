@@ -2,7 +2,6 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
-#include "Traffics.h"
 #include "Sockets.h"
 #include "Overview.h"
 #include "Units.h"
@@ -41,7 +40,6 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
     units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
-    Traffics traffics = Traffics_Init(video.xres);
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -63,8 +61,6 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-                Traffic_Print(dequeued.traffic);
-                traffics = Traffics_Queue(traffics, dequeued.traffic);
             }
         }
         units = Units_Caretake(units, data.graphics, grid, map, field);
@@ -85,7 +81,6 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         if(packet.control == PACKET_CONTROL_SLOW_DOWN)
             SDL_Delay(t3 - t1);
     }
-    Traffics_Free(traffics);
     Units_Free(floats);
     Units_Free(units);
     Packets_Free(packets);
