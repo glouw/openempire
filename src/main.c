@@ -8,10 +8,9 @@
 #include "Args.h"
 #include "Util.h"
 
-static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid, const Args args )
+static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
 {
-    // LOBBY.
-    int32_t users = 0;
+    int32_t loops = 0;
     Overview overview = Overview_Init(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -20,16 +19,22 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         if(packet.turn > 0)
         {
             overview.share.color = (Color) packet.client_id;
-            Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color);
+            Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
             if(packet.game_running)
             {
-                users = packet.users;
+                *users = packet.users;
                 break;
             }
         }
         SDL_Delay(CONFIG_MAIN_LOOP_SPEED_MS);
     }
-    // PLAY.
+    return overview;
+}
+
+static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid, const Args args )
+{
+    int32_t users = 0;
+    Overview overview = WaitInLobby(video, sock, &users);
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
     Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
     units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
@@ -85,7 +90,7 @@ static void RunClient(const Args args)
 {
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
-    Video_PrintLobby(video, 0, 0, (Color) -1);
+    Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
     const Map map = Map_Make(40, data.terrain);
     const Grid grid = Grid_Make(map.cols, map.rows, map.tile_width, map.tile_height);

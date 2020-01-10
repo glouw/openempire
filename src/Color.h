@@ -18,3 +18,5 @@ typedef enum
 Color;
 
 const char* Color_ToString(const Color);
+
+uint32_t Color_ToInt(const Color);
