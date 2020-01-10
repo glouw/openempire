@@ -12,27 +12,26 @@ Packets Packets_Init(void)
     return packets;
 }
 
-#define WRAP(index, max) (index % max)
-
 Packets Packets_Queue(Packets packets, Packet packet)
 {
-    const int32_t index = WRAP(packets.b, packets.max);
+    const int32_t index = UTIL_WRAP(packets.b, packets.max);
     packets.packet[index] = packet;
     packets.b++;
-    if(packets.b == packets.a)
+    if(UTIL_WRAP(packets.b, packets.max)
+    == UTIL_WRAP(packets.a, packets.max))
         packets.a++;
     return packets;
 }
 
 Packet Packets_Peek(const Packets packets)
 {
-    const int32_t index = WRAP(packets.a, packets.max);
+    const int32_t index = UTIL_WRAP(packets.a, packets.max);
     return packets.packet[index];
 }
 
 Packets Packets_Dequeue(Packets packets, Packet* packet)
 {
-    const int32_t index = WRAP(packets.a, packets.max);
+    const int32_t index = UTIL_WRAP(packets.a, packets.max);
     *packet = packets.packet[index];
     packets.a++;
     return packets;

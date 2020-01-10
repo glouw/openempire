@@ -11,6 +11,7 @@
 
 #define UTIL_REALLOC(pointer, type, count) ((type*) realloc(pointer, sizeof(type) * count))
 
+#define UTIL_WRAP(a, b) ((a) % (b))
 
 #define UTIL_LEN(array) ((int32_t) (sizeof(array) / sizeof(*array)))
 

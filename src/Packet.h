@@ -11,9 +11,10 @@
 #define PACKET_CONTROL_SLOW_DOWN ('-')
 #define PACKET_CONTROL_STEADY ('*')
 
+// NO POINTERS ANYWHERE IN HERE! PERFECT FOR TCP...
+
 typedef struct
 {
-    // NO POINTERS ANYWHERE IN HERE! PERFECT FOR TCP...
     Overview overview[COLOR_COUNT];
     char control;
     int32_t turn;
@@ -23,6 +24,7 @@ typedef struct
     bool game_running;
     int32_t users_connected;
     int32_t users;
+    int32_t setpoint;
 }
 Packet;
 

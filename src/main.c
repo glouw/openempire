@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
+#include "Traffics.h"
 #include "Sockets.h"
 #include "Overview.h"
 #include "Units.h"
@@ -31,15 +32,16 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
     return overview;
 }
 
-static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid, const Args args )
+static void Play(const Sock sock, const Video video, const Data data, const Map map, const Grid grid, const Civ civ)
 {
     int32_t users = 0;
     Overview overview = WaitInLobby(video, sock, &users);
-    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
-    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
+    Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, civ);
+    Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, civ);
     units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
+    Traffics traffics = Traffics_Init(video.xres);
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -61,6 +63,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+                traffics = Traffics_Queue(traffics, Traffic_Make(dequeued));
             }
         }
         units = Units_Caretake(units, data.graphics, grid, map, field);
@@ -81,6 +84,7 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         if(packet.control == PACKET_CONTROL_SLOW_DOWN)
             SDL_Delay(t3 - t1);
     }
+    Traffics_Free(traffics);
     Units_Free(floats);
     Units_Free(units);
     Packets_Free(packets);
@@ -99,7 +103,7 @@ static void RunClient(const Args args)
     else
     {
         const Sock sock = Sock_Connect(args.host, args.port);
-        Play(sock, video, data, map, grid, args);
+        Play(sock, video, data, map, grid, args.civ);
         Sock_Disconnect(sock);
     }
     Map_Free(map);
