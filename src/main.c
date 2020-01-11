@@ -68,14 +68,13 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         if(packet.control == PACKET_CONTROL_SPEED_UP)
             continue;
         floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
-        const int32_t t1 = SDL_GetTicks();
         Video_Draw(video, data, map, units, floats, overview, grid);
-        const int32_t t2 = SDL_GetTicks();
-        const int32_t dt = t2 - t0;
+        const int32_t t1 = SDL_GetTicks();
+        const int32_t dt = t1 - t0;
         Video_Render(video, units, dt, cycles);
         Field_Free(field);
-        const int32_t t3 = SDL_GetTicks();
-        const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t3 - t0);
+        const int32_t t2 = SDL_GetTicks();
+        const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
         if(ms > 0)
             SDL_Delay(ms);
     }
