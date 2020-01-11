@@ -106,19 +106,6 @@ static int32_t GetCycleMax(const Sockets sockets)
     return max;
 }
 
-static int32_t GetCycleMin(const Sockets sockets)
-{
-    int32_t min = INT32_MAX;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    {
-        const int32_t cycles = sockets.cycles[i];
-        if(cycles != 0)
-            if(cycles < min)
-                min = cycles;
-    }
-    return min;
-}
-
 static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -173,18 +160,10 @@ static bool ShouldRelay(const int32_t cycles, const int32_t interval)
     return (cycles % interval) == 0;
 }
 
-// ----- MAX
-//   A
-// ----- SETPOINT (MUST BE ABOVE THRESHOLD)
-//   B
-// ----- MIN
-static Sockets CheckStability(Sockets sockets, const int32_t setpoint, const int32_t min, const int32_t max)
+static Sockets CheckStability(Sockets sockets, const int32_t setpoint)
 {
-    const int32_t a = max - setpoint;
-    const int32_t b = setpoint - min;
-    const int32_t window = CONFIG_SOCKETS_LATENCY_WINDOW;
     const int32_t threshold = CONFIG_SOCKETS_THRESHOLD_START;
-    sockets.is_stable = setpoint > threshold && a < window && b < window;
+    sockets.is_stable = setpoint > threshold;
     return sockets;
 }
 
@@ -229,10 +208,9 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
     if(ShouldRelay(cycles, interval))
     {
         const int32_t setpoint = GetCycleSetpoint(sockets);
-        const int32_t min = GetCycleMin(sockets);
         const int32_t max = GetCycleMax(sockets);
         sockets = CalculateControlChars(sockets, setpoint);
-        sockets = CheckStability(sockets, setpoint, min, max);
+        sockets = CheckStability(sockets, setpoint);
         sockets = CountConnectedPlayers(sockets);
         const bool game_running = GetGameRunning(sockets);
         if(!quiet)
