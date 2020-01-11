@@ -138,7 +138,9 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
         TCPsocket socket = sockets.socket[i];
         if(socket)
         {
-            const int32_t offset = 20; // XXX. MAKE THIS PING DEPENDENT.
+            const int32_t latency_ms = 100;
+            const int32_t fps = 1000 / CONFIG_MAIN_LOOP_SPEED_MS;
+            const int32_t offset = (3 * fps * latency_ms) / 2000;
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
