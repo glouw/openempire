@@ -777,7 +777,7 @@ static void AgeUpUnit(Unit* const unit, const Overview overview, const Grid grid
     unit->has_children = has_children;
 }
 
-static void AgeUpInitial(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
+static void AgeUpSimple(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -794,25 +794,17 @@ static Age GetNextAge(const Status status)
     return (Age) ((int32_t) status.age + 1);
 }
 
-// TOWN CENTERS DO NOT PLAY NICELY WITH AGING UP - NEW TOWN CENTERS HAVE MORE PARTS, ETC.
-// THIS FUNCTION REMOVES OLD TOWN CENTERS AND PLACES NEW TOWN CENTERS WITH THE NEXT AGE.
-static Units AgeUpTownCenters(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Color color)
+static Units AgeUpBuildingByType(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Type type, const Color color)
 {
     static Point zero;
-    const Button button = {
-        ICONTYPE_BUILD, {
-            ICONBUILD_TOWN_CENTER
-        },
-        TRIGGER_NONE
-    };
     const Age age = GetNextAge(overview.share.status);
-    const Parts towncenter = Parts_FromButton(button, age, overview.share.status.civ);
+    const Parts parts = Parts_FromButton(button, age, overview.share.status.civ);
     Points points = Points_New(COLOR_COUNT);
     // REMOVE.
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(Unit_IsType(unit, color, TYPE_TOWN_CENTER))
+        if(Unit_IsType(unit, color, type))
         {
             const Point half = Point_Div(unit->trait.dimensions, 2);
             const Point cart = Point_Add(unit->cart, half);
@@ -823,7 +815,7 @@ static Units AgeUpTownCenters(Units units, const Overview overview, const Grid g
     }
     // CREATE.
     for(int32_t i = 0; i < points.count; i++)
-        units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, towncenter, true, TRIGGER_NONE);
+        units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE);
     Points_Free(points);
     return units;
 }
@@ -839,22 +831,45 @@ static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid,
     return units;
 }
 
-static bool IsMyFlag(const Units units, Unit* const flag)
+static bool IsMyColor(const Units units, const Color color)
 {
-    return flag->color == units.share.color;
+    return color == units.share.color;
+}
+
+// SOME BUILDINGS LIKE MILLS AND TOWNCENTERS SPAWN ADDITIONAL PARTS IN THEIR SUCCESSIVE AGES.
+// THE SIMPLE AGE UP WILL NOT WORK. THE ENTIRE THING MUST BE REMOVED AND REPLACED.
+static Units AgeUpAdvanced(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color, const Map map)
+{
+    typedef struct
+    {
+        Button button;
+        Type type;
+    }
+    Print;
+    const Print prints[] = {
+        { { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE }, TYPE_TOWN_CENTER },
+        { { ICONTYPE_BUILD, { ICONBUILD_MILL        }, TRIGGER_NONE }, TYPE_MILL        },
+    };
+    for(int32_t i = 0; i < UTIL_LEN(prints); i++)
+    {
+        const Print print = prints[i];
+        units = AgeUpBuildingByType(units, overview, grid, graphics, map, print.button, print.type, color);
+    }
+    return units;
 }
 
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(IsMyFlag(units, flag))
+    const Color color = flag->color;
+    if(IsMyColor(units, color))
         units.share.status.age = GetNextAge(units.share.status);
-    AgeUpInitial(units, overview, grid, graphics, flag->color);
-    return AgeUpTownCenters(units, overview, grid, graphics, map, flag->color);
+    AgeUpSimple(units, overview, grid, graphics, color);
+    return AgeUpAdvanced(units, overview, grid, graphics, color, map);
 }
 
 static Units UpdateBits(Units units, Unit* const flag)
 {
-    if(IsMyFlag(units, flag))
+    if(IsMyColor(units, flag->color))
         units.share.bits = Bits_Set(units.share.bits, flag->trigger);
     return units;
 }
