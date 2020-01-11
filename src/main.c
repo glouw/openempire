@@ -78,8 +78,6 @@ static void Play(const Sock sock, const Video video, const Data data, const Map 
         const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t3 - t0);
         if(ms > 0)
             SDL_Delay(ms);
-        if(packet.control == PACKET_CONTROL_SLOW_DOWN)
-            SDL_Delay(t3 - t1);
     }
     Units_Free(floats);
     Units_Free(units);

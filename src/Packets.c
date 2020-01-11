@@ -4,7 +4,7 @@
 
 Packets Packets_Init(void)
 {
-    const int32_t max = 64;
+    const int32_t max = 32;
     static Packets zero;
     Packets packets = zero;
     packets.packet = UTIL_ALLOC(Packet, max);

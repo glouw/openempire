@@ -122,12 +122,9 @@ static int32_t GetCycleMin(const Sockets sockets)
 static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-    {
-        const int32_t cycles = sockets.cycles[i];
-        if(cycles  > setpoint) sockets.control[i] = PACKET_CONTROL_SLOW_DOWN;
-        if(cycles == setpoint) sockets.control[i] = PACKET_CONTROL_STEADY;
-        if(cycles  < setpoint) sockets.control[i] = PACKET_CONTROL_SPEED_UP;
-    }
+        sockets.control[i] = (sockets.cycles[i] < setpoint)
+            ? PACKET_CONTROL_SPEED_UP
+            : PACKET_CONTROL_STEADY;
     return sockets;
 }
 
@@ -154,7 +151,7 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
         TCPsocket socket = sockets.socket[i];
         if(socket)
         {
-            const int32_t offset = 2; // XXX. MAKE THIS PING DEPENDENT.
+            const int32_t offset = 20; // XXX. MAKE THIS PING DEPENDENT.
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
