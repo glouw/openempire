@@ -800,7 +800,6 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
     const Age age = GetNextAge(overview.share.status);
     const Parts parts = Parts_FromButton(button, age, overview.share.status.civ);
     Points points = Points_New(COLOR_COUNT);
-    // REMOVE.
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -813,7 +812,6 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
             unit->must_skip_debris = true;
         }
     }
-    // CREATE.
     for(int32_t i = 0; i < points.count; i++)
         units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE);
     Points_Free(points);

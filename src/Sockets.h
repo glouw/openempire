@@ -10,6 +10,7 @@ typedef struct
 {
     int32_t cycles[COLOR_COUNT];
     int32_t queue_size[COLOR_COUNT];
+    int32_t pings[COLOR_COUNT];
     uint64_t parity[COLOR_COUNT];
     TCPsocket socket[COLOR_COUNT];
     char control[COLOR_COUNT];
@@ -19,6 +20,8 @@ typedef struct
     int32_t turn;
     int32_t users_connected;
     int32_t users;
+    int32_t offset_last;
+    int32_t cycles_last;
     bool is_stable;
 }
 Sockets;
@@ -32,3 +35,5 @@ Sockets Sockets_Service(const Sockets, const int32_t timeout);
 Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval, const bool quiet);
 
 Sockets Sockets_Accept(const Sockets);
+
+void Sockets_Ping(const Sockets, const int32_t timeout);

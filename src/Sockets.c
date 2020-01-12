@@ -62,6 +62,7 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                     sockets.cycles[i] = overview.cycles;
                     sockets.parity[i] = overview.parity;
                     sockets.queue_size[i] = overview.queue_size;
+                    sockets.pings[i] = overview.ping;
                     if(Overview_UsedAction(overview))
                         sockets.packet.overview[i] = overview;
                 }
@@ -106,6 +107,18 @@ static int32_t GetCycleMax(const Sockets sockets)
     return max;
 }
 
+static int32_t GetPingMax(const Sockets sockets)
+{
+    int32_t max = 0;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t ping = sockets.pings[i];
+        if(ping > max)
+            max = ping;
+    }
+    return max;
+}
+
 static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -115,36 +128,46 @@ static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
     return sockets;
 }
 
-static void Print(const Sockets sockets, const int32_t setpoint)
+static void Print(const Sockets sockets, const int32_t setpoint, const int32_t max_ping)
 {
-    printf("%d :: %d\n", sockets.turn, setpoint);
+    printf("TURN %d :: SETPOINT %d :: MAX_PING %d\n", sockets.turn, setpoint, max_ping);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const uint64_t parity = sockets.parity[i];
         const int32_t cycles = sockets.cycles[i];
+        const int32_t ping = sockets.pings[i];
         const char control = sockets.control[i];
         const char queue_size = sockets.queue_size[i];
         const char parity_symbol = sockets.is_stable ? '!' : '?';
         TCPsocket socket = sockets.socket[i];
-        printf("%d :: %d :: %c :: 0x%016lX :: %c :: %d :: %d\n",
-                i, socket != NULL, parity_symbol, parity, control, cycles, queue_size);
+        printf("%d :: %d :: %c :: 0x%016lX :: %c :: %d :: %d -> %d ms\n",
+                i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
     }
 }
 
-static void Send(const Sockets sockets, const int32_t max, const bool game_running)
+static Sockets Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running, const int32_t cycles)
 {
+    const int32_t fps = 1000 / CONFIG_MAIN_LOOP_SPEED_MS;
+    const int32_t offset = (2 * fps * max_ping) / 1000;
+    const int32_t exec_cycle = max_cycle + offset;
+    if(offset < sockets.offset_last)
+    {
+        const int32_t dt = cycles - sockets.cycles_last;
+        if(dt < sockets.offset_last)
+        {
+            puts(">>> LAG SPIKE.... HOLDING...");
+            return sockets;
+        }
+    }
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         TCPsocket socket = sockets.socket[i];
         if(socket)
         {
-            const int32_t latency_ms = 100;
-            const int32_t fps = 1000 / CONFIG_MAIN_LOOP_SPEED_MS;
-            const int32_t offset = (3 * fps * latency_ms) / 2000;
             Packet packet = sockets.packet;
             packet.control = sockets.control[i];
             packet.turn = sockets.turn;
-            packet.exec_cycle = max + offset;
+            packet.exec_cycle = exec_cycle;
             packet.client_id = i;
             packet.is_stable = sockets.is_stable;
             packet.game_running = game_running;
@@ -155,6 +178,9 @@ static void Send(const Sockets sockets, const int32_t max, const bool game_runni
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
     }
+    sockets.offset_last = offset;
+    sockets.cycles_last = cycles;
+    return sockets;
 }
 
 static bool ShouldRelay(const int32_t cycles, const int32_t interval)
@@ -210,15 +236,16 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
     if(ShouldRelay(cycles, interval))
     {
         const int32_t setpoint = GetCycleSetpoint(sockets);
-        const int32_t max = GetCycleMax(sockets);
+        const int32_t max_cycle = GetCycleMax(sockets);
+        const int32_t max_ping = GetPingMax(sockets);
         sockets = CalculateControlChars(sockets, setpoint);
         sockets = CheckStability(sockets, setpoint);
         sockets = CountConnectedPlayers(sockets);
         const bool game_running = GetGameRunning(sockets);
         if(!quiet)
-            Print(sockets, setpoint);
+            Print(sockets, setpoint, max_ping);
         CheckParity(sockets);
-        Send(sockets, max, game_running);
+        sockets = Send(sockets, max_cycle, max_ping, game_running, cycles);
         return Clear(sockets);
     }
     return sockets;
@@ -230,4 +257,20 @@ Sockets Sockets_Accept(const Sockets sockets)
     return (client != NULL)
         ? Add(sockets, client)
         : sockets;
+}
+
+void Sockets_Ping(const Sockets ping, const int32_t timeout)
+{
+    if(SDLNet_CheckSockets(ping.set, timeout))
+        for(int32_t i = 0; i < COLOR_COUNT; i++)
+        {
+            TCPsocket socket = ping.socket[i];
+            if(SDLNet_SocketReady(socket))
+            {
+                int32_t temp = 0;
+                const int32_t size = sizeof(temp);
+                SDLNet_TCP_Recv(socket, &temp, size);
+                SDLNet_TCP_Send(socket, &temp, size);
+            }
+        }
 }

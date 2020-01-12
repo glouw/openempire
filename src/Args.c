@@ -18,6 +18,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
     args.color = COLOR_BLU;
     args.host = "localhost";
     args.port = 1234;
+    args.port_ping = args.port + 1;
     args.xres = 800;
     args.yres = 600;
     args.users = 1;
