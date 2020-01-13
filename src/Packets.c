@@ -75,13 +75,6 @@ Packets Packets_ClearWaste(Packets packets, const int32_t cycles)
     return packets;
 }
 
-void Packets_FinalCheck(const Packets packets, const int32_t cycles)
-{
-    const Packet peek = Packets_Peek(packets);
-    if(cycles > peek.exec_cycle)
-        Util_Bomb("CLIENT - CLIENT_ID %d :: OUT OF SYNC :: CYCLES %d :: PEEK %d\n", peek.client_id, cycles, peek.exec_cycle);
-}
-
 bool Packets_MustExecute(const Packets packets, const int32_t cycles)
 {
     return Packets_Peek(packets).exec_cycle == cycles;

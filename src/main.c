@@ -46,6 +46,7 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
+        const Field field = Units_Field(units, map);
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
@@ -55,17 +56,13 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
         packets = Packets_ClearWaste(packets, cycles);
-        const Field field = Units_Field(units, map);
         if(Packets_Active(packets))
-        {
-            Packets_FinalCheck(packets, cycles);
             while(Packets_MustExecute(packets, cycles))
             {
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
-        }
         units = Units_Caretake(units, data.graphics, grid, map, field);
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)

@@ -31,6 +31,4 @@ void Packets_Print(const Packets);
 
 Packets Packets_ClearWaste(Packets, const int32_t cycles);
 
-void Packets_FinalCheck(const Packets, const int32_t cycles);
-
 bool Packets_MustExecute(const Packets, const int32_t cycles);

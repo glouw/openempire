@@ -2,18 +2,21 @@
 
 #include "Interfac.h"
 #include "Util.h"
-
-#include <assert.h>
+#include "Config.h"
 
 const char* Graphics_GetString(const Graphics graphics)
 {
+#if CONFIG_DISABLE_STRINGS == 1
     switch(graphics)
     {
 #define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, dimensions, action, detail, midding) case name: return #name;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
-    return 0;
+#else
+    (void) graphics;
+#endif
+    return "N/A";
 }
 
 uint8_t Graphics_GetHeight(const Graphics graphics)
