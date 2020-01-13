@@ -90,25 +90,20 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
+        const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
-        const int32_t my_ping = GetPing();
-        overview = Overview_Update(overview, input, parity, cycles, Packets_Size(packets), units.share, my_ping);
+        const int32_t ping_now = GetPing();
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping_now);
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
-        while(Packets_Active(packets) && Packets_Peek(packets).exec_cycle < cycles)
-        {
-            Packet waste;
-            packets = Packets_Dequeue(packets, &waste);
-        }
+        packets = Packets_ClearWaste(packets, cycles);
         const Field field = Units_Field(units, map);
         if(Packets_Active(packets))
         {
-            const Packet peek = Packets_Peek(packets);
-            if(cycles > peek.exec_cycle)
-                Util_Bomb("CLIENT - CLIENT_ID %d :: OUT OF SYNC :: CYCLES %d :: PEEK %d\n", peek.client_id, cycles, peek.exec_cycle);
-            while(cycles == Packets_Peek(packets).exec_cycle)
+            Packets_FinalCheck(packets, cycles);
+            while(Packets_MustExecute(packets, cycles))
             {
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
@@ -154,7 +149,6 @@ static void RunClient(const Args args)
     Video_Free(video);
     SDL_Quit();
     SDL_DestroyMutex(mutex);
-    // NO NEED TO FREE PING LOOP. OPERATING SYSTEM WILL SHUT IT DOWN.
 }
 
 static void RunServer(const Args args)
