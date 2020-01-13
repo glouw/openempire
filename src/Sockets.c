@@ -148,7 +148,7 @@ static void Print(const Sockets sockets, const int32_t setpoint, const int32_t m
 static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t fps = 1000 / CONFIG_MAIN_LOOP_SPEED_MS;
-    const int32_t offset = (2 * fps *  max_ping) / 1000; // XXX. SOMETHING IS NOT RIGHT HERE. NEED TO EXPERIMENT AT DIFFERENT LATENCIES.
+    const int32_t offset = (3 * fps *  max_ping) / 1000; // XXX. SOMETHING IS NOT RIGHT HERE. NEED TO EXPERIMENT AT DIFFERENT LATENCIES.
     const int32_t exec_cycle = max_cycle + offset;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
