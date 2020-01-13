@@ -36,6 +36,7 @@ SRCS += Parts.c
 SRCS += Packet.c
 SRCS += Packets.c
 SRCS += Palette.c
+SRCS += Ping.c
 SRCS += Point.c
 SRCS += Points.c
 SRCS += Quad.c

@@ -2,36 +2,12 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
+#include "Ping.h"
 #include "Sockets.h"
 #include "Overview.h"
 #include "Units.h"
 #include "Args.h"
 #include "Util.h"
-
-#include <SDL2/SDL_mutex.h>
-
-static SDL_mutex* mutex;
-static int32_t ping;
-
-static void SetPing(const int32_t dt)
-{
-    if(SDL_TryLockMutex(mutex) == 0)
-    {
-        ping = dt;
-        SDL_UnlockMutex(mutex);
-    }
-}
-
-static int32_t GetPing(void)
-{
-    int32_t out = -1;
-    if(SDL_TryLockMutex(mutex) == 0)
-    {
-        out = ping;
-        SDL_UnlockMutex(mutex);
-    }
-    return out;
-}
 
 static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
 {
@@ -56,26 +32,6 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
     return overview;
 }
 
-static int32_t Ping(void* const data)
-{
-    Args* args = (Args*) data;
-    const Sock pinger = Sock_Connect(args->host, args->port_ping);
-    while(true)
-    {
-        const int32_t message = 0xCAFEBABE;
-        int32_t temp;
-        const int32_t size = sizeof(temp);
-        const int32_t t0 = SDL_GetTicks();
-        SDLNet_TCP_Send(pinger.server, &message, size);
-        SDLNet_TCP_Recv(pinger.server, &temp, size);
-        const int32_t t1 = SDL_GetTicks();
-        if(temp == message)
-            SetPing(t1 - t0);
-    }
-    Sock_Disconnect(pinger);
-    return 0;
-}
-
 static void Play(const Video video, const Data data, const Map map, const Grid grid, const Args args)
 {
     int32_t users = 0;
@@ -92,8 +48,8 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
         const int32_t t0 = SDL_GetTicks();
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
-        const int32_t ping_now = GetPing();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping_now);
+        const int32_t ping = Ping_Get();
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
@@ -133,8 +89,8 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
 
 static void RunClient(const Args args)
 {
-    mutex = SDL_CreateMutex();
-    SDL_CreateThread(Ping, "N/A", (void*) &args);
+    Ping_Init();
+    SDL_CreateThread(Ping_Ping, "N/A", (void*) &args);
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
@@ -148,7 +104,7 @@ static void RunClient(const Args args)
     Data_Free(data);
     Video_Free(video);
     SDL_Quit();
-    SDL_DestroyMutex(mutex);
+    Ping_Shutdown();
 }
 
 static void RunServer(const Args args)

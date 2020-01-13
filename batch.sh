@@ -1,7 +1,7 @@
 BIN=openempires
 XRES=1300
 YRES=720
-USERS=4
+USERS=2
 CIVS=4
 ./$BIN --server --users $USERS &
 SERVER_PID=$!
