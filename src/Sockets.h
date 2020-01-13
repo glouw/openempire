@@ -20,8 +20,6 @@ typedef struct
     int32_t turn;
     int32_t users_connected;
     int32_t users;
-    int32_t offset_last;
-    int32_t cycles_last;
     bool is_stable;
 }
 Sockets;

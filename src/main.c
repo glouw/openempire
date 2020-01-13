@@ -97,6 +97,11 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
+        while(Packets_Active(packets) && Packets_Peek(packets).exec_cycle < cycles)
+        {
+            Packet waste;
+            packets = Packets_Dequeue(packets, &waste);
+        }
         const Field field = Units_Field(units, map);
         if(Packets_Active(packets))
         {

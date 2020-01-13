@@ -51,3 +51,13 @@ bool Packets_Active(const Packets packets)
 {
     return Packets_Size(packets) > 0;
 }
+
+void Packets_Print(const Packets packets)
+{
+    for(int32_t i = packets.a; i < packets.b; i++)
+    {
+        const int32_t x = UTIL_WRAP(i, packets.max);
+        printf("%d ", packets.packet[x].exec_cycle);
+    }
+    putchar('\n');
+}

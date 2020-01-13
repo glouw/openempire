@@ -140,25 +140,16 @@ static void Print(const Sockets sockets, const int32_t setpoint, const int32_t m
         const char queue_size = sockets.queue_size[i];
         const char parity_symbol = sockets.is_stable ? '!' : '?';
         TCPsocket socket = sockets.socket[i];
-        printf("%d :: %d :: %c :: 0x%016lX :: %c :: %d :: %d -> %d ms\n",
+        printf("%d :: %d :: %c :: 0x%016lX :: %c :: CYCLES %d :: QUEUE %d -> %d ms\n",
                 i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
     }
 }
 
-static Sockets Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running, const int32_t cycles)
+static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t fps = 1000 / CONFIG_MAIN_LOOP_SPEED_MS;
-    const int32_t offset = (2 * fps * max_ping) / 1000;
+    const int32_t offset = (fps * (max_ping + CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES)) / 1000;
     const int32_t exec_cycle = max_cycle + offset;
-    if(offset < sockets.offset_last)
-    {
-        const int32_t dt = cycles - sockets.cycles_last;
-        if(dt < sockets.offset_last)
-        {
-            puts(">>> LAG SPIKE.... HOLDING...");
-            return sockets;
-        }
-    }
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         TCPsocket socket = sockets.socket[i];
@@ -178,9 +169,6 @@ static Sockets Send(Sockets sockets, const int32_t max_cycle, const int32_t max_
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
     }
-    sockets.offset_last = offset;
-    sockets.cycles_last = cycles;
-    return sockets;
 }
 
 static bool ShouldRelay(const int32_t cycles, const int32_t interval)
@@ -245,7 +233,7 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         if(!quiet)
             Print(sockets, setpoint, max_ping);
         CheckParity(sockets);
-        sockets = Send(sockets, max_cycle, max_ping, game_running, cycles);
+        Send(sockets, max_cycle, max_ping, game_running);
         return Clear(sockets);
     }
     return sockets;
