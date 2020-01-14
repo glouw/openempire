@@ -32,5 +32,3 @@ bool Util_StringEqual(const char* const a, const char* const b);
 int32_t Util_Sqrt(const int64_t val);
 
 uint16_t Util_Rand(void);
-
-int32_t Util_Time(void);

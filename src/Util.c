@@ -1,7 +1,6 @@
 #include "Util.h"
 
 #include <stdio.h>
-#include <sys/time.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -56,11 +55,4 @@ uint16_t Util_Rand(void)
     static uint32_t next = 1;
     next = next * 1103515245 + 12345;
     return (uint16_t) (next / 65536) % 32768;
-}
-
-int32_t Util_Time(void)
-{
-    struct timeval stamp;
-    gettimeofday(&stamp, NULL);
-    return stamp.tv_sec * (int32_t) 1e6 + stamp.tv_usec;
 }
