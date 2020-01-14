@@ -69,9 +69,11 @@ static bool IsNextWaste(const Packets packets, const int32_t cycles)
 
 Packets Packets_ClearWaste(Packets packets, const int32_t cycles)
 {
-    Packet waste;
     while(IsNextWaste(packets, cycles))
+    {
+        Packet waste;
         packets = Packets_Dequeue(packets, &waste);
+    }
     return packets;
 }
 
