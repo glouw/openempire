@@ -11,8 +11,8 @@ Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const 
         const Point zero = { 0,0 };
         const int32_t starting_villagers = 5;
         const Point middle = {
-            map.cols / 2,
-            map.rows / 2,
+            map.size / 2,
+            map.size / 2,
         };
         const int32_t padding = 10;
         const int32_t dx = middle.x - padding;

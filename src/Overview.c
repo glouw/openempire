@@ -111,8 +111,8 @@ Point Overview_IsoToCart(const Overview overview, const Grid grid, const Point i
     const int32_t h = grid.tile_iso_height - 1;
     const int32_t rx = (xx * h + yy * w);
     const int32_t ry = (yy * w - xx * h);
-    const int32_t cx = (+2 * rx + w * h * grid.cols) / (2 * w);
-    const int32_t cy = (-2 * ry + w * h * grid.rows) / (4 * h);
+    const int32_t cx = (+2 * rx + w * h * grid.size) / (2 * w);
+    const int32_t cy = (-2 * ry + w * h * grid.size) / (4 * h);
     const Point cart_raw = { cx, cy };
     const Point cart = {
         1 * cx / h,
@@ -139,7 +139,7 @@ Point Overview_CartToIso(const Overview overview, const Grid grid, const Point c
     const int32_t yy = (cart.y - cart.x) * (h / 2);
     const int32_t mx = xx + overview.xres / 2;
     const int32_t my = yy + overview.yres / 2;
-    const int32_t cx = mx - (w / 2) * grid.cols;
+    const int32_t cx = mx - (w / 2) * grid.size;
     const int32_t cy = my - (h / 2);
     const Point iso = {
         cx - overview.pan.x,

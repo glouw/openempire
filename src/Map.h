@@ -10,8 +10,8 @@
 typedef struct
 {
     Terrain* file;
-    int32_t rows;
-    int32_t cols;
+    int32_t* height;
+    int32_t size;
     int32_t tile_width;
     int32_t tile_height;
 }

@@ -1,5 +1,6 @@
 #include "Map.h"
 
+#include "Rect.h"
 #include "Util.h"
 
 #include <stdlib.h>
@@ -7,8 +8,8 @@
 
 static void GenerateTestZone(const Map map)
 {
-    for(int32_t y = 0; y < map.rows; y++)
-    for(int32_t x = 0; x < map.cols; x++)
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
     {
         const Point point = { x, y };
         Map_SetTerrainFile(map, point, FILE_GRASS);
@@ -20,9 +21,10 @@ Map Map_Make(const int32_t size, const Registrar terrain)
     const Frame frame = terrain.animation[COLOR_GAIA][FILE_DIRT].frame[0];
     static Map zero;
     Map map = zero;
-    map.rows = size;
-    map.cols = size;
-    map.file = UTIL_ALLOC(Terrain, map.rows * map.cols);
+    map.size = size;
+    const int32_t power = map.size * map.size;
+    map.file = UTIL_ALLOC(Terrain, power);
+    map.height = UTIL_ALLOC(Terrain, power);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
 #if 1
@@ -33,27 +35,28 @@ Map Map_Make(const int32_t size, const Registrar terrain)
 
 static bool InBounds(const Map map, const Point point)
 {
-    return point.x < map.cols && point.x >= 0
-        && point.y < map.rows && point.y >= 0;
+    return point.x < map.size && point.x >= 0
+        && point.y < map.size && point.y >= 0;
 }
 
 Terrain Map_GetTerrainFile(const Map map, const Point point)
 {
     if(!InBounds(map, point))
         return FILE_TERRAIN_NONE;
-    return map.file[point.x + point.y * map.cols];
+    return map.file[point.x + point.y * map.size];
 }
 
 void Map_SetTerrainFile(const Map map, const Point point, const Terrain file)
 {
     if(!InBounds(map, point))
         return;
-    map.file[point.x + point.y * map.cols] = file;
+    map.file[point.x + point.y * map.size] = file;
 }
 
 void Map_Free(const Map map)
 {
     free(map.file);
+    free(map.height);
 }
 
 Points Map_GetBlendBox(const Map map, const Point inner)

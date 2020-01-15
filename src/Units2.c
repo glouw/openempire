@@ -56,12 +56,12 @@ void Units_ResetTiled(const Units units)
 
 static bool OutOfBounds(const Units units, const Point point)
 {
-    return point.x < 0 || point.y < 0 || point.x >= units.cols || point.y >= units.rows;
+    return point.x < 0 || point.y < 0 || point.x >= units.size || point.y >= units.size;
 }
 
 static Stack* GetStack(const Units units, const Point p)
 {
-    return &units.stack[p.x + p.y * units.cols];
+    return &units.stack[p.x + p.y * units.size];
 }
 
 Stack Units_GetStackCart(const Units units, const Point p)
@@ -72,8 +72,8 @@ Stack Units_GetStackCart(const Units units, const Point p)
 
 void Units_ResetStacks(const Units units)
 {
-    for(int32_t y = 0; y < units.rows; y++)
-    for(int32_t x = 0; x < units.cols; x++)
+    for(int32_t y = 0; y < units.size; y++)
+    for(int32_t x = 0; x < units.size; x++)
     {
         const Point point = { x, y };
         GetStack(units, point)->count = 0;

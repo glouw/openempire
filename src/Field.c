@@ -9,18 +9,18 @@
 
 static bool IsInBounds(const Field field, const Point point)
 {
-    return point.x < field.cols && point.x >= 0
-        && point.y < field.rows && point.y >= 0;
+    return point.x < field.size && point.x >= 0
+        && point.y < field.size && point.y >= 0;
 }
 
 char Field_Get(const Field field, const Point point)
 {
-    return field.object[point.x + point.y * field.cols];
+    return field.object[point.x + point.y * field.size];
 }
 
 void Field_Set(const Field field, const Point point, const char ch)
 {
-    field.object[point.x + point.y * field.cols] = ch;
+    field.object[point.x + point.y * field.size] = ch;
 }
 
 static bool IsWalkable(const Field field, const Point point)
@@ -41,7 +41,7 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     while(!Point_Equal(current, start))
     {
         path = Points_Append(path, current);
-        current = came_from.point[current.x + current.y * field.cols];
+        current = came_from.point[current.x + current.y * field.size];
     }
     return Points_Append(path, start);
 }
@@ -52,7 +52,7 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
     Meap_Insert(&frontier, 0, start);
     Points came_from = Points_New(32);
     const Point none = { -1, -1 };
-    for(int32_t i = 0; i < field.rows * field.cols; i++)
+    for(int32_t i = 0; i < field.size * field.size; i++)
         came_from = Points_Append(came_from, none);
     for(int32_t tries = 0; frontier.size > 0; tries++)
     {
@@ -82,11 +82,11 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
             && IsWalkable(field, vert)
             && IsWalkable(field, horz))
             {
-                if(Point_Equal(came_from.point[next.x + next.y * field.cols], none))
+                if(Point_Equal(came_from.point[next.x + next.y * field.size], none))
                 {
                     const int32_t priority = Heuristic(goal, next);
                     Meap_Insert(&frontier, priority, next);
-                    came_from.point[next.x + next.y * field.cols] = current.point;
+                    came_from.point[next.x + next.y * field.size] = current.point;
                 }
             }
         }

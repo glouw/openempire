@@ -11,8 +11,7 @@
 typedef struct
 {
     char* object;
-    int32_t rows;
-    int32_t cols;
+    int32_t size;
 }
 Field;
 

@@ -6,8 +6,7 @@
 
 typedef struct
 {
-    int32_t cols;
-    int32_t rows;
+    int32_t size;
     int32_t tile_iso_width;
     int32_t tile_iso_height;
     int32_t tile_cart_width;
@@ -16,7 +15,7 @@ typedef struct
 }
 Grid;
 
-Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_width, const int32_t tile_iso_height);
+Grid Grid_Make(const int32_t size, const int32_t tile_iso_width, const int32_t tile_iso_height);
 
 Point Grid_GetGridPoint(const Grid, const Point);
 

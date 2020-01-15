@@ -43,11 +43,10 @@ Field Units_Field(const Units units, const Map map)
 {
     static Field zero;
     Field field = zero;
-    field.rows = map.rows;
-    field.cols = map.cols;
-    field.object = UTIL_ALLOC(char, field.rows * field.cols);
-    for(int32_t row = 0; row < field.rows; row++)
-    for(int32_t col = 0; col < field.cols; col++)
+    field.size = map.size;
+    field.object = UTIL_ALLOC(char, field.size * field.size);
+    for(int32_t row = 0; row < field.size; row++)
+    for(int32_t col = 0; col < field.size; col++)
     {
         const Point point = { col, row };
         CanWalk(units, map, point)
@@ -59,7 +58,7 @@ Field Units_Field(const Units units, const Map map)
 
 Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
 {
-    const int32_t area = grid.rows * grid.cols;
+    const int32_t area = grid.size * grid.size;
     Unit* const unit = UTIL_ALLOC(Unit, max);
     Stack* const stack = UTIL_ALLOC(Stack, area);
     for(int32_t i = 0; i < area; i++)
@@ -69,8 +68,7 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, con
     units.unit = unit;
     units.max = max;
     units.stack = stack;
-    units.rows = grid.rows;
-    units.cols = grid.cols;
+    units.size = grid.size;
     units.cpu_count = cpu_count;
     units.share.status.age = AGE_1;
     units.share.status.civ = civ;
@@ -82,7 +80,7 @@ Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, con
 
 void Units_Free(const Units units)
 {
-    const int32_t area = units.rows * units.cols;
+    const int32_t area = units.size * units.size;
     for(int32_t i = 0; i < area; i++)
         Stack_Free(units.stack[i]);
     free(units.stack);

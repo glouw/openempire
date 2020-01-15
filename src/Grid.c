@@ -3,12 +3,11 @@
 #include "Point.h"
 #include "Config.h"
 
-Grid Grid_Make(const int32_t cols, const int32_t rows, const int32_t tile_iso_width, const int32_t tile_iso_height)
+Grid Grid_Make(const int32_t size, const int32_t tile_iso_width, const int32_t tile_iso_height)
 {
     static Grid zero;
     Grid grid = zero;
-    grid.cols = cols;
-    grid.rows = rows;
+    grid.size = size;
     grid.tile_iso_width = tile_iso_width;
     grid.tile_iso_height = tile_iso_height;
     const Point iso_n = { 0, -tile_iso_height / 2 }; // N
@@ -90,8 +89,8 @@ Point Grid_OffsetToCell(const Point offset)
 static Point GetCenterTile(const Grid grid)
 {
     const Point out = {
-        (grid.cols * grid.tile_cart_width) / 2,
-        (grid.rows * grid.tile_cart_height) / 2,
+        (grid.size * grid.tile_cart_width) / 2,
+        (grid.size * grid.tile_cart_height) / 2,
     };
     return out;
 }
