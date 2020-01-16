@@ -9,16 +9,6 @@ static SDL_mutex* mutex;
 
 static int32_t ping;
 
-void Ping_Init(void)
-{
-    mutex = SDL_CreateMutex();
-}
-
-void Ping_Shutdown(void)
-{
-    SDL_DestroyMutex(mutex);
-}
-
 static void Set(const int32_t dt)
 {
     if(SDL_TryLockMutex(mutex) == 0)
@@ -39,7 +29,7 @@ int32_t Ping_Get(void)
     return out;
 }
 
-int32_t Ping_Ping(void* const data)
+static int32_t Ping(void* const data)
 {
     Args* args = (Args*) data;
     const Sock pinger = Sock_Connect(args->host, args->port_ping);
@@ -57,4 +47,15 @@ int32_t Ping_Ping(void* const data)
     }
     Sock_Disconnect(pinger);
     return 0;
+}
+
+void Ping_Init(const Args args)
+{
+    mutex = SDL_CreateMutex();
+    SDL_CreateThread(Ping, "N/A", (void*) &args);
+}
+
+void Ping_Shutdown(void)
+{
+    SDL_DestroyMutex(mutex);
 }

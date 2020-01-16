@@ -34,6 +34,7 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
 
 static void Play(const Video video, const Data data, const Map map, const Grid grid, const Args args)
 {
+    Ping_Init(args);
     int32_t users = 0;
     const Sock sock = Sock_Connect(args.host, args.port);
     Overview overview = WaitInLobby(video, sock, &users);
@@ -82,17 +83,16 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
     Units_Free(units);
     Packets_Free(packets);
     Sock_Disconnect(sock);
+    Ping_Shutdown();
 }
 
 static void RunClient(const Args args)
 {
-    Ping_Init();
-    SDL_CreateThread(Ping_Ping, "N/A", (void*) &args);
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(40, data.terrain);
+    const Map map = Map_Make(6, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     args.demo
         ? Video_RenderDataDemo(video, data, args.color)
@@ -101,7 +101,6 @@ static void RunClient(const Args args)
     Data_Free(data);
     Video_Free(video);
     SDL_Quit();
-    Ping_Shutdown();
 }
 
 static void RunServer(const Args args)
