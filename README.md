@@ -10,16 +10,17 @@ Assets from the HD edition (not the definitive edition) will soon be supported.
 
 ![](art/screenshot.png)
 
-## Dependencies
+## Dependency Installation
 
-    sdl2
-    sdl2_ttf
-    sdl2_net
+Assuming root, install the following SDL2 libraries:
 
-### Ubuntu 18.04
-    sudo apt-get install libsdl2-dev
-    sudo apt-get install libsdl2-net-dev
-    sudo apt-get install libsdl2-ttf-dev
+### Arch Linux
+
+    pacman -S sdl2 sdl2_ttf sdl2_net
+
+### Ubuntu
+
+    apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
 ## Building
 
