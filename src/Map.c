@@ -7,6 +7,12 @@
 #include <limits.h>
 #include <stdio.h>
 
+#define HEIGHT_MAX           255
+#define HEIGHT_DIRT          125
+#define HEIGHT_WATER_SHALLOW 100
+#define HEIGHT_WATER_NORMAL   75
+#define HEIGHT_WATER_DEEP     50
+
 static void Interpolate(const Map map, const Rect rect)
 {
     for(int32_t x = rect.a.x; x < rect.b.x; x++)
@@ -74,11 +80,11 @@ static void NormalizeHeight(const Map map)
     const int32_t max = Max(map);
     for(int32_t i = 0; i < map.size; i++)
     for(int32_t j = 0; j < map.size; j++)
-        map.height[j + map.size * i] = (0xFF * map.height[j + map.size * i]) / max;
+    {
+        int32_t* const height = &map.height[j + map.size * i];
+        *height = (*height * HEIGHT_MAX) / max;
+    }
 }
-
-#define GRASS 0x2A
-#define SEA   0x5F
 
 static void Create(const Map map)
 {
@@ -87,9 +93,11 @@ static void Create(const Map map)
     {
         const Point point = { x, y };
         const int32_t height = map.height[y + map.size * x];
-        Terrain file = FILE_DIRT;
-        if(height < GRASS)
-            file = FILE_GRASS;
+        Terrain file = FILE_GRASS;
+        if(height < HEIGHT_DIRT)          file = FILE_DIRT;
+        if(height < HEIGHT_WATER_SHALLOW) file = FILE_WATER_SHALLOW;
+        if(height < HEIGHT_WATER_NORMAL)  file = FILE_WATER_NORMAL;
+        if(height < HEIGHT_WATER_DEEP)    file = FILE_WATER_DEEP;
         Map_SetTerrainFile(map, point, file);
     }
 }
@@ -102,8 +110,8 @@ static void Draw(const Map map)
     for(int i = 0; i < map.size; i++)
     for(int j = 0; j < map.size; j++)
     {
-        const int a = 0x2A; // Sea floor.
-        const int b = 0x5F; // Sea level.
+        const int a = HEIGHT_WATER_SHALLOW;
+        const int b = HEIGHT_GRASS;
         const int p = map.height[j + map.size * i];
         p < a ?
             SDL_SetRenderDrawColor(renderer, 0, 0, a, 0): // Sea floor.
