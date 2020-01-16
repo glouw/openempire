@@ -40,6 +40,7 @@ void Video_PrintLobby(const Video video, const int32_t users_connected, const in
 
 Video Video_Setup(const int32_t xres, const int32_t yres, const char* const title)
 {
+    const char* const terminus = "art/TerminusTTF-4.47.0.ttf";
     const Point middle = { xres / 2, yres / 2 };
     const Point bot_rite = { xres, yres };
     const Point bot_left = { 0, yres };
@@ -51,8 +52,8 @@ Video Video_Setup(const int32_t xres, const int32_t yres, const char* const titl
     video.renderer = SDL_CreateRenderer(video.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     video.canvas = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
     video.title = title;
-    video.text = Text_Build("art/blood-and-blade.ttf", 28, 0x00FF0000);
-    video.text_small = Text_Build("art/TerminusTTF-4.47.0.ttf", 14, 0x00FFFF00);
+    video.text = Text_Build(terminus, 28, 0x00FF0000);
+    video.text_small = Text_Build(terminus, 14, 0x00FFFF00);
     video.xres = xres;
     video.yres = yres;
     video.cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
