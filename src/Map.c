@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #define HEIGHT_MAX           255
+#define HEIGHT_GRASS         140
 #define HEIGHT_DIRT          125
 #define HEIGHT_WATER_SHALLOW 100
 #define HEIGHT_WATER_NORMAL   75
