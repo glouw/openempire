@@ -1,8 +1,12 @@
 ## Open Empires
 
-This is a custom game engine for Age of Empires II written in C99 and SDL2 built for fast network play.
+This is a custom game engine for Age of Empires II written in less than 15,000 lines of C99 using only SDL2.
+
+Open Empires is multiplayer only, and borrows elements from StarCraft II and Age of Empires III.
 
 Data, art, and sound files are not supplied - to play Open Empires you must own the original boxed-set version of Age of Empires II and The Conquerors.
+
+Assets from the HD edition (not the definitive edition) will soon be supported.
 
 ![](art/screenshot.png)
 
@@ -39,5 +43,6 @@ Thanks to:
 * Ensemble Studios for many gifted childhood memories
 * Forgotten Empires for keeping the spirit of Age of Empires II alive
 
-Dedicated to Ondrej who I met walking across England as he hiked from Scotland to Spain.
-For the Josh Master. Volare, my friend.
+Dedicated to Ondrej whom I met hiking across England as he hiked from Scotland to Spain.
+
+For the Josh Master. Volare, my friend, wherever you are.
