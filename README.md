@@ -10,19 +10,12 @@ Assets from the HD edition (not the definitive edition) will soon be supported.
 
 ![](art/screenshot.png)
 
-## Dependency Installation
+## Installing SDL2 dependencies
 
-Assuming root, install the following SDL2 libraries:
+    Arch   : pacman -S sdl2 sdl2_ttf sdl2_net
+    Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
-### Arch Linux
-
-    pacman -S sdl2 sdl2_ttf sdl2_net
-
-### Ubuntu
-
-    apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
-
-## Building
+## Building from source
 
     git clone https://github.com/glouw/openempires
     cd openempires
@@ -30,15 +23,15 @@ Assuming root, install the following SDL2 libraries:
 
 ## Running
 
-First, start the server.
+First, start the server:
 
     ./openempires --server
 
-Second, start the client. Point the path flag to the installation's data folder.
+Second, start the client by specifying your window resolution and installation data folder path:
 
-    ./openempires --path "/path/to/data/folder"
+    ./openempires --xres 1440 --yres 900 --path "/path/to/data/folder"
 
-## Development Blog (on hiatus)
+## Development blog (on hiatus)
 
 http://glouw.com/2019/04/10/Reverse-Engineering-Age-of-Empires-2-Part-0.html
 
