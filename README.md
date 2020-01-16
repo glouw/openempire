@@ -10,12 +10,12 @@ Assets from the HD edition (not the definitive edition) will soon be supported.
 
 ![](art/screenshot.png)
 
-## Installing SDL2 dependencies
+## Dependencies
 
     Arch   : pacman -S sdl2 sdl2_ttf sdl2_net
     Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
-## Building from source
+## Building
 
     git clone https://github.com/glouw/openempires
     cd openempires
