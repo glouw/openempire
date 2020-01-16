@@ -16,9 +16,9 @@
 
 static void Interpolate(const Map map, const Rect rect)
 {
-    for(int32_t x = rect.a.x; x < rect.b.x; x++)
     for(int32_t y = rect.a.y; y < rect.b.y; y++)
-        map.height[y + map.size * x] = (
+    for(int32_t x = rect.a.x; x < rect.b.x; x++)
+        map.height[x + map.size * y] = (
             map.height[rect.a.y + map.size * rect.a.x] * (rect.b.x - x) * (rect.b.y - y) +
             map.height[rect.a.y + map.size * rect.b.x] * (x - rect.a.x) * (rect.b.y - y) +
             map.height[rect.b.y + map.size * rect.a.x] * (rect.b.x - x) * (y - rect.a.y) +
@@ -31,15 +31,15 @@ static void GenerateHeight(const Map map, const int32_t square)
     if(square == 2)
         return;
     const int32_t m = (square - 1) / 2;
-    for(int32_t i = m; i < map.size; i += 2 * m)
-    for(int32_t j = m; j < map.size; j += 2 * m)
-        map.height[j + map.size * i] += Util_Rand() % (2 * square + 1) - square;
-    for(int32_t i = 0; i < map.size - 1; i += m)
-    for(int32_t j = 0; j < map.size - 1; j += m)
+    for(int32_t y = m; y < map.size; y += 2 * m)
+    for(int32_t x = m; x < map.size; x += 2 * m)
+        map.height[x + map.size * y] += Util_Rand() % (2 * square + 1) - square;
+    for(int32_t y = 0; y < map.size - 1; y += m)
+    for(int32_t x = 0; x < map.size - 1; x += m)
     {
         const Rect rect = {
-            { i + 0, j + 0 },
-            { i + m, j + m },
+            { x + 0, y + 0 },
+            { x + m, y + m },
         };
         Interpolate(map, rect);
     }
@@ -49,28 +49,34 @@ static void GenerateHeight(const Map map, const int32_t square)
 static int32_t Max(const Map map)
 {
     int32_t max = INT_MIN;
-    for(int32_t i = 0; i < map.size; i++)
-    for(int32_t j = 0; j < map.size; j++)
-        if(map.height[j + map.size * i] > max)
-            max = map.height[j + map.size * i];
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
+    {
+        const int32_t height = map.height[x + map.size * y];
+        if(height > max)
+            max = height;
+    }
     return max;
 }
 
 static int32_t Min(const Map map)
 {
     int32_t min = INT_MAX;
-    for(int32_t i = 0; i < map.size; i++)
-    for(int32_t j = 0; j < map.size; j++)
-        if(map.height[j + map.size * i] < min)
-            min = map.height[j + map.size * i];
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
+    {
+        const int32_t height = map.height[x + map.size * y];
+        if(height < min)
+            min = height;
+    }
     return min;
 }
 
 static void Add(const Map map, const int32_t shift)
 {
-    for(int32_t i = 0; i < map.size; i++)
-    for(int32_t j = 0; j < map.size; j++)
-        map.height[j + map.size * i] += shift;
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
+        map.height[x + map.size * y] += shift;
 }
 
 static void NormalizeHeight(const Map map)
@@ -79,10 +85,10 @@ static void NormalizeHeight(const Map map)
     const int32_t shift = abs(min);
     Add(map, shift);
     const int32_t max = Max(map);
-    for(int32_t i = 0; i < map.size; i++)
-    for(int32_t j = 0; j < map.size; j++)
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
     {
-        int32_t* const height = &map.height[j + map.size * i];
+        int32_t* const height = &map.height[x + map.size * y];
         *height = (*height * HEIGHT_MAX) / max;
     }
 }
@@ -93,7 +99,7 @@ static void Create(const Map map)
     for(int32_t x = 0; x < map.size; x++)
     {
         const Point point = { x, y };
-        const int32_t height = map.height[y + map.size * x];
+        const int32_t height = map.height[x + map.size * y];
         Terrain file = FILE_GRASS;
         if(height < HEIGHT_DIRT)          file = FILE_DIRT;
         if(height < HEIGHT_WATER_SHALLOW) file = FILE_WATER_SHALLOW;
@@ -108,18 +114,18 @@ static void Draw(const Map map)
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_CreateWindowAndRenderer(map.size, map.size, 0, &window, &renderer);
-    for(int i = 0; i < map.size; i++)
-    for(int j = 0; j < map.size; j++)
+    for(int y = 0; y < map.size; y++)
+    for(int x = 0; x < map.size; x++)
     {
         const int a = HEIGHT_WATER_SHALLOW;
         const int b = HEIGHT_GRASS;
-        const int p = map.height[j + map.size * i];
+        const int p = map.height[x + map.size * y];
         p < a ?
             SDL_SetRenderDrawColor(renderer, 0, 0, a, 0): // Sea floor.
             p < b ?
             SDL_SetRenderDrawColor(renderer, 0, 0, p, 0): // Sea.
             SDL_SetRenderDrawColor(renderer, p, p, p, 0); // Ice and snow.
-        SDL_RenderDrawPoint(renderer, i, j);
+        SDL_RenderDrawPoint(renderer, x, y);
     }
     SDL_RenderPresent(renderer);
     SDL_Delay(1000);
