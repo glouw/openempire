@@ -2,18 +2,21 @@
 
 This is a custom game engine for Age of Empires II written in less than 15,000 lines of C99 using only SDL2.
 
-Open Empires is multiplayer only, and borrows elements from StarCraft II and Age of Empires III.
+Open Empires is multiplayer only.
 
 ![](art/screenshot.png)
 
 ## Legal
 
-Open Empires is *NOT* a binary decompilation of Age of Empires II, and its expansion, The Conquerors. The source has been written by hand to best emulate the mechanics of Age of Empires II and its expansion, The Conquerors.
+Open Empires is *NOT* a binary decompilation of Age of Empires II, and its expansion, The Conquerors.
+Open Empires is an educational custom RTS game engine with networking support written from ground up to best emulate the mechanics -
+and interface with the art assets - of Age of Empires II and its expansion, The Conquerors.
 
-Data, art, and sound files from Age of Empires II or its expansion, The Conquerors, are not supplied - to play Open Empires you must own the original boxed-set version of Age of Empires II and The Conquerors, preferably the Gold Edition.
+Data, art, and sound files from Age of Empires II or its expansion, The Conquerors, are not supplied -
+to play Open Empires you must own the original boxed-set version of Age of Empires II and The Conquerors, preferably the Gold Edition.
 
 ## Dependencies
-   
+
     Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
     Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
