@@ -16,6 +16,11 @@ Assets from the HD edition (not the definitive edition) will soon be supported.
     sdl2_ttf
     sdl2_net
 
+### Ubuntu 18.04
+    sudo apt-get install libsdl2-dev
+    sudo apt-get install libsdl2-net-dev
+    sudo apt-get install libsdl2-ttf-dev
+
 ## Building
 
     git clone https://github.com/glouw/openempires
