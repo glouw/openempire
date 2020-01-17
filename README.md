@@ -9,11 +9,15 @@ Open Empires is multiplayer only.
 ## Legal
 
 Open Empires is *NOT* a binary decompilation of Age of Empires II, and its expansion, The Conquerors.
-Open Empires is an educational custom RTS game engine with networking support written from ground up to best emulate the mechanics -
-and interface with the art assets - of Age of Empires II and its expansion, The Conquerors.
+Open Empires is an educational custom RTS game engine with networking support written from the ground up. 
 
+Open Empires interfaces with the art assets of Age of Empires II and its expansion, The Conquerors.
 Data, art, and sound files from Age of Empires II or its expansion, The Conquerors, are not supplied -
-to play Open Empires you must own the original boxed-set version of Age of Empires II and The Conquerors, preferably the Gold Edition.
+to play Open Empires you must legally own the original boxed-set version of Age of Empires II and The Conquerors, preferably the Gold Edition.
+
+Please note that this custom educational game engine, called Open Empires, is neither developed by, nor endorsed by, Ensemble Studios and its parent company Microsoft.
+Age of Empires II and The Conquerors is copyright (1999-2000) by Ensemble Studios and Microsoft.
+All rights are reserved, as are trademarks of their respective owners.
 
 ## Dependencies
 
@@ -24,7 +28,7 @@ to play Open Empires you must own the original boxed-set version of Age of Empir
 
     git clone https://github.com/glouw/openempires
     cd openempires
-    make -C src
+    make -C src 
 
 ## Running
 
@@ -44,7 +48,7 @@ http://glouw.com/2019/04/10/Reverse-Engineering-Age-of-Empires-2-Part-0.html
 
 ## Credits
 
-Thanks to:
+Thanks to: 
 * SFTech OpenAge team for their fantastic reverse engineering documentation (https://github.com/SFTtech/openage)
 * Ensemble Studios for many gifted childhood memories
 * Forgotten Empires for keeping the spirit of Age of Empires II alive
