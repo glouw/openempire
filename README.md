@@ -12,7 +12,7 @@ Assets from the HD edition (not the definitive edition) will soon be supported.
 
 ## Dependencies
 
-    Arch   : pacman -S sdl2 sdl2_ttf sdl2_net
+    Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
     Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
 ## Building
@@ -26,6 +26,8 @@ Assets from the HD edition (not the definitive edition) will soon be supported.
 First, start the server:
 
     ./openempires --server
+
+Connections only to localhost are currently supported.
 
 Second, start the client by specifying your window resolution and installation data folder path:
 

@@ -7,13 +7,6 @@
 #include <limits.h>
 #include <stdio.h>
 
-#define HEIGHT_MAX           255
-#define HEIGHT_GRASS         140
-#define HEIGHT_DIRT          125
-#define HEIGHT_WATER_SHALLOW 100
-#define HEIGHT_WATER_NORMAL   75
-#define HEIGHT_WATER_DEEP     50
-
 static void Interpolate(const Map map, const Rect rect)
 {
     for(int32_t y = rect.a.y; y < rect.b.y; y++)
@@ -89,7 +82,7 @@ static void NormalizeHeight(const Map map)
     for(int32_t x = 0; x < map.size; x++)
     {
         int32_t* const height = &map.height[x + map.size * y];
-        *height = (*height * HEIGHT_MAX) / max;
+        *height = (*height * MAP_HEIGHT_MAX) / max;
     }
 }
 
@@ -101,36 +94,12 @@ static void Create(const Map map)
         const Point point = { x, y };
         const int32_t height = map.height[x + map.size * y];
         Terrain file = FILE_GRASS;
-        if(height < HEIGHT_DIRT)          file = FILE_DIRT;
-        if(height < HEIGHT_WATER_SHALLOW) file = FILE_WATER_SHALLOW;
-        if(height < HEIGHT_WATER_NORMAL)  file = FILE_WATER_NORMAL;
-        if(height < HEIGHT_WATER_DEEP)    file = FILE_WATER_DEEP;
+        if(height < MAP_HEIGHT_DIRT)          file = FILE_DIRT;
+        if(height < MAP_HEIGHT_WATER_SHALLOW) file = FILE_WATER_SHALLOW;
+        if(height < MAP_HEIGHT_WATER_NORMAL)  file = FILE_WATER_NORMAL;
+        if(height < MAP_HEIGHT_WATER_DEEP)    file = FILE_WATER_DEEP;
         Map_SetTerrainFile(map, point, file);
     }
-}
-
-static void Draw(const Map map)
-{
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_CreateWindowAndRenderer(map.size, map.size, 0, &window, &renderer);
-    for(int y = 0; y < map.size; y++)
-    for(int x = 0; x < map.size; x++)
-    {
-        const int a = HEIGHT_WATER_SHALLOW;
-        const int b = HEIGHT_GRASS;
-        const int p = map.height[x + map.size * y];
-        p < a ?
-            SDL_SetRenderDrawColor(renderer, 0, 0, a, 0): // Sea floor.
-            p < b ?
-            SDL_SetRenderDrawColor(renderer, 0, 0, p, 0): // Sea.
-            SDL_SetRenderDrawColor(renderer, p, p, p, 0); // Ice and snow.
-        SDL_RenderDrawPoint(renderer, x, y);
-    }
-    SDL_RenderPresent(renderer);
-    SDL_Delay(1000);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
 }
 
 Map Map_Make(const int32_t power, const Registrar terrain)
@@ -147,7 +116,6 @@ Map Map_Make(const int32_t power, const Registrar terrain)
     map.tile_height = frame.height;
     GenerateHeight(map, map.size);
     NormalizeHeight(map);
-    Draw(map);
     Create(map);
     return map;
 }
@@ -163,6 +131,13 @@ Terrain Map_GetTerrainFile(const Map map, const Point point)
     if(!InBounds(map, point))
         return FILE_TERRAIN_NONE;
     return map.file[point.x + point.y * map.size];
+}
+
+int32_t Map_GetHeight(const Map map, const Point point)
+{
+    if(!InBounds(map, point))
+        return 0;
+    return map.height[point.x + point.y * map.size];
 }
 
 void Map_SetTerrainFile(const Map map, const Point point, const Terrain file)

@@ -7,6 +7,13 @@
 #include "Points.h"
 #include "Terrain.h"
 
+#define MAP_HEIGHT_MAX           255
+#define MAP_HEIGHT_GRASS         140
+#define MAP_HEIGHT_DIRT          125
+#define MAP_HEIGHT_WATER_SHALLOW 100
+#define MAP_HEIGHT_WATER_NORMAL   75
+#define MAP_HEIGHT_WATER_DEEP     50
+
 typedef struct
 {
     Terrain* file;
@@ -28,3 +35,5 @@ void Map_Free(const Map);
 Points Map_GetBlendBox(const Map, const Point inner);
 
 Lines Map_GetBlendLines(const Map, const Points);
+
+int32_t Map_GetHeight(const Map, const Point);

@@ -49,7 +49,7 @@ void Vram_Unlock(SDL_Texture* const texture)
     SDL_UnlockTexture(texture);
 }
 
-static void Put(const Vram vram, const int32_t x, const int32_t y, const uint32_t pixel)
+void Vram_Put(const Vram vram, const int32_t x, const int32_t y, const uint32_t pixel)
 {
     vram.pixels[x + y * vram.width] = pixel;
 }
@@ -61,15 +61,15 @@ static uint32_t Get(const Vram vram, const int32_t x, const int32_t y)
 
 void Vram_DrawCross(const Vram vram, const Point point, const int32_t len, const uint32_t color)
 {
-    for(int32_t x = point.x - len; x <= point.x + len; x++) Put(vram, x, point.y, color);
-    for(int32_t y = point.y - len; y <= point.y + len; y++) Put(vram, point.x, y, color);
+    for(int32_t x = point.x - len; x <= point.x + len; x++) Vram_Put(vram, x, point.y, color);
+    for(int32_t y = point.y - len; y <= point.y + len; y++) Vram_Put(vram, point.x, y, color);
 }
 
 void Vram_Clear(const Vram vram, const uint32_t color)
 {
     for(int32_t y = 0; y < vram.yres; y++)
     for(int32_t x = 0; x < vram.xres; x++)
-        Put(vram, x, y, color);
+        Vram_Put(vram, x, y, color);
 }
 
 static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
@@ -101,7 +101,7 @@ static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, co
             || tile.is_floating)
                 surface_pixel = Blend(surface_pixel, vram_pixel, 0xFF / 2);
             const uint32_t pixel = (tile.height << SURFACE_ALPHA) | surface_pixel;
-            Put(vram, coords.x, coords.y, pixel);
+            Vram_Put(vram, coords.x, coords.y, pixel);
         }
     }
 }
@@ -188,7 +188,7 @@ static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords,
         {
             const uint32_t blend_pixel = BlendMaskWithBuffer(vram, coords.x, coords.y, mask, x, y, top_pixel);
             const uint32_t pixel = blend_pixel | (tile.height << SURFACE_ALPHA);
-            Put(vram, coords.x, coords.y, pixel);
+            Vram_Put(vram, coords.x, coords.y, pixel);
         }
     }
 }
@@ -347,7 +347,7 @@ static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_
 {
     if(!OutOfBounds(vram, point.x, point.y))
         if((Get(vram, point.x, point.y) >> SURFACE_ALPHA) < FILE_PRIO_DECAY)
-            Put(vram, point.x, point.y, color);
+            Vram_Put(vram, point.x, point.y, color);
 }
 
 // See: https://gist.github.com/bert/1085538
@@ -415,10 +415,10 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     if(enabled && Overview_IsSelectionBoxBigEnough(overview))
     {
         const Rect box = Rect_CorrectOrientation(overview.selection_box);
-        for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.a.y, color);
-        for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.b.y, color);
-        for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.a.x, y, color);
-        for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.b.x, y, color);
+        for(int32_t x = box.a.x; x < box.b.x; x++) Vram_Put(vram, x, box.a.y, color);
+        for(int32_t x = box.a.x; x < box.b.x; x++) Vram_Put(vram, x, box.b.y, color);
+        for(int32_t y = box.a.y; y < box.b.y; y++) Vram_Put(vram, box.a.x, y, color);
+        for(int32_t y = box.a.y; y < box.b.y; y++) Vram_Put(vram, box.b.x, y, color);
     }
 }
 
@@ -452,7 +452,7 @@ static void DrawHealthBar(const Vram vram, const Point top, const int32_t health
         {
             const uint32_t base = x - x0 > percent ? 0xFF0000 : 0x00FF00;
             const uint32_t color = base | (FILE_PRIO_HIGHEST << SURFACE_ALPHA);
-            Put(vram, x, y, color);
+            Vram_Put(vram, x, y, color);
         }
 }
 
@@ -508,7 +508,7 @@ static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point of
         {
             if(red_out)
                 pixel &= 0xFFFF0000;
-            Put(vram, xx, yy, pixel);
+            Vram_Put(vram, xx, yy, pixel);
         }
     }
 }

@@ -55,3 +55,5 @@ void Vram_DrawMotiveRow(const Vram, const Registrar, const Share);
 void Vram_DrawHud(const Vram, const Registrar);
 
 void Vram_Free(const Vram);
+
+void Vram_Put(const Vram, const int32_t x, const int32_t y, const uint32_t pixel);

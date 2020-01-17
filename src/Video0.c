@@ -165,11 +165,49 @@ static void PrintResources(const Video video, const Units units)
     }
 }
 
-void Video_Render(const Video video, const Units units, const int32_t dt, const int32_t cycles)
+// XXX ROUGH PROTOTYPE - COLORS ARE POOR - PIXELS ARE TOO SMALL.
+static void DrawMiniMap(const Video video, const Units units, const Map map)
+{
+    const int32_t xres = 2 * map.size;
+    const int32_t yres = 1 * map.size;
+    SDL_Texture* const texture = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
+    Vram vram = Vram_Lock(texture, xres, yres, 1);
+    Vram_Clear(vram, 0x0);
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
+    {
+        const Point cart = { x, y };
+        const Stack stack = Units_GetStackCart(units, cart);
+        const int32_t height = Map_GetHeight(map, cart);
+        int32_t pixel = height < MAP_HEIGHT_DIRT ? 0xFF0000FF : 0xFF00FF00;
+        // OVERRIDE TERRAIN COLOR WITH UNIT COLOR.
+        if(stack.count > 0)
+            pixel = Color_ToInt(stack.reference[0]->color);
+        Point iso = Point_ToIso(cart);
+        iso.y += yres / 2;
+        Vram_Put(vram, iso.x, iso.y, pixel);
+    }
+    Vram_Unlock(texture);
+    const int32_t dim = 128;
+    const int32_t w = 2 * (dim + 1);
+    const int32_t h = 1 * (dim + 1);
+    const SDL_Rect dest = {
+        video.bot_rite.x - w,
+        video.bot_rite.y - h,
+        w,
+        h,
+    };
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_RenderCopy(video.renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+}
+
+void Video_Render(const Video video, const Units units, const Map map, const int32_t dt, const int32_t cycles)
 {
     CopyCanvas(video);
     PrintPerformanceMonitor(video, units, dt, cycles);
     PrintResources(video, units);
     PrintHotkeys(video);
+    DrawMiniMap(video, units, map);
     Present(video);
 }

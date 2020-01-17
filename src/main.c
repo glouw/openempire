@@ -72,7 +72,7 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
         Video_Draw(video, data, map, units, floats, overview, grid);
         const int32_t t1 = SDL_GetTicks();
         const int32_t dt = t1 - t0;
-        Video_Render(video, units, dt, cycles);
+        Video_Render(video, units, map, dt, cycles);
         Field_Free(field);
         const int32_t t2 = SDL_GetTicks();
         const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);

@@ -5,7 +5,15 @@ static const char* strings[] = {
 };
 
 static const uint32_t colors[] = {
-    0x000000FF, 0x00FF0000, 0x0000FF00, 0x00FFFF00, 0x00FFA500, 0x0000FFFF, 0x00800080, 0x00D3D3D3, 0x00000000,
+    0xFF0000FF,
+    0xFFFF0000,
+    0xFF00FF00,
+    0xFFFFFF00,
+    0xFFFFA500,
+    0xFF00FFFF,
+    0xFF800080,
+    0xFFD3D3D3,
+    0xFF000000,
 };
 
 const char* Color_ToString(const Color color)
