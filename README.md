@@ -4,7 +4,7 @@ Open Empires is an educational RTS game engine that interfaces with the Age of E
 
 Open Empires is mulitplayer only and strives to be written in less than 15,000 lines of C99 using only SDL2.
 
-![](art/screenshot.png)
+![](art/men-at-arms.png)
 
 ## Legal
 
