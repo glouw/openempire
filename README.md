@@ -2,7 +2,7 @@
 
 Open Empires is an educational RTS game engine that interfaces with the Age of Empires II and The Conquerors art assets.
 
-Open Empires is mulitplayer only and strives to be written in less than 15,000 lines of C99 using only SDL2.
+Open Empires is multi-player only and strives to be written in less than 15,000 lines of C99 using only SDL2.
 
 ![](art/men-at-arms.png)
 
@@ -10,8 +10,8 @@ Open Empires is mulitplayer only and strives to be written in less than 15,000 l
 
 Open Empires is *NOT* a binary decompilation of Age of Empires II, and its expansion, The Conquerors.
 
-Data, art, and sound files from Age of Empires II or its expansion, The Conquerors, are not supplied -
-to play Open Empires you must legally own the original boxed-set version of Age of Empires II and The Conquerors,
+Data, art, and sound files from Age of Empires II - or its expansion, The Conquerors - are not supplied.
+To play Open Empires you must legally own the original boxed-set version of Age of Empires II and The Conquerors,
 preferably the Gold Edition.
 
 Age of Empires II and The Conquerors are copyrighted (1999-2000) by Ensemble Studios and Microsoft.
