@@ -1,5 +1,7 @@
 #include "Palette.h"
 
+#include "Surface.h"
+
 #include "Util.h"
 
 void Palette_Print(const Palette palette)
@@ -9,7 +11,10 @@ void Palette_Print(const Palette palette)
     for(int32_t i = 0; i < palette.count; i++)
     {
         const uint32_t color = palette.color[i];
-        fprintf(stderr, "%3d : %3d %3d %3d\n", i, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+        fprintf(stderr, "%3d : %3d %3d %3d\n", i,
+                (color >> SURFACE_R_SHIFT) & 0xFF,
+                (color >> SURFACE_G_SHIFT) & 0xFF,
+                (color >> SURFACE_B_SHIFT) & 0xFF);
     }
     fprintf(stderr, "count   : %d\n", palette.count);
 }

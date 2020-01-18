@@ -80,11 +80,11 @@ static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
 // See: https://gist.github.com/XProger/96253e93baccfbf338de
 static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
 {
-    uint32_t rb = top_pixel & 0xFF00FF;
-    uint32_t g  = top_pixel & 0x00FF00;
-    rb += ((bot_pixel & 0xFF00FF) - rb) * alpha >> 8;
-    g  += ((bot_pixel & 0x00FF00) -  g) * alpha >> 8;
-    return (rb & 0xFF00FF) | (g & 0xFF00);
+    uint32_t rb = top_pixel & SURFACE_RB_MASK;
+    uint32_t g  = top_pixel & SURFACE_G_MASK;
+    rb += ((bot_pixel & SURFACE_RB_MASK) - rb) * alpha >> 8;
+    g  += ((bot_pixel & SURFACE_G_MASK) - g) * alpha >> 8;
+    return (rb & SURFACE_RB_MASK) | (g & SURFACE_G_MASK);
 }
 
 static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)

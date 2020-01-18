@@ -1,5 +1,7 @@
 #include "Text.h"
 
+#include "Surface.h"
+
 #include "Util.h"
 
 Text Text_Build(const char* const path, const int32_t size, const uint32_t color)
@@ -11,9 +13,9 @@ Text Text_Build(const char* const path, const int32_t size, const uint32_t color
     text.font = TTF_OpenFont(path, size);
     if(text.font == NULL)
         Util_Bomb("Could not open %s\n", path);
-    text.color.r = (color >> 0x10) & 0xFF;
-    text.color.g = (color >> 0x08) & 0xFF;
-    text.color.b = (color >> 0x00) & 0xFF;
+    text.color.r = (color >> SURFACE_R_SHIFT) & 0xFF;
+    text.color.g = (color >> SURFACE_G_SHIFT) & 0xFF;
+    text.color.b = (color >> SURFACE_B_SHIFT) & 0xFF;
     return text;
 }
 

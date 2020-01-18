@@ -9,6 +9,8 @@
 #define SURFACE_R_SHIFT (16)
 #define SURFACE_G_SHIFT  (8)
 #define SURFACE_B_SHIFT  (0)
+#define SURFACE_RB_MASK (0xFF00FF)
+#define SURFACE_G_MASK  (0x00FF00)
 
 #define SURFACE_BIT_DEPTH (32)
 
