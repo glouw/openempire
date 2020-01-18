@@ -108,7 +108,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
 #if SANITIZE_THREAD == 0
-    // Breaks sanitizer - but that's okay - renderer race conditions will not affect syncing P2P.
+    // BREAKS SANITIZER - BUT THAT'S OKAY - RENDERER RACE CONDITIONS WILL NOT AFFECT SYNCING P2P.
     Vram_DrawMap(vram, data.terrain, map, overview, grid, data.blendomatic, blend_lines, terrain_tiles);
 #endif
     Vram_DrawUnits(vram, graphics_tiles_floats);
@@ -165,8 +165,8 @@ static void PrintResources(const Video video, const Units units)
     }
 }
 
-// XXX ROUGH PROTOTYPE - COLORS ARE POOR - PIXELS ARE TOO SMALL.
-static void DrawMiniMap(const Video video, const Units units, const Map map)
+// DIM MUST BE POWER OF TWO (64, 128, 256, ETC).
+static void DrawMiniMap(const Video video, const Units units, const Map map, const int32_t dim)
 {
     const int32_t xres = 2 * map.size;
     const int32_t yres = 1 * map.size;
@@ -184,18 +184,18 @@ static void DrawMiniMap(const Video video, const Units units, const Map map)
             pixel = Color_ToInt(stack.reference[0]->color);
         Point iso = Point_ToIso(cart);
         iso.y += yres / 2;
-        Vram_Put(vram, iso.x, iso.y, pixel);
+        // BLENDMODE BLEND OPERATES LIKE:
+        //   DSTRGB = (SRCRGB * SRCA) + (DSTRGB * (1-SRCA))
+        //   DSTA = SRCA + (DSTA * (1-SRCA))
+        // SO ENSURE THAT SRCA IS SET TO 0XFF AND ENSURE MINIMAP DRAWING IS DONE LAST AS ALPHA
+        // (ORIGINALLY USED FOR Z-BUFFERING) IS NOW CLOBBERED IN THE AREA OF THE MINIMAP.
+        const uint32_t enforced_alpha = (0xFF << SURFACE_A_SHIFT) | pixel;
+        Vram_Put(vram, iso.x, iso.y, enforced_alpha);
     }
     Vram_Unlock(texture);
-    const int32_t dim = 128;
     const int32_t w = 2 * (dim + 1);
     const int32_t h = 1 * (dim + 1);
-    const SDL_Rect dest = {
-        video.bot_rite.x - w,
-        video.bot_rite.y - h,
-        w,
-        h,
-    };
+    const SDL_Rect dest = { video.bot_rite.x - w, video.bot_rite.y - h, w, h };
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(video.renderer, texture, NULL, &dest);
     SDL_DestroyTexture(texture);
@@ -207,6 +207,6 @@ void Video_Render(const Video video, const Units units, const Map map, const int
     PrintPerformanceMonitor(video, units, dt, cycles);
     PrintResources(video, units);
     PrintHotkeys(video);
-    DrawMiniMap(video, units, map);
+    DrawMiniMap(video, units, map, 128);
     Present(video);
 }

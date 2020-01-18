@@ -475,7 +475,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
 void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid)
 {
     const int32_t line_width = 3;
-    const uint32_t color = 0xFFFF0000;
+    const uint32_t color = 0xFF0000;
     const Animation animation = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT];
     const Image image = animation.image[0];
     const Frame frame = animation.frame[0];
@@ -507,7 +507,7 @@ static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point of
         if(pixel != SURFACE_COLOR_KEY)
         {
             if(red_out)
-                pixel &= 0xFFFF0000;
+                pixel &= 0xFF0000;
             Vram_Put(vram, xx, yy, pixel);
         }
     }
