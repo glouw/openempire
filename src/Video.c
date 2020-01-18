@@ -166,33 +166,20 @@ static void PrintResources(const Video video, const Units units)
     }
 }
 
-// DIM MUST BE POWER OF TWO (64, 128, 256, ETC).
+// * DIM MUST BE POWER OF TWO (64, 128, 256, ETC).
+// * BLENDMODE BLEND OPERATES LIKE:
+//     DSTRGB = (SRCRGB * SRCA) + (DSTRGB * (1-SRCA))
+//     DSTA = SRCA + (DSTA * (1-SRCA))
+//   SO SET SRCA TO 0XFF TO HAVE PIXEL APPEAR ON MINIMAP.
 static void DrawMiniMap(const Video video, const Units units, const Map map, const int32_t dim)
 {
     const int32_t xres = 2 * map.size;
     const int32_t yres = 1 * map.size;
     SDL_Texture* const texture = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
     Vram vram = Vram_Lock(texture, xres, yres, 1);
-    Vram_Clear(vram, 0x0);
-    for(int32_t y = 0; y < map.size; y++)
-    for(int32_t x = 0; x < map.size; x++)
-    {
-        const Point cart = { x, y };
-        const Stack stack = Units_GetStackCart(units, cart);
-        const Terrain terrain = Map_GetTerrainFile(map, cart);
-        uint32_t pixel = map.color[terrain];
-        if(stack.count > 0)
-            pixel = Color_ToInt(stack.reference[0]->color);
-        Point iso = Point_ToIso(cart);
-        iso.y += yres / 2;
-        // BLENDMODE BLEND OPERATES LIKE:
-        //   DSTRGB = (SRCRGB * SRCA) + (DSTRGB * (1-SRCA))
-        //   DSTA = SRCA + (DSTA * (1-SRCA))
-        // SO ENSURE THAT SRCA IS SET TO 0XFF AND ENSURE MINIMAP DRAWING IS DONE LAST AS ALPHA
-        // (ORIGINALLY USED FOR Z-BUFFERING) IS NOW CLOBBERED IN THE AREA OF THE MINIMAP.
-        const uint32_t enforced_alpha = (0xFF << SURFACE_A_SHIFT) | pixel;
-        Vram_Put(vram, iso.x, iso.y, enforced_alpha);
-    }
+    Vram_Clear(vram, 0x00000000);
+    Vram_PaintMiniMap(vram, units, map);
+    Vram_OutlineMiniMapColors(vram, map, 0x0FF000000);
     Vram_Unlock(texture);
     const int32_t w = 2 * (dim + 1);
     const int32_t h = 1 * (dim + 1);
