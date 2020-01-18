@@ -124,6 +124,7 @@ static Map PopulateMiniMapColors(Map map, const Registrar terrain)
         g /= size;
         b /= size;
         map.color[i] =
+            0xFF000000 |
             (r << SURFACE_R_SHIFT) |
             (g << SURFACE_G_SHIFT) |
             (b << SURFACE_B_SHIFT);
@@ -161,13 +162,6 @@ Terrain Map_GetTerrainFile(const Map map, const Point point)
     if(!InBounds(map, point))
         return FILE_TERRAIN_NONE;
     return map.file[point.x + point.y * map.size];
-}
-
-int32_t Map_GetHeight(const Map map, const Point point)
-{
-    if(!InBounds(map, point))
-        return 0;
-    return map.height[point.x + point.y * map.size];
 }
 
 void Map_SetTerrainFile(const Map map, const Point point, const Terrain file)

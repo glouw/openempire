@@ -178,9 +178,8 @@ static void DrawMiniMap(const Video video, const Units units, const Map map)
     {
         const Point cart = { x, y };
         const Stack stack = Units_GetStackCart(units, cart);
-        const int32_t height = Map_GetHeight(map, cart);
-        int32_t pixel = height < MAP_HEIGHT_DIRT ? 0xFF0000FF : 0xFF00FF00;
-        // OVERRIDE TERRAIN COLOR WITH UNIT COLOR.
+        const Terrain terrain = Map_GetTerrainFile(map, cart);
+        uint32_t pixel = map.color[terrain];
         if(stack.count > 0)
             pixel = Color_ToInt(stack.reference[0]->color);
         Point iso = Point_ToIso(cart);

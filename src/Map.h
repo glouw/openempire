@@ -36,5 +36,3 @@ void Map_Free(const Map);
 Points Map_GetBlendBox(const Map, const Point inner);
 
 Lines Map_GetBlendLines(const Map, const Points);
-
-int32_t Map_GetHeight(const Map, const Point);
