@@ -40,10 +40,6 @@ Second, start the client by specifying your window resolution and installation d
 
     ./openempires --xres 1440 --yres 900 --path "/path/to/data/folder"
 
-## Development blog (on hiatus)
-
-http://glouw.com/2019/04/10/Reverse-Engineering-Age-of-Empires-2-Part-0.html
-
 ## Credits
 
 Thanks to:
