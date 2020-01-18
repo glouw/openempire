@@ -30,7 +30,7 @@ typedef enum
     TYPE_TREE,
     TYPE_FLAG,
 
-    // Resources.
+    // RESOURCES.
     TYPE_FOOD,
     TYPE_WOOD,
     TYPE_GOLD,

@@ -57,12 +57,9 @@ SRCS += Text.c
 SRCS += Tile.c
 SRCS += Tiles.c
 SRCS += Unit.c
-SRCS += Units0.c
-SRCS += Units1.c
-SRCS += Units2.c
+SRCS += Units.c
 SRCS += Util.c
-SRCS += Video0.c
-SRCS += Video1.c
+SRCS += Video.c
 SRCS += Vram.c
 
 OBJS = $(SRCS:.c=.o)

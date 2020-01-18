@@ -13,10 +13,10 @@ bool Tile_IsHotspotInRect(const Tile tile, const Rect rect)
         && point.y < rect.b.y;
 }
 
-// a---------+
+// A---------+
 // |         |
 // |         |
-// +---------b
+// +---------B
 Rect Tile_GetFrameOutline(const Tile tile)
 {
     const Point dimensions = { tile.frame.width, tile.frame.height };
@@ -26,13 +26,13 @@ Rect Tile_GetFrameOutline(const Tile tile)
     return rect;
 }
 
-// a---------+
-// |         | Where (*) is the point of interest.
-// |         | and points (a, b) are a bounding rectangle.
+// A---------+
+// |         | WHERE (*) IS THE POINT OF INTEREST.
+// |         | AND POINTS (A, B) ARE A BOUNDING RECTANGLE.
 // |         |
 // |     *   |
 // |         |
-// +---------b
+// +---------B
 bool Tile_ContainsPoint(const Tile tile, const Point point)
 {
     const Rect rect = Tile_GetFrameOutline(tile);
@@ -129,7 +129,7 @@ Tile Tile_GetGraphics(const Overview overview, const Grid grid, const Point cart
     const Point shifted = Unit_GetShift(reference, cart);
     const uint8_t height = Graphics_GetHeight(reference->file);
     Point offset = cart_grid_offset;
-    // MINOR graphics tweak for rubble - seems like sprite rubble artwork was always bugged with a half grid offset.
+    // MINOR GRAPHICS TWEAK FOR RUBBLE - SEEMS LIKE SPRITE RUBBLE ARTWORK WAS ALWAYS BUGGED WITH A HALF GRID OFFSET.
     if(reference->trait.type == TYPE_RUBBLE)
     {
         const Point shift = { 0, grid.tile_cart_mid.y / 2 };
