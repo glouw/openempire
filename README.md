@@ -14,7 +14,7 @@ Data, art, and sound files from Age of Empires II or its expansion, The Conquero
 to play Open Empires you must legally own the original boxed-set version of Age of Empires II and The Conquerors,
 preferably the Gold Edition.
 
-Age of Empires II and The Conquerors is copyright (1999-2000) by Ensemble Studios and Microsoft.
+Age of Empires II and The Conquerors are copyrighted (1999-2000) by Ensemble Studios and Microsoft.
 All rights are reserved, as are trademarks of their respective owners.
 
 ## Dependencies
