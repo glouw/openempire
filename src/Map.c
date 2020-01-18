@@ -222,3 +222,10 @@ Lines Map_GetBlendLines(const Map map, const Points render_points)
     }
     return lines;
 }
+
+int32_t Map_GetHeight(const Map map, const Point point)
+{
+    if(!InBounds(map, point))
+        return 0;
+    return map.height[point.x + point.y * map.size];
+}

@@ -120,6 +120,10 @@ static Part two_handed_swordsman[] = {
 static Part champion[] = {
     { {0,0}, false, false, FILE_GRAPHICS_CHAMPION_IDLE }
 };
+static Part forest_tree[] = {
+    { {0,0}, false, false, FILE_GRAPHICS_FOREST_TREE },
+    { {0,0}, false, false, FILE_GRAPHICS_FOREST_TREE_SHADOW },
+};
 
 static Parts GetAgeUpFlag(void)
 {
@@ -171,8 +175,7 @@ Parts Parts_GetSmoke(void)
 
 Parts Parts_GetFire(void)
 {
-    // NOTICE THE 1 PART - RANDOM FIRE IS CHOSEN.
-    Parts parts = { NULL, 1 };
+    Parts parts = { NULL, 1 }; // NOTICE THE 1 PART - RANDOM FIRE IS CHOSEN.
     switch(Util_Rand() % 5)
     {
         case 0: parts.part = fire_a; break;
@@ -181,6 +184,14 @@ Parts Parts_GetFire(void)
         case 3: parts.part = fire_d; break;
         case 4: parts.part = fire_e; break;
     }
+    return parts;
+}
+
+Parts Parts_GetForestTree(void)
+{
+    const Parts parts = {
+        forest_tree, UTIL_LEN(forest_tree)
+    };
     return parts;
 }
 

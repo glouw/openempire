@@ -14,12 +14,16 @@ typedef struct
 }
 Parts;
 
+Parts Parts_FromButton(const Button, const Age, const Civ);
+
+void Parts_Free(const Parts);
+
+// SOME PARTS HAVE TO BE EXPORTED AS THEY ARE NOT CREATED THROUGH A BUTTON.
+
 Parts Parts_GetRedArrows(void);
 
 Parts Parts_GetSmoke(void);
 
 Parts Parts_GetFire(void);
 
-Parts Parts_FromButton(const Button, const Age, const Civ);
-
-void Parts_Free(const Parts);
+Parts Parts_GetForestTree(void);
