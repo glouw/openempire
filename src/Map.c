@@ -123,10 +123,11 @@ static Map PopulateMiniMapColors(Map map, const Registrar terrain)
         r /= size;
         g /= size;
         b /= size;
-        map.color[i] =
-            (r << SURFACE_R_SHIFT) |
-            (g << SURFACE_G_SHIFT) |
-            (b << SURFACE_B_SHIFT);
+        map.color[i] = (Color) (
+                (r << SURFACE_R_SHIFT) |
+                (g << SURFACE_G_SHIFT) |
+                (b << SURFACE_B_SHIFT)
+            );
     }
     return map;
 }
