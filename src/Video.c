@@ -178,7 +178,7 @@ static void DrawMiniMap(const Video video, const Units units, const Map map, con
     SDL_Texture* const texture = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
     Vram vram = Vram_Lock(texture, xres, yres, 1);
     Vram_Clear(vram, 0x00000000);
-    Vram_PaintMiniMap(vram, units, map);
+    Vram_DrawMiniMap(vram, units, map);
     Vram_Unlock(texture);
     const int32_t w = 2 * (dim + 1);
     const int32_t h = 1 * (dim + 1);

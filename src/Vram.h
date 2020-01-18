@@ -56,4 +56,4 @@ void Vram_DrawHud(const Vram, const Registrar);
 
 void Vram_Free(const Vram);
 
-void Vram_PaintMiniMap(const Vram, const Units, const Map);
+void Vram_DrawMiniMap(const Vram, const Units, const Map);

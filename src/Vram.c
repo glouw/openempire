@@ -570,20 +570,79 @@ void Vram_Free(const Vram vram)
     Rects_Free(vram.channel_rects);
 }
 
-void Vram_PaintMiniMap(const Vram vram, const Units units, const Map map)
+static void DrawDot(const Vram vram, const Point point, const int32_t size, const uint32_t in, const uint32_t out)
+{
+    for(int32_t y = -size; y <= size; y++)
+    for(int32_t x = -size; x <= size; x++)
+    {
+        const int xx = x + point.x;
+        const int yy = y + point.y;
+        if(!OutOfBounds(vram, xx, yy))
+        {
+            const bool is_outline =
+                x == -size ||
+                x ==  size ||
+                y == -size ||
+                y ==  size;
+            const uint32_t pixel = is_outline ? out : in;
+            Put(vram, xx, yy, pixel);
+        }
+    }
+}
+
+static Point ToIsoMiniMap(const Vram vram, const Point cart)
+{
+    Point iso = Point_ToIso(cart);
+    iso.y += vram.yres / 2;
+    return iso;
+}
+
+static void DrawMiniMapTerrain(const Vram vram, const Map map)
 {
     for(int32_t y = 0; y < map.size; y++)
     for(int32_t x = 0; x < map.size; x++)
     {
         const Point cart = { x, y };
-        const Stack stack = Units_GetStackCart(units, cart);
+        const Point iso = ToIsoMiniMap(vram, cart);
         const Terrain terrain = Map_GetTerrainFile(map, cart);
-        uint32_t pixel = map.color[terrain];
-        if(stack.count > 0)
-            pixel = Color_ToInt(stack.reference[0]->color);
-        Point iso = Point_ToIso(cart);
-        iso.y += vram.yres / 2;
-        const uint32_t enforced_alpha = (0xFF << SURFACE_A_SHIFT) | pixel;
-        Put(vram, iso.x, iso.y, enforced_alpha);
+        const uint32_t pixel = (0xFF << SURFACE_A_SHIFT) | map.color[terrain];
+        Put(vram, iso.x, iso.y, pixel);
     }
+}
+
+static void DrawMiniMapUnits(const Vram vram, const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        const Point iso = ToIsoMiniMap(vram, unit->cart);
+        const uint32_t pixel = (0xFF << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
+        const int32_t size = unit->trait.is_inanimate ? 2 : 1;
+        DrawDot(vram, iso, size, pixel, 0xFF000000);
+    }
+}
+
+static void DrawMiniMapBorder(const Vram vram, const Map map)
+{
+    for(int32_t y = 0; y < map.size; y++)
+    for(int32_t x = 0; x < map.size; x++)
+    {
+        const int32_t width = 1;
+        if(x < width
+        || y < width
+        || x > map.size - width - 1
+        || y > map.size - width - 1)
+        {
+            const Point cart = { x, y };
+            const Point iso = ToIsoMiniMap(vram, cart);
+            Put(vram, iso.x, iso.y, 0xFF000000);
+        }
+    }
+}
+
+void Vram_DrawMiniMap(const Vram vram, const Units units, const Map map)
+{
+    DrawMiniMapTerrain(vram, map);
+    DrawMiniMapUnits(vram, units);
+    DrawMiniMapBorder(vram, map);
 }

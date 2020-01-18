@@ -94,7 +94,7 @@ static void Create(const Map map)
     {
         const Point point = { x, y };
         const int32_t height = map.height[x + map.size * y];
-        Terrain file = FILE_TERRAIN_GRASS_C;
+        Terrain file = FILE_TERRAIN_GRASS_A;
         if(height < MAP_HEIGHT_DIRT)          file = FILE_TERRAIN_DIRT;
         if(height < MAP_HEIGHT_WATER_SHALLOW) file = FILE_TERRAIN_WATER_SHALLOW;
         if(height < MAP_HEIGHT_WATER_NORMAL)  file = FILE_TERRAIN_WATER_NORMAL;
@@ -124,10 +124,10 @@ static Map PopulateMiniMapColors(Map map, const Registrar terrain)
         g /= size;
         b /= size;
         map.color[i] = (Color) (
-                (r << SURFACE_R_SHIFT) |
-                (g << SURFACE_G_SHIFT) |
-                (b << SURFACE_B_SHIFT)
-            );
+            (r << SURFACE_R_SHIFT) |
+            (g << SURFACE_G_SHIFT) |
+            (b << SURFACE_B_SHIFT)
+        );
     }
     return map;
 }
