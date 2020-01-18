@@ -1,6 +1,7 @@
 #include "Map.h"
 
 #include "Rect.h"
+#include "Surface.h"
 #include "Util.h"
 
 #include <stdlib.h>
@@ -102,6 +103,34 @@ static void Create(const Map map)
     }
 }
 
+static Map PopulateMiniMapColors(Map map, const Registrar terrain)
+{
+    for(int32_t i = 0; i < TERRAIN_COUNT; i++)
+    {
+        const Animation animation = terrain.animation[COLOR_GAIA][i];
+        SDL_Surface* const surface = animation.surface[0];
+        uint32_t* pixels = (uint32_t*) surface->pixels;
+        const int32_t size = surface->w * surface->h;
+        int64_t r = 0x0;
+        int64_t g = 0x0;
+        int64_t b = 0x0;
+        for(int j = 0; j < size; j++)
+        {
+            r += (pixels[j] >> SURFACE_R_SHIFT) & 0xFF;
+            g += (pixels[j] >> SURFACE_G_SHIFT) & 0xFF;
+            b += (pixels[j] >> SURFACE_B_SHIFT) & 0xFF;
+        }
+        r /= size;
+        g /= size;
+        b /= size;
+        map.color[i] =
+            (r << SURFACE_R_SHIFT) |
+            (g << SURFACE_G_SHIFT) |
+            (b << SURFACE_B_SHIFT);
+    }
+    return map;
+}
+
 Map Map_Make(const int32_t power, const Registrar terrain)
 {
     const Frame frame = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT].frame[0];
@@ -114,6 +143,7 @@ Map Map_Make(const int32_t power, const Registrar terrain)
     map.height = UTIL_ALLOC(int32_t, area);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
+    map = PopulateMiniMapColors(map, terrain);
     GenerateHeight(map, map.size);
     NormalizeHeight(map);
     Create(map);

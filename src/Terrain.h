@@ -9,7 +9,7 @@ typedef enum
 #define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, dimensions, action, detail, midding) name = file,
     FILE_X_TERRAIN
 #undef FILE_X
-    FILE_TERRAIN_COUNT
+    TERRAIN_COUNT
 }
 Terrain;
 

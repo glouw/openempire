@@ -21,6 +21,7 @@ typedef struct
     int32_t size;
     int32_t tile_width;
     int32_t tile_height;
+    Color color[TERRAIN_COUNT]; // MINIMAP COLORS.
 }
 Map;
 
@@ -28,7 +29,7 @@ Map Map_Make(const int32_t power, const Registrar terrain);
 
 Terrain Map_GetTerrainFile(const Map, const Point);
 
-void Map_SetTerrainFile(const Map, const Point, const Terrain file);
+void Map_SetTerrainFile(const Map, const Point, const Terrain);
 
 void Map_Free(const Map);
 
