@@ -93,18 +93,18 @@ static void Create(const Map map)
     {
         const Point point = { x, y };
         const int32_t height = map.height[x + map.size * y];
-        Terrain file = FILE_GRASS;
-        if(height < MAP_HEIGHT_DIRT)          file = FILE_DIRT;
-        if(height < MAP_HEIGHT_WATER_SHALLOW) file = FILE_WATER_SHALLOW;
-        if(height < MAP_HEIGHT_WATER_NORMAL)  file = FILE_WATER_NORMAL;
-        if(height < MAP_HEIGHT_WATER_DEEP)    file = FILE_WATER_DEEP;
+        Terrain file = FILE_TERRAIN_GRASS_C;
+        if(height < MAP_HEIGHT_DIRT)          file = FILE_TERRAIN_DIRT;
+        if(height < MAP_HEIGHT_WATER_SHALLOW) file = FILE_TERRAIN_WATER_SHALLOW;
+        if(height < MAP_HEIGHT_WATER_NORMAL)  file = FILE_TERRAIN_WATER_NORMAL;
+        if(height < MAP_HEIGHT_WATER_DEEP)    file = FILE_TERRAIN_WATER_DEEP;
         Map_SetTerrainFile(map, point, file);
     }
 }
 
 Map Map_Make(const int32_t power, const Registrar terrain)
 {
-    const Frame frame = terrain.animation[COLOR_GAIA][FILE_DIRT].frame[0];
+    const Frame frame = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT].frame[0];
     const int32_t size = Util_Pow(2, power) + 1;
     const int32_t area = size * size;
     static Map zero;

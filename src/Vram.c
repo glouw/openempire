@@ -224,11 +224,11 @@ static void DrawBlendLine(const Vram vram, const Line line, const Registrar terr
     const Point inner = line.inner;
     const Point outer = line.outer;
     const Terrain file = Map_GetTerrainFile(map, inner);
-    // The outer tile uses the outer tile animation,
-    // but with the inner file so that the correct surface can be looked up.
+    // THE OUTER TILE USES THE OUTER TILE ANIMATION,
+    // BUT WITH THE INNER FILE SO THAT THE CORRECT SURFACE CAN BE LOOKED UP.
     const Animation outer_animation = terrain.animation[COLOR_GAIA][file];
     const Tile outer_tile = Tile_GetTerrain(overview, grid, outer, outer_animation, file);
-    const int32_t index = (file == FILE_FARM) ? 3 : 0;
+    const int32_t index = (file == FILE_TERRAIN_FARM_READY) ? 3 : 0; // XXX: NEEDS A TERRAIN HARD CORNER BLEND BOOLEAN
     const Mode blend_mode = blendomatic.mode[index];
     const int32_t blend_id = Mode_GetBlendIndex(inner, outer);
     DrawTileMask(vram, outer_tile, blend_mode.mask_real[blend_id]);
@@ -476,7 +476,7 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Ov
 {
     const int32_t line_width = 3;
     const uint32_t color = 0xFFFF0000;
-    const Animation animation = terrain.animation[COLOR_GAIA][FILE_DIRT];
+    const Animation animation = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT];
     const Image image = animation.image[0];
     const Frame frame = animation.frame[0];
     const Point snap = Overview_IsoSnapTo(overview, grid, overview.mouse_cursor);

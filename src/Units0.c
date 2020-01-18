@@ -267,11 +267,11 @@ static bool EqualDimension(Point dimensions, const Graphics file)
     switch(file)
     {
         default:
-        case FILE_RUBBLE_1X1: return Point_Equal(_1x1_, dimensions);
-        case FILE_RUBBLE_2X2: return Point_Equal(_2x2_, dimensions);
-        case FILE_RUBBLE_3X3: return Point_Equal(_3x3_, dimensions);
-        case FILE_RUBBLE_4X4: return Point_Equal(_4x4_, dimensions);
-        case FILE_RUBBLE_5X5: return Point_Equal(_5x5_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_1X1: return Point_Equal(_1x1_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_2X2: return Point_Equal(_2x2_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_3X3: return Point_Equal(_3x3_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_4X4: return Point_Equal(_4x4_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_5X5: return Point_Equal(_5x5_, dimensions);
     }
 }
 
@@ -312,11 +312,11 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
 {
     static Point none;
     const Graphics rubbles[] = {
-        FILE_RUBBLE_1X1,
-        FILE_RUBBLE_2X2,
-        FILE_RUBBLE_3X3,
-        FILE_RUBBLE_4X4,
-        FILE_RUBBLE_5X5,
+        FILE_GRAPHICS_RUBBLE_1X1,
+        FILE_GRAPHICS_RUBBLE_2X2,
+        FILE_GRAPHICS_RUBBLE_3X3,
+        FILE_GRAPHICS_RUBBLE_4X4,
+        FILE_GRAPHICS_RUBBLE_5X5,
     };
     Graphics file = FILE_GRAPHICS_NONE;
     for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
