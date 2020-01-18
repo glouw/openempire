@@ -50,17 +50,23 @@ int32_t Util_Sqrt(const int64_t val)
     return a;
 }
 
-uint16_t Util_Rand(void)
-{
-    static uint32_t next = 4;
-    next = next * 1103515245 + 12345;
-    return (uint16_t) (next / 65536) % 32768;
-}
-
 int32_t Util_Pow(const int32_t value, const int32_t n)
 {
     int32_t out = value;
     for(int32_t i = 0; i < n - 1; i++)
         out *= value;
     return out;
+}
+
+static uint32_t next;
+
+void Util_Srand(const int32_t seed)
+{
+    next = seed;
+}
+
+uint16_t Util_Rand(void)
+{
+    next = next * 1103515245 + 12345;
+    return (uint16_t) (next / 65536) % 32768;
 }

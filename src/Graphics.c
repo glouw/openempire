@@ -38,7 +38,7 @@ bool Graphics_GetWalkable(const Graphics graphics)
         FILE_X_GRAPHICS
 #undef FILE_X
     }
-    return 0;
+    return false;
 }
 
 Type Graphics_GetType(const Graphics graphics)
@@ -137,7 +137,7 @@ Point Graphics_GetDimensions(const Graphics graphics)
         FILE_X_GRAPHICS
 #undef FILE_X
     }
-    Point zero = { 0,0 };
+    static Point zero;
     return zero;
 }
 
