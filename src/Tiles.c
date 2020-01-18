@@ -129,7 +129,7 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
-        if(Tile_ContainsPoint(tile, click)) // XXX. Make this selection point a bit bigger (maybe 5x5).
+        if(Tile_ContainsPoint(tile, click)) // XXX: MAKE THIS SELECTION POINT A BIT BIGGER (MAYBE 5X5).
         {
             const Rect rect = Tile_GetFrameOutline(tile);
             const Point origin_click = Point_Sub(click, rect.a);

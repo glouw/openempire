@@ -200,7 +200,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
 {
     static Point zero;
     Point out = zero;
-    if(!Unit_IsExempt(unit)) // XXX. How to use normal vectors to run along walls?
+    if(!Unit_IsExempt(unit)) // XXX: HOW TO USE NORMAL VECTORS TO RUN ALONG WALLS?
     {
         const Point n = {  0, -1 };
         const Point e = { +1,  0 };
@@ -211,7 +211,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         const bool can_walk_s = CanWalk(units, map, Point_Add(unit->cart, s));
         const bool can_walk_w = CanWalk(units, map, Point_Add(unit->cart, w));
         const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
-        const int32_t repulsion = 1000; // XXX. How strong should this be?
+        const int32_t repulsion = 1000; // XXX: HOW STRONG SHOULD THIS BE?
         const int32_t border = 10;
         if(!can_walk_n && offset.y < border) out = Point_Add(out, Point_Mul(s, repulsion));
         if(!can_walk_w && offset.x < border) out = Point_Add(out, Point_Mul(e, repulsion));
@@ -393,7 +393,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(other->color != unit->color && !Unit_IsExempt(other)) // XXX. USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
+            if(other->color != unit->color && !Unit_IsExempt(other)) // XXX: USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
             {
                 Point cell = zero;
                 if(other->trait.is_inanimate)

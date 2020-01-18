@@ -422,7 +422,7 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
-// XXX. INANIMATE objects need a square drawn around them, not an ellipse.
+// XXX: INANIMATE OBJECTS NEED A SQUARE DRAWN AROUND THEM, NOT AN ELLIPSE.
 void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
 {
     for(int32_t i = 0; i < tiles.count; i++)
