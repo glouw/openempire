@@ -1095,7 +1095,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
     if(users == 0)
         return units;
     const Point zero = { 0,0 };
-    const int32_t starting_villagers = 5;
+    const int32_t starting_villagers = 3;
     const Point middle = {
         map.size / 2,
         map.size / 2,
@@ -1126,7 +1126,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
         for(int32_t j = 0; j < starting_villagers; j++)
         {
-            const Point shift = { -3, 3 };
+            const Point shift = { -3, 3 + j };
             const Point cart = Point_Add(slot, shift);
             units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE);
         }
