@@ -1095,11 +1095,11 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
     if(users == 0)
         return units;
     const Point zero = { 0,0 };
-    const int32_t starting_villagers = 3;
     const Point middle = {
         map.size / 2,
         map.size / 2,
     };
+    const int32_t villagers = 3;
     const int32_t padding = 10;
     const int32_t dx = middle.x - padding;
     const int32_t dy = middle.y - padding;
@@ -1116,7 +1116,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
     const Button a = { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER  }, TRIGGER_NONE };
     const Button b = { ICONTYPE_UNIT,  { ICONUNIT_MALE_VILLAGER }, TRIGGER_NONE };
     const Parts towncenter = Parts_FromButton(a, units.share.status.age, units.share.status.civ);
-    const Parts villager   = Parts_FromButton(b, units.share.status.age, units.share.status.civ);
+    const Parts villager = Parts_FromButton(b, units.share.status.age, units.share.status.civ);
     const int32_t len = UTIL_LEN(slots);
     for(int32_t i = 0; i < users; i++)
     {
@@ -1124,7 +1124,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         const Point slot = slots[index];
         const Color color = (Color) i;
         units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
-        for(int32_t j = 0; j < starting_villagers; j++)
+        for(int32_t j = 0; j < villagers; j++)
         {
             const Point shift = { -3, 3 + j };
             const Point cart = Point_Add(slot, shift);
