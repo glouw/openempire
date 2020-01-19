@@ -171,7 +171,7 @@ static void PrintResources(const Video video, const Units units)
 //     DSTRGB = (SRCRGB * SRCA) + (DSTRGB * (1-SRCA))
 //     DSTA = SRCA + (DSTA * (1-SRCA))
 //   SO SET SRCA TO 0XFF TO HAVE PIXEL APPEAR ON MINIMAP.
-static void DrawMiniMap(const Video video, const Units units, const Map map, const int32_t dim)
+static void DrawMiniMap(const Video video, const Units units, const Map map, const int32_t dimension)
 {
     const int32_t xres = 2 * map.size;
     const int32_t yres = 1 * map.size;
@@ -180,21 +180,23 @@ static void DrawMiniMap(const Video video, const Units units, const Map map, con
     Vram_Clear(vram, 0x00000000);
     Vram_DrawMiniMap(vram, units, map);
     Vram_Unlock(texture);
-    const int32_t w = 2 * (dim + 1);
-    const int32_t h = 1 * (dim + 1);
-    const SDL_Rect dest = { video.bot_rite.x - w, video.bot_rite.y - h, w, h };
+    Vram_Free(vram);
+    const int32_t w = 2 * (dimension + 1);
+    const int32_t h = 1 * (dimension + 1);
+    const SDL_Rect dest = { video.middle.x - w / 2, video.middle.y - h / 2, w, h };
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(video.renderer, texture, NULL, &dest);
     SDL_DestroyTexture(texture);
 }
 
-void Video_Render(const Video video, const Units units, const Map map, const int32_t dt, const int32_t cycles)
+void Video_Render(const Video video, const Units units, const Overview overview, const Map map, const int32_t dt, const int32_t cycles)
 {
     CopyCanvas(video);
     PrintPerformanceMonitor(video, units, dt, cycles);
     PrintResources(video, units);
     PrintHotkeys(video);
-    DrawMiniMap(video, units, map, 128);
+    if(overview.event.tab)
+        DrawMiniMap(video, units, map, 256);
     Present(video);
 }
 

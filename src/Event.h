@@ -30,5 +30,6 @@ typedef struct
     bool key_2          : 1;
     bool key_3          : 1;
     bool key_left_ctrl  : 1;
+    bool tab            : 1;
 }
 Event;
