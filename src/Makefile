@@ -65,25 +65,15 @@ SRCS += Vram.c
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 
-# 0: Compile with gcc.
-# 1: Compile with clang.
-
 CLANG = 0
-
-# 0: Compile as C.
-# 1: Compile as C++ (Better type checking).
 
 CPP = 0
 
-# 0: Do not use address sanitizer.
-# 1: Use address sanitizer.
-
 SANITIZE_ADDRESS = 0
 
-# 0: Do not use thread sanitizer.
-# 1: Use thread sanitizer.
-
 SANITIZE_THREAD = 0
+
+SANITIZE_UNDEFINED = 0
 
 FLAGS = -O3 -march=native -flto
 
@@ -95,6 +85,10 @@ endif
 
 ifeq (1, $(SANITIZE_THREAD))
 FLAGS = $(DEBUG) -fsanitize=thread
+endif
+
+ifeq (1, $(SANITIZE_UNDEFINED))
+FLAGS = $(DEBUG) -fsanitize=undefined
 endif
 
 FLAGS += -Wall -Wextra -Wshadow -Wpedantic
@@ -119,7 +113,7 @@ $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
 
 %.o : %.c %.d Makefile
-	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
+	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
 
 -include *.d
 

@@ -21,12 +21,12 @@ File File_Load(FILE* const);
 
 #define FILE_NONE (-1)
 
-#define FILE_PRIO_TERRAIN (1)
-#define FILE_PRIO_SHADOW (2)
-#define FILE_PRIO_DECAY (3)
-#define FILE_PRIO_BUILDING (4)
-#define FILE_PRIO_UNIT (5)
-#define FILE_PRIO_HIGHEST (255)
+#define FILE_PRIO_TERRAIN (1U)
+#define FILE_PRIO_SHADOW (2U)
+#define FILE_PRIO_DECAY (3U)
+#define FILE_PRIO_BUILDING (4U)
+#define FILE_PRIO_UNIT (5U)
+#define FILE_PRIO_HIGHEST (255U)
 
 #define FILE_DIMENSIONS_1X1 {1,1}
 #define FILE_DIMENSIONS_2X1 {2,1}

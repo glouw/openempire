@@ -19,7 +19,7 @@ typedef struct
     Frame frame;
     Point iso_pixel;
     Point iso_pixel_offset;
-    uint8_t height;
+    uint32_t height;
     bool needs_clipping;
     bool flip_vert;
     bool totally_offscreen;

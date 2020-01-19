@@ -90,7 +90,7 @@ static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const 
 static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)
 {
     const uint32_t vram_pixel = Get(vram, coords.x, coords.y);
-    const uint8_t height = vram_pixel >> SURFACE_A_SHIFT;
+    const uint32_t height = vram_pixel >> SURFACE_A_SHIFT;
     if(tile.height > height)
     {
         uint32_t surface_pixel = Surface_GetPixel(tile.surface, x, y);
@@ -180,7 +180,7 @@ static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int
 
 static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
 {
-    const uint8_t height = Get(vram, coords.x, coords.y) >> SURFACE_A_SHIFT;
+    const uint32_t height = Get(vram, coords.x, coords.y) >> SURFACE_A_SHIFT;
     if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
     {
         const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
@@ -605,7 +605,7 @@ static void DrawMiniMapTerrain(const Vram vram, const Map map)
         const Point cart = { x, y };
         const Point iso = ToIsoMiniMap(vram, cart);
         const Terrain terrain = Map_GetTerrainFile(map, cart);
-        const uint32_t pixel = (0xFF << SURFACE_A_SHIFT) | map.color[terrain];
+        const uint32_t pixel = (0xFFU << SURFACE_A_SHIFT) | map.color[terrain];
         Put(vram, iso.x, iso.y, pixel);
     }
 }
@@ -616,7 +616,7 @@ static void DrawMiniMapUnits(const Vram vram, const Units units)
     {
         Unit* const unit = &units.unit[i];
         const Point iso = ToIsoMiniMap(vram, unit->cart);
-        const uint32_t pixel = (0xFF << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
+        const uint32_t pixel = (0xFFU << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
         const int32_t size = unit->trait.is_inanimate ? 2 : 1;
         DrawDot(vram, iso, size, pixel, 0xFF000000);
     }
