@@ -605,7 +605,7 @@ static void DrawMiniMapTerrain(const Vram vram, const Map map)
         const Point cart = { x, y };
         const Point iso = ToIsoMiniMap(vram, cart);
         const Terrain terrain = Map_GetTerrainFile(map, cart);
-        const uint32_t pixel = (0xFFU << SURFACE_A_SHIFT) | map.color[terrain];
+        const uint32_t pixel = (0xAAU << SURFACE_A_SHIFT) | map.color[terrain];
         Put(vram, iso.x, iso.y, pixel);
     }
 }
@@ -616,9 +616,9 @@ static void DrawMiniMapUnits(const Vram vram, const Units units)
     {
         Unit* const unit = &units.unit[i];
         const Point iso = ToIsoMiniMap(vram, unit->cart);
-        const uint32_t pixel = (0xFFU << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
+        const uint32_t pixel = (0xAAU << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
         const int32_t size = unit->trait.is_inanimate ? 2 : 1;
-        DrawDot(vram, iso, size, pixel, 0xFF000000);
+        DrawDot(vram, iso, size, pixel, 0xAA000000);
     }
 }
 
@@ -644,5 +644,4 @@ void Vram_DrawMiniMap(const Vram vram, const Units units, const Map map)
 {
     DrawMiniMapTerrain(vram, map);
     DrawMiniMapUnits(vram, units);
-    DrawMiniMapBorder(vram, map);
 }

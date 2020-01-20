@@ -92,7 +92,7 @@ static void RunClient(const Args args)
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(7, data.terrain);
+    const Map map = Map_Make(8, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     args.demo
         ? Video_RenderDataDemo(video, data, args.color)
@@ -121,7 +121,7 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
-    Util_Srand(0);
+    Util_Srand(40);
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server
