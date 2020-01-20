@@ -70,3 +70,8 @@ uint16_t Util_Rand(void)
     next = next * 1103515245 + 12345;
     return (uint16_t) (next / 65536) % 32768;
 }
+
+bool Util_FlipCoin(void)
+{
+    return Util_Rand() % 2;
+}

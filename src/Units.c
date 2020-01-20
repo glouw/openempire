@@ -1144,7 +1144,8 @@ static Units GenerateTrees(Units units, const Map map, const Grid grid, const Re
     {
         const Point cart = { x, y };
         const int32_t height = Map_GetHeight(map, cart);
-        if((Util_Rand() % 2) == 0)
+        if(Util_FlipCoin()
+        && Util_FlipCoin())
             if(height > MAP_HEIGHT_TREES)
             {
                 const Parts parts = Parts_GetForestTree();

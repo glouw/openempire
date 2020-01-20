@@ -25,6 +25,7 @@ typedef struct
     int32_t cycles;
     int32_t queue_size;
     int32_t ping;
+    int32_t map_power;
     Share share;
 }
 Overview;

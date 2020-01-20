@@ -24,6 +24,7 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
             if(packet.game_running)
             {
                 *users = packet.users;
+                overview.map_power = 7; // XXX. MAKE SERVER SPECIFY MAP POWER.
                 break;
             }
         }
@@ -32,12 +33,14 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
     return overview;
 }
 
-static void Play(const Video video, const Data data, const Map map, const Grid grid, const Args args)
+static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
     int32_t users = 0;
     const Sock sock = Sock_Connect(args.host, args.port);
     Overview overview = WaitInLobby(video, sock, &users);
+    const Map map = Map_Make(overview.map_power, data.terrain);
+    const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
     Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
     units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
@@ -84,6 +87,7 @@ static void Play(const Video video, const Data data, const Map map, const Grid g
     Packets_Free(packets);
     Sock_Disconnect(sock);
     Ping_Shutdown();
+    Map_Free(map);
 }
 
 static void RunClient(const Args args)
@@ -92,14 +96,11 @@ static void RunClient(const Args args)
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
-    const Map map = Map_Make(8, data.terrain);
-    const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     args.demo
         ? Video_RenderDataDemo(video, data, args.color)
-        : Play(video, data, map, grid, args);
-    Map_Free(map);
-    Data_Free(data);
+        : Play(video, data, args);
     Video_Free(video);
+    Data_Free(data);
     SDL_Quit();
 }
 

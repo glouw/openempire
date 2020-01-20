@@ -36,3 +36,5 @@ int32_t Util_Pow(const int32_t value, const int32_t n);
 void Util_Srand(const int32_t seed);
 
 uint16_t Util_Rand(void);
+
+bool Util_FlipCoin(void);

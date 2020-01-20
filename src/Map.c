@@ -132,28 +132,6 @@ static Map PopulateMiniMapColors(Map map, const Registrar terrain)
     return map;
 }
 
-static void Draw(const Map map)
-{
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_CreateWindowAndRenderer(map.size, map.size, 0, &window, &renderer);
-    NormalizeHeight(map);
-    for(int i = 0; i < map.size; i++)
-    for(int j = 0; j < map.size; j++)
-    {
-        const int a = 0x2A; // Sea floor.
-        const int b = 0x5F; // Sea level.
-        const int p = map.height[j + map.size * i];
-        p < a ?
-            SDL_SetRenderDrawColor(renderer, 0, 0, a, 0): // Sea floor.
-            p < b ?
-            SDL_SetRenderDrawColor(renderer, 0, 0, p, 0): // Sea.
-            SDL_SetRenderDrawColor(renderer, p, p, p, 0); // Ice and snow.
-        SDL_RenderDrawPoint(renderer, i, j);
-    }
-    SDL_RenderPresent(renderer);
-}
-
 Map Map_Make(const int32_t power, const Registrar terrain)
 {
     const Frame frame = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT].frame[0];
@@ -170,7 +148,6 @@ Map Map_Make(const int32_t power, const Registrar terrain)
     GenerateHeight(map, map.size);
     NormalizeHeight(map);
     Create(map);
-    Draw(map);
     return map;
 }
 
