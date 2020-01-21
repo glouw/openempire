@@ -37,6 +37,4 @@ Points Map_GetBlendBox(const Map, const Point inner);
 
 Lines Map_GetBlendLines(const Map, const Points);
 
-int32_t Map_GetHeight(const Map, const Point);
-
 Points Map_GetSlots(const Map map, const int32_t from_edge);
