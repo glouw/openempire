@@ -24,6 +24,7 @@ typedef struct
     int32_t users_connected;
     int32_t users;
     int32_t seed;
+    int32_t map_power;
 }
 Packet;
 

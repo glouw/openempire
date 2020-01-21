@@ -11,7 +11,7 @@
 #define MAP_HEIGHT_GRASS         (140)
 #define MAP_HEIGHT_DIRT          (125)
 #define MAP_HEIGHT_WATER_SHALLOW (100)
-#define MAP_HEIGHT_WATER_NORMAL   (75)
+#define MAP_HEIGHT_WATER_NORMAL   (90)
 #define MAP_HEIGHT_WATER_DEEP     (50)
 
 typedef struct
@@ -22,6 +22,7 @@ typedef struct
     int32_t tile_width;
     int32_t tile_height;
     Color color[TERRAIN_COUNT];
+    Point middle;
 }
 Map;
 
@@ -38,3 +39,5 @@ Points Map_GetBlendBox(const Map, const Point inner);
 Lines Map_GetBlendLines(const Map, const Points);
 
 Points Map_GetSlots(const Map map, const int32_t from_edge);
+
+Point Map_GetFixedSlot(const Map, const Point);

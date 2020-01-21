@@ -16,6 +16,7 @@ Sockets Sockets_Init(const int32_t port, const int32_t users)
     sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     sockets.seed = rand();
+    sockets.map_power = 7;
     return sockets;
 }
 
@@ -163,6 +164,7 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
             packet.users_connected = sockets.users_connected;
             packet.users = sockets.users;
             packet.seed = sockets.seed;
+            packet.map_power = sockets.map_power;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));

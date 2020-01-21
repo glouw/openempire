@@ -27,6 +27,7 @@ typedef struct
     int32_t ping;
     int32_t map_power;
     int32_t seed;
+    int32_t users;
     Share share;
 }
 Overview;

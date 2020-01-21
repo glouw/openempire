@@ -2,6 +2,7 @@
 
 #include "Rect.h"
 #include "Surface.h"
+#include "Config.h"
 #include "Util.h"
 
 #include <stdlib.h>
@@ -122,38 +123,13 @@ static void TrimWaterEdge(const Map map)
     }
 }
 
-static void FillInWaterGaps(const Map map)
+static Terrain GetTerrainFromHeight(const int32_t height)
 {
-    Points edges = Points_New(32);
-    for(int32_t x = 1; x < map.size - 1; x++)
-    for(int32_t y = 1; y < map.size - 1; y++)
-    {
-        const Point point = { x, y };
-        const Point points[] = {
-            { x + 1, y + 0 },
-            { x + 1, y + 1 },
-            { x + 0, y + 1 },
-            { x - 1, y - 1 },
-            { x - 1, y + 0 },
-            { x - 1, y - 1 },
-            { x + 0, y - 1 },
-            { x + 1, y - 1 },
-        };
-        int32_t count = 0;
-        for(int32_t i = 0; i < UTIL_LEN(points); i++)
-        {
-            const Terrain file = Map_GetTerrainFile(map, points[i]);
-            if(file == FILE_TERRAIN_WATER_SHALLOW
-            || file == FILE_TERRAIN_WATER_NORMAL
-            || file == FILE_TERRAIN_WATER_DEEP)
-                count++;
-        }
-        if(count > 5)
-            edges = Points_Append(edges, point);
-    }
-    for(int32_t i = 0; i < edges.count; i++)
-        Map_SetTerrainFile(map, edges.point[i], FILE_TERRAIN_WATER_NORMAL);
-    Points_Free(edges);
+    if(height < MAP_HEIGHT_WATER_DEEP)    return FILE_TERRAIN_WATER_DEEP;
+    if(height < MAP_HEIGHT_WATER_NORMAL)  return FILE_TERRAIN_WATER_NORMAL;
+    if(height < MAP_HEIGHT_WATER_SHALLOW) return FILE_TERRAIN_WATER_SHALLOW;
+    if(height < MAP_HEIGHT_DIRT)          return FILE_TERRAIN_DIRT;
+    return FILE_TERRAIN_GRASS_A;
 }
 
 static void Create(const Map map)
@@ -163,11 +139,7 @@ static void Create(const Map map)
     {
         const Point point = { x, y };
         const int32_t height = map.height[x + map.size * y];
-        Terrain file = FILE_TERRAIN_GRASS_A;
-        if(height < MAP_HEIGHT_DIRT)          file = FILE_TERRAIN_DIRT;
-        if(height < MAP_HEIGHT_WATER_SHALLOW) file = FILE_TERRAIN_WATER_SHALLOW;
-        if(height < MAP_HEIGHT_WATER_NORMAL)  file = FILE_TERRAIN_WATER_NORMAL;
-        if(height < MAP_HEIGHT_WATER_DEEP)    file = FILE_TERRAIN_WATER_DEEP;
+        const Terrain file = GetTerrainFromHeight(height);
         Map_SetTerrainFile(map, point, file);
     }
 }
@@ -213,11 +185,15 @@ Map Map_Make(const int32_t power, const Registrar terrain)
     map.height = UTIL_ALLOC(int32_t, area);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
+    const Point middle = {
+        map.size / 2,
+        map.size / 2,
+    };
+    map.middle = middle;
     map = PopulateMiniMapColors(map, terrain);
     GenerateHeight(map, map.size);
     NormalizeHeight(map);
     Create(map);
-    FillInWaterGaps(map);
     TrimWaterEdge(map);
     return map;
 }
@@ -296,24 +272,48 @@ Lines Map_GetBlendLines(const Map map, const Points render_points)
 
 Points Map_GetSlots(const Map map, const int32_t from_edge)
 {
-    const Point middle = {
-        map.size / 2,
-        map.size / 2,
-    };
-    const int32_t dx = middle.x - from_edge;
-    const int32_t dy = middle.y - from_edge;
+    const int32_t dx = map.middle.x - from_edge;
+    const int32_t dy = map.middle.y - from_edge;
     const Point slots[] = {
-        { middle.x + dx, middle.y      }, // E.
-        { middle.x + dx, middle.y + dy }, // SE.
-        { middle.x,      middle.y + dy }, // S.
-        { middle.x - dx, middle.y + dy }, // SW.
-        { middle.x - dx, middle.y      }, // W.
-        { middle.x - dx, middle.y - dy }, // NW
-        { middle.x,      middle.y - dy }, // N.
-        { middle.x + dx, middle.y - dy }, // NE.
+        { map.middle.x + dx, map.middle.y      }, // E.
+        { map.middle.x + dx, map.middle.y + dy }, // SE.
+        { map.middle.x,      map.middle.y + dy }, // S.
+        { map.middle.x - dx, map.middle.y + dy }, // SW.
+        { map.middle.x - dx, map.middle.y      }, // W.
+        { map.middle.x - dx, map.middle.y - dy }, // NW
+        { map.middle.x,      map.middle.y - dy }, // N.
+        { map.middle.x + dx, map.middle.y - dy }, // NE.
     };
-    Points points = Points_New(16);
-    for(int32_t i = 0; i < UTIL_LEN(slots); i++)
+    const int32_t size = UTIL_LEN(slots);
+    Points points = Points_New(size);
+    for(int32_t i = 0; i < size; i++)
         points = Points_Append(points, slots[i]);
     return points;
+}
+
+static bool IsAreaClear(const Map map, const Point point, const int32_t width)
+{
+    for(int32_t x = -width; x < width; x++)
+    for(int32_t y = -width; y < width; y++)
+    {
+        const Point shift = { x, y };
+        const Point cart = Point_Add(point, shift);
+        const Terrain terrain = Map_GetTerrainFile(map, cart);
+        const bool none = terrain == FILE_TERRAIN_NONE;
+        if(none || !Terrain_IsWalkable(terrain)) // WATER OR SOMETHING LIKE THAT.
+            return false;
+    }
+    return true;
+}
+
+Point Map_GetFixedSlot(const Map map, const Point slot)
+{
+    const int32_t step_size = 5;
+    const Point dir = Point_Sub(map.middle, slot);
+    const Point step = Point_Normalize(dir, step_size);
+    const int32_t width = CONFIG_UNITS_STARTING_AREA_TILE_SPACE / 2;
+    Point fixed = slot;
+    while(!IsAreaClear(map, fixed, width))
+        fixed = Point_Add(fixed, step);
+    return fixed;
 }

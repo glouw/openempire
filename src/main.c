@@ -11,7 +11,7 @@
 
 #include <time.h>
 
-static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
+static Overview WaitInLobby(const Video video, const Sock sock)
 {
     int32_t loops = 0;
     Overview overview = Overview_Init(video.xres, video.yres);
@@ -25,8 +25,8 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
             Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
             if(packet.game_running)
             {
-                *users = packet.users;
-                overview.map_power = 7; // XXX. MAKE SERVER SPECIFY MAP POWER.
+                overview.users = packet.users;
+                overview.map_power = packet.map_power;
                 overview.seed = packet.seed;
                 break;
             }
@@ -39,15 +39,14 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
 static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
-    int32_t users = 0;
     const Sock sock = Sock_Connect(args.host, args.port);
-    Overview overview = WaitInLobby(video, sock, &users);
+    Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
     Units floats = Units_New(grid, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
-    units = Units_GenerateTestZone(units, map, grid, data.graphics, users);
+    units = Units_Generate(units, map, grid, data.graphics, overview.users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
     int32_t cycles = 0;
