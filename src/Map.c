@@ -148,7 +148,7 @@ static void FillInWaterGaps(const Map map)
             || file == FILE_TERRAIN_WATER_DEEP)
                 count++;
         }
-        if(count == 8)
+        if(count > 5)
             edges = Points_Append(edges, point);
     }
     for(int32_t i = 0; i < edges.count; i++)

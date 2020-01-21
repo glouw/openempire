@@ -26,6 +26,7 @@ typedef struct
     int32_t queue_size;
     int32_t ping;
     int32_t map_power;
+    int32_t seed;
     Share share;
 }
 Overview;

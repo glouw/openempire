@@ -9,6 +9,8 @@
 #include "Args.h"
 #include "Util.h"
 
+#include <time.h>
+
 static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
 {
     int32_t loops = 0;
@@ -25,6 +27,7 @@ static Overview WaitInLobby(const Video video, const Sock sock, int32_t* users)
             {
                 *users = packet.users;
                 overview.map_power = 7; // XXX. MAKE SERVER SPECIFY MAP POWER.
+                overview.seed = packet.seed;
                 break;
             }
         }
@@ -39,6 +42,7 @@ static void Play(const Video video, const Data data, const Args args)
     int32_t users = 0;
     const Sock sock = Sock_Connect(args.host, args.port);
     Overview overview = WaitInLobby(video, sock, &users);
+    Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     Units units = Units_New(grid, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
@@ -106,6 +110,7 @@ static void RunClient(const Args args)
 
 static void RunServer(const Args args)
 {
+    srand(time(NULL));
     Sockets sockets = Sockets_Init(args.port, args.users);
     Sockets pingers = Sockets_Init(args.port_ping, args.users);
     for(int32_t cycles = 0; true; cycles++)
@@ -122,7 +127,6 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
-    Util_Srand(40);
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server

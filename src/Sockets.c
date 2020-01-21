@@ -15,6 +15,7 @@ Sockets Sockets_Init(const int32_t port, const int32_t users)
     sockets.users = users;
     sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
+    sockets.seed = rand();
     return sockets;
 }
 
@@ -51,10 +52,6 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                 if(bytes <= 0)
                 {
                     SDLNet_TCP_DelSocket(sockets.set, socket);
-                    sockets.cycles[i] = 0;
-                    sockets.parity[i] = 0;
-                    sockets.queue_size[i] = 0;
-                    sockets.packet.overview[i] = zero;
                     sockets.socket[i] = NULL;
                 }
                 if(bytes == max)
@@ -165,6 +162,7 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
             packet.game_running = game_running;
             packet.users_connected = sockets.users_connected;
             packet.users = sockets.users;
+            packet.seed = sockets.seed;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));

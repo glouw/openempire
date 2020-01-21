@@ -20,6 +20,7 @@ typedef struct
     int32_t turn;
     int32_t users_connected;
     int32_t users;
+    int32_t seed;
     bool is_stable;
 }
 Sockets;

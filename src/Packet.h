@@ -23,6 +23,7 @@ typedef struct
     bool game_running;
     int32_t users_connected;
     int32_t users;
+    int32_t seed;
 }
 Packet;
 
