@@ -615,10 +615,13 @@ static void DrawMiniMapUnits(const Vram vram, const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        const Point iso = ToIsoMiniMap(vram, unit->cart);
-        const uint32_t pixel = (0xFFU << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
-        const int32_t size = unit->trait.is_inanimate ? 2 : 1;
-        DrawDot(vram, iso, size, pixel, 0xFF000000);
+        if(!Unit_IsExempt(unit))
+        {
+            const Point iso = ToIsoMiniMap(vram, unit->cart);
+            const uint32_t pixel = (0xFFU << SURFACE_A_SHIFT) | Color_ToInt(unit->color);
+            const int32_t size = unit->trait.is_inanimate ? 2 : 1;
+            DrawDot(vram, iso, size, pixel, 0xFF000000);
+        }
     }
 }
 

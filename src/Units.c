@@ -1090,74 +1090,54 @@ void Units_ManageStacks(const Units units)
     Units_StackStacks(units);
 }
 
-static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
+static Units GenerateVillagers(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot, const Color color, const int32_t villagers)
 {
-    if(users == 0)
-        return units;
     const Point zero = { 0,0 };
-    const Point middle = {
-        map.size / 2,
-        map.size / 2,
+    const Button button = {
+        ICONTYPE_UNIT, {
+            ICONUNIT_MALE_VILLAGER
+        },
+        TRIGGER_NONE
     };
-    const int32_t villagers = 3;
-    const int32_t padding = 10;
-    const int32_t dx = middle.x - padding;
-    const int32_t dy = middle.y - padding;
-    const Point slots[] = {
-        { middle.x + dx, middle.y      }, // E.
-        { middle.x + dx, middle.y + dy }, // SE.
-        { middle.x,      middle.y + dy }, // S.
-        { middle.x - dx, middle.y + dy }, // SW.
-        { middle.x - dx, middle.y      }, // W.
-        { middle.x - dx, middle.y - dy }, // NW
-        { middle.x,      middle.y - dy }, // N.
-        { middle.x + dx, middle.y - dy }, // NE.
-    };
-    const Button a = { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER  }, TRIGGER_NONE };
-    const Button b = { ICONTYPE_UNIT,  { ICONUNIT_MALE_VILLAGER }, TRIGGER_NONE };
-    const Parts towncenter = Parts_FromButton(a, units.share.status.age, units.share.status.civ);
-    const Parts villager = Parts_FromButton(b, units.share.status.age, units.share.status.civ);
-    const int32_t len = UTIL_LEN(slots);
-    for(int32_t i = 0; i < users; i++)
+    const Parts villager = Parts_FromButton(button, units.share.status.age, units.share.status.civ);
+    // KEEP IT SIMPLE AND JUST LET VILLAGERS SPAWN IN A LINE
+    for(int32_t i = 0; i < villagers; i++)
     {
-        const int32_t index = (i * len) / users;
-        const Point slot = slots[index];
-        const Color color = (Color) i;
-        units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
-        for(int32_t j = 0; j < villagers; j++)
-        {
-            const Point shift = { -3, 3 + j };
-            const Point cart = Point_Add(slot, shift);
-            units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE);
-        }
+        const Point shift = { -3, 3 + i };
+        const Point cart = Point_Add(slot, shift);
+        units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE);
     }
-    Parts_Free(towncenter);
     Parts_Free(villager);
     return units;
 }
 
-static Units GenerateTrees(Units units, const Map map, const Grid grid, const Registrar graphics)
+static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
-    static Point zero;
-    for(int32_t y = 0; y < map.size; y++)
-    for(int32_t x = 0; x < map.size; x++)
+    Points points = Map_GetSlots(map, CONFIG_UNITS_TILES_FROM_EDGE);
+    const Point zero = { 0,0 };
+    const Button button = {
+        ICONTYPE_BUILD, {
+            ICONBUILD_TOWN_CENTER
+        },
+        TRIGGER_NONE
+    };
+    const Parts towncenter = Parts_FromButton(button, units.share.status.age, units.share.status.civ);
+    for(int32_t i = 0; i < users; i++)
     {
-        const Point cart = { x, y };
-        const int32_t height = Map_GetHeight(map, cart);
-        if(Util_FlipCoin()
-        && Util_FlipCoin())
-            if(height > MAP_HEIGHT_TREES)
-            {
-                const Parts parts = Parts_GetForestTree();
-                units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
-            }
+        const int32_t index = (i * points.count) / users;
+        const Point slot = points.point[index];
+        const Color color = (Color) i;
+        units = Units_SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
+        units = GenerateVillagers(units, map, grid, graphics, slot, color, CONFIG_UNITS_STARTING_VILLAGERS);
     }
+    Parts_Free(towncenter);
+    Points_Free(points);
     return units;
 }
 
 Units Units_GenerateTestZone(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
-    units = GenerateTownCenters(units, map, grid, graphics, users);
-    units = GenerateTrees(units, map, grid, graphics);
+    if(users > 0)
+        units = GenerateTownCenters(units, map, grid, graphics, users);
     return units;
 }

@@ -229,3 +229,27 @@ int32_t Map_GetHeight(const Map map, const Point point)
         return 0;
     return map.height[point.x + point.y * map.size];
 }
+
+Points Map_GetSlots(const Map map, const int32_t from_edge)
+{
+    const Point middle = {
+        map.size / 2,
+        map.size / 2,
+    };
+    const int32_t dx = middle.x - from_edge;
+    const int32_t dy = middle.y - from_edge;
+    const Point slots[] = {
+        { middle.x + dx, middle.y      }, // E.
+        { middle.x + dx, middle.y + dy }, // SE.
+        { middle.x,      middle.y + dy }, // S.
+        { middle.x - dx, middle.y + dy }, // SW.
+        { middle.x - dx, middle.y      }, // W.
+        { middle.x - dx, middle.y - dy }, // NW
+        { middle.x,      middle.y - dy }, // N.
+        { middle.x + dx, middle.y - dy }, // NE.
+    };
+    Points points = Points_New(16);
+    for(int32_t i = 0; i < UTIL_LEN(slots); i++)
+        points = Points_Append(points, slots[i]);
+    return points;
+}
