@@ -77,8 +77,7 @@ static void Play(const Video video, const Data data, const Args args)
         floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
         Video_Draw(video, data, map, units, floats, overview, grid);
         const int32_t t1 = SDL_GetTicks();
-        const int32_t dt = t1 - t0;
-        Video_Render(video, units, overview, map, dt, cycles);
+        Video_Render(video, units, overview, map, t1 - t0, cycles);
         Field_Free(field);
         const int32_t t2 = SDL_GetTicks();
         const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
@@ -110,8 +109,8 @@ static void RunClient(const Args args)
 static void RunServer(const Args args)
 {
     srand(time(NULL));
-    Sockets sockets = Sockets_Init(args.port, args.users);
-    Sockets pingers = Sockets_Init(args.port_ping, args.users);
+    Sockets sockets = Sockets_Init(args.port, args.users, args.map_power);
+    Sockets pingers = Sockets_Init(args.port_ping, args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);

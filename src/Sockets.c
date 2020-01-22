@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-Sockets Sockets_Init(const int32_t port, const int32_t users)
+Sockets Sockets_Init(const int32_t port, const int32_t users, const int32_t map_power)
 {
     IPaddress ip;
     SDLNet_ResolveHost(&ip, NULL, port);
@@ -16,7 +16,7 @@ Sockets Sockets_Init(const int32_t port, const int32_t users)
     sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     sockets.seed = rand();
-    sockets.map_power = 7;
+    sockets.map_power = map_power;
     return sockets;
 }
 

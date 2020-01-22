@@ -26,7 +26,7 @@ typedef struct
 }
 Sockets;
 
-Sockets Sockets_Init(const int32_t port, const int32_t users);
+Sockets Sockets_Init(const int32_t port, const int32_t users, const int32_t map_power);
 
 void Sockets_Free(Sockets);
 
