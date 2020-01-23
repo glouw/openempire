@@ -171,7 +171,7 @@ static void PrintResources(const Video video, const Units units)
 //     DSTRGB = (SRCRGB * SRCA) + (DSTRGB * (1-SRCA))
 //     DSTA = SRCA + (DSTA * (1-SRCA))
 //   SO SET SRCA TO 0XFF TO HAVE PIXEL APPEAR ON MINIMAP.
-static void DrawMiniMap(const Video video, const Units units, const Map map, const int32_t dimension)
+static void DrawMiniMap(const Video video, const Units units, const Map map)
 {
     const int32_t xres = 2 * map.size;
     const int32_t yres = 1 * map.size;
@@ -181,9 +181,12 @@ static void DrawMiniMap(const Video video, const Units units, const Map map, con
     Vram_DrawMiniMap(vram, units, map);
     Vram_Unlock(texture);
     Vram_Free(vram);
-    const int32_t w = 2 * (dimension + 1);
-    const int32_t h = 1 * (dimension + 1);
-    const SDL_Rect dest = { video.middle.x - w / 2, video.middle.y - h / 2, w, h };
+    const SDL_Rect dest = {
+        video.middle.x - xres / 2,
+        video.middle.y - yres / 2,
+        xres,
+        yres,
+    };
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(video.renderer, texture, NULL, &dest);
     SDL_DestroyTexture(texture);
@@ -196,7 +199,7 @@ void Video_Render(const Video video, const Units units, const Overview overview,
     PrintResources(video, units);
     PrintHotkeys(video);
     if(overview.event.tab)
-        DrawMiniMap(video, units, map, 256);
+        DrawMiniMap(video, units, map);
     Present(video);
 }
 
