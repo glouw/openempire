@@ -128,7 +128,7 @@ static Terrain GetTerrainFromHeight(const int32_t height)
     if(height < MAP_HEIGHT_WATER_DEEP)    return FILE_TERRAIN_WATER_DEEP;
     if(height < MAP_HEIGHT_WATER_NORMAL)  return FILE_TERRAIN_WATER_NORMAL;
     if(height < MAP_HEIGHT_WATER_SHALLOW) return FILE_TERRAIN_WATER_SHALLOW;
-    if(height < MAP_HEIGHT_DIRT)          return FILE_TERRAIN_DIRT;
+    if(height < MAP_HEIGHT_BEACH_SAND)    return FILE_TERRAIN_BEACH_SAND;
     return FILE_TERRAIN_GRASS_A;
 }
 
@@ -270,8 +270,9 @@ Lines Map_GetBlendLines(const Map map, const Points render_points)
     return lines;
 }
 
-Points Map_GetSlots(const Map map, const int32_t from_edge)
+Points Map_GetSlots(const Map map)
 {
+    const int32_t from_edge = CONFIG_UNITS_STARTING_AREA_TILE_SPACE;
     const int32_t dx = map.middle.x - from_edge;
     const int32_t dy = map.middle.y - from_edge;
     const Point slots[] = {

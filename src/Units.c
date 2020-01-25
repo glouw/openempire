@@ -1120,7 +1120,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         TRIGGER_NONE
     };
     const Parts towncenter = Parts_FromButton(button, units.share.status.age, units.share.status.civ);
-    const Points points = Map_GetSlots(map, CONFIG_UNITS_TILES_FROM_EDGE);
+    const Points points = Map_GetSlots(map);
     for(int32_t i = 0; i < users; i++)
     {
         const Color color = (Color) i;
