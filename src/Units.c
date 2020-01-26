@@ -1108,10 +1108,10 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     return units;
 }
 
-static Units GenerateStartingResources(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
+static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
 {
     static Point zero;
-    const int32_t dis = 7;
+    const int32_t dis = CONFIG_UNITS_STARTING_TREE_TILES_FROM_TOWNCENTER;
     const Point point[] = {
         {  dis,    0 },
         {    0,  dis },
@@ -1123,8 +1123,8 @@ static Units GenerateStartingResources(Units units, const Map map, const Grid gr
     {
         const Point cart = Point_Add(slot, point[i]);
         Point shift;
-        shift.x = Util_Rand() % 3;
-        shift.y = Util_Rand() % 3;
+        shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
+        shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
         const Point shifted = Point_Add(cart, shift);
         units = Units_SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
     }
@@ -1150,7 +1150,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         const Point fixed = Map_GetFixedSlot(map, slot);
         units = Units_SpawnParts(units, fixed, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
         units = GenerateVillagers(units, map, grid, graphics, fixed, color, CONFIG_UNITS_STARTING_VILLAGERS);
-        units = GenerateStartingResources(units, map, grid, graphics, fixed);
+        units = GenerateStartingTrees(units, map, grid, graphics, fixed);
     }
     Parts_Free(towncenter);
     Points_Free(points);

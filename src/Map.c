@@ -312,7 +312,7 @@ Point Map_GetFixedSlot(const Map map, const Point slot)
     const int32_t step_size = 5;
     const Point dir = Point_Sub(map.middle, slot);
     const Point step = Point_Normalize(dir, step_size);
-    const int32_t width = CONFIG_UNITS_STARTING_AREA_TILE_SPACE / 2;
+    const int32_t width = CONFIG_UNITS_STARTING_AREA_TILE_SPACE;
     Point fixed = slot;
     while(!IsAreaClear(map, fixed, width))
         fixed = Point_Add(fixed, step);

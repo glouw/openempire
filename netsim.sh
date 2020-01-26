@@ -3,7 +3,7 @@
 
 DEV=lo
 
-LATENCY=75ms
+LATENCY=50ms
 VARIANCE=5ms
 
 sudo tc qdisc del dev $DEV root netem
