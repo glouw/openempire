@@ -1110,6 +1110,29 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     return units;
 }
 
+static Units GenerateStartingResources(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
+{
+    static Point zero;
+    const int32_t dis = 7;
+    const Point point[] = {
+        {  dis,    0 },
+        {    0,  dis },
+        {    0, -dis },
+        { -dis,    0 },
+    };
+    const Parts parts = Parts_GetForestTree();
+    for(int32_t i = 0; i < UTIL_LEN(point); i++)
+    {
+        const Point cart = Point_Add(slot, point[i]);
+        Point shift;
+        shift.x = Util_Rand() % 3;
+        shift.y = Util_Rand() % 3;
+        const Point shifted = Point_Add(cart, shift);
+        units = Units_SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+    }
+    return units;
+}
+
 static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
     static Point zero;
@@ -1129,6 +1152,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         const Point fixed = Map_GetFixedSlot(map, slot);
         units = Units_SpawnParts(units, fixed, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
         units = GenerateVillagers(units, map, grid, graphics, fixed, color, CONFIG_UNITS_STARTING_VILLAGERS);
+        units = GenerateStartingResources(units, map, grid, graphics, fixed);
     }
     Parts_Free(towncenter);
     Points_Free(points);
