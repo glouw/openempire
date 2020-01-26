@@ -14,8 +14,9 @@ Data, art, and sound files from Age of Empires II - or its expansion, The Conque
 To play Open Empires you must legally own the original boxed-set version of Age of Empires II and The Conquerors,
 preferably the Gold Edition.
 
-Age of Empires II and The Conquerors are copyrighted (1999-2000) by Ensemble Studios and Microsoft.
-All rights are reserved, as are trademarks of their respective owners.
+Age of Empires II and The Conquerors are copyright (©) by Microsoft Corporation and Ensemble Studios.
+Open Empires was created under Microsoft's ["Game Content Usage Rules"](https://www.xbox.com/en-us/developers/rules)
+using assets from Age of Empires II and The Conquerors, and it is not endorsed by or affiliated with Microsoft.
 
 ## Dependencies
 
@@ -57,7 +58,8 @@ Second, start the client by specifying your window resolution and installation d
 
 All C source code lives in src. C source is compilable by both C++11 and C11 compilers for maximum portability.
 Top level contains a couple helper shell scripts for setting up a lag simulated client-server testing environment.
-Top level also contains the terminus true type font which must reside in the same directory as the compiled binary.
+Top level also contains the terminus true type font which must reside in the same directory as the compiled binary
+for the binary to run.
 
 ## Credits
 

@@ -1,5 +1,3 @@
-// Unit group pathfinding and actions.
-
 #include "Units.h"
 
 #include "Window.h"
