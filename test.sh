@@ -29,7 +29,7 @@ batch()
     POWER=8
     HOST=localhost
     PORT=1111
-    ./$BIN --server --quiet --users $USERS --power $POWER --host $HOST --port $PORT &
+    ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do

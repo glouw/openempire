@@ -35,15 +35,13 @@ To test the client-server model, run:
 
     ./test.sh
 
-Otherwise, first start the server:
+Otherwise, assuming everything is on localhost, first start the server:
 
-    ./openempires --server
-
-Connections to localhost are currently supported.
+    ./openempires --server --port 1234
 
 Second, start the client by specifying your window resolution and installation data folder path:
 
-    ./openempires --xres 1440 --yres 900 --path "/path/to/data/folder"
+    ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
 
 ## Status
 
