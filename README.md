@@ -31,7 +31,11 @@ using assets from Age of Empires II and The Conquerors, and it is not endorsed b
 
 ## Running
 
-First, start the server:
+To test the client-server model, run:
+
+    ./test.sh
+
+Otherwise, first start the server:
 
     ./openempires --server
 
@@ -54,12 +58,11 @@ Second, start the client by specifying your window resolution and installation d
 * [ ] Unit and building build times and resource use
 * [ ] Sound
 
-## Other
+## Structure
 
-All C source code lives in src. C source is compilable by both C++11 and C11 compilers for maximum portability.
-Top level contains a couple helper shell scripts for setting up a lag simulated client-server testing environment.
-Top level also contains the terminus true type font which must reside in the same directory as the compiled binary
-for the binary to run.
+C source lives in src/ folder and is compilable by both C++11 and C11 compilers.
+C source is separated by typedefs, implemented with .[ch] files.
+General purpose scripts may live in the top level.
 
 ## Credits
 

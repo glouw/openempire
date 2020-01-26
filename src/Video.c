@@ -129,7 +129,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Window_Free(window);
 }
 
-static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles)
+static void PrintPerformanceMonitor(const Video video, const Units units, const int32_t dt, const int32_t cycles, const int32_t ping)
 {
     static int32_t dt_hold;
     if(cycles % 10 == 0)
@@ -137,8 +137,9 @@ static void PrintPerformanceMonitor(const Video video, const Units units, const 
     const Point top_rite = { video.xres, 0 };
     Text_Printf(video.text_small, video.renderer, top_rite, POSITION_TOP_RITE, 0xFF, 0,
             "units.count   : %6d\n"
+            "ping          : %6d\n"
             "dt (ms) video : %6d\n"
-            "cycles        : %6d\n", units.count, dt_hold, cycles);
+            "cycles        : %6d\n", units.count, ping, dt_hold, cycles);
 }
 
 static void PrintResources(const Video video, const Units units)
@@ -192,10 +193,10 @@ static void DrawMiniMap(const Video video, const Units units, const Map map)
     SDL_DestroyTexture(texture);
 }
 
-void Video_Render(const Video video, const Units units, const Overview overview, const Map map, const int32_t dt, const int32_t cycles)
+void Video_Render(const Video video, const Units units, const Overview overview, const Map map, const int32_t dt, const int32_t cycles, const int32_t ping)
 {
     CopyCanvas(video);
-    PrintPerformanceMonitor(video, units, dt, cycles);
+    PrintPerformanceMonitor(video, units, dt, cycles, ping);
     PrintResources(video, units);
     PrintHotkeys(video);
     if(overview.event.tab)
