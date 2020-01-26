@@ -9,7 +9,7 @@
 
 #define MAP_HEIGHT_MAX           (255)
 #define MAP_HEIGHT_GRASS         (140)
-#define MAP_HEIGHT_BEACH_SAND    (110)
+#define MAP_HEIGHT_BEACH_SAND    (115)
 #define MAP_HEIGHT_WATER_SHALLOW (100)
 #define MAP_HEIGHT_WATER_NORMAL   (90)
 #define MAP_HEIGHT_WATER_DEEP     (50)

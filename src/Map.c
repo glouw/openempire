@@ -88,16 +88,17 @@ static void NormalizeHeight(const Map map)
     }
 }
 
-static void TrimWaterEdge(const Map map)
+static void Trim(const Map map, const Terrain inner, const Terrain outer)
 {
-    for(int32_t trims = 0; trims < 10; trims++)
+    const int32_t trims = 10;
+    for(int32_t trim = 0; trim < trims; trim++)
     {
         Points edges = Points_New(32);
         for(int32_t x = 1; x < map.size - 1; x++)
         for(int32_t y = 1; y < map.size - 1; y++)
         {
             const Point point = { x, y };
-            if(Map_GetTerrainFile(map, point) == FILE_TERRAIN_WATER_SHALLOW)
+            if(Map_GetTerrainFile(map, point) == inner)
             {
                 const Point points[] = {
                     { x + 1, y + 0 },
@@ -111,14 +112,14 @@ static void TrimWaterEdge(const Map map)
                 };
                 int32_t count = 0;
                 for(int32_t i = 0; i < UTIL_LEN(points); i++)
-                    if(Map_GetTerrainFile(map, points[i]) == FILE_TERRAIN_DIRT)
+                    if(Map_GetTerrainFile(map, points[i]) == outer)
                         count++;
                 if(count >= 5)
                     edges = Points_Append(edges, point);
             }
         }
         for(int32_t i = 0; i < edges.count; i++)
-            Map_SetTerrainFile(map, edges.point[i], FILE_TERRAIN_DIRT);
+            Map_SetTerrainFile(map, edges.point[i], outer);
         Points_Free(edges);
     }
 }
@@ -194,7 +195,8 @@ Map Map_Make(const int32_t power, const Registrar terrain)
     GenerateHeight(map, map.size);
     NormalizeHeight(map);
     Create(map);
-    TrimWaterEdge(map);
+    Trim(map, FILE_TERRAIN_WATER_SHALLOW, FILE_TERRAIN_BEACH_SAND);
+    Trim(map, FILE_TERRAIN_WATER_NORMAL, FILE_TERRAIN_BEACH_SAND);
     return map;
 }
 
