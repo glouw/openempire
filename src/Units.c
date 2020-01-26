@@ -98,7 +98,7 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
     if(overview.event.mouse_lu && !overview.event.key_left_shift)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
-        Tiles_SortByHeight(tiles); // For selecting transparent units behind inanimates or trees.
+        Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
         units = UnSelectAll(units);
         if(Overview_IsSelectionBoxBigEnough(overview))
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);

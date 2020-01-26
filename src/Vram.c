@@ -77,7 +77,7 @@ static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
     return x < 0 || y < 0 || x >= vram.xres || y >= vram.yres;
 }
 
-// See: https://gist.github.com/XProger/96253e93baccfbf338de
+// SEE: HTTPS://GIST.GITHUB.COM/XPROGER/96253E93BACCFBF338DE
 static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
 {
     uint32_t rb = top_pixel & SURFACE_RB_MASK;
@@ -181,7 +181,7 @@ static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int
 static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
 {
     const uint32_t height = Get(vram, coords.x, coords.y) >> SURFACE_A_SHIFT;
-    if(tile.height >= height) // NOTE: Greater than or equal to so that terrain tiles can blend.
+    if(tile.height >= height) // NOTE: GREATER THAN OR EQUAL TO SO THAT TERRAIN TILES CAN BLEND.
     {
         const uint32_t top_pixel = Surface_GetPixel(tile.surface, x, y);
         if(top_pixel != SURFACE_COLOR_KEY)
@@ -267,9 +267,9 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
     int32_t index = width;
     while(index < lines.count)
     {
-        // Since lines are sorted by outer tiles, an outer tile may get shared
-        // across threads. To counteract that, advance the index of the end of the slice
-        // to a new outer blend tile.
+        // SINCE LINES ARE SORTED BY OUTER TILES, AN OUTER TILE MAY GET SHARED
+        // ACROSS THREADS. TO COUNTERACT THAT, ADVANCE THE INDEX OF THE END OF THE SLICE
+        // TO A NEW OUTER BLEND TILE.
         const Point prev = lines.line[index - 1].outer;
         const Point curr = lines.line[index - 0].outer;
         if(Point_Equal(prev, curr))
@@ -350,7 +350,7 @@ static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_
             Put(vram, point.x, point.y, color);
 }
 
-// See: https://gist.github.com/bert/1085538
+// SEE: HTTPS://GIST.GITHUB.COM/BERT/1085538
 static void DrawEllipse(const Vram vram, Rect rect, const uint32_t color)
 {
     int32_t a = abs(rect.b.x - rect.a.x);
