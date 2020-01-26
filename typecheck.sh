@@ -1,3 +1,6 @@
+# Compiles the C source using clang and gcc,
+# using both C++ and C compilers for extra strength type checking.
+
 set -e
 
 for i in 11 10 01 00

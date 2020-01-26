@@ -1,3 +1,6 @@
+# Adds some latency, packet loss, packet loss, and packet corruption to localhost
+# to simulate world wide latency effects.
+
 DEV=lo
 
 LATENCY=75ms

@@ -53,6 +53,12 @@ Second, start the client by specifying your window resolution and installation d
 * [ ] Unit and building build times and resource use
 * [ ] Sound
 
+## Other
+
+All C source code lives in src. C source is compilable by both C++11 and C11 compilers for maximum portability.
+Top level contains a couple helper shell scripts for setting up a lag simulated client-server testing environment.
+Top level also contains the terminus true type font which must reside in the same directory as the compiled binary.
+
 ## Credits
 
 Thanks to:

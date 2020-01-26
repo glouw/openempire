@@ -1,3 +1,6 @@
+# Starts the server, and then starts how ever many
+# clients specified by $USERS.
+
 BIN=openempires
 XRES=1300
 YRES=730
