@@ -479,3 +479,13 @@ bool Unit_IsTriggerValid(Unit* const flag)
 {
     return !flag->is_triggered && flag->trigger != TRIGGER_NONE;
 }
+
+void Unit_Preserve(Unit* const to, const Unit* const from)
+{
+    to->id = from->id;
+    to->parent_id = from->parent_id;
+    to->has_children = from->has_children;
+    to->path = from->path;
+    to->dir = from->dir;
+    to->health = from->health;
+}

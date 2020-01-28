@@ -755,22 +755,13 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
-static void Preserve(Unit* const to, const Unit* const from)
-{
-    to->id = from->id;
-    to->parent_id = from->parent_id;
-    to->has_children = from->has_children;
-    to->path = from->path;
-    to->dir = from->dir;
-}
-
 static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar graphics, const Graphics upgrade)
 {
     static Unit zero;
     Unit temp = zero;
-    Preserve(&temp, unit);
+    Unit_Preserve(&temp, unit);
     *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
-    Preserve(unit, &temp);
+    Unit_Preserve(unit, &temp);
 }
 
 static void UpgradeByBranch(Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics)

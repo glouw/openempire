@@ -119,3 +119,5 @@ bool Unit_HasNoPath(Unit* const);
 bool Unit_IsType(Unit* const, const Color, const Type);
 
 bool Unit_IsTriggerValid(Unit* const);
+
+void Unit_Preserve(Unit* const to, const Unit* const from);
