@@ -11,7 +11,7 @@ typedef struct
 }
 Sock;
 
-Sock Sock_Connect(const char* const host, const int32_t port);
+Sock Sock_Connect(const char* const host, const int32_t port, const char* const from);
 
 void Sock_Disconnect(const Sock);
 

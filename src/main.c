@@ -39,7 +39,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
 static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
-    const Sock sock = Sock_Connect(args.host, args.port);
+    const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
