@@ -755,22 +755,24 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
         : floats;
 }
 
+static void Preserve(Unit* const to, const Unit* const from)
+{
+    to->id = from->id;
+    to->parent_id = from->parent_id;
+    to->has_children = from->has_children;
+}
+
 static void AgeUpUnit(Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics)
 {
     static Point zero;
     Graphics upgrade = unit->trait.upgrade;
     if(overview.share.status.age == AGE_1)
         upgrade = (Graphics) ((int32_t) upgrade + (int32_t) overview.share.status.civ);
-    // SINCE THIS IS A PART UPGRADE, IDS MUST BE SAVED...
-    const int32_t id = unit->id;
-    const int32_t parent_id = unit->parent_id;
-    const bool has_children = unit->has_children;
-    // ... SUCH THAT WHEN THE PART IS UPGRADED...
+    static Unit none;
+    Unit temp = none;
+    Preserve(&temp, unit);
     *unit = Unit_Make(unit->cart, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
-    // ... THE IDS ARE RESTORED.
-    unit->id = id;
-    unit->parent_id = parent_id;
-    unit->has_children = has_children;
+    Preserve(unit, &temp);
 }
 
 static void AgeUpSimple(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
@@ -999,7 +1001,7 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t l
     return units;
 }
 
-void SetChildren(Unit unit[], const int32_t count)
+static void SetChildren(Unit unit[], const int32_t count)
 {
     if(count > 1)
     {
