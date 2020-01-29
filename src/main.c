@@ -64,12 +64,14 @@ static void Play(const Video video, const Data data, const Args args)
             packets = Packets_Queue(packets, packet);
         packets = Packets_ClearWaste(packets, cycles);
         if(Packets_Active(packets))
+        {
             while(Packets_MustExecute(packets, cycles))
             {
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
+        }
         units = Units_Caretake(units, data.graphics, grid, map, field);
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)

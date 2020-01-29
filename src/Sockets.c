@@ -146,7 +146,7 @@ static void Print(const Sockets sockets, const int32_t setpoint, const int32_t m
 static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
-    const int32_t buffer = 5;
+    const int32_t buffer = 3;
     const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {

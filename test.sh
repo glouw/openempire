@@ -14,8 +14,11 @@ netsim()
     DEV=lo
     LATENCY=50ms
     VARIANCE=5ms
+    CORRUPT=0.1%
+    DUPLICATE=1%
+    LOSS=0.1%
     sudo tc qdisc del dev $DEV root netem
-    sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss 0.1% 25% duplicate 1% corrupt 0.1%
+    sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $LOSS 25% duplicate $DUPLICATE corrupt $CORRUPT
 }
 
 # SPAWNS A SERVER AND SOME NUMBER OF CLIENTS ON LOCALHOST.
