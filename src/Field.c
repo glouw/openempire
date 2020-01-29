@@ -46,7 +46,11 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     return Points_Append(path, start);
 }
 
-Points Field_PathGreedyBest(const Field field, const Point start, const Point goal) // XXX: MAY GET STUCK IN PLACE IF GREEDY BEST AS THE PATH FINDER RUNS EVERY HALF A SECOND OR SO (TWO BEST PATHS CAN BE FOUND).
+// XXX:
+// 1. MAY GET STUCK IN PLACE IF GREEDY BEST AS THE PATH FINDER RUNS EVERY HALF A SECOND OR SO (TWO BEST PATHS CAN BE FOUND).
+// 2. SINCE THE FINDER RUNS EVERY HALF SECOND OR SO, UNITS MAY LOOK LIKE THEY ARE SERPENTINING WHEN THEY ARE MOVING TOGETHER
+//    AS THEIR GREEDY BEST PATH IS RECALCULATING ON THE FLY.
+Points Field_PathGreedyBest(const Field field, const Point start, const Point goal)
 {
     Meap frontier = Meap_Init();
     Meap_Insert(&frontier, 0, start);

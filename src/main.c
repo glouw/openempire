@@ -49,6 +49,9 @@ static void Play(const Video video, const Data data, const Args args)
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
+    // XXX:
+    // CLIENT NEEDS A COUPLE FALL BACK COPIES OF UNITS SOME SECONDS IN THE PAST.
+    // THIS WILL LOAD WHEN THE SERVER SAYS THERE IS AN OUT OF SYNC PROBLEM.
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {

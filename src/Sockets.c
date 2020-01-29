@@ -38,6 +38,24 @@ static Sockets Add(Sockets sockets, TCPsocket socket)
     return sockets;
 }
 
+static void CheckParity(const Sockets sockets)
+{
+    if(sockets.is_stable)
+        for(int32_t j = 0; j < COLOR_COUNT; j++)
+        {
+            const int32_t cycles_check = sockets.cycles[j];
+            const int32_t parity_check = sockets.parity[j];
+            for(int32_t i = 0; i < COLOR_COUNT; i++)
+            {
+                const int32_t cycles = sockets.cycles[i];
+                const int32_t parity = sockets.parity[i];
+                if((cycles == cycles_check)
+                && (parity != parity_check)) // XXX: MAKE THIS KILL THE CLIENT INSTEAD OF KILLING THE SERVER.
+                    Util_Bomb("SERVER - CLIENT_ID %d :: OUT OF SYNC\n", i);
+            }
+        }
+}
+
 Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
 {
     if(SDLNet_CheckSockets(sockets.set, timeout))
@@ -63,6 +81,7 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                     sockets.pings[i] = overview.ping;
                     if(Overview_UsedAction(overview))
                         sockets.packet.overview[i] = overview;
+                    CheckParity(sockets);
                 }
             }
         }
@@ -183,24 +202,6 @@ static Sockets CheckStability(Sockets sockets, const int32_t setpoint)
     return sockets;
 }
 
-static void CheckParity(const Sockets sockets)
-{
-    if(sockets.is_stable)
-        for(int32_t j = 0; j < COLOR_COUNT; j++)
-        {
-            const int32_t cycles_check = sockets.cycles[j];
-            const int32_t parity_check = sockets.parity[j];
-            for(int32_t i = 0; i < COLOR_COUNT; i++)
-            {
-                const int32_t cycles = sockets.cycles[i];
-                const int32_t parity = sockets.parity[i];
-                if((cycles == cycles_check)
-                && (parity != parity_check)) // XXX: MAKE THIS KILL THE CLIENT INSTEAD OF KILLING THE SERVER.
-                    Util_Bomb("SERVER - CLIENT_ID %d :: OUT OF SYNC\n", i);
-            }
-        }
-}
-
 static Sockets CountConnectedPlayers(Sockets sockets)
 {
     int32_t count = 0;
@@ -232,7 +233,6 @@ Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t inter
         const bool game_running = GetGameRunning(sockets);
         if(!quiet)
             Print(sockets, setpoint, max_ping);
-        CheckParity(sockets);
         Send(sockets, max_cycle, max_ping, game_running);
         return Clear(sockets);
     }
