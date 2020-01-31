@@ -3,40 +3,7 @@
 #include "Buttons.h"
 #include "Util.h"
 
-static const Trigger research_long_swordsman[] = {
-    TRIGGER_UPGRADE_MILITIA,
-    TRIGGER_AGE_UP_3
-};
-static const Trigger research_two_handed_swordsman[] = {
-    TRIGGER_UPGRADE_MAN_AT_ARMS,
-    TRIGGER_AGE_UP_4
-};
-static const Trigger research_champion[] = {
-    TRIGGER_UPGRADE_LONG_SWORDSMAN,
-    TRIGGER_AGE_UP_4
-};
-static const Trigger icon_age_3[] = {
-    TRIGGER_AGE_UP_2
-};
-static const Trigger icon_age_4[] = {
-    TRIGGER_AGE_UP_3
-};
-static const Trigger icon_man_at_arms[] = {
-    TRIGGER_UPGRADE_MILITIA
-};
-static const Trigger icon_long_swordsman[] = {
-    TRIGGER_UPGRADE_MAN_AT_ARMS
-};
-static const Trigger icon_two_handed_swordsman[] = {
-    TRIGGER_UPGRADE_LONG_SWORDSMAN
-};
-static const Trigger icon_champion[] = {
-    TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN
-};
-
-static const char hotkeys[] = {
-    'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B'
-};
+#define TRIGGERED(bits, triggers) Triggered(bits, triggers, UTIL_LEN(triggers))
 
 static bool Triggered(const Bits bits, const Trigger triggers[], const int32_t len)
 {
@@ -46,7 +13,40 @@ static bool Triggered(const Bits bits, const Trigger triggers[], const int32_t l
     return true;
 }
 
-#define TRIGGERED(bits, triggers) Triggered(bits, triggers, UTIL_LEN(triggers))
+static const Trigger reqs_upgrade_to_man_at_arms[] = {
+    TRIGGER_UPGRADE_MILITIA,
+    TRIGGER_AGE_UP_3
+},
+reqs_upgrade_to_long_swordsman[] = {
+    TRIGGER_UPGRADE_MAN_AT_ARMS,
+    TRIGGER_AGE_UP_4
+},
+reqs_upgrade_to_two_handed_swordsman[] = {
+    TRIGGER_UPGRADE_LONG_SWORDSMAN,
+    TRIGGER_AGE_UP_4
+},
+reqs_upgrade_icon_to_age_3[] = {
+    TRIGGER_AGE_UP_2
+},
+reqs_upgrade_icon_to_age_4[] = {
+    TRIGGER_AGE_UP_3
+},
+reqs_upgrade_icon_to_man_at_arms[] = {
+    TRIGGER_UPGRADE_MILITIA
+},
+reqs_upgrade_icon_to_long_swordsman[] = {
+    TRIGGER_UPGRADE_MAN_AT_ARMS
+},
+reqs_upgrade_icon_to_two_handed_swordsman[] = {
+    TRIGGER_UPGRADE_LONG_SWORDSMAN
+},
+reqs_upgrade_icon_to_champion[] = {
+    TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN
+};
+
+static const char hotkeys[] = {
+    'Q', 'W', 'E', 'R', 'T', 'A', 'S', 'D', 'F', 'G', 'Z', 'X', 'C', 'V', 'B'
+};
 
 Button Button_FromOverview(const Overview overview)
 {
@@ -88,7 +88,6 @@ Button Next(Button button, const Trigger trigger, const int32_t index)
     return button;
 }
 
-// BUTTON INDEX REFERENCES DEFAULT BUTTON STARTING POINT DEFINED IN BUTTONS.C
 Button Button_Upgrade(Button button, const Bits bits)
 {
     switch(button.icon_type)
@@ -96,31 +95,31 @@ Button Button_Upgrade(Button button, const Bits bits)
     case ICONTYPE_TECH:
         if(button.index == ICONTECH_AGE_2)
         {
-            if(TRIGGERED(bits, icon_age_3))
+            if(TRIGGERED(bits, reqs_upgrade_icon_to_age_3))
                 button = Next(button, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
-            if(TRIGGERED(bits, icon_age_4))
+            if(TRIGGERED(bits, reqs_upgrade_icon_to_age_4))
                 button = Next(button, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
         }
         if(button.index == ICONTECH_RESEARCH_MAN_AT_ARMS)
         {
-            if(TRIGGERED(bits, research_long_swordsman))
+            if(TRIGGERED(bits, reqs_upgrade_to_man_at_arms))
                 button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS, ICONTECH_RESEARCH_LONG_SWORDSMAN);
-            if(TRIGGERED(bits, research_two_handed_swordsman))
+            if(TRIGGERED(bits, reqs_upgrade_to_long_swordsman))
                 button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN, ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN);
-            if(TRIGGERED(bits, research_champion))
+            if(TRIGGERED(bits, reqs_upgrade_to_two_handed_swordsman))
                 button = Next(button, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN, ICONTECH_RESEARCH_CHAMPION);
         }
         break;
     case ICONTYPE_UNIT:
         if(button.index == ICONUNIT_MILITIA)
         {
-            if(TRIGGERED(bits, icon_man_at_arms))
+            if(TRIGGERED(bits, reqs_upgrade_icon_to_man_at_arms))
                 button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
-            if(TRIGGERED(bits, icon_long_swordsman))
+            if(TRIGGERED(bits, reqs_upgrade_icon_to_long_swordsman))
                 button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
-            if(TRIGGERED(bits, icon_two_handed_swordsman))
+            if(TRIGGERED(bits, reqs_upgrade_icon_to_two_handed_swordsman))
                 button = Next(button, TRIGGER_NONE, ICONUNIT_TWO_HANDED_SWORDSMAN);
-            if(TRIGGERED(bits, icon_champion))
+            if(TRIGGERED(bits, reqs_upgrade_icon_to_champion))
                 button = Next(button, TRIGGER_NONE, ICONUNIT_CHAMPION);
         }
         break;
