@@ -12,7 +12,7 @@ build()
 netsim()
 {
     DEV=lo
-    LATENCY=50ms
+    LATENCY=25ms
     VARIANCE=5ms
     DUPLICATE=1%
     # PACKET CORRUPTION AND PACKET LOSS WILL TRIGGER TCP TO RESEND ITS COMMAND AND MISS BUFFER DEADLINE.
@@ -30,7 +30,7 @@ batch()
     YRES=600
     USERS=3
     CIVS=4
-    POWER=8
+    POWER=7
     HOST=localhost
     PORT=1111
     ./$BIN --server --users $USERS --power $POWER --port $PORT &

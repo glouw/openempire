@@ -333,9 +333,11 @@ static bool MustEngage(Unit* const unit, const Grid grid)
                 ? unit->interest->cell_inanimate
                 : unit->interest->cell,
             unit->cell);
-    const int32_t reach = UTIL_MAX(unit->trait.width, unit->interest->trait.width) + CONFIG_UNIT_SWORD_LENGTH;
+    const int32_t width = UTIL_MAX(unit->trait.width, unit->interest->trait.width);
+    int32_t reach = CONFIG_UNIT_SWORD_LENGTH + width;
     if(unit->interest->trait.is_inanimate)
     {
+        reach -= width / 2;
         const Point feeler = Point_Normalize(diff, reach);
         const Point cell = Point_Add(unit->cell, feeler);
         const Point cart = Grid_CellToCart(grid, cell);
@@ -377,7 +379,8 @@ static Resource CollectResource(Unit* const unit)
 static bool MustDisengage(Unit* const unit)
 {
     return unit->state == STATE_ATTACK
-        && unit->state_timer >= Unit_GetLastAttackTick(unit);
+        && unit->state_timer >= Unit_GetLastAttackTick(unit)
+        && !Unit_IsDead(unit->interest);
 }
 
 Resource Unit_Melee(Unit* const unit, const Grid grid)
@@ -393,13 +396,10 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         }
         if(MustDisengage(unit))
         {
-            if(!Unit_IsDead(unit->interest))
-            {
-                unit->interest->health -= unit->trait.attack;
-                Unit_Unlock(unit);
-                if(unit->trait.type == TYPE_VILLAGER)
-                    return CollectResource(unit);
-            }
+            unit->interest->health -= unit->trait.attack;
+            Unit_Unlock(unit);
+            if(unit->trait.type == TYPE_VILLAGER)
+                return CollectResource(unit);
         }
     }
     else
