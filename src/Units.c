@@ -127,6 +127,50 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
     }
 }
 
+static Units Append(Units units, const Unit unit)
+{
+    if(units.count == units.max)
+        Util_Bomb("OUT OF MEMORY\n");
+    units.unit[units.count++] = unit;
+    return units;
+}
+
+static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len, const bool ignore_collisions)
+{
+    if(!ignore_collisions)
+        for(int32_t i = 0; i < len; i++)
+            if(!Units_CanBuild(units, map, &unit[i]))
+                return units;
+    for(int32_t i = 0; i < len; i++)
+        units = Append(units, unit[i]);
+    return units;
+}
+
+static void SetChildren(Unit unit[], const int32_t count)
+{
+    if(count > 1)
+    {
+        unit[0].has_children = true;
+        for(int32_t i = 1; i < count; i++)
+            unit[i].parent_id = unit[0].id;
+    }
+}
+
+static Units SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions, const Trigger trigger)
+{
+    Unit* const temp = UTIL_ALLOC(Unit, parts.count);
+    for(int32_t i = 0; i < parts.count; i++)
+    {
+        const Part part = parts.part[i];
+        const Point cart_part = Point_Add(cart, part.cart);
+        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, trigger);
+    }
+    SetChildren(temp, parts.count);
+    units = BulkAppend(units, map, temp, parts.count, ignore_collisions);
+    free(temp);
+    return units;
+}
+
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field)
 {
     if(overview.event.mouse_ru && units.select_count > 0)
@@ -139,7 +183,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             units.command_group_next++;
             FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
             const Parts parts = Parts_GetRedArrows();
-            units = Units_SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+            units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
         }
     }
     return units;
@@ -287,7 +331,7 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % h - h / 2,
         };
         const Parts parts = Parts_GetFire();
-        units = Units_SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
+        units = SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
     }
     return units;
 }
@@ -301,7 +345,7 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const Parts parts = Parts_GetSmoke();
-        units = Units_SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
+        units = SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
     }
     return units;
 }
@@ -728,7 +772,7 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
     if(parts.part != NULL)
     {
         if(!Bits_Get(overview.share.bits, button.trigger))
-            units = Units_SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
+            units = SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
         Parts_Free(parts);
     }
     return units;
@@ -809,7 +853,7 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
         }
     }
     for(int32_t i = 0; i < points.count; i++)
-        units = Units_SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE);
+        units = SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE);
     Points_Free(points);
     return units;
 }
@@ -980,50 +1024,6 @@ Point Units_GetFirstTownCenterPan(const Units units, const Grid grid, const Colo
     return zero;
 }
 
-static Units Append(Units units, const Unit unit)
-{
-    if(units.count == units.max)
-        Util_Bomb("OUT OF MEMORY\n");
-    units.unit[units.count++] = unit;
-    return units;
-}
-
-static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len, const bool ignore_collisions)
-{
-    if(!ignore_collisions)
-        for(int32_t i = 0; i < len; i++)
-            if(!Units_CanBuild(units, map, &unit[i]))
-                return units;
-    for(int32_t i = 0; i < len; i++)
-        units = Append(units, unit[i]);
-    return units;
-}
-
-static void SetChildren(Unit unit[], const int32_t count)
-{
-    if(count > 1)
-    {
-        unit[0].has_children = true;
-        for(int32_t i = 1; i < count; i++)
-            unit[i].parent_id = unit[0].id;
-    }
-}
-
-Units Units_SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions, const Trigger trigger)
-{
-    Unit* const temp = UTIL_ALLOC(Unit, parts.count);
-    for(int32_t i = 0; i < parts.count; i++)
-    {
-        const Part part = parts.part[i];
-        const Point cart_part = Point_Add(cart, part.cart);
-        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, trigger);
-    }
-    SetChildren(temp, parts.count);
-    units = BulkAppend(units, map, temp, parts.count, ignore_collisions);
-    free(temp);
-    return units;
-}
-
 void Units_ResetTiled(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -1102,7 +1102,7 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     {
         const Point shift = { -2, 1 + i };
         const Point cart = Point_Add(slot, shift);
-        units = Units_SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE);
+        units = SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE);
     }
     Parts_Free(villager);
     return units;
@@ -1126,7 +1126,7 @@ static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, 
         shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
         shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
         const Point shifted = Point_Add(cart, shift);
-        units = Units_SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+        units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
     }
     return units;
 }
@@ -1148,7 +1148,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         const int32_t index = (i * points.count) / users;
         const Point slot = points.point[index];
         const Point fixed = Map_GetFixedSlot(map, slot);
-        units = Units_SpawnParts(units, fixed, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
+        units = SpawnParts(units, fixed, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
         units = GenerateVillagers(units, map, grid, graphics, fixed, color, CONFIG_UNITS_STARTING_VILLAGERS);
         units = GenerateStartingTrees(units, map, grid, graphics, fixed);
     }

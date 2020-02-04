@@ -15,20 +15,20 @@
 
 typedef struct
 {
+    uint64_t parity;
     Point pan;
     Rect selection_box;
-    int32_t xres;
-    int32_t yres;
     Point mouse_cursor;
     Event event;
-    uint64_t parity;
+    Share share;
+    int32_t xres;
+    int32_t yres;
     int32_t cycles;
     int32_t queue_size;
     int32_t ping;
     int32_t map_power;
     int32_t seed;
     int32_t users;
-    Share share;
 }
 Overview;
 

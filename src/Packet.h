@@ -15,16 +15,16 @@
 typedef struct
 {
     Overview overview[COLOR_COUNT];
-    char control;
     int32_t turn;
     int32_t exec_cycle;
     int32_t client_id;
-    bool is_stable;
-    bool game_running;
     int32_t users_connected;
     int32_t users;
     int32_t seed;
     int32_t map_power;
+    char control;
+    bool is_stable;
+    bool game_running;
 }
 Packet;
 
