@@ -277,7 +277,7 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     {
         Unit_FreePath(unit);
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->path = Field_PathGreedyBest(field, unit->cart, cart_goal);
+        unit->path = Field_PathAStar(field, unit->cart, cart_goal);
     }
 }
 

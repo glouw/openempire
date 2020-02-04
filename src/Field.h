@@ -15,7 +15,7 @@ typedef struct
 }
 Field;
 
-Points Field_PathGreedyBest(const Field, const Point start, const Point goal);
+Points Field_PathAStar(const Field, const Point start, const Point goal);
 
 void Field_Free(const Field);
 

@@ -46,25 +46,25 @@ Points Construct(const Field field, const Point start, const Point goal, const P
     return Points_Append(path, start);
 }
 
-// XXX:
-// 1. MAY GET STUCK IN PLACE IF GREEDY BEST AS THE PATH FINDER RUNS EVERY HALF A SECOND OR SO (TWO BEST PATHS CAN BE FOUND).
-// 2. SINCE THE FINDER RUNS EVERY HALF SECOND OR SO, UNITS MAY LOOK LIKE THEY ARE SERPENTINING WHEN THEY ARE MOVING TOGETHER
-//    AS THEIR GREEDY BEST PATH IS RECALCULATING ON THE FLY.
-Points Field_PathGreedyBest(const Field field, const Point start, const Point goal)
+Points Field_PathAStar(const Field field, const Point start, const Point goal)
 {
     Meap frontier = Meap_Init();
     Meap_Insert(&frontier, 0, start);
-    Points came_from = Points_New(32);
     const Point none = { -1, -1 };
-    for(int32_t i = 0; i < field.size * field.size; i++)
-        came_from = Points_Append(came_from, none);
+    const int32_t area = field.size * field.size;
+    int32_t* const cost_so_far = UTIL_ALLOC(int32_t, area);
+    const Points came_from = Points_New(area);
+    for(int32_t i = 0; i < area; i++)
+    {
+        came_from.point[i] = none;
+        cost_so_far[i] = -1;
+    }
+    cost_so_far[start.x + start.y * field.size] = 0;
     for(int32_t tries = 0; frontier.size > 0; tries++)
     {
         Step current = Meap_Delete(&frontier);
-        // EARLY EXIT - GOAL REACHED.
         if(Point_Equal(current.point, goal))
             break;
-        // EARLY EXIT - IMPOSSIBLE GOAL.
         if(tries > CONFIG_FIELD_MAX_PATHING_TRIES)
         {
             static Points zero;
@@ -77,18 +77,20 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
         };
         for(int32_t i = 0; i < UTIL_LEN(deltas); i++)
         {
+            const int32_t new_cost = cost_so_far[current.point.x + current.point.y * field.size] + 1;
             const Point delta = deltas[i];
             const Point vert = { current.point.x + delta.x, current.point.y };
             const Point horz = { current.point.x, current.point.y + delta.y };
             const Point next = Point_Add(current.point, delta);
-            // CHECK ALL THREE SO CORNERS ARE NOT CUT WITH BUILDINGS.
             if(IsWalkable(field, next)
             && IsWalkable(field, vert)
             && IsWalkable(field, horz))
             {
-                if(Point_Equal(came_from.point[next.x + next.y * field.size], none))
+                const int32_t cost = cost_so_far[next.x + next.y * field.size];
+                if(cost == -1 || new_cost < cost)
                 {
-                    const int32_t priority = Heuristic(goal, next);
+                    cost_so_far[next.x + next.y * field.size] = new_cost;
+                    const int32_t priority = Heuristic(goal, next) + new_cost;
                     Meap_Insert(&frontier, priority, next);
                     came_from.point[next.x + next.y * field.size] = current.point;
                 }
@@ -100,6 +102,7 @@ Points Field_PathGreedyBest(const Field field, const Point start, const Point go
     Points_Free(came_from);
     Meap_Free(&frontier);
     Points_Free(forwards);
+    free(cost_so_far);
     return backward;
 }
 

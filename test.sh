@@ -28,7 +28,7 @@ batch()
     BIN=openempires
     XRES=1000
     YRES=600
-    USERS=3
+    USERS=1
     CIVS=4
     POWER=7
     HOST=localhost
