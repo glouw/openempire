@@ -5,3 +5,4 @@ cachegrind.out*
 *.vgcore
 log.txt
 openempires
+openempires.s
