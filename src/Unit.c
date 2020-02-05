@@ -450,7 +450,7 @@ bool Unit_IsDead(Unit* const unit)
 
 bool Unit_IsExempt(Unit* const unit)
 {
-    return State_IsDead(unit->state) || unit->trait.is_detail;
+    return State_IsDead(unit->state) || unit->trait.is_detail || unit->must_garbage_collect;
 }
 
 Point Unit_GetShift(Unit* const unit, const Point cart)

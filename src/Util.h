@@ -38,3 +38,5 @@ void Util_Srand(const int32_t seed);
 uint16_t Util_Rand(void);
 
 bool Util_FlipCoin(void);
+
+void Util_Trace(void);
