@@ -54,26 +54,41 @@ Field Units_Field(const Units units, const Map map)
     return field;
 }
 
-Units Units_New(const Grid grid, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
+static Units Alloc(Units units)
 {
-    const int32_t area = grid.size * grid.size;
-    Unit* const unit = UTIL_ALLOC(Unit, max);
-    Stack* const stack = UTIL_ALLOC(Stack, area);
+    const int32_t area = units.size * units.size;
+    units.unit = UTIL_ALLOC(Unit, units.max);
+    units.stack = UTIL_ALLOC(Stack, area);
     for(int32_t i = 0; i < area; i++)
-        stack[i] = Stack_Build(8);
+        units.stack[i] = Stack_Build(8);
+    return units;
+}
+
+Units Units_New(const int32_t size, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
+{
     static Units zero;
     Units units = zero;
-    units.unit = unit;
+    units.size = size;
     units.max = max;
-    units.stack = stack;
-    units.size = grid.size;
     units.cpu_count = cpu_count;
     units.share.status.age = AGE_1;
     units.share.status.civ = civ;
     units.share.motive.action = ACTION_NONE;
     units.share.motive.type = TYPE_NONE;
     units.share.color = color;
-    return units;
+    return Alloc(units);
+}
+
+Units Units_Copy(const Units units)
+{
+    Units copy = units;
+    copy = Alloc(copy);
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        copy.unit[i] = units.unit[i];
+        copy.unit[i].interest = NULL;
+    }
+    return copy;
 }
 
 void Units_Free(const Units units)
