@@ -1,10 +1,10 @@
-## Open Empires
+OPEN EMPIRES
 
 Open Empires is an educational Genie Engine implementation capable of interfacing with the Age of Empires II and The Conquerors art assets.
 
 Open Empires is multi-player only and strives to be written in less than 15,000 lines of C99 using only SDL2.
 
-## Legal
+LEGAL
 
 Open Empires is a clean room implementation of the Genie Engine and was written from scratch with the highest regards of the original copyright holders.
 
@@ -18,18 +18,18 @@ Age of Empires II and The Conquerors are copyright (©) by Microsoft Corporation
 Open Empires was created under Microsoft's ["Game Content Usage Rules"](https://www.xbox.com/en-us/developers/rules)
 using assets from Age of Empires II and The Conquerors, and it is not endorsed by or affiliated with Microsoft.
 
-## Dependencies
+DEPENDENCIES
 
     Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
     Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
-## Building
+BUILDING
 
     git clone https://github.com/glouw/openempires
     cd openempires
     make -C src
 
-## Running
+RUNNING
 
 To test the client-server model, run:
 
@@ -43,7 +43,7 @@ Second, start the client by specifying your window resolution and installation d
 
     ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
 
-## Status
+STATUS
 
 * [x] Multithreaded software renderer
 * [x] Random map generation
@@ -56,13 +56,13 @@ Second, start the client by specifying your window resolution and installation d
 * [ ] Unit and building build times and resource use
 * [ ] Sound
 
-## Structure
+STRUCTURE
 
 C source lives in src/ folder and is compilable by both C++11 and C11 compilers.
 C source is separated by typedefs, implemented with .[ch] files.
 General purpose scripts may live in the top level.
 
-## Credits
+CREDITS
 
 Thanks to:
 * SFTech OpenAge team for their fantastic documentation on the inner workings of the SLP and DRS file formats (https://github.com/SFTtech/openage)
