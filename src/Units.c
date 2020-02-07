@@ -823,9 +823,11 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
 static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar graphics, const Graphics upgrade)
 {
     static Unit zero;
+    static Point none;
+    const Point offset = unit->trait.is_inanimate ? none : unit->cart_grid_offset;
     Unit temp = zero;
     Unit_Preserve(&temp, unit);
-    *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+    *unit = Unit_Make(unit->cart, offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
     Unit_Preserve(unit, &temp);
 }
 
