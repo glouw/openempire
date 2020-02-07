@@ -80,8 +80,8 @@ bool Point_IsZero(const Point point)
 int32_t Point_Mag(const Point point)
 {
     return Util_Sqrt(
-            (uint64_t) point.x * (uint64_t) point.x +
-            (uint64_t) point.y * (uint64_t) point.y);
+            (int64_t) point.x * (int64_t) point.x +
+            (int64_t) point.y * (int64_t) point.y);
 }
 
 Point Point_Normalize(const Point point, const int32_t normal)
