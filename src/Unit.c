@@ -48,8 +48,10 @@ static void ReachGoal(Unit* const unit)
 static void GotoGoal(Unit* const unit, const Point delta)
 {
     static Point zero;
-    const Point velocity = (unit->state == STATE_ATTACK) ? zero : Point_Normalize(delta, unit->trait.max_speed);
+    const Point velocity = Point_Normalize(delta, unit->trait.max_speed);
     unit->velocity = Point_Div(Point_Add(velocity, unit->velocity), 2); // SMOOTHEN USING PREVIOUS AND NEW VELOCITY VECTORS.
+    if(unit->state == STATE_ATTACK) // OVERRIDE AND SET TO ZERO IF ATTACKING.
+        unit->velocity = zero;
     if(unit->is_engaged)
     {
         const Point cell = unit->interest->trait.is_inanimate

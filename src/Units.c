@@ -789,7 +789,11 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
     if(parts.part != NULL)
     {
         if(!Bits_Get(overview.share.bits, button.trigger))
-            units = SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
+        {
+            const int32_t amount = button.icon_type == ICONTYPE_UNIT ? 10 : 1; // XXX: REMOVE IN FUTURE - THIS IS CRAZY.
+            for(int32_t i = 0; i < amount; i++)
+                units = SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
+        }
         Parts_Free(parts);
     }
     return units;
