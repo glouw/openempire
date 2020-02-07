@@ -505,6 +505,8 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
     }
 }
 
+// DOES NOT NEED TO BE THREADED -
+// GIVES A MORE NATURAL FEEL TO HAVE THE PATHER REPATH IN TIME SLICES.
 static Units Repath(Units units, const Field field)
 {
     int32_t slice = units.count / CONFIG_UNITS_REPATH_SLICE_SIZE;

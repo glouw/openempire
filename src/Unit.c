@@ -55,12 +55,14 @@ static void GotoGoal(Unit* const unit, const Point delta)
         const Point cell = unit->interest->trait.is_inanimate
             ? unit->interest->cell_inanimate
             : unit->interest->cell;
-        Unit_SetDir(unit, Point_Sub(cell, unit->cell));
+        const Point dir = Point_Sub(cell, unit->cell);
+        Unit_SetDir(unit, dir);
     }
     else
     {
         const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
-        Unit_SetDir(unit, align ? unit->group_alignment : unit->velocity);
+        const Point dir = align ? unit->group_alignment : unit->velocity;
+        Unit_SetDir(unit, dir);
     }
 }
 
