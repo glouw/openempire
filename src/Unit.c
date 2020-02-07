@@ -16,12 +16,13 @@ static void ConditionallySkipFirstPoint(Unit* const unit)
 static Point GetDelta(Unit* const unit, const Grid grid)
 {
     static Point zero;
-    const Point point = (unit->path_index == unit->path.count - 1)
-        ? unit->cart_grid_offset_goal
-        : zero;
-    const Point goal_grid_coords = Grid_GetGridPointWithOffset(grid, unit->path.point[unit->path_index], point);
-    const Point unit_grid_coords = Grid_GetGridPointWithOffset(grid, unit->cart, unit->cart_grid_offset);
-    return Point_Sub(goal_grid_coords, unit_grid_coords);
+    const bool is_last = unit->path_index == unit->path.count - 1;
+    const Point offset = is_last ? unit->cart_grid_offset_goal : zero;
+    const Point cell_goal = Point_Add(
+        Grid_OffsetToCell(offset),
+        Grid_CartToCell(grid, unit->path.point[unit->path_index])
+    );
+    return Point_Sub(cell_goal, unit->cell);
 }
 
 void Unit_UpdatePathIndex(Unit* const unit, const int32_t index, const bool reset_path_index_timer)
@@ -47,7 +48,8 @@ static void ReachGoal(Unit* const unit)
 static void GotoGoal(Unit* const unit, const Point delta)
 {
     static Point zero;
-    unit->velocity = (unit->state == STATE_ATTACK) ? zero : Point_Normalize(delta, unit->trait.max_speed);
+    const Point velocity = (unit->state == STATE_ATTACK) ? zero : Point_Normalize(delta, unit->trait.max_speed);
+    unit->velocity = Point_Div(Point_Add(velocity, unit->velocity), 2); // SMOOTHEN USING PREVIOUS AND NEW VELOCITY VECTORS.
     if(unit->is_engaged)
     {
         const Point cell = unit->interest->trait.is_inanimate
@@ -104,9 +106,9 @@ void UpdateCart(Unit* const unit, const Grid grid)
 
 void Unit_UndoMove(Unit* const unit, const Grid grid)
 {
+    static Point zero;
     unit->cell = unit->cell_last;
     UpdateCart(unit, grid);
-    static Point zero;
     unit->velocity = zero;
 }
 
@@ -206,8 +208,8 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     if(unit.trait.is_multi_state)
     {
         unit.attack_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_ATTACK);
-        unit.fall_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_FALL);
-        unit.decay_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_DECAY);
+        unit.fall_frames_per_dir   = GetFramesFromState(&unit, graphics, STATE_FALL);
+        unit.decay_frames_per_dir  = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
     if(unit.trait.type == TYPE_FIRE
     || unit.trait.type == TYPE_RUBBLE)
