@@ -87,7 +87,7 @@ static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const 
     return (rb & SURFACE_RB_MASK) | (g & SURFACE_G_MASK);
 }
 
-static void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)
+static inline void TransferTilePixel(const Vram vram, const Tile tile, Point coords, const int32_t x, const int32_t y)
 {
     const uint32_t vram_pixel = Get(vram, coords.x, coords.y);
     const uint32_t height = vram_pixel >> SURFACE_A_SHIFT;
