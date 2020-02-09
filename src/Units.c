@@ -86,7 +86,7 @@ Units Units_Copy(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         copy.unit[i] = units.unit[i];
-        copy.unit[i].interest = NULL;
+        copy.unit[i].interest = NULL; // NEW MEMORY ALLOCATION. INTEREST NO LONGER VALID.
     }
     return copy;
 }

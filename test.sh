@@ -33,11 +33,11 @@ batch()
     POWER=7
     HOST=localhost
     PORT=1111
-    ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
+    ./$BIN --server --users $USERS --power $POWER --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do
-        sleep 0.4
+        sleep 0.5
         D=20
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))

@@ -113,7 +113,7 @@ endif
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	$(DUMP) -d $(BIN) > $(BIN).s
+	$(DUMP) -M intel -d $(BIN) > $(BIN).s
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
