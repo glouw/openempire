@@ -1,4 +1,5 @@
 BIN = ../openempires
+ASM = $(BIN).s
 
 LIBS  = -lSDL2
 LIBS += -lSDL2_ttf
@@ -117,7 +118,7 @@ endif
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	$(DUMP) -M intel -d $(BIN) > $(BIN).s
+	$(DUMP) -M intel -d $(BIN) > $(ASM)
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
@@ -129,5 +130,6 @@ $(BIN): $(OBJS) $(DEPS)
 .PHONY clean:
 clean:
 	rm -f $(BIN)
+	rm -f $(ASM)
 	rm -f $(OBJS)
 	rm -f $(DEPS)

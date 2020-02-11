@@ -18,21 +18,18 @@ typedef struct
     Packet packet;
     SDLNet_SocketSet set;
     int32_t turn;
-    int32_t users_connected;
-    int32_t users;
     int32_t seed;
-    int32_t map_power;
     bool is_stable;
 }
 Sockets;
 
-Sockets Sockets_Init(const int32_t port, const int32_t users, const int32_t map_power);
+Sockets Sockets_Init(const int32_t port);
 
 void Sockets_Free(Sockets);
 
 Sockets Sockets_Service(const Sockets, const int32_t timeout);
 
-Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval, const bool quiet);
+Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval, const bool quiet, const int32_t users, const int32_t map_power);
 
 Sockets Sockets_Accept(const Sockets);
 

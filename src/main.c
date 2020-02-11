@@ -37,10 +37,14 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     return overview;
 }
 
+// SDLNet_TCP_Send(panic.server, &message, size);
+// SDLNet_TCP_Recv(panic.server, &temp, size);
+
 static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
     const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
+    const Sock panic = Sock_Connect(args.host, args.port_panic, "PANIC");
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
@@ -89,6 +93,7 @@ static void Play(const Video video, const Data data, const Args args)
     Units_Free(floats);
     Units_Free(units);
     Packets_Free(packets);
+    Sock_Disconnect(panic);
     Sock_Disconnect(sock);
     Ping_Shutdown();
     Map_Free(map);
@@ -112,18 +117,20 @@ static void RunClient(const Args args)
 static void RunServer(const Args args)
 {
     srand(time(NULL));
-    Sockets sockets = Sockets_Init(args.port, args.users, args.map_power);
-    Sockets pingers = Sockets_Init(args.port_ping, args.users, args.map_power);
+    Sockets sockets = Sockets_Init(args.port);
+    Sockets pingers = Sockets_Init(args.port_ping);
+    Sockets panicks = Sockets_Init(args.port_panic);
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
         sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
-        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES, args.quiet);
+        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES, args.quiet, args.users, args.map_power);
         pingers = Sockets_Accept(pingers);
         Sockets_Ping(pingers, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
     }
     Sockets_Free(pingers);
     Sockets_Free(sockets);
+    Sockets_Free(panicks);
 }
 
 int main(const int argc, const char* argv[])

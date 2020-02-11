@@ -6,17 +6,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-Sockets Sockets_Init(const int32_t port, const int32_t users, const int32_t map_power)
+Sockets Sockets_Init(const int32_t port)
 {
+    static Sockets zero;
     IPaddress ip;
     SDLNet_ResolveHost(&ip, NULL, port);
-    static Sockets zero;
     Sockets sockets = zero;
-    sockets.users = users;
     sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     sockets.seed = rand();
-    sockets.map_power = map_power;
     return sockets;
 }
 
@@ -160,7 +158,7 @@ static void Print(const Sockets sockets, const int32_t setpoint, const int32_t m
     }
 }
 
-static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
+static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const bool game_running, const int32_t users, const int32_t map_power, const int32_t users_connected)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
     const int32_t buffer = 3;
@@ -177,10 +175,10 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
             packet.client_id = i;
             packet.is_stable = sockets.is_stable;
             packet.game_running = game_running;
-            packet.users_connected = sockets.users_connected;
-            packet.users = sockets.users;
+            packet.users_connected = users_connected;
+            packet.users = users;
             packet.seed = sockets.seed;
-            packet.map_power = sockets.map_power;
+            packet.map_power = map_power;
             if(!sockets.is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
@@ -188,19 +186,7 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
     }
 }
 
-static bool ShouldRelay(const int32_t cycles, const int32_t interval)
-{
-    return (cycles % interval) == 0;
-}
-
-static Sockets CheckStability(Sockets sockets, const int32_t setpoint)
-{
-    const int32_t threshold = CONFIG_SOCKETS_THRESHOLD_START;
-    sockets.is_stable = setpoint > threshold;
-    return sockets;
-}
-
-static Sockets CountConnectedPlayers(Sockets sockets)
+static int32_t CountConnectedPlayers(const Sockets sockets)
 {
     int32_t count = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -209,29 +195,23 @@ static Sockets CountConnectedPlayers(Sockets sockets)
         if(socket != NULL)
             count++;
     }
-    sockets.users_connected = count;
-    return sockets;
+    return count;
 }
 
-static bool GetGameRunning(const Sockets sockets)
+Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval, const bool quiet, const int32_t users, const int32_t map_power)
 {
-    return sockets.users_connected == sockets.users;
-}
-
-Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval, const bool quiet)
-{
-    if(ShouldRelay(cycles, interval))
+    if(cycles % interval == 0)
     {
         const int32_t setpoint = GetCycleSetpoint(sockets);
         const int32_t max_cycle = GetCycleMax(sockets);
         const int32_t max_ping = GetPingMax(sockets);
         sockets = CalculateControlChars(sockets, setpoint);
-        sockets = CheckStability(sockets, setpoint);
-        sockets = CountConnectedPlayers(sockets);
-        const bool game_running = GetGameRunning(sockets);
+        sockets.is_stable = setpoint > CONFIG_SOCKETS_THRESHOLD_START;
+        const int32_t users_connected = CountConnectedPlayers(sockets);
+        const bool game_running = users_connected == users;
         if(!quiet)
             Print(sockets, setpoint, max_ping);
-        Send(sockets, max_cycle, max_ping, game_running);
+        Send(sockets, max_cycle, max_ping, game_running, users, map_power, users_connected);
         return Clear(sockets);
     }
     return sockets;

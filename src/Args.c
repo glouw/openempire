@@ -39,5 +39,6 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Check(arg, "-ppp", "--port"  )) args.port = atoi(next);
     }
     args.port_ping = args.port + 1;
+    args.port_panic = args.port + 2;
     return args;
 }
