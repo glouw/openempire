@@ -495,3 +495,16 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     to->dir = from->dir;
     to->health = from->health;
 }
+
+Unit Unit_Copy(const Unit unit)
+{
+    Unit copy = unit;
+    copy.path = Points_Copy(unit.path);
+    copy.interest = NULL;
+    return copy;
+}
+
+void Unit_Free(Unit* const unit)
+{
+    Unit_FreePath(unit);
+}

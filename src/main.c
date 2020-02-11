@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
+#include "Backup.h"
 #include "Ping.h"
 #include "Sockets.h"
 #include "Overview.h"
@@ -49,9 +50,7 @@ static void Play(const Video video, const Data data, const Args args)
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
-    // XXX:
-    // CLIENT NEEDS A COUPLE FALL BACK COPIES OF UNITS SOME SECONDS IN THE PAST.
-    // THIS WILL LOAD WHEN THE SERVER SAYS THERE IS AN OUT OF SYNC PROBLEM.
+    Backup backup = Backup_Init();
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -66,13 +65,13 @@ static void Play(const Video video, const Data data, const Args args)
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
         packets = Packets_ClearWaste(packets, cycles);
-        if(Packets_Active(packets))
-            while(Packets_MustExecute(packets, cycles))
-            {
-                Packet dequeued;
-                packets = Packets_Dequeue(packets, &dequeued);
-                units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-            }
+        while(Packets_MustExecute(packets, cycles))
+        {
+            Packet dequeued;
+            packets = Packets_Dequeue(packets, &dequeued);
+            backup = Backup_Push(backup, units);
+            units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+        }
         units = Units_Caretake(units, data.graphics, grid, map, field);
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)
@@ -93,6 +92,7 @@ static void Play(const Video video, const Data data, const Args args)
     Sock_Disconnect(sock);
     Ping_Shutdown();
     Map_Free(map);
+    Backup_Free(backup);
 }
 
 static void RunClient(const Args args)

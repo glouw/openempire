@@ -6,6 +6,7 @@ LIBS += -lSDL2_net
 
 SRCS  = Animation.c
 SRCS += Args.c
+SRCS += Backup.c
 SRCS += Bits.c
 SRCS += Blendomatic.c
 SRCS += Channels.c
