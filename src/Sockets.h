@@ -27,10 +27,10 @@ Sockets Sockets_Init(const int32_t port);
 
 void Sockets_Free(Sockets);
 
-Sockets Sockets_Service(const Sockets, const int32_t timeout);
+Sockets Sockets_Service(const Sockets);
 
-Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval, const bool quiet, const int32_t users, const int32_t map_power);
+Sockets Sockets_Relay(const Sockets, const int32_t cycles, const bool quiet, const int32_t users, const int32_t map_power);
 
 Sockets Sockets_Accept(const Sockets);
 
-void Sockets_Ping(const Sockets, const int32_t timeout);
+void Sockets_Ping(const Sockets);

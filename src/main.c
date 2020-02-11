@@ -123,10 +123,12 @@ static void RunServer(const Args args)
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
-        sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
-        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES, args.quiet, args.users, args.map_power);
         pingers = Sockets_Accept(pingers);
-        Sockets_Ping(pingers, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
+        panicks = Sockets_Accept(panicks);
+        sockets = Sockets_Service(sockets);
+        sockets = Sockets_Relay(sockets, cycles, args.quiet, args.users, args.map_power);
+        Sockets_Ping(pingers);
+        SDL_Delay(1);
     }
     Sockets_Free(pingers);
     Sockets_Free(sockets);

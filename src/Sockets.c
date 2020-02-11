@@ -53,9 +53,9 @@ static void CheckParity(const Sockets sockets)
         }
 }
 
-Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
+Sockets Sockets_Service(Sockets sockets)
 {
-    if(SDLNet_CheckSockets(sockets.set, timeout))
+    if(SDLNet_CheckSockets(sockets.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
             TCPsocket socket = sockets.socket[i];
@@ -198,9 +198,9 @@ static int32_t CountConnectedPlayers(const Sockets sockets)
     return count;
 }
 
-Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t interval, const bool quiet, const int32_t users, const int32_t map_power)
+Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const bool quiet, const int32_t users, const int32_t map_power)
 {
-    if(cycles % interval == 0)
+    if(cycles % CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES == 0)
     {
         const int32_t setpoint = GetCycleSetpoint(sockets);
         const int32_t max_cycle = GetCycleMax(sockets);
@@ -225,9 +225,9 @@ Sockets Sockets_Accept(const Sockets sockets)
         : sockets;
 }
 
-void Sockets_Ping(const Sockets ping, const int32_t timeout)
+void Sockets_Ping(const Sockets ping)
 {
-    if(SDLNet_CheckSockets(ping.set, timeout))
+    if(SDLNet_CheckSockets(ping.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
             TCPsocket socket = ping.socket[i];
