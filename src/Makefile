@@ -95,20 +95,23 @@ endif
 
 FLAGS += -Wall -Wextra -Wshadow -Wpedantic
 
+CSTD=-std=c11
+CPPSTD=-std=c++11
+
 ifeq (00, $(CLANG)$(CPP))
-COMPILER = gcc -std=c11
+COMPILER = gcc $(CSTD)
 endif
 
 ifeq (01, $(CLANG)$(CPP))
-COMPILER = g++ -std=c++11
+COMPILER = g++ $(CPPSTD)
 endif
 
 ifeq (10, $(CLANG)$(CPP))
-COMPILER = clang -std=c11
+COMPILER = clang $(CSTD)
 endif
 
 ifeq (11, $(CLANG)$(CPP))
-COMPILER = clang++ -std=c++11
+COMPILER = clang++ $(CPPSTD)
 endif
 
 $(BIN): $(OBJS) $(DEPS)

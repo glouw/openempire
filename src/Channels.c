@@ -30,4 +30,5 @@ void Channels_Free(const Channels channels)
 {
     for(int32_t i = 0; i < channels.count; i++)
         Tiles_Free(channels.tiles[i]);
+    free(channels.tiles);
 }
