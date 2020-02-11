@@ -8,6 +8,7 @@
 #include "Rect.h"
 #include "Motive.h"
 #include "Quad.h"
+#include "Parity.h"
 #include "Status.h"
 #include "Share.h"
 
@@ -15,15 +16,14 @@
 
 typedef struct
 {
-    uint64_t parity;
     Point pan;
     Rect selection_box;
     Point mouse_cursor;
     Event event;
     Share share;
+    Parity parity;
     int32_t xres;
     int32_t yres;
-    int32_t cycles;
     int32_t queue_size;
     int32_t ping;
     int32_t map_power;
@@ -34,7 +34,7 @@ Overview;
 
 Overview Overview_Init(const int32_t xres, const int32_t yres);
 
-Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Share, const int32_t ping);
+Overview Overview_Update(Overview, const Input, const uint64_t xorred, const int32_t cycles, const int32_t queue_size, const Share, const int32_t ping);
 
 Point Overview_IsoToCart(const Overview, const Grid, const Point, const bool raw);
 

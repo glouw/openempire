@@ -2,13 +2,6 @@
 
 #include "Util.h"
 
-static Backup Xor(Backup backup)
-{
-    for(int32_t i = 0; i < BACKUP_MAX; i++)
-        backup.parities.parity[i] = Units_Xor(backup.units[i]);
-    return backup;
-}
-
 static Backup Shift(Backup backup)
 {
     const int32_t end = BACKUP_MAX - 1;
@@ -16,14 +9,18 @@ static Backup Shift(Backup backup)
     {
         if(i == end)
             Units_Free(backup.units[end]);
-        backup.units[i] = backup.units[i - 1];
+        const int32_t next = i - 1;
+        backup.units[i] = backup.units[next];
+        backup.parity[i] = backup.parity[next];
     }
-    return Xor(backup);
+    return backup;
 }
 
-Backup Backup_Push(Backup backup, const Units units)
+Backup Backup_Push(Backup backup, const Units units, const int32_t cycles)
 {
     backup = Shift(backup);
+    backup.parity[0].xorred = Units_Xor(units);
+    backup.parity[0].cycles = cycles;
     backup.units[0] = Units_Copy(units);
     return backup;
 }

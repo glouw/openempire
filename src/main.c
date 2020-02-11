@@ -57,9 +57,9 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t t0 = SDL_GetTicks();
         const Field field = Units_Field(units, map);
         const int32_t size = Packets_Size(packets);
-        const uint64_t parity = Units_Xor(units);
+        const uint64_t xorred = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
+        overview = Overview_Update(overview, input, xorred, cycles, size, units.share, ping);
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
@@ -69,7 +69,7 @@ static void Play(const Video video, const Data data, const Args args)
         {
             Packet dequeued;
             packets = Packets_Dequeue(packets, &dequeued);
-            backup = Backup_Push(backup, units);
+            backup = Backup_Push(backup, units, cycles);
             units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
         }
         units = Units_Caretake(units, data.graphics, grid, map, field);

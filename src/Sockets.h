@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Packet.h"
+#include "Parity.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -8,10 +9,9 @@
 
 typedef struct
 {
-    int32_t cycles[COLOR_COUNT];
     int32_t queue_size[COLOR_COUNT];
     int32_t pings[COLOR_COUNT];
-    uint64_t parity[COLOR_COUNT];
+    Parity parity[COLOR_COUNT];
     TCPsocket socket[COLOR_COUNT];
     char control[COLOR_COUNT];
     TCPsocket self;

@@ -43,14 +43,13 @@ static void CheckParity(const Sockets sockets)
     if(sockets.is_stable)
         for(int32_t j = 0; j < COLOR_COUNT; j++)
         {
-            const int32_t cycles_check = sockets.cycles[j];
-            const int32_t parity_check = sockets.parity[j];
+            const int32_t cycles_check = sockets.parity[j].cycles;
+            const int32_t xorred_check = sockets.parity[j].xorred;
             for(int32_t i = 0; i < COLOR_COUNT; i++)
             {
-                const int32_t cycles = sockets.cycles[i];
-                const int32_t parity = sockets.parity[i];
-                if((cycles == cycles_check)
-                && (parity != parity_check)) // XXX: MAKE THIS KILL THE CLIENT INSTEAD OF KILLING THE SERVER.
+                const int32_t cycles = sockets.parity[i].cycles;
+                const int32_t xorred = sockets.parity[i].xorred;
+                if(cycles == cycles_check && xorred != xorred_check)
                     Util_Bomb("SERVER - CLIENT_ID %d :: OUT OF SYNC\n", i);
             }
         }
@@ -75,7 +74,6 @@ Sockets Sockets_Service(Sockets sockets, const int32_t timeout)
                 }
                 if(bytes == max)
                 {
-                    sockets.cycles[i] = overview.cycles;
                     sockets.parity[i] = overview.parity;
                     sockets.queue_size[i] = overview.queue_size;
                     sockets.pings[i] = overview.ping;
@@ -102,7 +100,7 @@ static int32_t GetCycleSetpoint(const Sockets sockets)
     int32_t count = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const int32_t cycles = sockets.cycles[i];
+        const int32_t cycles = sockets.parity[i].cycles;
         if(cycles > 0)
         {
             setpoint += cycles;
@@ -117,7 +115,7 @@ static int32_t GetCycleMax(const Sockets sockets)
     int32_t max = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const int32_t cycles = sockets.cycles[i];
+        const int32_t cycles = sockets.parity[i].cycles;
         if(cycles > max)
             max = cycles;
     }
@@ -139,7 +137,7 @@ static int32_t GetPingMax(const Sockets sockets)
 static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        sockets.control[i] = (sockets.cycles[i] < setpoint)
+        sockets.control[i] = (sockets.parity[i].cycles < setpoint)
             ? PACKET_CONTROL_SPEED_UP
             : PACKET_CONTROL_STEADY;
     return sockets;
@@ -150,15 +148,15 @@ static void Print(const Sockets sockets, const int32_t setpoint, const int32_t m
     printf("TURN %d :: SETPOINT %d :: MAX_PING %d\n", sockets.turn, setpoint, max_ping);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const uint64_t parity = sockets.parity[i];
-        const int32_t cycles = sockets.cycles[i];
+        const uint64_t xorred = sockets.parity[i].xorred;
+        const int32_t cycles = sockets.parity[i].cycles;
         const int32_t ping = sockets.pings[i];
         const char control = sockets.control[i];
         const char queue_size = sockets.queue_size[i];
         const char parity_symbol = sockets.is_stable ? '!' : '?';
         TCPsocket socket = sockets.socket[i];
         printf("%d :: %d :: %c :: 0x%016lX :: %c :: CYCLES %d :: QUEUE %d -> %d ms\n",
-                i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
+                i, socket != NULL, parity_symbol, xorred, control, cycles, queue_size, ping);
     }
 }
 
