@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Util.h"
 #include "Backup.h"
+#include "Cache.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -15,7 +16,6 @@ Sockets Sockets_Init(const int32_t port)
     Sockets sockets = zero;
     sockets.self = SDLNet_TCP_Open(&ip);
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
-    sockets.seed = rand();
     return sockets;
 }
 
@@ -37,21 +37,7 @@ static Sockets Add(Sockets sockets, TCPsocket socket)
     return sockets;
 }
 
-static Sockets AppendParity(Sockets sockets, const Color color, const Parity parity)
-{
-    int32_t i = 0;
-    while(true)
-    {
-        const Parity avail = sockets.parity[color][i];
-        if(Parity_IsZero(avail))
-            break;
-        i++;
-    }
-    sockets.parity[color][i] = parity;
-    return sockets;
-}
-
-static Sockets Recieve(Sockets sockets)
+static Sockets Recieve(Sockets sockets, Cache* const cache)
 {
     if(SDLNet_CheckSockets(sockets.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -70,18 +56,18 @@ static Sockets Recieve(Sockets sockets)
                 }
                 if(bytes == max)
                 {
-                    sockets = AppendParity(sockets, (Color) i, overview.parity);
-                    sockets.queue_size[i] = overview.queue_size;
-                    sockets.pings[i] = overview.ping;
+                    Cache_AppendParity(cache, (Color) i, overview.parity);
+                    cache->queue_size[i] = overview.queue_size;
+                    cache->pings[i] = overview.ping;
                     if(Overview_UsedAction(overview))
-                        sockets.packet.overview[i] = overview;
+                        cache->packet.overview[i] = overview;
                 }
             }
         }
     return sockets;
 }
 
-static Sockets CountConnectedPlayers(Sockets sockets)
+static void CountConnectedPlayers(Sockets sockets, Cache* const cache)
 {
     int32_t count = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -90,122 +76,18 @@ static Sockets CountConnectedPlayers(Sockets sockets)
         if(socket != NULL)
             count++;
     }
-    sockets.users_connected = count;
+    cache->users_connected = count;
+}
+
+Sockets Sockets_Service(Sockets sockets, Cache* const cache)
+{
+    sockets = Recieve(sockets, cache);
+    CountConnectedPlayers(sockets, cache);
+    Cache_CalcOutOfSync(cache);
     return sockets;
 }
 
-static Sockets CalcOutOfSync(Sockets sockets)
-{
-    sockets.is_out_of_sync = false;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-        for(int32_t x = 0; x < COLOR_COUNT; x++)
-        for(int32_t y = 0; y < CONFIG_MAIN_LOOP_SPEED_FPS; y++)
-        {
-            const Parity a = sockets.parity[x][y];
-            const Parity b = sockets.parity[i][j];
-            if(a.cycles == b.cycles)
-                if(a.xorred != b.xorred)
-                {
-                    sockets.is_out_of_sync = true;
-                    return sockets;
-                }
-        }
-    return sockets;
-}
-
-Sockets Sockets_Service(Sockets sockets)
-{
-    sockets = Recieve(sockets);
-    sockets = CountConnectedPlayers(sockets);
-    sockets = CalcOutOfSync(sockets);
-    return sockets;
-}
-
-static Sockets Clear(Sockets sockets)
-{
-    static Packet zero;
-    static Parity none;
-    sockets.packet = zero;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-        sockets.parity[i][j] = none;
-    sockets.turn++;
-    return sockets;
-}
-
-static int32_t GetCycleSetpoint(const Sockets sockets)
-{
-    int32_t setpoint = 0;
-    int32_t count = 0;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-    {
-        const int32_t cycles = sockets.parity[i][j].cycles;
-        if(cycles > 0)
-        {
-            setpoint += cycles;
-            count++;
-        }
-    }
-    return (count > 0) ? (setpoint / count) : 0;
-}
-
-static int32_t GetCycleMax(const Sockets sockets)
-{
-    int32_t max = 0;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-    {
-        const int32_t cycles = sockets.parity[i][j].cycles;
-        if(cycles > max)
-            max = cycles;
-    }
-    return max;
-}
-
-static int32_t GetCycleAverage(const Sockets sockets)
-{
-    int32_t count = 0;
-    int32_t sum = 0;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-    {
-        const Parity parity = sockets.parity[i][j];
-        if(!Parity_IsZero(parity))
-        {
-            sum += parity.cycles;
-            count++;
-        }
-    }
-    return count == 0 ? 0 : (sum / count);
-}
-
-static int32_t GetPingMax(const Sockets sockets)
-{
-    int32_t max = 0;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    {
-        const int32_t ping = sockets.pings[i];
-        if(ping > max)
-            max = ping;
-    }
-    return max;
-}
-
-static Sockets CalculateControlChars(Sockets sockets, const int32_t setpoint)
-{
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    {
-        const int32_t average = GetCycleAverage(sockets);
-        sockets.control[i] = (average < setpoint)
-            ? PACKET_CONTROL_SPEED_UP
-            : PACKET_CONTROL_STEADY;
-    }
-    return sockets;
-}
-
-static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, const int32_t users, const int32_t map_power)
+static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, Cache* const cache)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
     const int32_t buffer = 3;
@@ -215,45 +97,38 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
         TCPsocket socket = sockets.socket[i];
         if(socket)
         {
-            Packet packet = sockets.packet;
-            packet.control = sockets.control[i];
-            packet.turn = sockets.turn;
+            Packet packet = cache->packet;
+            packet.control = cache->control[i];
+            packet.turn = cache->turn;
             packet.exec_cycle = exec_cycle;
             packet.client_id = i;
-            packet.is_stable = sockets.is_stable;
-            packet.is_game_running = sockets.users_connected == users;
-            packet.users_connected = sockets.users_connected;
-            packet.users = users;
-            packet.seed = sockets.seed;
-            packet.map_power = map_power;
-            packet.is_out_of_sync = sockets.is_out_of_sync;
-            if(!sockets.is_stable)
+            packet.is_stable = cache->is_stable;
+            packet.is_game_running = cache->users_connected == cache->users;
+            packet.users_connected = cache->users_connected;
+            packet.users = cache->users;
+            packet.seed = cache->seed;
+            packet.map_power = cache->map_power;
+            packet.is_out_of_sync = cache->is_out_of_sync;
+            if(!cache->is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
     }
 }
 
-static Sockets CalcStability(Sockets sockets, const int32_t setpoint)
-{
-    sockets.is_stable = setpoint > CONFIG_SOCKETS_THRESHOLD_START;
-    return sockets;
-}
-
-Sockets Sockets_Relay(Sockets sockets, const int32_t cycles, const int32_t users, const int32_t map_power)
+void Sockets_Relay(Sockets sockets, const int32_t cycles, Cache* const cache)
 {
     if(cycles % CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES == 0)
     {
         printf("<3 %d\n", cycles);
-        const int32_t setpoint = GetCycleSetpoint(sockets);
-        const int32_t max_cycle = GetCycleMax(sockets);
-        const int32_t max_ping = GetPingMax(sockets);
-        sockets = CalcStability(sockets, setpoint);
-        sockets = CalculateControlChars(sockets, setpoint);
-        Send(sockets, max_cycle, max_ping, users, map_power);
-        return Clear(sockets);
+        const int32_t setpoint = Cache_GetCycleSetpoint(cache);
+        const int32_t max_cycle = Cache_GetCycleMax(cache);
+        const int32_t max_ping = Cache_GetPingMax(cache);
+        Cache_CalcStability(cache, setpoint);
+        Cache_CalculateControlChars(cache, setpoint);
+        Send(sockets, max_cycle, max_ping, cache);
+        Cache_Clear(cache);
     }
-    return sockets;
 }
 
 Sockets Sockets_Accept(const Sockets sockets)
@@ -280,9 +155,9 @@ void Sockets_Ping(const Sockets ping)
         }
 }
 
-Sockets Sockets_Panic(Sockets panic, const int32_t users_connected, const bool is_stable)
+void Sockets_Panic(Sockets panic, Cache* const cache)
 {
-    if(is_stable)
+    if(cache->is_stable)
     {
         if(SDLNet_CheckSockets(panic.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS)) // PANICS ARE STREAMED IN BECAUSE CLIENTS ARE NOT PREDICTABLE.
             for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -290,12 +165,12 @@ Sockets Sockets_Panic(Sockets panic, const int32_t users_connected, const bool i
                 TCPsocket socket = panic.socket[i];
                 if(SDLNet_SocketReady(socket))
                 {
-                    printf("GOT %d :: PANIC COUNT %d\n", i, panic.panic_count);
-                    SDLNet_TCP_Recv(socket, panic.panic[i], sizeof(panic.panic[i]));
-                    panic.panic_count++;
+                    printf("GOT %d :: PANIC COUNT %d\n", i, cache->panic_count);
+                    SDLNet_TCP_Recv(socket, cache->panic[i], sizeof(cache->panic[i]));
+                    cache->panic_count++;
                 }
             }
-        if(panic.panic_count == users_connected) // IN A SINGLE BATCH CALL, ALL CLIENTS ARE UPDATED WITH THE INDEX THEY MUST FALL BACK WITH.
+        if(cache->panic_count == cache->users_connected) // IN A SINGLE BATCH CALL, ALL CLIENTS ARE UPDATED WITH THE INDEX THEY MUST FALL BACK WITH.
         {
             for(int32_t i = 0; i < COLOR_COUNT; i++)
             {
@@ -303,7 +178,7 @@ Sockets Sockets_Panic(Sockets panic, const int32_t users_connected, const bool i
                 TCPsocket socket = panic.socket[i];
                 SDLNet_TCP_Send(socket, &index, sizeof(index));
             }
-            panic.panic_count = 0;
+            cache->panic_count = 0;
         }
         // for(int32_t i = 0; i < COLOR_COUNT; i++)
         // {
@@ -312,5 +187,4 @@ Sockets Sockets_Panic(Sockets panic, const int32_t users_connected, const bool i
         //     puts("");
         // }
     }
-    return panic;
 }

@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
+#include "Cache.h"
 #include "Backup.h"
 #include "Ping.h"
 #include "Sockets.h"
@@ -127,14 +128,15 @@ static void RunServer(const Args args)
     Sockets sockets = Sockets_Init(args.port);
     Sockets pingers = Sockets_Init(args.port_ping);
     Sockets panicks = Sockets_Init(args.port_panic);
+    Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
         pingers = Sockets_Accept(pingers);
         panicks = Sockets_Accept(panicks);
-        sockets = Sockets_Service(sockets);
-        sockets = Sockets_Relay(sockets, cycles, args.users, args.map_power);
-        panicks = Sockets_Panic(panicks, sockets.users_connected, sockets.is_stable);
+        sockets = Sockets_Service(sockets, &cache);
+        Sockets_Relay(sockets, cycles, &cache);
+        Sockets_Panic(panicks, &cache);
         Sockets_Ping(pingers);
         SDL_Delay(1);
     }
