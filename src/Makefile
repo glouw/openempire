@@ -35,6 +35,7 @@ SRCS += Overview.c
 SRCS += Window.c
 SRCS += Part.c
 SRCS += Parts.c
+SRCS += Parity.c
 SRCS += Packet.c
 SRCS += Packets.c
 SRCS += Palette.c

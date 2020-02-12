@@ -24,7 +24,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
         {
             overview.share.color = (Color) packet.client_id;
             Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
-            if(packet.game_running)
+            if(packet.is_game_running)
             {
                 overview.users = packet.users;
                 overview.map_power = packet.map_power;
@@ -36,9 +36,6 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     }
     return overview;
 }
-
-// SDLNet_TCP_Send(panic.server, &message, size);
-// SDLNet_TCP_Recv(panic.server, &temp, size);
 
 static void Play(const Video video, const Data data, const Args args)
 {
@@ -67,7 +64,17 @@ static void Play(const Video video, const Data data, const Args args)
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
+        {
+            if(packet.is_out_of_sync)
+            {
+                SDLNet_TCP_Send(panic.server, backup.parity, sizeof(backup.parity));
+                puts("PANICKING...");
+                int32_t index;
+                SDLNet_TCP_Recv(panic.server, &index, sizeof(index));
+                printf("GOT WHAT I NEEDED... INDEX %d", index);
+            }
             packets = Packets_Queue(packets, packet);
+        }
         packets = Packets_ClearWaste(packets, cycles);
         while(Packets_MustExecute(packets, cycles))
         {
@@ -126,7 +133,8 @@ static void RunServer(const Args args)
         pingers = Sockets_Accept(pingers);
         panicks = Sockets_Accept(panicks);
         sockets = Sockets_Service(sockets);
-        sockets = Sockets_Relay(sockets, cycles, args.quiet, args.users, args.map_power);
+        sockets = Sockets_Relay(sockets, cycles, args.users, args.map_power);
+        panicks = Sockets_Panic(panicks, sockets.users_connected, sockets.is_stable);
         Sockets_Ping(pingers);
         SDL_Delay(1);
     }
