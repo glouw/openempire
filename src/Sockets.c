@@ -37,7 +37,7 @@ static Sockets Add(Sockets sockets, TCPsocket socket)
     return sockets;
 }
 
-static Sockets Recieve(Sockets sockets, Cache* const cache)
+Sockets Sockets_Recieve(Sockets sockets, Cache* const cache)
 {
     if(SDLNet_CheckSockets(sockets.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -67,24 +67,16 @@ static Sockets Recieve(Sockets sockets, Cache* const cache)
     return sockets;
 }
 
-static void CountConnectedPlayers(Sockets sockets, Cache* const cache)
+void Sockets_CountConnectedPlayers(Sockets sockets, Cache* const cache)
 {
     int32_t count = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         TCPsocket socket = sockets.socket[i];
-        if(socket != NULL)
+        if(socket)
             count++;
     }
     cache->users_connected = count;
-}
-
-Sockets Sockets_Service(Sockets sockets, Cache* const cache)
-{
-    sockets = Recieve(sockets, cache);
-    CountConnectedPlayers(sockets, cache);
-    Cache_CalcOutOfSync(cache);
-    return sockets;
 }
 
 static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_ping, Cache* const cache)
@@ -116,7 +108,7 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
     }
 }
 
-void Sockets_Relay(Sockets sockets, const int32_t cycles, Cache* const cache)
+void Sockets_Send(Sockets sockets, const int32_t cycles, Cache* const cache)
 {
     if(cycles % CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES == 0)
     {
@@ -176,15 +168,17 @@ void Sockets_Panic(Sockets panic, Cache* const cache)
             {
                 int32_t index = -1;
                 TCPsocket socket = panic.socket[i];
-                SDLNet_TCP_Send(socket, &index, sizeof(index));
+                if(socket)
+                    SDLNet_TCP_Send(socket, &index, sizeof(index));
             }
             cache->panic_count = 0;
+            for(int32_t i = 0; i < COLOR_COUNT; i++)
+            {
+                for(int32_t j = 0; j < BACKUP_MAX; j++)
+                    printf("0x%016lX %5d\n", cache->panic[i][j].xorred, cache->panic[i][j].cycles);
+                puts("");
+            }
+            exit(1);
         }
-        // for(int32_t i = 0; i < COLOR_COUNT; i++)
-        // {
-        //     for(int32_t j = 0; j < BACKUP_MAX; j++)
-        //         printf("0x%016lX %5d ", parity[i][j].xorred, parity[i][j].cycles);
-        //     puts("");
-        // }
     }
 }

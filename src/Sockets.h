@@ -20,9 +20,7 @@ Sockets Sockets_Init(const int32_t port);
 
 void Sockets_Free(const Sockets);
 
-Sockets Sockets_Service(const Sockets, Cache* const);
-
-void Sockets_Relay(const Sockets, const int32_t cycles, Cache* const);
+void Sockets_Send(const Sockets, const int32_t cycles, Cache* const);
 
 Sockets Sockets_Accept(const Sockets);
 
@@ -30,6 +28,6 @@ void Sockets_Ping(const Sockets);
 
 void Sockets_Panic(const Sockets, Cache* const);
 
-int32_t Sockets_CountConnectedPlayers(const Sockets);
+Sockets Sockets_Recieve(Sockets, Cache* const);
 
-bool Sockets_IsOutOfSync(const Sockets);
+void Sockets_CountConnectedPlayers(Sockets, Cache* const);

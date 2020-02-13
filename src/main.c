@@ -134,10 +134,12 @@ static void RunServer(const Args args)
         sockets = Sockets_Accept(sockets);
         pingers = Sockets_Accept(pingers);
         panicks = Sockets_Accept(panicks);
-        sockets = Sockets_Service(sockets, &cache);
-        Sockets_Relay(sockets, cycles, &cache);
-        Sockets_Panic(panicks, &cache);
         Sockets_Ping(pingers);
+        Sockets_CountConnectedPlayers(sockets, &cache);
+        sockets = Sockets_Recieve(sockets, &cache);
+        Cache_CalcOutOfSync(&cache);
+        Sockets_Panic(panicks, &cache);
+        Sockets_Send(sockets, cycles, &cache);
         SDL_Delay(1);
     }
     Sockets_Free(pingers);
