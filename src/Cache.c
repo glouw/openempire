@@ -27,9 +27,10 @@ void Cache_AppendParity(Cache* cache, const Color color, const Parity parity)
 
 void Cache_CalcOutOfSync(Cache* const cache)
 {
-    cache->is_out_of_sync = false;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+    if(cache->is_stable && !cache->is_out_of_sync)
+    {
+        for(int32_t i = 0; i < COLOR_COUNT; i++)
+        for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
         for(int32_t x = 0; x < COLOR_COUNT; x++)
         for(int32_t y = 0; y < CONFIG_MAIN_LOOP_SPEED_FPS; y++)
         {
@@ -37,19 +38,30 @@ void Cache_CalcOutOfSync(Cache* const cache)
             const Parity b = cache->parity[i][j];
             if(a.cycles == b.cycles
             && a.xorred != b.xorred)
+            {
+                puts(">> OUT OF SYNC");
                 cache->is_out_of_sync = true;
+                Cache_DumpParityTable(cache);
+                return;
+            }
         }
+    }
+}
+
+void Cache_ClearParity(Cache* const cache)
+{
+    static Parity zero;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+        cache->parity[i][j] = zero;
 }
 
 void Cache_Clear(Cache* const cache)
 {
     static Packet zero;
-    static Parity none;
     cache->packet = zero;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-        cache->parity[i][j] = none;
     cache->turn++;
+    Cache_ClearParity(cache);
 }
 
 int32_t Cache_GetCycleSetpoint(Cache* const cache)
@@ -129,11 +141,22 @@ void Cache_CalcStability(Cache* const cache, const int32_t setpoint)
 
 void Cache_DumpPanicTable(Cache* const cache)
 {
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    for(int32_t i = 0; i < 2; i++)
     {
         Parity* const panic = cache->panic[i];
         for(int32_t j = 0; j < BACKUP_MAX; j++)
-            printf("0x%016lX %5d\n", panic[j].xorred, panic[j].cycles);
+            printf("PANIC 0x%016lX %5d\n", panic[j].xorred, panic[j].cycles);
+        putchar('\n');
+    }
+}
+
+void Cache_DumpParityTable(Cache* const cache)
+{
+    for(int32_t i = 0; i < 2; i++)
+    {
+        Parity* const parity = cache->parity[i];
+        for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+            printf("PARITY 0x%016lX %5d\n", parity[j].xorred, parity[j].cycles);
         putchar('\n');
     }
 }

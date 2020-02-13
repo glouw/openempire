@@ -498,8 +498,9 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
 
 Unit Unit_Copy(const Unit unit)
 {
+    static Points zero;
     Unit copy = unit;
-    copy.path = Points_Copy(unit.path);
+    copy.path = zero; //Points_Copy(unit.path);
     copy.interest = NULL;
     return copy;
 }

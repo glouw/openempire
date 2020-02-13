@@ -68,22 +68,24 @@ static void Play(const Video video, const Data data, const Args args)
         {
             if(packet.is_out_of_sync)
             {
-                puts("PANICKING...");
-                puts("SENDING...");
+                printf("%d PANICKING...", packet.client_id);
+                printf("%d SENDING...", packet.client_id);
                 SDLNet_TCP_Send(panic.server, backup.parity, sizeof(backup.parity));
-                puts("DONE SENDING...");
+                printf("%d DONE SENDING...", packet.client_id);
                 int32_t index;
-                puts("RECIEVING...");
+                printf("%d RECIEVING...", packet.client_id);
                 SDLNet_TCP_Recv(panic.server, &index, sizeof(index));
-                printf("GOT WHAT I NEEDED... INDEX %d\n", index);
+                printf("%d GOT WHAT I NEEDED... INDEX %d\n", packet.client_id, index);
                 if(index < 0 || index >= BACKUP_MAX)
                     Util_Bomb("NO GOOD INDEX\n");
                 Units_Free(units);
                 units = Units_Copy(backup.units[index]);
                 packets = Packets_Flush(packets);
                 backup = Backup_Free(backup);
-                cycles = backup.parity[index].cycles;
-                printf("XORRED 0x%016lX\n", Units_Xor(units));
+                printf("%d XORRED 0x%016lX\n", packet.client_id, Units_Xor(units));
+                int32_t ack = 0xDEADBEEF;
+                SDLNet_TCP_Send(panic.server, &ack, sizeof(ack));
+                printf("%d PACKETS SIZE %d\n", packet.client_id, Packets_Size(packets));
                 continue;
             }
             packets = Packets_Queue(packets, packet);

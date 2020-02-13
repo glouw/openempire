@@ -104,6 +104,8 @@ static void Send(Sockets sockets, const int32_t max_cycle, const int32_t max_pin
             if(!cache->is_stable)
                 packet = Packet_ZeroOverviews(packet);
             SDLNet_TCP_Send(socket, &packet, sizeof(packet));
+            if(cache->is_out_of_sync)
+                printf(">> %d SEND OUTTA SYNC\n", packet.client_id);
         }
     }
 }
@@ -152,9 +154,9 @@ static void PopulatePanicTable(const Sockets panic, Cache* const cache)
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         TCPsocket socket = panic.socket[i];
-        if(SDLNet_SocketReady(socket))
+        if(socket && SDLNet_SocketReady(socket))
         {
-            printf("GOT %d :: PANIC COUNT %d\n", i, cache->panic_count);
+            printf(">> GOT %d :: PANIC COUNT %d\n", i, cache->panic_count);
             SDLNet_TCP_Recv(socket, cache->panic[i], sizeof(cache->panic[i]));
             cache->panic_count++;
         }
@@ -167,15 +169,25 @@ static void SendPanicSolution(const Sockets panic, Cache* const cache)
     Cache_DumpPanicTable(cache);
     Cache_FindPanicSolution(cache, indices);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        printf("%d\n", indices[i]);
+        printf(">> %d\n", indices[i]);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         int32_t index = indices[i];
         TCPsocket socket = panic.socket[i];
         if(socket)
         {
-            printf("SENDING %d TO %d\n", index, i);
+            printf(">> SENDING %d TO %d\n", index, i);
             SDLNet_TCP_Send(socket, &index, sizeof(index));
+        }
+    }
+    for(int32_t i = 0; i < COLOR_COUNT; i++) // WAIT ON ACKS.
+    {
+        TCPsocket socket = panic.socket[i];
+        if(socket)
+        {
+            int32_t ack;
+            SDLNet_TCP_Recv(socket, &ack, sizeof(ack));
+            printf(">> ACK 0x%08X\n", ack);
         }
     }
 }
@@ -188,9 +200,12 @@ void Sockets_Panic(const Sockets panic, Cache* const cache)
             PopulatePanicTable(panic, cache);
         if(cache->panic_count == cache->users_connected)
         {
-            SendPanicSolution(panic, cache);
+            puts(">> CLEAR PARITY");
             cache->panic_count = 0;
             cache->is_out_of_sync = false;
+            Cache_ClearParity(cache);
+            puts(">> SEND SOLUTION");
+            SendPanicSolution(panic, cache);
         }
     }
 }

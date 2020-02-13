@@ -34,6 +34,8 @@ void Cache_AppendParity(Cache*, const Color color, const Parity);
 
 void Cache_CalcOutOfSync(Cache* const);
 
+void Cache_ClearParity(Cache* const);
+
 void Cache_Clear(Cache* const);
 
 int32_t Cache_GetCycleSetpoint(Cache* const);
@@ -47,5 +49,7 @@ void Cache_CalculateControlChars(Cache* const, const int32_t setpoint);
 void Cache_CalcStability(Cache* const, const int32_t setpoint);
 
 void Cache_DumpPanicTable(Cache* const);
+
+void Cache_DumpParityTable(Cache* const);
 
 void Cache_FindPanicSolution(Cache* const, int32_t indices[COLOR_COUNT]);
