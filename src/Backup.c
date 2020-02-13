@@ -31,8 +31,15 @@ Backup Backup_Init(void)
     return zero;
 }
 
-void Backup_Free(const Backup backup)
+Backup Backup_Free(Backup backup)
 {
+    static Units zero;
+    static Parity none;
     for(int32_t i = 0; i < BACKUP_MAX; i++)
+    {
         Units_Free(backup.units[i]);
+        backup.units[i] = zero;
+        backup.parity[i] = none;
+    }
+    return backup;
 }

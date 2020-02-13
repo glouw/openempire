@@ -1,5 +1,7 @@
 #include "Cache.h"
 
+#include "Util.h"
+
 Cache Cache_Init(const int32_t users, const int32_t map_power)
 {
     static Cache zero;
@@ -33,9 +35,9 @@ void Cache_CalcOutOfSync(Cache* const cache)
         {
             const Parity a = cache->parity[x][y];
             const Parity b = cache->parity[i][j];
-            if(a.cycles == b.cycles)
-                if(a.xorred != b.xorred)
-                    cache->is_out_of_sync = true;
+            if(a.cycles == b.cycles
+            && a.xorred != b.xorred)
+                cache->is_out_of_sync = true;
         }
 }
 
@@ -156,13 +158,16 @@ void Cache_FindPanicSolution(Cache* const cache, int32_t indices[COLOR_COUNT])
             const int32_t index = GetIndex(parities, parity);
             if(index != -1)
             {
-                puts("MATCH");
                 indices[j] = index;
                 solutions++;
             }
         }
         indices[COLOR_BLU] = i;
         if(solutions == cache->users_connected)
-            break;
+        {
+            puts("SOLUTION FOUND\n");
+            return;
+        }
     }
+    Util_Bomb("NO SOLUTION FOUND - CLIENTS TOTALLY OUT OF SYNC\n");
 }

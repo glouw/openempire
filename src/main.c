@@ -68,13 +68,25 @@ static void Play(const Video video, const Data data, const Args args)
         {
             if(packet.is_out_of_sync)
             {
-                SDLNet_TCP_Send(panic.server, backup.parity, sizeof(backup.parity));
                 puts("PANICKING...");
+                puts("SENDING...");
+                SDLNet_TCP_Send(panic.server, backup.parity, sizeof(backup.parity));
+                puts("DONE SENDING...");
                 int32_t index;
+                puts("RECIEVING...");
                 SDLNet_TCP_Recv(panic.server, &index, sizeof(index));
-                printf("GOT WHAT I NEEDED... INDEX %d", index);
+                printf("GOT WHAT I NEEDED... INDEX %d\n", index);
+                if(index < 0 || index >= BACKUP_MAX)
+                    Util_Bomb("NO GOOD INDEX\n");
+                Units_Free(units);
+                units = Units_Copy(backup.units[index]);
+                packets = Packets_Flush(packets);
+                backup = Backup_Free(backup);
+                cycles = backup.parity[index].cycles;
+                printf("XORRED 0x%016lX\n", Units_Xor(units));
+                continue;
             }
-            else packets = Packets_Queue(packets, packet);
+            packets = Packets_Queue(packets, packet);
         }
         packets = Packets_ClearWaste(packets, cycles);
         while(Packets_MustExecute(packets, cycles))
@@ -138,8 +150,8 @@ static void RunServer(const Args args)
         Sockets_CountConnectedPlayers(sockets, &cache);
         sockets = Sockets_Recieve(sockets, &cache);
         Cache_CalcOutOfSync(&cache);
-        Sockets_Panic(panicks, &cache);
         Sockets_Send(sockets, cycles, &cache);
+        Sockets_Panic(panicks, &cache);
         SDL_Delay(1);
     }
     Sockets_Free(pingers);

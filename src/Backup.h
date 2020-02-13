@@ -3,7 +3,7 @@
 #include "Units.h"
 #include "Parity.h"
 
-#define BACKUP_MAX (16)
+#define BACKUP_MAX (8)
 
 typedef struct
 {
@@ -16,4 +16,4 @@ Backup Backup_Push(Backup, const Units, const int32_t cycles);
 
 Backup Backup_Init(void);
 
-void Backup_Free(const Backup);
+Backup Backup_Free(Backup);

@@ -47,7 +47,7 @@ int32_t Packets_Size(const Packets packets)
     return packets.b - packets.a;
 }
 
-static bool Active(const Packets packets)
+static bool IsActive(const Packets packets)
 {
     return Packets_Size(packets) > 0;
 }
@@ -64,7 +64,7 @@ void Packets_Print(const Packets packets)
 
 static bool IsNextWaste(const Packets packets, const int32_t cycles)
 {
-    return Active(packets) && Packets_Peek(packets).exec_cycle < cycles;
+    return IsActive(packets) && Packets_Peek(packets).exec_cycle < cycles;
 }
 
 Packets Packets_ClearWaste(Packets packets, const int32_t cycles)
@@ -79,5 +79,15 @@ Packets Packets_ClearWaste(Packets packets, const int32_t cycles)
 
 bool Packets_MustExecute(const Packets packets, const int32_t cycles)
 {
-    return Active(packets) && Packets_Peek(packets).exec_cycle == cycles;
+    return IsActive(packets) && Packets_Peek(packets).exec_cycle == cycles;
+}
+
+Packets Packets_Flush(Packets packets)
+{
+    while(IsActive(packets))
+    {
+        Packet waste;
+        packets = Packets_Dequeue(packets, &waste);
+    }
+    return packets;
 }

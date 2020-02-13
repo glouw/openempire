@@ -170,13 +170,14 @@ static void SendPanicSolution(const Sockets panic, Cache* const cache)
         printf("%d\n", indices[i]);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        int32_t index = -1;
+        int32_t index = indices[i];
         TCPsocket socket = panic.socket[i];
         if(socket)
+        {
+            printf("SENDING %d TO %d\n", index, i);
             SDLNet_TCP_Send(socket, &index, sizeof(index));
+        }
     }
-    cache->panic_count = 0;
-    exit(1);
 }
 
 void Sockets_Panic(const Sockets panic, Cache* const cache)
@@ -186,6 +187,10 @@ void Sockets_Panic(const Sockets panic, Cache* const cache)
         if(SDLNet_CheckSockets(panic.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
             PopulatePanicTable(panic, cache);
         if(cache->panic_count == cache->users_connected)
+        {
             SendPanicSolution(panic, cache);
+            cache->panic_count = 0;
+            cache->is_out_of_sync = false;
+        }
     }
 }
