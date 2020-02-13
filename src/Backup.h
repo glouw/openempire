@@ -3,7 +3,7 @@
 #include "Units.h"
 #include "Parity.h"
 
-#define BACKUP_MAX (8)
+#define BACKUP_MAX (16)
 
 typedef struct
 {

@@ -74,7 +74,7 @@ static void Play(const Video video, const Data data, const Args args)
                 SDLNet_TCP_Recv(panic.server, &index, sizeof(index));
                 printf("GOT WHAT I NEEDED... INDEX %d", index);
             }
-            packets = Packets_Queue(packets, packet);
+            else packets = Packets_Queue(packets, packet);
         }
         packets = Packets_ClearWaste(packets, cycles);
         while(Packets_MustExecute(packets, cycles))

@@ -55,15 +55,15 @@ int32_t Cache_GetCycleSetpoint(Cache* const cache)
     int32_t setpoint = 0;
     int32_t count = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+    {
+        const int32_t cycles = cache->parity[i][j].cycles;
+        if(cycles > 0)
         {
-            const int32_t cycles = cache->parity[i][j].cycles;
-            if(cycles > 0)
-            {
-                setpoint += cycles;
-                count++;
-            }
+            setpoint += cycles;
+            count++;
         }
+    }
     return (count > 0) ? (setpoint / count) : 0;
 }
 
@@ -71,12 +71,12 @@ int32_t Cache_GetCycleMax(Cache* const cache)
 {
     int32_t max = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
-        {
-            const int32_t cycles = cache->parity[i][j].cycles;
-            if(cycles > max)
-                max = cycles;
-        }
+    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+    {
+        const int32_t cycles = cache->parity[i][j].cycles;
+        if(cycles > max)
+            max = cycles;
+    }
     return max;
 }
 
@@ -85,15 +85,15 @@ static int32_t GetCycleAverage(Cache* const cache)
     int32_t count = 0;
     int32_t sum = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+    for(int32_t j = 0; j < CONFIG_MAIN_LOOP_SPEED_FPS; j++)
+    {
+        const Parity parity = cache->parity[i][j];
+        if(!Parity_IsZero(parity))
         {
-            const Parity parity = cache->parity[i][j];
-            if(!Parity_IsZero(parity))
-            {
-                sum += parity.cycles;
-                count++;
-            }
+            sum += parity.cycles;
+            count++;
         }
+    }
     return count == 0 ? 0 : (sum / count);
 }
 
@@ -129,13 +129,40 @@ void Cache_DumpPanicTable(Cache* const cache)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
+        Parity* const panic = cache->panic[i];
         for(int32_t j = 0; j < BACKUP_MAX; j++)
-        {
-            Parity* const panic = cache->panic[i];
-            printf("0x%016lX %5d\n",
-                    panic[j].xorred,
-                    panic[j].cycles);
-        }
+            printf("0x%016lX %5d\n", panic[j].xorred, panic[j].cycles);
         putchar('\n');
+    }
+}
+
+static int32_t GetIndex(Parity* const parities, const Parity parity)
+{
+    for(int32_t i = 0; i < BACKUP_MAX; i++)
+        if(Parity_IsEqual(parities[i], parity))
+            return i;
+    return -1;
+}
+
+void Cache_FindPanicSolution(Cache* const cache, int32_t indices[COLOR_COUNT])
+{
+    int32_t solutions = 1;
+    for(int32_t i = 0; i < BACKUP_MAX; i++)
+    {
+        const Parity parity = cache->panic[COLOR_BLU][i];
+        for(int32_t j = 1; j < COLOR_COUNT; j++)
+        {
+            Parity* const parities = cache->panic[j];
+            const int32_t index = GetIndex(parities, parity);
+            if(index != -1)
+            {
+                puts("MATCH");
+                indices[j] = index;
+                solutions++;
+            }
+        }
+        indices[COLOR_BLU] = i;
+        if(solutions == cache->users_connected)
+            break;
     }
 }

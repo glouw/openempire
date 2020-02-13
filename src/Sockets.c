@@ -163,6 +163,11 @@ static void PopulatePanicTable(const Sockets panic, Cache* const cache)
 
 static void SendPanicSolution(const Sockets panic, Cache* const cache)
 {
+    int32_t indices[COLOR_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    Cache_DumpPanicTable(cache);
+    Cache_FindPanicSolution(cache, indices);
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        printf("%d\n", indices[i]);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         int32_t index = -1;
@@ -171,8 +176,7 @@ static void SendPanicSolution(const Sockets panic, Cache* const cache)
             SDLNet_TCP_Send(socket, &index, sizeof(index));
     }
     cache->panic_count = 0;
-    Cache_DumpPanicTable(cache);
-    Util_Bomb("PANIC TABLE SOLUTION NOT YET IMPLEMENTED\n");
+    exit(1);
 }
 
 void Sockets_Panic(const Sockets panic, Cache* const cache)

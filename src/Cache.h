@@ -47,3 +47,5 @@ void Cache_CalculateControlChars(Cache* const, const int32_t setpoint);
 void Cache_CalcStability(Cache* const, const int32_t setpoint);
 
 void Cache_DumpPanicTable(Cache* const);
+
+void Cache_FindPanicSolution(Cache* const, int32_t indices[COLOR_COUNT]);
