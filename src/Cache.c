@@ -124,3 +124,18 @@ void Cache_CalcStability(Cache* const cache, const int32_t setpoint)
 {
     cache->is_stable = setpoint > CONFIG_SOCKETS_THRESHOLD_START;
 }
+
+void Cache_DumpPanicTable(Cache* const cache)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        for(int32_t j = 0; j < BACKUP_MAX; j++)
+        {
+            Parity* const panic = cache->panic[i];
+            printf("0x%016lX %5d\n",
+                    panic[j].xorred,
+                    panic[j].cycles);
+        }
+        putchar('\n');
+    }
+}

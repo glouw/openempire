@@ -30,4 +30,4 @@ void Sockets_Panic(const Sockets, Cache* const);
 
 Sockets Sockets_Recieve(Sockets, Cache* const);
 
-void Sockets_CountConnectedPlayers(Sockets, Cache* const);
+void Sockets_CountConnectedPlayers(const Sockets, Cache* const);

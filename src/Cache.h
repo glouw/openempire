@@ -45,3 +45,5 @@ int32_t Cache_GetPingMax(Cache* const);
 void Cache_CalculateControlChars(Cache* const, const int32_t setpoint);
 
 void Cache_CalcStability(Cache* const, const int32_t setpoint);
+
+void Cache_DumpPanicTable(Cache* const);

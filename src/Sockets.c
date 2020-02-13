@@ -147,38 +147,41 @@ void Sockets_Ping(const Sockets ping)
         }
 }
 
-void Sockets_Panic(Sockets panic, Cache* const cache)
+static void PopulatePanicTable(const Sockets panic, Cache* const cache)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        TCPsocket socket = panic.socket[i];
+        if(SDLNet_SocketReady(socket))
+        {
+            printf("GOT %d :: PANIC COUNT %d\n", i, cache->panic_count);
+            SDLNet_TCP_Recv(socket, cache->panic[i], sizeof(cache->panic[i]));
+            cache->panic_count++;
+        }
+    }
+}
+
+static void SendPanicSolution(const Sockets panic, Cache* const cache)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        int32_t index = -1;
+        TCPsocket socket = panic.socket[i];
+        if(socket)
+            SDLNet_TCP_Send(socket, &index, sizeof(index));
+    }
+    cache->panic_count = 0;
+    Cache_DumpPanicTable(cache);
+    Util_Bomb("PANIC TABLE SOLUTION NOT YET IMPLEMENTED\n");
+}
+
+void Sockets_Panic(const Sockets panic, Cache* const cache)
 {
     if(cache->is_stable)
     {
-        if(SDLNet_CheckSockets(panic.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS)) // PANICS ARE STREAMED IN BECAUSE CLIENTS ARE NOT PREDICTABLE.
-            for(int32_t i = 0; i < COLOR_COUNT; i++)
-            {
-                TCPsocket socket = panic.socket[i];
-                if(SDLNet_SocketReady(socket))
-                {
-                    printf("GOT %d :: PANIC COUNT %d\n", i, cache->panic_count);
-                    SDLNet_TCP_Recv(socket, cache->panic[i], sizeof(cache->panic[i]));
-                    cache->panic_count++;
-                }
-            }
-        if(cache->panic_count == cache->users_connected) // IN A SINGLE BATCH CALL, ALL CLIENTS ARE UPDATED WITH THE INDEX THEY MUST FALL BACK WITH.
-        {
-            for(int32_t i = 0; i < COLOR_COUNT; i++)
-            {
-                int32_t index = -1;
-                TCPsocket socket = panic.socket[i];
-                if(socket)
-                    SDLNet_TCP_Send(socket, &index, sizeof(index));
-            }
-            cache->panic_count = 0;
-            for(int32_t i = 0; i < COLOR_COUNT; i++)
-            {
-                for(int32_t j = 0; j < BACKUP_MAX; j++)
-                    printf("0x%016lX %5d\n", cache->panic[i][j].xorred, cache->panic[i][j].cycles);
-                puts("");
-            }
-            exit(1);
-        }
+        if(SDLNet_CheckSockets(panic.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
+            PopulatePanicTable(panic, cache);
+        if(cache->panic_count == cache->users_connected)
+            SendPanicSolution(panic, cache);
     }
 }
