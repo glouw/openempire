@@ -9,6 +9,7 @@ SRCS += Args.c
 SRCS += Bits.c
 SRCS += Blendomatic.c
 SRCS += Channels.c
+SRCS += Cache.c
 SRCS += Color.c
 SRCS += Data.c
 SRCS += Direction.c

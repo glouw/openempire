@@ -112,15 +112,17 @@ static void RunClient(const Args args)
 static void RunServer(const Args args)
 {
     srand(time(NULL));
-    Sockets sockets = Sockets_Init(args.port, args.users, args.map_power);
-    Sockets pingers = Sockets_Init(args.port_ping, args.users, args.map_power);
+    Sockets sockets = Sockets_Init(args.port);
+    Sockets pingers = Sockets_Init(args.port_ping);
+    Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
-        sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
-        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES, args.quiet);
         pingers = Sockets_Accept(pingers);
-        Sockets_Ping(pingers, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
+        sockets = Sockets_Recv(sockets, &cache);
+        Sockets_Send(sockets, &cache, cycles, args.quiet);
+        Sockets_Ping(pingers);
+        SDL_Delay(1);
     }
     Sockets_Free(pingers);
     Sockets_Free(sockets);

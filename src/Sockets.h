@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Packet.h"
+#include "Cache.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -8,32 +8,20 @@
 
 typedef struct
 {
-    int32_t cycles[COLOR_COUNT];
-    int32_t queue_size[COLOR_COUNT];
-    int32_t pings[COLOR_COUNT];
-    uint64_t parity[COLOR_COUNT];
-    TCPsocket socket[COLOR_COUNT];
-    char control[COLOR_COUNT];
     TCPsocket self;
-    Packet packet;
+    TCPsocket socket[COLOR_COUNT];
     SDLNet_SocketSet set;
-    int32_t turn;
-    int32_t users_connected;
-    int32_t users;
-    int32_t seed;
-    int32_t map_power;
-    bool is_stable;
 }
 Sockets;
 
-Sockets Sockets_Init(const int32_t port, const int32_t users, const int32_t map_power);
+Sockets Sockets_Init(const int32_t port);
 
-void Sockets_Free(Sockets);
+void Sockets_Free(const Sockets);
 
-Sockets Sockets_Service(const Sockets, const int32_t timeout);
+Sockets Sockets_Recv(const Sockets, Cache* const);
 
-Sockets Sockets_Relay(const Sockets, const int32_t cycles, const int32_t interval, const bool quiet);
+void Sockets_Send(const Sockets, Cache* const, const int32_t cycles, const bool quiet);
 
 Sockets Sockets_Accept(const Sockets);
 
-void Sockets_Ping(const Sockets, const int32_t timeout);
+void Sockets_Ping(const Sockets);
