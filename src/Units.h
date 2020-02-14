@@ -62,5 +62,3 @@ Units Units_PacketService(Units, const Registrar, const Packet, const Grid, cons
 uint64_t Units_Xor(const Units);
 
 Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
-
-Unit Unit_Copy(const Unit);

@@ -35,7 +35,7 @@ static int32_t Ping(void* const data)
     const Sock pinger = Sock_Connect(args->host, args->port_ping, "PING");
     while(true)
     {
-        const int32_t message = 0xCafeBabe;
+        const int32_t message = 0xCAFEBABE;
         int32_t temp;
         const int32_t size = sizeof(temp);
         const int32_t t0 = SDL_GetTicks();

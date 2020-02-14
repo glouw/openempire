@@ -25,10 +25,10 @@ void Packets_Free(const Packets);
 
 int32_t Packets_Size(const Packets);
 
+bool Packets_Active(const Packets);
+
 void Packets_Print(const Packets);
 
 Packets Packets_ClearWaste(Packets, const int32_t cycles);
 
 bool Packets_MustExecute(const Packets, const int32_t cycles);
-
-Packets Packets_Flush(Packets);

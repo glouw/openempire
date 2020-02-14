@@ -2,8 +2,6 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
-#include "Cache.h"
-#include "Backup.h"
 #include "Ping.h"
 #include "Sockets.h"
 #include "Overview.h"
@@ -25,7 +23,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
         {
             overview.share.color = (Color) packet.client_id;
             Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
-            if(packet.is_game_running)
+            if(packet.game_running)
             {
                 overview.users = packet.users;
                 overview.map_power = packet.map_power;
@@ -42,7 +40,6 @@ static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
     const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
-    const Sock panic = Sock_Connect(args.host, args.port_panic, "PANIC");
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
@@ -52,52 +49,30 @@ static void Play(const Video video, const Data data, const Args args)
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
-    Backup backup = Backup_Init();
+    // XXX:
+    // CLIENT NEEDS A COUPLE FALL BACK COPIES OF UNITS SOME SECONDS IN THE PAST.
+    // THIS WILL LOAD WHEN THE SERVER SAYS THERE IS AN OUT OF SYNC PROBLEM.
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
         const Field field = Units_Field(units, map);
         const int32_t size = Packets_Size(packets);
-        const uint64_t xorred = Units_Xor(units);
+        const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, xorred, cycles, size, units.share, ping);
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
         Sock_Send(sock, overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsStable(packet))
-        {
-            if(packet.is_out_of_sync)
-            {
-                printf("%d PANICKING...", packet.client_id);
-                printf("%d SENDING...", packet.client_id);
-                SDLNet_TCP_Send(panic.server, backup.parity, sizeof(backup.parity));
-                printf("%d DONE SENDING...", packet.client_id);
-                int32_t index;
-                printf("%d RECIEVING...", packet.client_id);
-                SDLNet_TCP_Recv(panic.server, &index, sizeof(index));
-                printf("%d GOT WHAT I NEEDED... INDEX %d\n", packet.client_id, index);
-                if(index < 0 || index >= BACKUP_MAX)
-                    Util_Bomb("NO GOOD INDEX\n");
-                Units_Free(units);
-                units = Units_Copy(backup.units[index]);
-                packets = Packets_Flush(packets);
-                backup = Backup_Free(backup);
-                printf("%d XORRED 0x%016lX\n", packet.client_id, Units_Xor(units));
-                int32_t ack = 0xDEADBEEF;
-                SDLNet_TCP_Send(panic.server, &ack, sizeof(ack));
-                printf("%d PACKETS SIZE %d\n", packet.client_id, Packets_Size(packets));
-                continue;
-            }
             packets = Packets_Queue(packets, packet);
-        }
         packets = Packets_ClearWaste(packets, cycles);
-        while(Packets_MustExecute(packets, cycles))
-        {
-            Packet dequeued;
-            packets = Packets_Dequeue(packets, &dequeued);
-            backup = Backup_Push(backup, units, cycles);
-            units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-        }
+        if(Packets_Active(packets))
+            while(Packets_MustExecute(packets, cycles))
+            {
+                Packet dequeued;
+                packets = Packets_Dequeue(packets, &dequeued);
+                units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+            }
         units = Units_Caretake(units, data.graphics, grid, map, field);
         cycles++;
         if(packet.control == PACKET_CONTROL_SPEED_UP)
@@ -115,11 +90,9 @@ static void Play(const Video video, const Data data, const Args args)
     Units_Free(floats);
     Units_Free(units);
     Packets_Free(packets);
-    Sock_Disconnect(panic);
     Sock_Disconnect(sock);
     Ping_Shutdown();
     Map_Free(map);
-    Backup_Free(backup);
 }
 
 static void RunClient(const Args args)
@@ -139,26 +112,18 @@ static void RunClient(const Args args)
 static void RunServer(const Args args)
 {
     srand(time(NULL));
-    Sockets sockets = Sockets_Init(args.port);
-    Sockets pingers = Sockets_Init(args.port_ping);
-    Sockets panicks = Sockets_Init(args.port_panic);
-    Cache cache = Cache_Init(args.users, args.map_power);
+    Sockets sockets = Sockets_Init(args.port, args.users, args.map_power);
+    Sockets pingers = Sockets_Init(args.port_ping, args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
         sockets = Sockets_Accept(sockets);
+        sockets = Sockets_Service(sockets, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
+        sockets = Sockets_Relay(sockets, cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES, args.quiet);
         pingers = Sockets_Accept(pingers);
-        panicks = Sockets_Accept(panicks);
-        Sockets_Ping(pingers);
-        Sockets_CountConnectedPlayers(sockets, &cache);
-        sockets = Sockets_Recieve(sockets, &cache);
-        Cache_CalcOutOfSync(&cache);
-        Sockets_Send(sockets, cycles, &cache);
-        Sockets_Panic(panicks, &cache);
-        SDL_Delay(1);
+        Sockets_Ping(pingers, CONFIG_SOCKETS_SERVER_TIMEOUT_MS);
     }
     Sockets_Free(pingers);
     Sockets_Free(sockets);
-    Sockets_Free(panicks);
 }
 
 int main(const int argc, const char* argv[])

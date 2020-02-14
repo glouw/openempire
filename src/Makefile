@@ -1,5 +1,4 @@
 BIN = ../openempires
-ASM = $(BIN).s
 
 LIBS  = -lSDL2
 LIBS += -lSDL2_ttf
@@ -7,12 +6,10 @@ LIBS += -lSDL2_net
 
 SRCS  = Animation.c
 SRCS += Args.c
-SRCS += Backup.c
 SRCS += Bits.c
 SRCS += Blendomatic.c
 SRCS += Channels.c
 SRCS += Color.c
-SRCS += Cache.c
 SRCS += Data.c
 SRCS += Direction.c
 SRCS += Drs.c
@@ -36,7 +33,6 @@ SRCS += Overview.c
 SRCS += Window.c
 SRCS += Part.c
 SRCS += Parts.c
-SRCS += Parity.c
 SRCS += Packet.c
 SRCS += Packets.c
 SRCS += Palette.c
@@ -120,7 +116,7 @@ endif
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	$(DUMP) -M intel -d $(BIN) > $(ASM)
+	$(DUMP) -M intel -d $(BIN) > $(BIN).s
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
@@ -132,6 +128,5 @@ $(BIN): $(OBJS) $(DEPS)
 .PHONY clean:
 clean:
 	rm -f $(BIN)
-	rm -f $(ASM)
 	rm -f $(OBJS)
 	rm -f $(DEPS)

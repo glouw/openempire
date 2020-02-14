@@ -23,9 +23,8 @@ typedef struct
     int32_t seed;
     int32_t map_power;
     char control;
-    bool is_game_running;
     bool is_stable;
-    bool is_out_of_sync;
+    bool game_running;
 }
 Packet;
 

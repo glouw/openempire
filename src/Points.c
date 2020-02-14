@@ -71,11 +71,3 @@ Points Points_Reverse(Points points)
     }
     return out;
 }
-
-Points Points_Copy(const Points points)
-{
-    Points copy = Points_New(points.max);
-    for(int32_t i = 0; i < points.count; i++)
-        copy = Points_Append(copy, points.point[i]);
-    return copy;
-}

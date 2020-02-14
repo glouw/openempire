@@ -31,6 +31,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Check(arg, "-x",   "--xres"  )) args.xres = atoi(next);
         if(Check(arg, "-y",   "--yres"  )) args.yres = atoi(next);
         if(Check(arg, "-u",   "--users" )) args.users = atoi(next);
+        if(Check(arg, "-q",   "--quiet" )) args.quiet = true;
         if(Check(arg, "-v",   "--civ"   )) args.civ = (Civ) atoi(next);
         if(Check(arg, "-d",   "--demo"  )) args.demo = true;
         if(Check(arg, "-pp",  "--power" )) args.map_power = atoi(next);
@@ -38,6 +39,5 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Check(arg, "-ppp", "--port"  )) args.port = atoi(next);
     }
     args.port_ping = args.port + 1;
-    args.port_panic = args.port + 2;
     return args;
 }

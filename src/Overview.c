@@ -73,14 +73,14 @@ static Overview UpdatePan(Overview overview)
     return overview;
 }
 
-Overview Overview_Update(Overview overview, const Input input, const uint64_t xorred, const int32_t cycles, const int32_t queue_size, const Share share, const int32_t ping)
+Overview Overview_Update(Overview overview, const Input input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Share share, const int32_t ping)
 {
     overview = UpdateMouse(overview, input);
     overview = UpdateKeys(overview, input);
     overview = UpdatePan(overview);
     overview = UpdateSelectionBox(overview);
-    overview.parity.xorred = xorred;
-    overview.parity.cycles = cycles;
+    overview.parity = parity;
+    overview.cycles = cycles;
     overview.queue_size = queue_size;
     overview.share = share;
     overview.ping = ping == -1 ? overview.ping : ping;

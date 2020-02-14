@@ -84,7 +84,10 @@ Units Units_Copy(const Units units)
     Units copy = units;
     copy = Alloc(copy);
     for(int32_t i = 0; i < units.count; i++)
-        copy.unit[i] = Unit_Copy(units.unit[i]);
+    {
+        copy.unit[i] = units.unit[i];
+        copy.unit[i].interest = NULL; // NEW MEMORY ALLOCATION. INTEREST NO LONGER VALID.
+    }
     return copy;
 }
 
@@ -93,8 +96,6 @@ void Units_Free(const Units units)
     const int32_t area = units.size * units.size;
     for(int32_t i = 0; i < area; i++)
         Stack_Free(units.stack[i]);
-    for(int32_t i = 0; i < units.count; i++)
-        Unit_Free(&units.unit[i]);
     free(units.stack);
     free(units.unit);
 }
@@ -1009,7 +1010,7 @@ Units Units_PacketService(Units units, const Registrar graphics, const Packet pa
 
 uint64_t Units_Xor(const Units units)
 {
-    uint64_t parity = 0x0;
+    uint64_t parity = 0;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
