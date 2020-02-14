@@ -37,7 +37,8 @@ static Sockets Add(Sockets sockets, TCPsocket socket)
 
 Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
 {
-    if(SDLNet_CheckSockets(sockets.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
+    cache->is_out_of_sync = false;
+    if(SDLNet_CheckSockets(sockets.set, 0))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
             TCPsocket socket = sockets.socket[i];
@@ -100,6 +101,7 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
             packet.exec_cycle = exec_cycle;
             packet.client_id = i;
             packet.is_stable = cache->is_stable;
+            packet.is_out_of_sync = cache->is_out_of_sync;
             packet.game_running = game_running;
             packet.users_connected = cache->users_connected;
             packet.users = cache->users;
@@ -157,7 +159,7 @@ Sockets Sockets_Accept(const Sockets sockets)
 
 void Sockets_Ping(const Sockets pingers)
 {
-    if(SDLNet_CheckSockets(pingers.set, CONFIG_SOCKETS_SERVER_TIMEOUT_MS))
+    if(SDLNet_CheckSockets(pingers.set, 0))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
             TCPsocket socket = pingers.socket[i];

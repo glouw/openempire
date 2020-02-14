@@ -28,8 +28,12 @@ void Cache_CheckParity(Cache* const cache)
             for(int32_t i = 0; i < COLOR_COUNT; i++)
             {
                 const int32_t cycles = cache->cycles[i];
-                const int32_t parity = cache->parity[i]; if(cycles == cycles_check && parity != parity_check)
-                    Util_Bomb("SERVER - CLIENT_ID %d :: OUT OF SYNC\n", i);
+                const int32_t parity = cache->parity[i];
+                if(cycles == cycles_check && parity != parity_check)
+                {
+                    cache->is_out_of_sync = true;
+                    return;
+                }
             }
         }
 }

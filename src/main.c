@@ -17,7 +17,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     Overview overview = Overview_Init(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
-        Sock_Send(sock, overview);
+        SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
         const Packet packet = Packet_Get(sock);
         if(packet.turn > 0)
         {
@@ -61,8 +61,13 @@ static void Play(const Video video, const Data data, const Args args)
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
         overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
-        Sock_Send(sock, overview);
+        SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
         const Packet packet = Packet_Get(sock);
+        if(packet.is_out_of_sync)
+        {
+            puts("CLIENT OUT OF SYNC");
+            exit(1);
+        }
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
         packets = Packets_ClearWaste(packets, cycles);
@@ -117,12 +122,16 @@ static void RunServer(const Args args)
     Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
+        const int32_t t0 = SDL_GetTicks();
         sockets = Sockets_Accept(sockets);
         pingers = Sockets_Accept(pingers);
         sockets = Sockets_Recv(sockets, &cache);
         Sockets_Send(sockets, &cache, cycles, args.quiet);
         Sockets_Ping(pingers);
-        SDL_Delay(1);
+        const int32_t t1 = SDL_GetTicks();
+        const int32_t ms = 10 - (t1 - t0);
+        if(ms > 0)
+            SDL_Delay(ms);
     }
     Sockets_Free(pingers);
     Sockets_Free(sockets);

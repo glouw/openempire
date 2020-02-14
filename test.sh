@@ -16,8 +16,8 @@ netsim()
     VARIANCE=5ms
     DUPLICATE=1%
     # XXX. PACKET CORRUPTION AND PACKET LOSS WILL TRIGGER TCP TO RESEND ITS COMMAND AND MISS BUFFER DEADLINE.
-    CORRUPT=3.0%
-    LOSS=3.0%
+    CORRUPT=1.0%
+    LOSS=1.0%
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $LOSS 25% duplicate $DUPLICATE corrupt $CORRUPT
 }
@@ -33,7 +33,7 @@ batch()
     POWER=7
     HOST=localhost
     PORT=1111
-    ./$BIN --server --users $USERS --power $POWER --port $PORT &
+    ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do

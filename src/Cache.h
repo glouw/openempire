@@ -19,6 +19,7 @@ typedef struct
     int32_t seed;
     int32_t map_power;
     bool is_stable;
+    bool is_out_of_sync;
     char control[COLOR_COUNT];
 }
 Cache;

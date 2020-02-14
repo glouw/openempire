@@ -14,5 +14,3 @@ Sock;
 Sock Sock_Connect(const char* const host, const int32_t port, const char* const from);
 
 void Sock_Disconnect(const Sock);
-
-void Sock_Send(const Sock, const Overview);

@@ -21,8 +21,3 @@ void Sock_Disconnect(const Sock sock)
     SDLNet_FreeSocketSet(sock.set);
     SDLNet_TCP_Close(sock.server);
 }
-
-void Sock_Send(const Sock sock, const Overview overview)
-{
-    SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
-}
