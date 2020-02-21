@@ -49,9 +49,6 @@ static void Play(const Video video, const Data data, const Args args)
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
     Packets packets = Packets_Init();
-    // XXX:
-    // CLIENT NEEDS A COUPLE FALL BACK COPIES OF UNITS SOME SECONDS IN THE PAST.
-    // THIS WILL LOAD WHEN THE SERVER SAYS THERE IS AN OUT OF SYNC PROBLEM.
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -64,33 +61,30 @@ static void Play(const Video video, const Data data, const Args args)
         SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
-        {
-            puts("CLIENT OUT OF SYNC");
-            exit(1);
-        }
+            Util_Bomb("CLIENT OUT OF SYNC\n");
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
         packets = Packets_ClearWaste(packets, cycles);
-        if(Packets_Active(packets))
-            while(Packets_MustExecute(packets, cycles))
-            {
-                Packet dequeued;
-                packets = Packets_Dequeue(packets, &dequeued);
-                units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-            }
+        while(Packets_MustExecute(packets, cycles))
+        {
+            Packet dequeued;
+            packets = Packets_Dequeue(packets, &dequeued);
+            units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+        }
         units = Units_Caretake(units, data.graphics, grid, map, field);
         cycles++;
-        if(packet.control == PACKET_CONTROL_SPEED_UP)
-            continue;
-        floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
-        Video_Draw(video, data, map, units, floats, overview, grid);
-        const int32_t t1 = SDL_GetTicks();
-        Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
-        Field_Free(field);
-        const int32_t t2 = SDL_GetTicks();
-        const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
-        if(ms > 0)
-            SDL_Delay(ms);
+        if(packet.control != PACKET_CONTROL_SPEED_UP)
+        {
+            floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
+            Video_Draw(video, data, map, units, floats, overview, grid);
+            const int32_t t1 = SDL_GetTicks();
+            Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+            Field_Free(field);
+            const int32_t t2 = SDL_GetTicks();
+            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
+            if(ms > 0)
+                SDL_Delay(ms);
+        }
     }
     Units_Free(floats);
     Units_Free(units);

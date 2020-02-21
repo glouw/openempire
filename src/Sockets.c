@@ -13,6 +13,8 @@ Sockets Sockets_Init(const int32_t port)
     SDLNet_ResolveHost(&ip, NULL, port);
     Sockets sockets = zero;
     sockets.self = SDLNet_TCP_Open(&ip);
+    if(sockets.self == NULL)
+        Util_Bomb("COULD NOT OPEN SERVER SOCKET\n");
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     return sockets;
 }

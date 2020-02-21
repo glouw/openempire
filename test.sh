@@ -26,8 +26,8 @@ netsim()
 batch()
 {
     BIN=openempires
-    XRES=1300
-    YRES=700
+    XRES=800
+    YRES=400
     USERS=2
     CIVS=4
     POWER=7
@@ -37,7 +37,6 @@ batch()
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do
-        sleep 0.5
         D=20
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))

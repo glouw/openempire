@@ -10,7 +10,7 @@
 #include "Interfac.h"
 #include "Buttons.h"
 
-static Rects GetChannelRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
+static inline Rects GetChannelRects(const int32_t xres, const int32_t yres, const int32_t cpu_count)
 {
     Rects rects = Rects_Make(cpu_count);
     const int32_t width = xres / rects.count;
@@ -49,12 +49,12 @@ void Vram_Unlock(SDL_Texture* const texture)
     SDL_UnlockTexture(texture);
 }
 
-static void Put(const Vram vram, const int32_t x, const int32_t y, const uint32_t pixel)
+static inline void Put(const Vram vram, const int32_t x, const int32_t y, const uint32_t pixel)
 {
     vram.pixels[x + y * vram.width] = pixel;
 }
 
-static uint32_t Get(const Vram vram, const int32_t x, const int32_t y)
+static inline uint32_t Get(const Vram vram, const int32_t x, const int32_t y)
 {
     return vram.pixels[x + y * vram.width];
 }
@@ -72,13 +72,13 @@ void Vram_Clear(const Vram vram, const uint32_t color)
         Put(vram, x, y, color);
 }
 
-static bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
+static inline bool OutOfBounds(const Vram vram, const int32_t x, const int32_t y)
 {
     return x < 0 || y < 0 || x >= vram.xres || y >= vram.yres;
 }
 
 // SEE: HTTPS://GIST.GITHUB.COM/XPROGER/96253E93BACCFBF338DE
-static uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
+static inline uint32_t Blend(const uint32_t bot_pixel, const uint32_t top_pixel, const uint8_t alpha)
 {
     uint32_t rb = top_pixel & SURFACE_RB_MASK;
     uint32_t g  = top_pixel & SURFACE_G_MASK;
@@ -106,7 +106,7 @@ static inline void TransferTilePixel(const Vram vram, const Tile tile, Point coo
     }
 }
 
-static void DrawTileNoClip(const Vram vram, const Tile tile)
+static inline void DrawTileNoClip(const Vram vram, const Tile tile)
 {
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
@@ -116,7 +116,7 @@ static void DrawTileNoClip(const Vram vram, const Tile tile)
     }
 }
 
-static void DrawTileClip(const Vram vram, const Tile tile)
+static inline void DrawTileClip(const Vram vram, const Tile tile)
 {
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
@@ -130,7 +130,9 @@ static void DrawTileClip(const Vram vram, const Tile tile)
 void Vram_DrawTile(const Vram vram, const Tile tile)
 {
     if(!tile.totally_offscreen)
-        tile.needs_clipping ? DrawTileClip(vram, tile) : DrawTileNoClip(vram, tile);
+        tile.needs_clipping
+            ? DrawTileClip(vram, tile)
+            : DrawTileNoClip(vram, tile);
 }
 
 typedef struct
@@ -142,7 +144,7 @@ typedef struct
 }
 BatchNeedle;
 
-static int32_t DrawBatchNeedle(void* data)
+static inline int32_t DrawBatchNeedle(void* data)
 {
     BatchNeedle* needle = (BatchNeedle*) data;
     for(int32_t i = needle->a; i < needle->b; i++)
@@ -150,7 +152,7 @@ static int32_t DrawBatchNeedle(void* data)
     return 0;
 }
 
-static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
+static inline void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
 {
     BatchNeedle* const needles = UTIL_ALLOC(BatchNeedle, vram.cpu_count);
     const int32_t width = terrain_tiles.count / vram.cpu_count;
@@ -170,7 +172,7 @@ static void RenderTerrainTiles(const Vram vram, const Tiles terrain_tiles)
     free(threads);
 }
 
-static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int32_t yy, SDL_Surface* const mask, const int32_t x, const int32_t y, const uint32_t top_pixel)
+static inline uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int32_t yy, SDL_Surface* const mask, const int32_t x, const int32_t y, const uint32_t top_pixel)
 {
     const uint32_t mask_pixel = Surface_GetPixel(mask, x, y);
     const uint32_t bot_pixel = Get(vram, xx, yy);
@@ -178,7 +180,7 @@ static uint32_t BlendMaskWithBuffer(const Vram vram, const int32_t xx, const int
     return blend_pixel;
 }
 
-static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
+static inline void BlendTilePixel(const Vram vram, const Tile tile, const Point coords, SDL_Surface* const mask, const int32_t x, const int32_t y)
 {
     const uint32_t height = Get(vram, coords.x, coords.y) >> SURFACE_A_SHIFT;
     if(tile.height >= height) // NOTE: GREATER THAN OR EQUAL TO SO THAT TERRAIN TILES CAN BLEND.
@@ -193,7 +195,7 @@ static void BlendTilePixel(const Vram vram, const Tile tile, const Point coords,
     }
 }
 
-static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* const mask)
+static inline void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* const mask)
 {
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
@@ -204,7 +206,7 @@ static void DrawTileMaskClip(const Vram vram, const Tile tile, SDL_Surface* cons
     }
 }
 
-static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* const mask)
+static inline void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* const mask)
 {
     for(int32_t y = 0; y < tile.frame.height; y++)
     for(int32_t x = 0; x < tile.frame.width; x++)
@@ -214,12 +216,14 @@ static void DrawTileMaskNoClip(const Vram vram, const Tile tile, SDL_Surface* co
     }
 }
 
-static void DrawTileMask(const Vram vram, const Tile tile, SDL_Surface* const mask)
+static inline void DrawTileMask(const Vram vram, const Tile tile, SDL_Surface* const mask)
 {
-    tile.needs_clipping ? DrawTileMaskClip(vram, tile, mask) : DrawTileMaskNoClip(vram, tile, mask);
+    tile.needs_clipping
+        ? DrawTileMaskClip(vram, tile, mask)
+        : DrawTileMaskNoClip(vram, tile, mask);
 }
 
-static void DrawBlendLine(const Vram vram, const Line line, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Blendomatic blendomatic)
+static inline void DrawBlendLine(const Vram vram, const Line line, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Blendomatic blendomatic)
 {
     const Point inner = line.inner;
     const Point outer = line.outer;
@@ -248,7 +252,7 @@ typedef struct
 }
 BlendNeedle;
 
-static int32_t DrawBlendNeedle(void* const data)
+static inline int32_t DrawBlendNeedle(void* const data)
 {
     BlendNeedle* const needle = (BlendNeedle*) data;
     for(int32_t i = needle->a; i < needle->b; i++)
@@ -259,11 +263,11 @@ static int32_t DrawBlendNeedle(void* const data)
     return 0;
 }
 
-static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, const int32_t slices)
+static inline int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, const int32_t slices)
 {
     if(slice == 0)
         return 0;
-    const int32_t width = slice * lines.count / slices;
+    const int32_t width = (slice * lines.count) / slices;
     int32_t index = width;
     while(index < lines.count)
     {
@@ -282,7 +286,7 @@ static int32_t GetNextBestBlendTile(const Lines lines, const int32_t slice, cons
     return index;
 }
 
-static void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Lines blend_lines, const Blendomatic blendomatic)
+static inline void BlendTerrainTiles(const Vram vram, const Registrar terrain, const Map map, const Overview overview, const Grid grid, const Lines blend_lines, const Blendomatic blendomatic)
 {
     BlendNeedle* const needles = UTIL_ALLOC(BlendNeedle, vram.cpu_count);
     for(int32_t i = 0; i < vram.cpu_count; i++)
@@ -318,7 +322,7 @@ typedef struct
 }
 ChannelNeedle;
 
-static int32_t DrawChannelNeedle(void* data)
+static inline int32_t DrawChannelNeedle(void* data)
 {
     ChannelNeedle* const needle = (ChannelNeedle*) data;
     for(int32_t i = 0; i < needle->tiles.count; i++)
@@ -343,7 +347,7 @@ void Vram_DrawUnits(const Vram vram, const Tiles tiles)
     Channels_Free(channels);
 }
 
-static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
+static inline void DrawSelectionPixel(const Vram vram, const Point point, const uint32_t color)
 {
     if(!OutOfBounds(vram, point.x, point.y))
         if((Get(vram, point.x, point.y) >> SURFACE_A_SHIFT) < FILE_PRIO_DECAY)
@@ -351,7 +355,7 @@ static void DrawSelectionPixel(const Vram vram, const Point point, const uint32_
 }
 
 // SEE: HTTPS://GIST.GITHUB.COM/BERT/1085538
-static void DrawEllipse(const Vram vram, Rect rect, const uint32_t color)
+static inline void DrawEllipse(const Vram vram, Rect rect, const uint32_t color)
 {
     int32_t a = abs(rect.b.x - rect.a.x);
     int32_t b = abs(rect.b.y - rect.a.y);
@@ -435,7 +439,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
     }
 }
 
-static void DrawHealthBar(const Vram vram, const Point top, const int32_t health, const int32_t max_health, const bool is_inanimate)
+static inline void DrawHealthBar(const Vram vram, const Point top, const int32_t health, const int32_t max_health, const bool is_inanimate)
 {
     const int32_t w = is_inanimate ? 90 : 30;
     const int32_t h = 2;
@@ -496,7 +500,7 @@ void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Ov
     }
 }
 
-static void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const Rect rect, const bool red_out)
+static inline void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const Rect rect, const bool red_out)
 {
     for(int32_t y = rect.a.y; y < rect.b.y; y++)
     for(int32_t x = rect.a.x; x < rect.b.x; x++)
@@ -520,7 +524,7 @@ typedef struct
 }
 Pack;
 
-static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color, const Age age)
+static inline Pack GetPackFromMotive(const Registrar interfac, const Motive motive, const Color color, const Age age)
 {
     const Animation* const base = interfac.animation[color];
     static Pack zero;
@@ -532,7 +536,7 @@ static Pack GetPackFromMotive(const Registrar interfac, const Motive motive, con
     return pack;
 }
 
-static void DrawPack(const Vram vram, const Pack pack, const Bits bits)
+static inline void DrawPack(const Vram vram, const Pack pack, const Bits bits)
 {
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
@@ -570,7 +574,7 @@ void Vram_Free(const Vram vram)
     Rects_Free(vram.channel_rects);
 }
 
-static void DrawDot(const Vram vram, const Point point, const int32_t size, const uint32_t in, const uint32_t out)
+static inline void DrawDot(const Vram vram, const Point point, const int32_t size, const uint32_t in, const uint32_t out)
 {
     for(int32_t y = -size; y <= size; y++)
     for(int32_t x = -size; x <= size; x++)
@@ -590,14 +594,14 @@ static void DrawDot(const Vram vram, const Point point, const int32_t size, cons
     }
 }
 
-static Point ToIsoMiniMap(const Vram vram, const Point cart)
+static inline Point ToIsoMiniMap(const Vram vram, const Point cart)
 {
     Point iso = Point_ToIso(cart);
     iso.y += vram.yres / 2;
     return iso;
 }
 
-static void DrawMiniMapTerrain(const Vram vram, const Map map)
+static inline void DrawMiniMapTerrain(const Vram vram, const Map map)
 {
     for(int32_t y = 0; y < map.size; y++)
     for(int32_t x = 0; x < map.size; x++)
@@ -610,7 +614,7 @@ static void DrawMiniMapTerrain(const Vram vram, const Map map)
     }
 }
 
-static void DrawMiniMapUnits(const Vram vram, const Units units)
+static inline void DrawMiniMapUnits(const Vram vram, const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
