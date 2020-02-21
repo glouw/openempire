@@ -79,18 +79,6 @@ Units Units_New(const int32_t size, const int32_t cpu_count, const int32_t max, 
     return Alloc(units);
 }
 
-Units Units_Copy(const Units units)
-{
-    Units copy = units;
-    copy = Alloc(copy);
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        copy.unit[i] = units.unit[i];
-        copy.unit[i].interest = NULL; // NEW MEMORY ALLOCATION. INTEREST NO LONGER VALID.
-    }
-    return copy;
-}
-
 void Units_Free(const Units units)
 {
     const int32_t area = units.size * units.size;
@@ -1016,10 +1004,7 @@ uint64_t Units_Xor(const Units units)
         Unit* const unit = &units.unit[i];
         const uint64_t x = (uint64_t) unit->cell.x;
         const uint64_t y = (uint64_t) unit->cell.y;
-        const uint64_t xx = unit->id * x;
-        const uint64_t yy = unit->id * y;
-        parity ^= (yy << 32) | xx;
-        parity += (int32_t) unit->file;
+        parity ^= (y << 32) | x;
     }
     return parity;
 }
@@ -1185,14 +1170,47 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
     return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
 }
 
-Units Units_Restore(Units units, TCPsocket server)
+Units Units_Restore(Units units, TCPsocket server, int32_t* cycles)
 {
     const Restore restore = Restore_Recv(server);
-    free(units.unit);
-    units.unit = restore.unit;
     units.count = restore.count;
-    units.max = restore.max;
     for(int32_t i = 0; i < units.count; i++)
+    {
+        static Points zero;
+        static Point none;
+        units.unit[i] = restore.unit[i];
         units.unit[i].interest = NULL;
+        units.unit[i].path = zero;
+        units.unit[i].entropy_static = 0;
+        units.unit[i].entropy = none;
+        units.unit[i].path_index = 0;
+        units.unit[i].path_index_timer = 0;
+        units.unit[i].command_group = 0;
+        units.unit[i].command_group_count = 0;
+        units.unit[i].state_timer = 0;
+        units.unit[i].dir_timer = 0;
+        units.unit[i].garbage_collection_timer = 0;
+        units.unit[i].is_engaged = false;
+        units.unit[i].is_selected = false;
+        units.unit[i].is_state_locked = false;
+        units.unit[i].is_already_tiled = false;
+        units.unit[i].was_wall_pushed = false;
+        units.unit[i].is_timing_to_collect = false;
+        units.unit[i].is_triggered = false;
+        if(units.unit[i].trait.can_expire)
+            units.unit[i].must_garbage_collect = true;
+        units = RemoveGarbage(units);
+        units.repath_index = 0;
+        units.select_count = 0;
+        units.command_group_next = 0;
+        *cycles = restore.cycles;
+    }
+    Restore_Free(restore);
     return units;
+}
+
+Restore Units_PackRestore(const Units units, const int32_t cycles)
+{
+    const Restore restore = { units.unit, units.count, cycles };
+    return restore;
 }

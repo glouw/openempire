@@ -24,23 +24,20 @@ static void SendPath(TCPsocket socket, const Points path)
 Restore Restore_Recv(TCPsocket socket)
 {
     static Restore zero;
+    Restore restore = zero;
     if(socket)
     {
-        int32_t count = 0;
-        int32_t max = 0;
-        SDLNet_TCP_Recv(socket, &count, sizeof(count));
-        SDLNet_TCP_Recv(socket, &max, sizeof(max));
-        Unit* const unit = UTIL_ALLOC(Unit, max);
-        SDLNet_TCP_Recv(socket, unit, sizeof(*unit) * count);
-        for(int32_t i = 0; i < count; i++)
-        {
-            printf("RECV PATH %d / %d\n", i, count);
-            unit->path = RecvPath(socket);
-        }
-        const Restore restore = { unit, count, max };
-        return restore;
+        SDLNet_TCP_Recv(socket, &restore.count, sizeof(restore.count));
+        SDLNet_TCP_Recv(socket, &restore.cycles, sizeof(restore.cycles));
+        restore.unit = UTIL_ALLOC(Unit, restore.count);
+        SDLNet_TCP_Recv(socket, restore.unit, sizeof(*restore.unit) * restore.count);
+        // for(int32_t i = 0; i < restore.count; i++)
+        // {
+        //     printf("RECV PATH %d / %d\n", i, restore.count);
+        //     restore.unit->path = RecvPath(socket);
+        // }
     }
-    return zero;
+    return restore;
 }
 
 void Restore_Send(const Restore restore, TCPsocket socket)
@@ -48,13 +45,13 @@ void Restore_Send(const Restore restore, TCPsocket socket)
     if(socket)
     {
         SDLNet_TCP_Send(socket, &restore.count, sizeof(restore.count));
-        SDLNet_TCP_Send(socket, &restore.max, sizeof(restore.max));
+        SDLNet_TCP_Send(socket, &restore.cycles, sizeof(restore.cycles));
         SDLNet_TCP_Send(socket, restore.unit, sizeof(*restore.unit) * restore.count);
-        for(int32_t i = 0; i < restore.count; i++)
-        {
-            printf("SEND PATH %d / %d\n", i, restore.count);
-            SendPath(socket, restore.unit[i].path);
-        }
+        // for(int32_t i = 0; i < restore.count; i++)
+        // {
+        //     printf("SEND PATH %d / %d\n", i, restore.count);
+        //     SendPath(socket, restore.unit[i].path);
+        // }
     }
 }
 

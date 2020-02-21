@@ -13,8 +13,8 @@ netsim()
     LATENCY=25ms
     VARIANCE=5ms
     DUPLICATE=1%
-    CORRUPT=1.0%
-    LOSS=1.0%
+    CORRUPT=2.0%
+    LOSS=2.0%
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $LOSS 25% duplicate $DUPLICATE corrupt $CORRUPT
 }
@@ -22,14 +22,14 @@ netsim()
 batch()
 {
     BIN=openempires
-    XRES=800
-    YRES=400
+    XRES=1200
+    YRES=700
     USERS=2
     CIVS=4
     POWER=7
     HOST=localhost
     PORT=1111
-    ./$BIN --server --users $USERS --power $POWER --port $PORT &
+    ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do

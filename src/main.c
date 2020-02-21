@@ -66,40 +66,38 @@ static void Play(const Video video, const Data data, const Args args)
         {
             if(packet.client_id == COLOR_BLU)
             {
-                const Restore restore = { units.unit, units.count, units.max };
+                const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
-                printf("%d SEND\n", packet.client_id);
             }
-            printf("%d RECVWAIT\n", packet.client_id);
-            units = Units_Restore(units, reset.server);
-            printf("%d SRAND CLEAR RESET\n", packet.client_id);
+            units = Units_Restore(units, reset.server, &cycles);
             Util_Srand(overview.seed);
             packets = Packets_Clear(packets);
-            cycles = 0;
-            continue;
         }
-        if(Packet_IsStable(packet))
-            packets = Packets_Queue(packets, packet);
-        packets = Packets_ClearStale(packets, cycles);
-        while(Packets_MustExecute(packets, cycles))
+        else
         {
-            Packet dequeued;
-            packets = Packets_Dequeue(packets, &dequeued);
-            units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
-        }
-        units = Units_Caretake(units, data.graphics, grid, map, field);
-        cycles++;
-        if(packet.control != PACKET_CONTROL_SPEED_UP)
-        {
-            floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
-            Video_Draw(video, data, map, units, floats, overview, grid);
-            const int32_t t1 = SDL_GetTicks();
-            Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
-            Field_Free(field);
-            const int32_t t2 = SDL_GetTicks();
-            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
-            if(ms > 0)
-                SDL_Delay(ms);
+            if(Packet_IsStable(packet))
+                packets = Packets_Queue(packets, packet);
+            packets = Packets_ClearStale(packets, cycles);
+            while(Packets_MustExecute(packets, cycles))
+            {
+                Packet dequeued;
+                packets = Packets_Dequeue(packets, &dequeued);
+                units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
+            }
+            units = Units_Caretake(units, data.graphics, grid, map, field);
+            cycles++;
+            if(packet.control != PACKET_CONTROL_SPEED_UP)
+            {
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
+                Video_Draw(video, data, map, units, floats, overview, grid);
+                const int32_t t1 = SDL_GetTicks();
+                Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+                Field_Free(field);
+                const int32_t t2 = SDL_GetTicks();
+                const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
+                if(ms > 0)
+                    SDL_Delay(ms);
+            }
         }
     }
     Units_Free(floats);

@@ -34,8 +34,6 @@ Units;
 
 Units Units_New(const int32_t size, const int32_t cpu_count, const int32_t max, const Color, const Civ);
 
-Units Units_Copy(const Units);
-
 void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
@@ -64,4 +62,6 @@ uint64_t Units_Xor(const Units);
 
 Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
 
-Units Units_Restore(Units, TCPsocket);
+Units Units_Restore(Units, TCPsocket, int32_t* cycles);
+
+Restore Units_PackRestore(const Units, const int32_t cycles);

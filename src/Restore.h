@@ -8,7 +8,7 @@ typedef struct
 {
     Unit* unit;
     int32_t count;
-    int32_t max;
+    int32_t cycles;
 }
 Restore;
 

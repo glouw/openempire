@@ -190,8 +190,8 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
             const Restore restore = Restore_Recv(socket);
             for(int32_t i = 0; i < COLOR_COUNT; i++)
                 Restore_Send(restore, resets.socket[i]);
-            Restore_Free(restore);
             Cache_Reset(cache);
+            Restore_Free(restore);
         }
     }
 }
