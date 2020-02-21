@@ -27,6 +27,8 @@ int32_t Packets_Size(const Packets);
 
 void Packets_Print(const Packets);
 
-Packets Packets_ClearWaste(Packets, const int32_t cycles);
+Packets Packets_ClearStale(Packets, const int32_t cycles);
 
 bool Packets_MustExecute(const Packets, const int32_t cycles);
+
+Packets Packets_Clear(Packets);

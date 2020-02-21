@@ -1182,7 +1182,17 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
 
 Units Units_Generate(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
-    if(users > 0)
-        units = GenerateTownCenters(units, map, grid, graphics, users);
+    return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
+}
+
+Units Units_Restore(Units units, TCPsocket server)
+{
+    const Restore restore = Restore_Recv(server);
+    free(units.unit);
+    units.unit = restore.unit;
+    units.count = restore.count;
+    units.max = restore.max;
+    for(int32_t i = 0; i < units.count; i++)
+        units.unit[i].interest = NULL;
     return units;
 }

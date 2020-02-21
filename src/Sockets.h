@@ -25,3 +25,5 @@ void Sockets_Send(const Sockets, Cache* const, const int32_t cycles, const bool 
 Sockets Sockets_Accept(const Sockets);
 
 void Sockets_Ping(const Sockets);
+
+void Sockets_Reset(const Sockets, Cache* const);

@@ -98,3 +98,8 @@ void Cache_CalculateControlChars(Cache* const cache, const int32_t setpoint)
             : PACKET_CONTROL_STEADY;
 }
 
+void Cache_Reset(Cache* const cache)
+{
+    cache->is_out_of_sync = false;
+    cache->is_in_reset = false;
+}

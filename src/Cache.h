@@ -20,6 +20,7 @@ typedef struct
     int32_t map_power;
     bool is_stable;
     bool is_out_of_sync;
+    bool is_in_reset;
     char control[COLOR_COUNT];
 }
 Cache;
@@ -41,3 +42,5 @@ bool Cache_GetGameRunning(Cache* const);
 int32_t Cache_GetPingMax(Cache* const);
 
 void Cache_CalculateControlChars(Cache* const, const int32_t setpoint);
+
+void Cache_Reset(Cache* const);

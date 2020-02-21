@@ -62,17 +62,17 @@ void Packets_Print(const Packets packets)
     putchar('\n');
 }
 
-static bool IsNextWaste(const Packets packets, const int32_t cycles)
+static bool IsNextStale(const Packets packets, const int32_t cycles)
 {
     return Active(packets) && Packets_Peek(packets).exec_cycle < cycles;
 }
 
-Packets Packets_ClearWaste(Packets packets, const int32_t cycles)
+Packets Packets_ClearStale(Packets packets, const int32_t cycles)
 {
-    while(IsNextWaste(packets, cycles))
+    while(IsNextStale(packets, cycles))
     {
-        Packet waste;
-        packets = Packets_Dequeue(packets, &waste);
+        Packet stale;
+        packets = Packets_Dequeue(packets, &stale);
     }
     return packets;
 }
@@ -80,4 +80,14 @@ Packets Packets_ClearWaste(Packets packets, const int32_t cycles)
 bool Packets_MustExecute(const Packets packets, const int32_t cycles)
 {
     return Active(packets) && Packets_Peek(packets).exec_cycle == cycles;
+}
+
+Packets Packets_Clear(Packets packets)
+{
+    while(Active(packets))
+    {
+        Packet waste;
+        packets = Packets_Dequeue(packets, &waste);
+    }
+    return packets;
 }

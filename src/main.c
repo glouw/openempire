@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Config.h"
 #include "Packets.h"
+#include "Restore.h"
 #include "Ping.h"
 #include "Sockets.h"
 #include "Overview.h"
@@ -40,6 +41,7 @@ static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
     const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
+    const Sock reset = Sock_Connect(args.host, args.port_reset, "RESET");
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
@@ -61,10 +63,24 @@ static void Play(const Video video, const Data data, const Args args)
         SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
-            Util_Bomb("CLIENT OUT OF SYNC\n");
+        {
+            if(packet.client_id == COLOR_BLU)
+            {
+                const Restore restore = { units.unit, units.count, units.max };
+                Restore_Send(restore, reset.server);
+                printf("%d SEND\n", packet.client_id);
+            }
+            printf("%d RECVWAIT\n", packet.client_id);
+            units = Units_Restore(units, reset.server);
+            printf("%d SRAND CLEAR RESET\n", packet.client_id);
+            Util_Srand(overview.seed);
+            packets = Packets_Clear(packets);
+            cycles = 0;
+            continue;
+        }
         if(Packet_IsStable(packet))
             packets = Packets_Queue(packets, packet);
-        packets = Packets_ClearWaste(packets, cycles);
+        packets = Packets_ClearStale(packets, cycles);
         while(Packets_MustExecute(packets, cycles))
         {
             Packet dequeued;
@@ -90,6 +106,7 @@ static void Play(const Video video, const Data data, const Args args)
     Units_Free(units);
     Packets_Free(packets);
     Sock_Disconnect(sock);
+    Sock_Disconnect(reset);
     Ping_Shutdown();
     Map_Free(map);
 }
@@ -112,22 +129,26 @@ static void RunServer(const Args args)
 {
     srand(time(NULL));
     Sockets sockets = Sockets_Init(args.port);
-    Sockets pingers = Sockets_Init(args.port_ping);
+    Sockets pings = Sockets_Init(args.port_ping);
+    Sockets resets = Sockets_Init(args.port_reset);
     Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
         const int32_t t0 = SDL_GetTicks();
         sockets = Sockets_Accept(sockets);
-        pingers = Sockets_Accept(pingers);
+        pings = Sockets_Accept(pings);
+        resets = Sockets_Accept(resets);
         sockets = Sockets_Recv(sockets, &cache);
         Sockets_Send(sockets, &cache, cycles, args.quiet);
-        Sockets_Ping(pingers);
+        Sockets_Ping(pings);
+        Sockets_Reset(resets, &cache);
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = 10 - (t1 - t0);
         if(ms > 0)
             SDL_Delay(ms);
     }
-    Sockets_Free(pingers);
+    Sockets_Free(resets);
+    Sockets_Free(pings);
     Sockets_Free(sockets);
 }
 

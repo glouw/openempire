@@ -4,6 +4,7 @@
 #include "Overview.h"
 #include "Color.h"
 #include "Trigger.h"
+#include "Restore.h"
 #include "Parts.h"
 #include "Grid.h"
 #include "Grid.h"
@@ -62,3 +63,5 @@ Units Units_PacketService(Units, const Registrar, const Packet, const Grid, cons
 uint64_t Units_Xor(const Units);
 
 Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
+
+Units Units_Restore(Units, TCPsocket);
