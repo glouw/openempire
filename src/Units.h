@@ -62,6 +62,6 @@ uint64_t Units_Xor(const Units);
 
 Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
 
-Units Units_Restore(Units, TCPsocket, int32_t* cycles);
+Units Units_Restore(Units, const Restore);
 
 Restore Units_PackRestore(const Units, const int32_t cycles);

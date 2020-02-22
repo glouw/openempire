@@ -64,14 +64,19 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
+            puts("OUT OF SYNC. RESTORING");
             if(packet.client_id == COLOR_BLU)
             {
-                const Restore restore = Units_PackRestore(units, cycles);
+                const Restore restore = Units_PackRestore(units, cycles); // XXX. THIS CANNOT BE SENT BY PLAYER 0. SERVER MUST TRACK STATE AND SEND.
                 Restore_Send(restore, reset.server);
             }
-            units = Units_Restore(units, reset.server, &cycles);
+            const Restore restore = Restore_Recv(reset.server);
+            units = Units_Restore(units, restore);
+            cycles = restore.cycles;
+            Restore_Free(restore);
             Util_Srand(overview.seed);
             packets = Packets_Clear(packets);
+            Packet_Flush(sock);
         }
         else
         {

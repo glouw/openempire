@@ -1170,42 +1170,12 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
     return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
 }
 
-Units Units_Restore(Units units, TCPsocket server, int32_t* cycles)
+Units Units_Restore(Units units, const Restore restore)
 {
-    const Restore restore = Restore_Recv(server);
     units.count = restore.count;
+    units.repath_index = 0;
     for(int32_t i = 0; i < units.count; i++)
-    {
-        static Points zero;
-        static Point none;
         units.unit[i] = restore.unit[i];
-        units.unit[i].interest = NULL;
-        units.unit[i].path = zero;
-        units.unit[i].entropy_static = 0;
-        units.unit[i].entropy = none;
-        units.unit[i].path_index = 0;
-        units.unit[i].path_index_timer = 0;
-        units.unit[i].command_group = 0;
-        units.unit[i].command_group_count = 0;
-        units.unit[i].state_timer = 0;
-        units.unit[i].dir_timer = 0;
-        units.unit[i].garbage_collection_timer = 0;
-        units.unit[i].is_engaged = false;
-        units.unit[i].is_selected = false;
-        units.unit[i].is_state_locked = false;
-        units.unit[i].is_already_tiled = false;
-        units.unit[i].was_wall_pushed = false;
-        units.unit[i].is_timing_to_collect = false;
-        units.unit[i].is_triggered = false;
-        if(units.unit[i].trait.can_expire)
-            units.unit[i].must_garbage_collect = true;
-        units = RemoveGarbage(units);
-        units.repath_index = 0;
-        units.select_count = 0;
-        units.command_group_next = 0;
-        *cycles = restore.cycles;
-    }
-    Restore_Free(restore);
     return units;
 }
 

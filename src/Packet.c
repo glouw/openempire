@@ -31,3 +31,11 @@ bool Packet_IsStable(const Packet packet)
 {
     return packet.turn > 0 && packet.is_stable;
 }
+
+void Packet_Flush(const Sock sock)
+{
+    while(Packet_Get(sock).turn != 0)
+    {
+        // Do nothing;
+    }
+}
