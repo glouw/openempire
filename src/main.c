@@ -137,8 +137,6 @@ static void RunServer(const Args args)
     Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
-        if(cycles > 1500 && cycles % 750 == 0)
-            cache.is_out_of_sync = true;
         const int32_t t0 = SDL_GetTicks();
         sockets = Sockets_Accept(sockets);
         pings = Sockets_Accept(pings);

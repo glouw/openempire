@@ -22,7 +22,7 @@ static bool CanWalk(const Units units, const Map map, const Point point)
         && Stack_IsWalkable(stack);
 }
 
-bool Units_CanBuild(const Units units, const Map map, Unit* const unit)
+static bool CanBuild(const Units units, const Map map, Unit* const unit)
 {
     if(unit->trait.can_expire)
         return true;
@@ -142,7 +142,7 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t l
 {
     if(!ignore_collisions)
         for(int32_t i = 0; i < len; i++)
-            if(!Units_CanBuild(units, map, &unit[i]))
+            if(!CanBuild(units, map, &unit[i]))
                 return units;
     for(int32_t i = 0; i < len; i++)
         units = Append(units, unit[i]);
@@ -955,6 +955,64 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
     return units;
 }
 
+static bool OutOfBounds(const Units units, const Point point)
+{
+    return point.x < 0
+        || point.y < 0
+        || point.x >= units.size
+        || point.y >= units.size;
+}
+
+static Stack* GetStack(const Units units, const Point p)
+{
+    return &units.stack[p.x + p.y * units.size];
+}
+
+Stack Units_GetStackCart(const Units units, const Point p)
+{
+    static Stack zero;
+    return OutOfBounds(units, p) ? zero : *GetStack(units, p);
+}
+
+static void ResetStacks(const Units units)
+{
+    for(int32_t y = 0; y < units.size; y++)
+    for(int32_t x = 0; x < units.size; x++)
+    {
+        const Point point = { x, y };
+        GetStack(units, point)->count = 0;
+    }
+}
+
+static void SafeAppend(const Units units, Unit* const unit, const Point cart)
+{
+    if(!OutOfBounds(units, cart))
+        Stack_Append(GetStack(units, cart), unit);
+}
+
+static void StackStacks(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->trait.is_inanimate)
+            for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+            for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+            {
+                const Point point = { x, y };
+                const Point cart = Point_Add(point, unit->cart);
+                SafeAppend(units, unit, cart);
+            }
+        else SafeAppend(units, unit, unit->cart);
+    }
+}
+
+static void ManageStacks(const Units units)
+{
+    ResetStacks(units);
+    StackStacks(units);
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
@@ -965,7 +1023,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     Expire(units);
     units = Kill(units, grid, graphics, map);
     units = RemoveGarbage(units);
-    Units_ManageStacks(units);
+    ManageStacks(units);
     units = CountPopulation(units);
     return units;
 }
@@ -975,9 +1033,9 @@ Units Units_Float(Units floats, const Units units, const Registrar graphics, con
     floats.count = 0;
     floats.share.status.age = units.share.status.age;
     floats.share.motive = motive;
-    Units_ResetStacks(floats);
+    ResetStacks(floats);
     floats = FloatUsingIcons(floats, overview, grid, graphics, map);
-    Units_StackStacks(floats);
+    StackStacks(floats);
     return floats;
 }
 
@@ -1042,64 +1100,6 @@ void Units_ResetTiled(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i].is_already_tiled = false;
-}
-
-static bool OutOfBounds(const Units units, const Point point)
-{
-    return point.x < 0
-        || point.y < 0
-        || point.x >= units.size
-        || point.y >= units.size;
-}
-
-static Stack* GetStack(const Units units, const Point p)
-{
-    return &units.stack[p.x + p.y * units.size];
-}
-
-Stack Units_GetStackCart(const Units units, const Point p)
-{
-    static Stack zero;
-    return OutOfBounds(units, p) ? zero : *GetStack(units, p);
-}
-
-void Units_ResetStacks(const Units units)
-{
-    for(int32_t y = 0; y < units.size; y++)
-    for(int32_t x = 0; x < units.size; x++)
-    {
-        const Point point = { x, y };
-        GetStack(units, point)->count = 0;
-    }
-}
-
-static void SafeAppend(const Units units, Unit* const unit, const Point cart)
-{
-    if(!OutOfBounds(units, cart))
-        Stack_Append(GetStack(units, cart), unit);
-}
-
-void Units_StackStacks(const Units units)
-{
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        if(unit->trait.is_inanimate)
-            for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
-            for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
-            {
-                const Point point = { x, y };
-                const Point cart = Point_Add(point, unit->cart);
-                SafeAppend(units, unit, cart);
-            }
-        else SafeAppend(units, unit, unit->cart);
-    }
-}
-
-void Units_ManageStacks(const Units units)
-{
-    Units_ResetStacks(units);
-    Units_StackStacks(units);
 }
 
 static Units GenerateVillagers(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot, const Color color, const int32_t villagers)
@@ -1182,13 +1182,17 @@ Units Units_Restore(Units units, const Restore restore, const Grid grid)
     units.repath_index = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i] = restore.unit[i];
-    Units_ManageStacks(units);
+    // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
+    // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
+    ManageStacks(units);
     EngageAllBoids(units, grid);
     return units;
 }
 
 Restore Units_PackRestore(const Units units, const int32_t cycles)
 {
-    const Restore restore = { units.unit, units.count, cycles };
+    const Restore restore = {
+        units.unit, units.count, cycles
+    };
     return restore;
 }
