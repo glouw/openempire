@@ -2,6 +2,7 @@
 
 #include "Sock.h"
 #include "Args.h"
+#include "Util.h"
 
 #include <SDL2/SDL_mutex.h>
 
@@ -37,10 +38,9 @@ static int32_t Ping(void* const data)
     {
         const int32_t message = 0xCAFEBABE;
         int32_t temp;
-        const int32_t size = sizeof(temp);
         const int32_t t0 = SDL_GetTicks();
-        SDLNet_TCP_Send(pinger.server, &message, size);
-        SDLNet_TCP_Recv(pinger.server, &temp, size);
+        UTIL_TCP_SEND(pinger.server, &message);
+        UTIL_TCP_RECV(pinger.server, &temp);
         const int32_t t1 = SDL_GetTicks();
         if(temp == message)
             Set(t1 - t0);

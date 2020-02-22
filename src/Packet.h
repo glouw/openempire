@@ -7,8 +7,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL_net.h>
 
-#define PACKET_CONTROL_SPEED_UP ('+')
-#define PACKET_CONTROL_STEADY ('*')
+enum { PACKET_CONTROL_SPEED_UP = '+', PACKET_CONTROL_STEADY = '*' };
 
 // NO POINTERS ANYWHERE IN HERE! PERFECT FOR TCP...
 

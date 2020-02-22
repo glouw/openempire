@@ -10,9 +10,8 @@ Packet Packet_Get(const Sock sock)
         if(SDLNet_SocketReady(sock.server))
         {
             Packet packet = zero;
-            const int32_t size = sizeof(packet);
-            const int32_t bytes = SDLNet_TCP_Recv(sock.server, &packet, size);
-            if(bytes == size)
+            const int32_t bytes = UTIL_TCP_RECV(sock.server, &packet);
+            if(bytes == sizeof(packet))
                 return packet;
         }
     }

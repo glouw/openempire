@@ -48,14 +48,13 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
             {
                 static Overview zero;
                 Overview overview = zero;
-                const int32_t max = sizeof(overview);
-                const int32_t bytes = SDLNet_TCP_Recv(socket, &overview, max);
+                const int32_t bytes = UTIL_TCP_RECV(socket, &overview);
                 if(bytes <= 0)
                 {
                     SDLNet_TCP_DelSocket(sockets.set, socket);
                     sockets.socket[i] = NULL;
                 }
-                if(bytes == max)
+                if(bytes == sizeof(overview))
                 {
                     cache->cycles[i] = overview.cycles;
                     cache->parity[i] = overview.parity;
@@ -111,7 +110,7 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
             packet.map_power = cache->map_power;
             if(!cache->is_stable)
                 packet = Packet_ZeroOverviews(packet);
-            SDLNet_TCP_Send(socket, &packet, sizeof(packet));
+            UTIL_TCP_SEND(socket, &packet);
         }
     }
 }
@@ -168,9 +167,8 @@ void Sockets_Ping(const Sockets pingers)
             if(SDLNet_SocketReady(socket))
             {
                 int32_t temp = 0;
-                const int32_t size = sizeof(temp);
-                SDLNet_TCP_Recv(socket, &temp, size);
-                SDLNet_TCP_Send(socket, &temp, size);
+                UTIL_TCP_RECV(socket, &temp);
+                UTIL_TCP_SEND(socket, &temp);
             }
         }
 }

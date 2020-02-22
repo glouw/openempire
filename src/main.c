@@ -18,7 +18,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     Overview overview = Overview_Init(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
-        SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
+        UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(packet.turn > 0)
         {
@@ -60,7 +60,7 @@ static void Play(const Video video, const Data data, const Args args)
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
         overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
-        SDLNet_TCP_Send(sock.server, &overview, sizeof(overview));
+        UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
