@@ -67,11 +67,11 @@ static void Play(const Video video, const Data data, const Args args)
             puts("OUT OF SYNC. RESTORING");
             if(packet.client_id == COLOR_BLU)
             {
-                const Restore restore = Units_PackRestore(units, cycles); // XXX. THIS CANNOT BE SENT BY PLAYER 0. SERVER MUST TRACK STATE AND SEND.
+                const Restore restore = Units_PackRestore(units, cycles); // XXX. THIS CANNOT BE SENT BY PLAYER 0. SERVER MUST TRACK STATE OF ALL PLAYERS AND SEND.
                 Restore_Send(restore, reset.server);
             }
             const Restore restore = Restore_Recv(reset.server);
-            units = Units_Restore(units, restore);
+            units = Units_Restore(units, restore, grid);
             cycles = restore.cycles;
             Restore_Free(restore);
             Util_Srand(overview.seed);
@@ -137,6 +137,8 @@ static void RunServer(const Args args)
     Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
+        if(cycles > 1500 && cycles % 750 == 0)
+            cache.is_out_of_sync = true;
         const int32_t t0 = SDL_GetTicks();
         sockets = Sockets_Accept(sockets);
         pings = Sockets_Accept(pings);

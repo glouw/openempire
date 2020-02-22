@@ -15,7 +15,7 @@
 
 typedef struct Unit
 {
-    struct Unit* interest;
+    struct Unit* interest; // XXX. THIS CANNOT BE A POINTER. MUST TRACK INTEGER INDEX AND LOOKUP UNIT.
     Trait trait;
     Point cart;
     Point cart_grid_offset;

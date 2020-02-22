@@ -299,6 +299,12 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
+static void ConditionallyStopAllBoids(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+        ConditionallyStopBoids(units, &units.unit[i]);
+}
+
 static bool EqualDimension(Point dimensions, const Graphics file)
 {
     const int32_t min = UTIL_MIN(dimensions.x, dimensions.y);
@@ -493,9 +499,15 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
     }
 }
 
+static void EngageAllBoids(const Units units, const Grid grid)
+{
+    for(int32_t i = 0; i < units.count; i++)
+        EngageBoids(units, &units.unit[i], grid);
+}
+
 // DOES NOT NEED TO BE THREADED -
 // GIVES A MORE NATURAL FEEL TO HAVE THE PATHER REPATH IN TIME SLICES.
-static Units Repath(Units units, const Field field)
+static Units RepathSomeBoids(Units units, const Field field)
 {
     int32_t slice = units.count / CONFIG_UNITS_REPATH_SLICE_SIZE;
     if(slice == 0)
@@ -511,36 +523,30 @@ static Units Repath(Units units, const Field field)
     return units;
 }
 
-static Units ProcessHardRules(Units units, const Field field, const Grid grid)
+static Units MeleeAllBoids(Units units, const Grid grid)
 {
-    units = Repath(units, field);
-    for(int32_t i = 0; i < units.count; i++)
-        ConditionallyStopBoids(units, &units.unit[i]);
-    for(int32_t i = 0; i < units.count; i++)
-        EngageBoids(units, &units.unit[i], grid);
     for(int32_t i = 0; i < units.count; i++)
     {
         const Resource resource = Unit_Melee(&units.unit[i], grid);
         if(resource.type != TYPE_NONE)
             switch(resource.type)
             {
-            default:
-                break;
-            case TYPE_FOOD:
-                units.share.status.food += resource.amount;
-                break;
-            case TYPE_WOOD:
-                units.share.status.wood += resource.amount;
-                break;
-            case TYPE_GOLD:
-                units.share.status.gold += resource.amount;
-                break;
-            case TYPE_STONE:
-                units.share.status.stone += resource.amount;
-                break;
+            default         : break;
+            case TYPE_FOOD  : units.share.status.food  += resource.amount; break;
+            case TYPE_WOOD  : units.share.status.wood  += resource.amount; break;
+            case TYPE_GOLD  : units.share.status.gold  += resource.amount; break;
+            case TYPE_STONE : units.share.status.stone += resource.amount; break;
             }
     }
     return units;
+}
+
+static Units ProcessHardRules(Units units, const Field field, const Grid grid)
+{
+    units = RepathSomeBoids(units, field);
+    ConditionallyStopAllBoids(units);
+    EngageAllBoids(units, grid);
+    return MeleeAllBoids(units, grid);
 }
 
 typedef struct
@@ -1170,12 +1176,14 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
     return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
 }
 
-Units Units_Restore(Units units, const Restore restore)
+Units Units_Restore(Units units, const Restore restore, const Grid grid)
 {
     units.count = restore.count;
     units.repath_index = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i] = restore.unit[i];
+    Units_ManageStacks(units);
+    EngageAllBoids(units, grid);
     return units;
 }
 

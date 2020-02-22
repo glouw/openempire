@@ -22,14 +22,14 @@ netsim()
 batch()
 {
     BIN=openempires
-    XRES=1200
-    YRES=700
+    XRES=600
+    YRES=400
     USERS=2
     CIVS=4
     POWER=7
     HOST=localhost
     PORT=1111
-    ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
+    ./$BIN --server --users $USERS --power $POWER --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do

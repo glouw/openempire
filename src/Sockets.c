@@ -89,35 +89,30 @@ static void Print(const Sockets sockets, Cache* const cache, const int32_t setpo
 
 static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
-    if(!cache->is_in_reset)
+    const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
+    const int32_t buffer = 3;
+    const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
-        const int32_t buffer = 3;
-        const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
-        for(int32_t i = 0; i < COLOR_COUNT; i++)
+        TCPsocket socket = sockets.socket[i];
+        if(socket)
         {
-            TCPsocket socket = sockets.socket[i];
-            if(socket)
-            {
-                Packet packet = cache->packet;
-                packet.control = cache->control[i];
-                packet.turn = cache->turn;
-                packet.exec_cycle = exec_cycle;
-                packet.client_id = i;
-                packet.is_stable = cache->is_stable;
-                packet.is_out_of_sync = cache->is_out_of_sync;
-                packet.game_running = game_running;
-                packet.users_connected = cache->users_connected;
-                packet.users = cache->users;
-                packet.seed = cache->seed;
-                packet.map_power = cache->map_power;
-                if(!cache->is_stable)
-                    packet = Packet_ZeroOverviews(packet);
-                SDLNet_TCP_Send(socket, &packet, sizeof(packet));
-            }
+            Packet packet = cache->packet;
+            packet.control = cache->control[i];
+            packet.turn = cache->turn;
+            packet.exec_cycle = exec_cycle;
+            packet.client_id = i;
+            packet.is_stable = cache->is_stable;
+            packet.is_out_of_sync = cache->is_out_of_sync;
+            packet.game_running = game_running;
+            packet.users_connected = cache->users_connected;
+            packet.users = cache->users;
+            packet.seed = cache->seed;
+            packet.map_power = cache->map_power;
+            if(!cache->is_stable)
+                packet = Packet_ZeroOverviews(packet);
+            SDLNet_TCP_Send(socket, &packet, sizeof(packet));
         }
-        if(cache->is_out_of_sync)
-            cache->is_in_reset = true;
     }
 }
 
@@ -190,7 +185,7 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
             const Restore restore = Restore_Recv(socket);
             for(int32_t i = 0; i < COLOR_COUNT; i++)
                 Restore_Send(restore, resets.socket[i]);
-            Cache_Reset(cache);
+            cache->is_out_of_sync = false;
             Restore_Free(restore);
         }
     }
