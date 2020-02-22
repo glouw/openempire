@@ -6,12 +6,13 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-Overview Overview_Init(const int32_t xres, const int32_t yres)
+Overview Overview_Init(const int32_t xres, const int32_t yres, const Civ civ)
 {
     static Overview zero;
     Overview overview = zero;
     overview.xres = xres;
     overview.yres = yres;
+    overview.share.status.civ = civ;
     return overview;
 }
 

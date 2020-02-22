@@ -30,8 +30,10 @@ Restore Restore_Recv(TCPsocket socket)
         UTIL_TCP_RECV(socket, &restore.count);
         UTIL_TCP_RECV(socket, &restore.cycles);
         restore.unit = UTIL_ALLOC(Unit, restore.count);
-        for(int32_t i = 0; i < restore.count; i++) UTIL_TCP_RECV(socket, &restore.unit[i]);
-        for(int32_t i = 0; i < restore.count; i++) restore.unit[i].path = RecvPath(socket);
+        for(int32_t i = 0; i < restore.count; i++)
+            UTIL_TCP_RECV(socket, &restore.unit[i]);
+        for(int32_t i = 0; i < restore.count; i++)
+            restore.unit[i].path = RecvPath(socket);
     }
     return restore;
 }
@@ -42,8 +44,10 @@ void Restore_Send(const Restore restore, TCPsocket socket)
     {
         UTIL_TCP_SEND(socket, &restore.count);
         UTIL_TCP_SEND(socket, &restore.cycles);
-        for(int32_t i = 0; i < restore.count; i++) UTIL_TCP_SEND(socket, &restore.unit[i]);
-        for(int32_t i = 0; i < restore.count; i++) SendPath(socket, restore.unit[i].path);
+        for(int32_t i = 0; i < restore.count; i++)
+            UTIL_TCP_SEND(socket, &restore.unit[i]);
+        for(int32_t i = 0; i < restore.count; i++)
+            SendPath(socket, restore.unit[i].path);
     }
 }
 

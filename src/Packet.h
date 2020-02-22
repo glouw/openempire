@@ -32,6 +32,8 @@ Packet Packet_Get(const Sock);
 
 Packet Packet_ZeroOverviews(Packet);
 
-bool Packet_IsStable(const Packet);
+bool Packet_IsReady(const Packet);
 
 void Packet_Flush(const Sock);
+
+bool Packet_IsAlive(const Packet);

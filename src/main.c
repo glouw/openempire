@@ -12,15 +12,15 @@
 
 #include <time.h>
 
-static Overview WaitInLobby(const Video video, const Sock sock)
+static Overview WaitInLobby(const Video video, const Sock sock, const Civ civ)
 {
     int32_t loops = 0;
-    Overview overview = Overview_Init(video.xres, video.yres);
+    Overview overview = Overview_Init(video.xres, video.yres, civ);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
-        if(packet.turn > 0)
+        if(Packet_IsAlive(packet))
         {
             overview.share.color = (Color) packet.client_id;
             Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
@@ -42,7 +42,7 @@ static void Play(const Video video, const Data data, const Args args)
     Ping_Init(args);
     const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
     const Sock reset = Sock_Connect(args.host, args.port_reset, "RESET");
-    Overview overview = WaitInLobby(video, sock);
+    Overview overview = WaitInLobby(video, sock, args.civ);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
@@ -64,7 +64,6 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            puts("OUT OF SYNC. RESTORING");
             if(packet.client_id == COLOR_BLU)
             {
                 const Restore restore = Units_PackRestore(units, cycles); // XXX. THIS CANNOT BE SENT BY PLAYER 0. SERVER MUST TRACK STATE OF ALL PLAYERS AND SEND.
@@ -80,7 +79,7 @@ static void Play(const Video video, const Data data, const Args args)
         }
         else
         {
-            if(Packet_IsStable(packet))
+            if(Packet_IsReady(packet))
                 packets = Packets_Queue(packets, packet);
             packets = Packets_ClearStale(packets, cycles);
             while(Packets_MustExecute(packets, cycles))
