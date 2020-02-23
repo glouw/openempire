@@ -1,34 +1,12 @@
 OPEN EMPIRES
 
-    Open Empires is an educational Genie Engine implementation capable of
-    interfacing with the Age of Empires II and The Conquerors art assets.
+    Open Empires is an educational multi-player RTS engine capable of interfacing
+    with the Age of Empires II and The Conquerors art assets.
 
-    Open Empires is multi-player only and strives to be written in less than
-    15,000 lines of C99 using only SDL2.
+    Open Empires strives to be written in less than 15,000 lines of C99 using only
+    SDL2 as an external dependency.
 
-LEGAL
-
-    Open Empires is a clean room implementation of the Genie Engine and was
-    written from scratch with the highest regards of the original copyright
-    holders.
-
-    Open Empires is *NOT* a binary decompilation of Age of Empires II,
-    and its expansion, The Conquerors.
-
-    Data, art, and sound files from Age of Empires II - or its expansion,
-    The Conquerors - ARE NOT, AND NEVER WILL BE, SUPPLIED.
-    To play Open Empires you must legally own the original boxed-set
-    version of Age of Empires II and The Conquerors, preferably the
-    Gold Edition.
-
-    Age of Empires II and The Conquerors are copyright (©) by Microsoft
-    Corporation and Ensemble Studios.
-    Open Empires was created under Microsoft's Game Content Usage Rules:
-
-        https://www.xbox.com/en-us/developers/rules
-
-    Open Empires uses assets from Age of Empires II and The Conquerors,
-    and it is not endorsed by or affiliated with Microsoft.
+    Open Empires borrows elements from Starcraft2 and Rome 1: Total War.
 
 DEPENDENCIES
 
@@ -66,6 +44,7 @@ STATUS
     [x] Melee combat
     [x] Unit upgrades
     [x] All ages and building updates
+    [x] Out of sync recovery
     [ ] Ranged combat
     [ ] Unit and building build times and resource use
     [ ] Sound
@@ -76,14 +55,48 @@ STRUCTURE
     compilers. C source is separated by typedefs, implemented with .[ch]
     files. General purpose scripts may live in the top level.
 
+    Structs are passed by value such that functions calls modify no more than
+    one argument at a time. Link time optimization removes most of the heavy
+    function argument copying.
+
+    To simplify the lockstep engine, double and floating points are not used,
+    and the standard math library is not linked with the final binary.
+
+LEGAL
+
+    Open Empires is a clean room implementation of the Genie Engine and was
+    written from scratch with the highest regards of the original copyright
+    holders.
+
+    Open Empires is *NOT* a binary decompilation of Age of Empires II,
+    and its expansion, The Conquerors.
+
+    Data, art, and sound files from Age of Empires II - or its expansion,
+    The Conquerors - ARE NOT, AND NEVER WILL BE, SUPPLIED.
+    To play Open Empires you must legally own the original boxed-set
+    version of Age of Empires II and The Conquerors, preferably the
+    Gold Edition.
+
+    Age of Empires II and The Conquerors are copyright (©) by Microsoft
+    Corporation and Ensemble Studios.
+    Open Empires was created under Microsoft's Game Content Usage Rules:
+
+        https://www.xbox.com/en-us/developers/rules
+
+    Open Empires uses assets from Age of Empires II and The Conquerors,
+    and it is not endorsed by or affiliated with Microsoft.
+
 CREDITS
 
     Thanks to:
+
         * SFTech OpenAge team for their fantastic documentation on the
           inner workings of the SLP and DRS file formats. See:
               https://github.com/SFTtech/openage
+
         * The developers and artists from Ensemble Studios for the many
           gifted childhood memories
+
         * Forgotten Empires for keeping the spirit of Age of Empires II alive
 
     Dedicated to Ondrej whom I met hiking across England as he hiked from
