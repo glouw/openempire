@@ -96,6 +96,15 @@ static Units UnSelectAll(Units units)
     return units;
 }
 
+static Units RecountSelected(Units units)
+{
+    units.select_count = 0;
+    for(int32_t i = 0; i < units.count; i++)
+        if(units.unit[i].is_selected)
+            units.select_count++;
+    return units;
+}
+
 static Units Select(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Points render_points)
 {
     if(overview.event.mouse_lu && !overview.event.key_left_shift)
@@ -1182,6 +1191,9 @@ Units Units_Restore(Units units, const Restore restore, const Grid grid)
     units.repath_index = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i] = restore.unit[i];
+    units = RecountSelected(units);
+    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
+    units.command_group_next++;
     // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
     ManageStacks(units);
