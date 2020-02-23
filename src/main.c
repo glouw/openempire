@@ -40,8 +40,19 @@ static Overview WaitInLobby(const Video video, const Sock sock)
 static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
+
     const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
+    if (!sock.connected) {
+        fprintf(stderr, "Failed to connect to server on channel MAIN\n");
+        return;
+    }
+
     const Sock reset = Sock_Connect(args.host, args.port_reset, "RESET");
+    if (!reset.connected) {
+        fprintf(stderr, "Failed to connect to server on channel RESET\n");
+        return;
+    }
+
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
