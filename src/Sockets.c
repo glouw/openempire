@@ -137,7 +137,7 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
     if(ShouldSend(cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES))
     {
         const int32_t setpoint = Cache_GetCycleSetpoint(cache);
-        const int32_t max_cycle = Cache_GetCycleMax(cache);
+        const int32_t max_cycle = Cache_GetCycleMax(cache); // XXX. NEED MIN CYCLE CHECK. IF MAX AND MIN STRAY TOO FAR AWAY ITS BEST JUST TO CALL AN OUT OF SYNC.
         const int32_t max_ping = Cache_GetPingMax(cache);
         Cache_CalculateControlChars(cache, setpoint);
         Cache_CheckStability(cache, setpoint);
