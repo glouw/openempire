@@ -6,7 +6,7 @@ Input Input_Pump(Input input)
 {
     SDL_Event event;
     SDL_PollEvent(&event);
-    if(input.key[SDL_SCANCODE_END] || input.key[SDL_SCANCODE_ESCAPE])
+    if(input.key[SDL_SCANCODE_END] || input.key[SDL_SCANCODE_ESCAPE] || event.type == SDL_QUIT)
         input.done = true;
     const uint32_t buttons = SDL_GetRelativeMouseState(NULL, NULL);
     input.l = (buttons >> 0) & 0x1;
