@@ -22,8 +22,8 @@ netsim()
 batch()
 {
     BIN=openempires
-    XRES=600
-    YRES=400
+    XRES=1300
+    YRES=700
     USERS=2
     CIVS=4
     POWER=7

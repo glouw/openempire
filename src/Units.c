@@ -536,15 +536,16 @@ static Units MeleeAllBoids(Units units, const Grid grid)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        const Resource resource = Unit_Melee(&units.unit[i], grid);
-        if(resource.type != TYPE_NONE)
+        Unit* const unit = &units.unit[i];
+        const Resource resource = Unit_Melee(unit, grid);
+        if(resource.type != TYPE_NONE && unit->color == units.share.color)
             switch(resource.type)
             {
-            default         : break;
             case TYPE_FOOD  : units.share.status.food  += resource.amount; break;
             case TYPE_WOOD  : units.share.status.wood  += resource.amount; break;
             case TYPE_GOLD  : units.share.status.gold  += resource.amount; break;
             case TYPE_STONE : units.share.status.stone += resource.amount; break;
+            default         : break;
             }
     }
     return units;
@@ -778,7 +779,8 @@ static Units CountPopulation(Units units)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit)
-        && !unit->trait.is_inanimate)
+        && !unit->trait.is_inanimate
+        && unit->color == units.share.color)
             count++;
     }
     units.share.status.population = count;
@@ -1191,14 +1193,13 @@ Units Units_Restore(Units units, const Restore restore, const Grid grid)
     units.repath_index = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i] = restore.unit[i];
-    units = RecountSelected(units);
-    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
-    units.command_group_next++;
     // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
     ManageStacks(units);
     EngageAllBoids(units, grid);
-    return units;
+    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
+    units.command_group_next++;
+    return RecountSelected(units);
 }
 
 Restore Units_PackRestore(const Units units, const int32_t cycles)
