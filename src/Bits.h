@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef int64_t Bits;
+typedef uint64_t Bits;
 
 Bits Bits_Set(Bits, const Trigger);
 

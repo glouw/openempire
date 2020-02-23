@@ -6,13 +6,12 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Civ civ)
+Overview Overview_Init(const int32_t xres, const int32_t yres)
 {
     static Overview zero;
     Overview overview = zero;
     overview.xres = xres;
     overview.yres = yres;
-    overview.share.status.civ = civ;
     return overview;
 }
 
@@ -83,7 +82,7 @@ Overview Overview_Update(Overview overview, const Input input, const uint64_t pa
     overview.parity = parity;
     overview.cycles = cycles;
     overview.queue_size = queue_size;
-    overview.share = share;
+    overview.incoming = share;
     overview.ping = ping == -1 ? overview.ping : ping;
     return overview;
 }

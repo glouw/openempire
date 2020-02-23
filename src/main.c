@@ -12,18 +12,18 @@
 
 #include <time.h>
 
-static Overview WaitInLobby(const Video video, const Sock sock, const Civ civ)
+static Overview WaitInLobby(const Video video, const Sock sock)
 {
     int32_t loops = 0;
-    Overview overview = Overview_Init(video.xres, video.yres, civ);
+    Overview overview = Overview_Init(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsAlive(packet))
         {
-            overview.share.color = (Color) packet.client_id;
-            Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
+            overview.color = (Color) packet.client_id;
+            Video_PrintLobby(video, packet.users_connected, packet.users, overview.color, loops++);
             if(packet.game_running)
             {
                 overview.users = packet.users;
@@ -40,16 +40,16 @@ static Overview WaitInLobby(const Video video, const Sock sock, const Civ civ)
 static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
-    const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
-    const Sock reset = Sock_Connect(args.host, args.port_reset, "RESET");
-    Overview overview = WaitInLobby(video, sock, args.civ);
+    const Sock sock = Sock_Connect(args.host, args.port);
+    const Sock reset = Sock_Connect(args.host, args.port_reset);
+    Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
-    Units units = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
-    Units floats = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
+    Units units  = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
+    Units floats = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
-    overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
+    overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Init();
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
@@ -59,23 +59,22 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
+        overview = Overview_Update(overview, input, parity, cycles, size, units.stamp[units.color], ping);
         UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
             if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER.
-            {
-                const Restore restore = Units_PackRestore(units, cycles);
-                Restore_Send(restore, reset.server);
-            }
+                Restore_Send(
+                    Units_PackRestore(units, cycles),
+                    reset.server);
             const Restore restore = Restore_Recv(reset.server);
             units = Units_Restore(units, restore, grid);
             cycles = restore.cycles;
-            Restore_Free(restore);
             Util_Srand(overview.seed);
             packets = Packets_Clear(packets);
             Packet_Flush(sock);
+            Restore_Free(restore);
         }
         else
         {
@@ -92,7 +91,7 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(packet.control != PACKET_CONTROL_SPEED_UP)
             {
-                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.stamp[units.color].motive);
                 Video_Draw(video, data, map, units, floats, overview, grid);
                 const int32_t t1 = SDL_GetTicks();
                 Video_Render(video, units, overview, map, t1 - t0, cycles, ping);

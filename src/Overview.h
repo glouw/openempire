@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Civ.h"
 #include "Input.h"
 #include "Point.h"
 #include "Grid.h"
@@ -21,7 +20,8 @@ typedef struct
     Rect selection_box;
     Point mouse_cursor;
     Event event;
-    Share share;
+    Color color;
+    Share incoming;
     int32_t xres;
     int32_t yres;
     int32_t cycles;
@@ -33,7 +33,7 @@ typedef struct
 }
 Overview;
 
-Overview Overview_Init(const int32_t xres, const int32_t yres, const Civ);
+Overview Overview_Init(const int32_t xres, const int32_t yres);
 
 Overview Overview_Update(Overview, const Input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Share, const int32_t ping);
 
