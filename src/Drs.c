@@ -25,6 +25,9 @@ Drs Drs_Load(const char* const path)
     static Drs zero;
     Drs drs = zero;
     drs.fp = fopen(path, "rb");
+    if (!drs.fp) {
+        return drs;
+    }
     drs.path = path;
     UTIL_FREAD(drs.copyright, sizeof(drs.copyright) - 1, drs.fp);
     UTIL_FREAD(drs.version, sizeof(drs.version) - 1, drs.fp);
@@ -40,6 +43,7 @@ Drs Drs_Load(const char* const path)
 #if 0
     Drs_Print(drs);
 #endif
+
     return drs;
 }
 

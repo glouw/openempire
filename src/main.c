@@ -120,9 +120,13 @@ static void RunClient(const Args args)
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
-    args.demo
-        ? Video_RenderDataDemo(video, data, args.color)
-        : Play(video, data, args);
+    if (data.loaded) {
+        args.demo
+            ? Video_RenderDataDemo(video, data, args.color)
+            : Play(video, data, args);
+    } else {
+        fprintf(stderr, "Failed to load data\n");
+    }
     Video_Free(video);
     Data_Free(data);
     SDL_Quit();
