@@ -71,7 +71,10 @@ static void Play(const Video video, const Data data, const Args args)
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
         overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
-        UTIL_TCP_SEND(sock.server, &overview);
+        if (UTIL_TCP_SEND(sock.server, &overview) != sizeof(overview)) {
+            fprintf(stderr, "Failed to send overview update to server\n");
+            return;
+        }
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
