@@ -55,6 +55,6 @@ uint64_t Units_Xor(const Units);
 
 Point Units_GetFirstTownCenterPan(const Units, const Grid);
 
-Units Units_Restore(Units, const Restore, const Grid);
+Units Units_UnpackRestore(Units, const Restore, const Grid);
 
 Restore Units_PackRestore(const Units, const int32_t cycles);

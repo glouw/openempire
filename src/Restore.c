@@ -34,6 +34,7 @@ Restore Restore_Recv(TCPsocket socket)
             UTIL_TCP_RECV(socket, &restore.unit[i]);
         for(int32_t i = 0; i < restore.count; i++)
             restore.unit[i].path = RecvPath(socket);
+        UTIL_TCP_RECV(socket, &restore.stamp);
     }
     return restore;
 }
@@ -48,6 +49,7 @@ void Restore_Send(const Restore restore, TCPsocket socket)
             UTIL_TCP_SEND(socket, &restore.unit[i]);
         for(int32_t i = 0; i < restore.count; i++)
             SendPath(socket, restore.unit[i].path);
+        UTIL_TCP_SEND(socket, &restore.stamp);
     }
 }
 

@@ -69,7 +69,7 @@ static void Play(const Video video, const Data data, const Args args)
                     Units_PackRestore(units, cycles),
                     reset.server);
             const Restore restore = Restore_Recv(reset.server);
-            units = Units_Restore(units, restore, grid);
+            units = Units_UnpackRestore(units, restore, grid);
             cycles = restore.cycles;
             Util_Srand(overview.seed);
             packets = Packets_Clear(packets);

@@ -1220,12 +1220,14 @@ static void PrintShares(const Units units)
     putchar('\n');
 }
 
-Units Units_Restore(Units units, const Restore restore, const Grid grid)
+Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
 {
     units.count = restore.count;
     units.repath_index = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i] = restore.unit[i];
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        units.stamp[i] = restore.stamp[i];
     // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
     ManageStacks(units);
@@ -1239,8 +1241,12 @@ Units Units_Restore(Units units, const Restore restore, const Grid grid)
 
 Restore Units_PackRestore(const Units units, const int32_t cycles)
 {
-    const Restore restore = {
-        units.unit, units.count, cycles
-    };
+    static Restore zero;
+    Restore restore = zero;
+    restore.unit = units.unit;
+    restore.count = units.count;
+    restore.cycles = cycles;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        restore.stamp[i] = units.stamp[i];
     return restore;
 }
