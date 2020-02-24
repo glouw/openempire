@@ -308,6 +308,12 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
+void Units_FreeAllPaths(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+        Unit_FreePath(&units.unit[i]);
+}
+
 static void ConditionallyStopAllBoids(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -1200,7 +1206,7 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
     return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
 }
 
-static void PrintShares(const Units units)
+static void PrintShares(const Units units) // XXX. REMOVE LATER.
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
@@ -1224,10 +1230,8 @@ Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
 {
     units.count = restore.count;
     units.repath_index = 0;
-    for(int32_t i = 0; i < units.count; i++)
-        units.unit[i] = restore.unit[i];
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-        units.stamp[i] = restore.stamp[i];
+    for(int32_t i = 0; i < units.count; i++) units.unit[i]  = restore.unit[i];
+    for(int32_t i = 0; i < COLOR_COUNT; i++) units.stamp[i] = restore.stamp[i];
     // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
     ManageStacks(units);

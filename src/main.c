@@ -65,9 +65,11 @@ static void Play(const Video video, const Data data, const Args args)
         if(packet.is_out_of_sync)
         {
             if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER.
-                Restore_Send(
-                    Units_PackRestore(units, cycles),
-                    reset.server);
+            {
+                Units_FreeAllPaths(units); // PATHS ARE TOO RISKY TO RESTORE.
+                const Restore restore = Units_PackRestore(units, cycles);
+                Restore_Send(restore, reset.server);
+            }
             const Restore restore = Restore_Recv(reset.server);
             units = Units_UnpackRestore(units, restore, grid);
             cycles = restore.cycles;

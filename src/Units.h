@@ -58,3 +58,5 @@ Point Units_GetFirstTownCenterPan(const Units, const Grid);
 Units Units_UnpackRestore(Units, const Restore, const Grid);
 
 Restore Units_PackRestore(const Units, const int32_t cycles);
+
+void Units_FreeAllPaths(const Units);
