@@ -15,8 +15,8 @@ typedef struct
 }
 Restore;
 
-Restore Restore_Recv(TCPsocket);
+Restore Restore_Recv(const TCPsocket);
 
-void Restore_Send(const Restore, TCPsocket);
+void Restore_Send(const Restore, const TCPsocket);
 
 void Restore_Free(const Restore);

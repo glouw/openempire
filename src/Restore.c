@@ -2,7 +2,7 @@
 
 #include "Util.h"
 
-Restore Restore_Recv(TCPsocket socket)
+Restore Restore_Recv(const TCPsocket socket)
 {
     static Restore zero;
     Restore restore = zero;
@@ -29,7 +29,7 @@ Restore Restore_Recv(TCPsocket socket)
     return restore;
 }
 
-void Restore_Send(const Restore restore, TCPsocket socket)
+void Restore_Send(const Restore restore, const TCPsocket socket)
 {
     if(socket)
     {
