@@ -36,6 +36,8 @@ int32_t Cache_GetCycleSetpoint(Cache* const);
 
 int32_t Cache_GetCycleMax(Cache* const);
 
+int32_t Cache_GetCycleMin(Cache* const);
+
 bool Cache_GetGameRunning(Cache* const);
 
 int32_t Cache_GetPingMax(Cache* const);

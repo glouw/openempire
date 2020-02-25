@@ -11,11 +11,13 @@ Sockets Sockets_Init(const int32_t port)
 {
     static Sockets zero;
     IPaddress ip;
-    SDLNet_ResolveHost(&ip, NULL, port);
+    const int32_t errors = SDLNet_ResolveHost(&ip, NULL, port);
+    if(errors == -1)
+        Util_Bomb("SERVER :: COULD NOT RESOLVE HOST\n");
     Sockets sockets = zero;
     sockets.self = SDLNet_TCP_Open(&ip);
     if(sockets.self == NULL)
-        Util_Bomb("COULD NOT OPEN SERVER SOCKET\n");
+        Util_Bomb("SERVER :: COULD NOT OPEN SERVER SOCKET\n");
     sockets.set = SDLNet_AllocSocketSet(COLOR_COUNT);
     return sockets;
 }
@@ -69,7 +71,7 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
     return sockets;
 }
 
-static void Print(const Sockets sockets, Cache* const cache, const int32_t setpoint, const int32_t max_ping)
+static void Print(const Sockets sockets, Cache* const cache, const int32_t setpoint, const int32_t max_ping, const bool game_running)
 {
     printf("TURN %d :: SETPOINT %d :: MAX_PING %d\n", cache->turn, setpoint, max_ping);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -81,8 +83,8 @@ static void Print(const Sockets sockets, Cache* const cache, const int32_t setpo
         const char queue_size = cache->queue_size[i];
         const char parity_symbol = cache->is_stable ? '!' : '?';
         const TCPsocket socket = sockets.socket[i];
-        printf("%d :: %d :: %c :: 0x%016lX :: %c :: CYCLES %d :: QUEUE %d -> %d ms\n",
-                i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
+        printf("%d :: %d :: %d :: %c :: 0x%016lX :: %c :: CYCLES %d :: QUEUE %d -> %d ms\n",
+                game_running, i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
     }
 }
 
@@ -136,15 +138,18 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
 {
     if(ShouldSend(cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES))
     {
+        const int32_t max_cycle = Cache_GetCycleMax(cache);
+        const int32_t min_cycle = Cache_GetCycleMin(cache);
+        if(max_cycle - min_cycle > CONFIG_PLAYER_CYCLE_WINDOW)
+            cache->is_out_of_sync = true;
         const int32_t setpoint = Cache_GetCycleSetpoint(cache);
-        const int32_t max_cycle = Cache_GetCycleMax(cache); // XXX. NEED MIN CYCLE CHECK. IF MAX AND MIN STRAY TOO FAR AWAY ITS BEST JUST TO CALL AN OUT OF SYNC.
         const int32_t max_ping = Cache_GetPingMax(cache);
         Cache_CalculateControlChars(cache, setpoint);
         Cache_CheckStability(cache, setpoint);
         cache->users_connected = CountConnectedPlayers(sockets);
         const bool game_running = Cache_GetGameRunning(cache);
         if(!quiet)
-            Print(sockets, cache, setpoint, max_ping);
+            Print(sockets, cache, setpoint, max_ping, game_running);
         Send(sockets, cache, max_cycle, max_ping, game_running);
         Cache_Clear(cache);
     }
@@ -166,7 +171,7 @@ void Sockets_Ping(const Sockets pingers)
             const TCPsocket socket = pingers.socket[i];
             if(SDLNet_SocketReady(socket))
             {
-                int32_t temp = 0;
+                uint8_t temp = 0;
                 UTIL_TCP_RECV(socket, &temp);
                 UTIL_TCP_SEND(socket, &temp);
             }

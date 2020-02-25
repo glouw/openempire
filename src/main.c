@@ -39,7 +39,6 @@ static Overview WaitInLobby(const Video video, const Sock sock)
 
 static void Play(const Video video, const Data data, const Args args)
 {
-    Ping_Init(args);
     const Sock sock = Sock_Connect(args.host, args.port);
     const Sock reset = Sock_Connect(args.host, args.port_reset);
     Overview overview = WaitInLobby(video, sock);
@@ -62,6 +61,8 @@ static void Play(const Video video, const Data data, const Args args)
         overview = Overview_Update(overview, input, parity, cycles, size, units.stamp[units.color], ping);
         UTIL_TCP_SEND(sock.server, &overview); // OKAY TO FAIL.
         const Packet packet = Packet_Get(sock);
+        if(packet.is_stable)
+            Ping_Init(args);
         if(packet.is_out_of_sync)
         {
             if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER. BLUE IS OK FOR NOW.

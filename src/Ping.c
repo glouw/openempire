@@ -10,6 +10,8 @@ static SDL_mutex* mutex;
 
 static int32_t ping;
 
+static bool is_running = false;
+
 static void Set(const int32_t dt)
 {
     if(SDL_TryLockMutex(mutex) == 0)
@@ -36,13 +38,13 @@ static int32_t Ping(void* const data)
     const Sock pinger = Sock_Connect(args->host, args->port_ping);
     while(true)
     {
-        const int32_t message = 0xCAFEBABE;
-        int32_t temp;
+        const uint8_t send = 0xAF;
+        uint8_t temp = 0x0;
         const int32_t t0 = SDL_GetTicks();
-        UTIL_TCP_SEND(pinger.server, &message);
+        UTIL_TCP_SEND(pinger.server, &send);
         UTIL_TCP_RECV(pinger.server, &temp);
         const int32_t t1 = SDL_GetTicks();
-        if(temp == message)
+        if(temp == send)
             Set(t1 - t0);
     }
     Sock_Disconnect(pinger);
@@ -51,8 +53,12 @@ static int32_t Ping(void* const data)
 
 void Ping_Init(const Args args)
 {
-    mutex = SDL_CreateMutex();
-    SDL_CreateThread(Ping, "N/A", (void*) &args);
+    if(!is_running)
+    {
+        mutex = SDL_CreateMutex();
+        SDL_CreateThread(Ping, "N/A", (void*) &args);
+        is_running = true;
+    }
 }
 
 void Ping_Shutdown(void)

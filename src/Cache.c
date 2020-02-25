@@ -18,7 +18,7 @@ void Cache_CheckStability(Cache* const cache, const int32_t setpoint)
     cache->is_stable = setpoint > CONFIG_SOCKETS_THRESHOLD_START;
 }
 
-void Cache_CheckParity(Cache* const cache)
+void Cache_CheckParity(Cache* const cache) // XXX. CHECKS SHOULD HAPPEN ON EVERY INCOMING CYCLE AND PARITY, NOT THE LAST ONE FOR EVERY TURN.
 {
     if(cache->is_stable)
         for(int32_t j = 0; j < COLOR_COUNT; j++)
@@ -72,6 +72,18 @@ int32_t Cache_GetCycleMax(Cache* const cache)
             max = cycles;
     }
     return max;
+}
+
+int32_t Cache_GetCycleMin(Cache* const cache)
+{
+    int32_t min = INT32_MAX;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t cycles = cache->cycles[i];
+        if(cycles != 0 && cycles < min)
+            min = cycles;
+    }
+    return min;
 }
 
 bool Cache_GetGameRunning(Cache* const cache)
