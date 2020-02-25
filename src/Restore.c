@@ -3,6 +3,8 @@
 #include "Util.h"
 #include "Config.h"
 
+#include <assert.h>
+
 static int32_t GetRestoreHeaderByteSize(const Restore restore)
 {
     return sizeof(restore.count)
@@ -23,12 +25,14 @@ static Restore RecvPacked(const TCPsocket socket)
     const int32_t* const cycles    = (int32_t*) &buffer[ 8]; // IT IS CHICKEN AND EGG, BUT IT IS MORE RELIABLE.
     const Share  * const stamp     = (Share  *) &buffer[12]; // THAN SPLITTING INTO 2 RECV CALLS.
     const Unit   * const unit      = (Unit   *) &buffer[12 + sizeof(restore.stamp)];
-    for(int32_t bytes = 0; bytes < size_max;)
+    int32_t bytes = 0;
+    while(bytes < size_max)
     {
         bytes += SDLNet_TCP_Recv(socket, &buffer[bytes], size_max);
         if(bytes >= *size_real)
             break;
     }
+    assert(bytes == *size_real);
     restore.count = *count;
     if(restore.count > 0)
     {

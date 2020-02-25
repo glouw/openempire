@@ -8,7 +8,6 @@ typedef struct
 {
     TCPsocket server;
     SDLNet_SocketSet set;
-    int connected;
 }
 Sock;
 

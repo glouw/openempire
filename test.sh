@@ -12,9 +12,9 @@ netsim()
     DEV=lo
     LATENCY=25ms
     VARIANCE=5ms
-    DUPLICATE=3.0%
-    CORRUPT=3.0%
-    LOSS=3.0%
+    DUPLICATE=2.0%
+    CORRUPT=2.0%
+    LOSS=2.0%
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $LOSS 25% duplicate $DUPLICATE corrupt $CORRUPT
 }
