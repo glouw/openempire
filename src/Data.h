@@ -11,6 +11,7 @@ typedef struct
     Registrar terrain;
     Registrar graphics;
     Registrar interfac;
+    int loaded;
 }
 Data;
 

@@ -92,12 +92,23 @@ void Registrar_Free(const Registrar registrar)
 
 Registrar Registrar_Load(const char* const path, const char* const drs_file_name, const int32_t table_index, const int32_t files[], const int32_t file_count)
 {
+    static Registrar zero;
+    Registrar registrar = zero;
+
     char* const drs_path = Util_StringJoin(path, drs_file_name);
     char* const interfac_path = Util_StringJoin(path, "interfac.drs");
     const Drs interfac = Drs_Load(interfac_path);
+    if (interfac.table_count == 0) {
+        fprintf(stderr, "Failed to load interfac.drs\n");
+        return registrar;
+    }
     const Drs drs = Drs_Load(drs_path);
+    if (drs.table_count == 0) {
+        fprintf(stderr, "Failed to load %s\n", drs_path);
+        return registrar;
+    }
     const Palette palette = Palette_Load(interfac, 0);
-    const Registrar registrar = LoadColoredAnimations(drs, table_index, palette, files, file_count);
+    registrar = LoadColoredAnimations(drs, table_index, palette, files, file_count);
     Palette_Free(palette);
     Drs_Free(interfac);
     Drs_Free(drs);

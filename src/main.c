@@ -59,8 +59,11 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.stamp[units.color], ping);
-        UTIL_TCP_SEND(sock.server, &overview);
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share, ping);
+        if (UTIL_TCP_SEND(sock.server, &overview) != sizeof(overview)) {
+            fprintf(stderr, "Failed to send overview update to server\n");
+            return;
+        }
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
@@ -120,9 +123,13 @@ static void RunClient(const Args args)
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
-    args.demo
-        ? Video_RenderDataDemo(video, data, args.color)
-        : Play(video, data, args);
+    if (data.loaded) {
+        args.demo
+            ? Video_RenderDataDemo(video, data, args.color)
+            : Play(video, data, args);
+    } else {
+        fprintf(stderr, "Failed to load data\n");
+    }
     Video_Free(video);
     Data_Free(data);
     SDL_Quit();

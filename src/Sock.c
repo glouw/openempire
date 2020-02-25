@@ -13,6 +13,7 @@ Sock Sock_Connect(const char* const host, const int32_t port)
         Util_Bomb("Could not connect to %s:%d... Is the openempires server running?\n", host, port);
     sock.set = SDLNet_AllocSocketSet(1);
     SDLNet_TCP_AddSocket(sock.set, sock.server);
+    sock.connected = 1;
     return sock;
 }
 
