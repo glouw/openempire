@@ -113,7 +113,7 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
             packet.map_power = cache->map_power;
             if(!cache->is_stable)
                 packet = Packet_ZeroOverviews(packet);
-            UTIL_TCP_SEND(socket, &packet);
+            assert(UTIL_TCP_SEND(socket, &packet) == sizeof(Packet));
         }
     }
 }
@@ -173,8 +173,8 @@ void Sockets_Ping(const Sockets pingers)
             if(SDLNet_SocketReady(socket))
             {
                 uint8_t temp = 0;
-                assert(UTIL_TCP_RECV(socket, &temp) == 1);
-                assert(UTIL_TCP_SEND(socket, &temp) == 1);
+                assert(UTIL_TCP_RECV(socket, &temp) == sizeof(uint8_t));
+                assert(UTIL_TCP_SEND(socket, &temp) == sizeof(uint8_t));
             }
         }
 }

@@ -67,10 +67,10 @@ void Restore_Send(const Restore restore, const TCPsocket socket)
         const int32_t size_units = restore.count * sizeof(*restore.unit);
         const int32_t size_real = size_header + size_units;
         /* ---------- HEADER --------- */
-        UTIL_TCP_SEND(socket, &size_real);
-        UTIL_TCP_SEND(socket, &restore.count);
-        UTIL_TCP_SEND(socket, &restore.cycles);
-        UTIL_TCP_SEND(socket, &restore.stamp);
+        assert(UTIL_TCP_SEND(socket, &size_real)      == sizeof(int32_t));
+        assert(UTIL_TCP_SEND(socket, &restore.count)  == sizeof(int32_t));
+        assert(UTIL_TCP_SEND(socket, &restore.cycles) == sizeof(int32_t));
+        assert(UTIL_TCP_SEND(socket, &restore.stamp)  == sizeof(restore.stamp));
         /* ---------- UNITS ---------- */
         SDLNet_TCP_Send(socket, restore.unit, size_units);
     }

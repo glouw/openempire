@@ -11,6 +11,7 @@
 #include "Util.h"
 
 #include <time.h>
+#include <assert.h>
 
 static Overview WaitInLobby(const Video video, const Sock sock)
 {
@@ -18,7 +19,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     Overview overview = Overview_Init(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
-        UTIL_TCP_SEND(sock.server, &overview);
+        assert(UTIL_TCP_SEND(sock.server, &overview) == sizeof(overview));
         const Packet packet = Packet_Get(sock);
         if(Packet_IsAlive(packet))
         {
@@ -59,7 +60,7 @@ static void Play(const Video video, const Data data, const Args args)
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
         overview = Overview_Update(overview, input, parity, cycles, size, units.stamp[units.color], ping);
-        UTIL_TCP_SEND(sock.server, &overview); // OKAY TO FAIL.
+        assert(UTIL_TCP_SEND(sock.server, &overview) == sizeof(overview));
         const Packet packet = Packet_Get(sock);
         if(packet.is_stable)
             Ping_Init(args);
