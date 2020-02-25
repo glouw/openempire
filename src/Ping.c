@@ -5,6 +5,7 @@
 #include "Util.h"
 
 #include <SDL2/SDL_mutex.h>
+#include <assert.h>
 
 static SDL_mutex* mutex;
 
@@ -34,15 +35,15 @@ int32_t Ping_Get(void)
 
 static int32_t Ping(void* const data)
 {
-    Args* args = (Args*) data;
+    Args* const args = (Args*) data;
     const Sock pinger = Sock_Connect(args->host, args->port_ping);
     while(true)
     {
         const uint8_t send = 0xAF;
         uint8_t temp = 0x0;
         const int32_t t0 = SDL_GetTicks();
-        UTIL_TCP_SEND(pinger.server, &send);
-        UTIL_TCP_RECV(pinger.server, &temp);
+        assert(UTIL_TCP_SEND(pinger.server, &send) == 1);
+        assert(UTIL_TCP_RECV(pinger.server, &temp) == 1);
         const int32_t t1 = SDL_GetTicks();
         if(temp == send)
             Set(t1 - t0);

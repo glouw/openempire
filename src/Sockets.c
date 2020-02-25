@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 
 Sockets Sockets_Init(const int32_t port)
 {
@@ -172,8 +173,8 @@ void Sockets_Ping(const Sockets pingers)
             if(SDLNet_SocketReady(socket))
             {
                 uint8_t temp = 0;
-                UTIL_TCP_RECV(socket, &temp);
-                UTIL_TCP_SEND(socket, &temp);
+                assert(UTIL_TCP_RECV(socket, &temp) == 1);
+                assert(UTIL_TCP_SEND(socket, &temp) == 1);
             }
         }
 }
