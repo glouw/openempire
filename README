@@ -25,6 +25,11 @@ RUNNING
 
         ./test.sh
 
+    Note that this test script runs netem which purposely emulates a
+    very laggy and lossy network. Change ENTROPY within test.sh to 0.1%
+    to set realistic playing conditions. For development,
+    set ENTROPY to 1.0% to stress test the networking engine more efficiently.
+
     Otherwise, assuming everything is on localhost, first start the server:
 
         ./openempires --server --port 1234
