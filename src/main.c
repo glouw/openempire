@@ -20,10 +20,10 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     {
         UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
-        if(packet.turn > 0)
+        if(Packet_IsAlive(packet))
         {
-            overview.share.color = (Color) packet.client_id;
-            Video_PrintLobby(video, packet.users_connected, packet.users, overview.share.color, loops++);
+            overview.color = (Color) packet.client_id;
+            Video_PrintLobby(video, packet.users_connected, packet.users, overview.color, loops++);
             if(packet.game_running)
             {
                 overview.users = packet.users;
@@ -40,27 +40,16 @@ static Overview WaitInLobby(const Video video, const Sock sock)
 static void Play(const Video video, const Data data, const Args args)
 {
     Ping_Init(args);
-
-    const Sock sock = Sock_Connect(args.host, args.port, "MAIN");
-    if (!sock.connected) {
-        fprintf(stderr, "Failed to connect to server on channel MAIN\n");
-        return;
-    }
-
-    const Sock reset = Sock_Connect(args.host, args.port_reset, "RESET");
-    if (!reset.connected) {
-        fprintf(stderr, "Failed to connect to server on channel RESET\n");
-        return;
-    }
-
+    const Sock sock = Sock_Connect(args.host, args.port);
+    const Sock reset = Sock_Connect(args.host, args.port_reset);
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_power, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
-    Units units = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.share.color, args.civ);
-    Units floats = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.share.color, args.civ);
+    Units units  = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
+    Units floats = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
-    overview.pan = Units_GetFirstTownCenterPan(units, grid, overview.share.color);
+    overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Init();
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
@@ -78,23 +67,23 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            puts("OUT OF SYNC. RESTORING");
-            if(packet.client_id == COLOR_BLU)
+            if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER. BLUE IS OK FOR NOW.
             {
-                const Restore restore = Units_PackRestore(units, cycles); // XXX. THIS CANNOT BE SENT BY PLAYER 0. SERVER MUST TRACK STATE OF ALL PLAYERS AND SEND.
+                Units_FreeAllPaths(units); // PATHS ARE TOO RISKY TO RESTORE.
+                const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
             }
             const Restore restore = Restore_Recv(reset.server);
-            units = Units_Restore(units, restore, grid);
+            units = Units_UnpackRestore(units, restore, grid);
             cycles = restore.cycles;
-            Restore_Free(restore);
             Util_Srand(overview.seed);
-            packets = Packets_Clear(packets);
-            Packet_Flush(sock);
+            packets = Packets_Clear(packets); // DISPOSES USER SPACE BUFFERING.
+            Packet_Flush(sock); // DISPOSES KERNEL SPACE BUFFERING. THIS NUKES ALL PACKETS.
+            Restore_Free(restore);
         }
         else
         {
-            if(Packet_IsStable(packet))
+            if(Packet_IsReady(packet))
                 packets = Packets_Queue(packets, packet);
             packets = Packets_ClearStale(packets, cycles);
             while(Packets_MustExecute(packets, cycles))
@@ -107,17 +96,17 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(packet.control != PACKET_CONTROL_SPEED_UP)
             {
-                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share.motive);
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.stamp[units.color].motive);
                 Video_Draw(video, data, map, units, floats, overview, grid);
                 const int32_t t1 = SDL_GetTicks();
                 Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
-                Field_Free(field);
                 const int32_t t2 = SDL_GetTicks();
                 const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
                 if(ms > 0)
                     SDL_Delay(ms);
             }
         }
+        Field_Free(field);
     }
     Units_Free(floats);
     Units_Free(units);

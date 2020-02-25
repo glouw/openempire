@@ -1,49 +1,68 @@
 #include "Restore.h"
 
 #include "Util.h"
+#include "Config.h"
 
-static Points RecvPath(TCPsocket socket)
+static int32_t GetRestoreHeaderByteSize(const Restore restore)
 {
-    Points path;
-    UTIL_TCP_RECV(socket, &path.max);
-    UTIL_TCP_RECV(socket, &path.count);
-    path.point = UTIL_ALLOC(Point, path.max);
-    for(int32_t i = 0; i < path.count; i++)
-        UTIL_TCP_RECV(socket, &path.point[i]);
-    return path;
+    return sizeof(restore.count)
+         + sizeof(restore.cycles)
+         + sizeof(restore.stamp);
 }
 
-static void SendPath(TCPsocket socket, const Points path)
-{
-    UTIL_TCP_SEND(socket, &path.max);
-    UTIL_TCP_SEND(socket, &path.count);
-    for(int32_t i = 0; i < path.count; i++)
-        UTIL_TCP_SEND(socket, &path.point[i]);
-}
-
-Restore Restore_Recv(TCPsocket socket)
+static Restore RecvPacked(const TCPsocket socket)
 {
     static Restore zero;
     Restore restore = zero;
-    if(socket)
+    const int32_t size = CONFIG_UNITS_MAX * sizeof(*restore.unit);
+    const int32_t size_header = GetRestoreHeaderByteSize(restore);
+    const int32_t size_max = size_header + size;
+    uint8_t* const buffer = UTIL_ALLOC(uint8_t, size_max);
+    const int32_t* const size_real = (int32_t*) &buffer[ 0]; // THE REAL SIZE OF THE INCOMING STREAM
+    const int32_t* const count     = (int32_t*) &buffer[ 4]; // WAS CHOSEN TO BE INCLUDED IN THE STREAM.
+    const int32_t* const cycles    = (int32_t*) &buffer[ 8]; // IT IS CHICKEN AND EGG, BUT IT IS MORE RELIABLE.
+    const Share  * const stamp     = (Share  *) &buffer[12]; // THAN SPLITTING INTO 2 RECV CALLS.
+    const Unit   * const unit      = (Unit   *) &buffer[12 + sizeof(restore.stamp)];
+    for(int32_t bytes = 0; bytes < size_max;)
     {
-        UTIL_TCP_RECV(socket, &restore.count);
-        UTIL_TCP_RECV(socket, &restore.cycles);
-        restore.unit = UTIL_ALLOC(Unit, restore.count);
-        for(int32_t i = 0; i < restore.count; i++) UTIL_TCP_RECV(socket, &restore.unit[i]);
-        for(int32_t i = 0; i < restore.count; i++) restore.unit[i].path = RecvPath(socket);
+        bytes += SDLNet_TCP_Recv(socket, &buffer[bytes], size_max);
+        if(bytes >= *size_real)
+            break;
     }
+    restore.count = *count;
+    if(restore.count > 0)
+    {
+        restore.unit = UTIL_ALLOC(Unit, restore.count);
+        for(int32_t i = 0; i < restore.count; i++)
+            restore.unit[i] = unit[i];
+    }
+    restore.cycles = *cycles;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        restore.stamp[i] = stamp[i];
+    free(buffer);
     return restore;
 }
 
-void Restore_Send(const Restore restore, TCPsocket socket)
+Restore Restore_Recv(const TCPsocket socket)
+{
+    static Restore zero;
+    return socket
+        ? RecvPacked(socket)
+        : zero;
+}
+
+void Restore_Send(const Restore restore, const TCPsocket socket)
 {
     if(socket)
     {
+        const int32_t size = restore.count * sizeof(*restore.unit);
+        const int32_t size_header = GetRestoreHeaderByteSize(restore);
+        const int32_t size_total = size_header + size;
+        UTIL_TCP_SEND(socket, &size_total);
         UTIL_TCP_SEND(socket, &restore.count);
         UTIL_TCP_SEND(socket, &restore.cycles);
-        for(int32_t i = 0; i < restore.count; i++) UTIL_TCP_SEND(socket, &restore.unit[i]);
-        for(int32_t i = 0; i < restore.count; i++) SendPath(socket, restore.unit[i].path);
+        UTIL_TCP_SEND(socket, &restore.stamp);
+        SDLNet_TCP_Send(socket, restore.unit, size);
     }
 }
 

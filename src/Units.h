@@ -21,6 +21,8 @@ typedef struct
 {
     Unit* unit;
     Stack* stack;
+    Color color;
+    Share stamp[COLOR_COUNT];
     int32_t count;
     int32_t max;
     int32_t size;
@@ -28,7 +30,6 @@ typedef struct
     int32_t select_count;
     int32_t cpu_count;
     int32_t repath_index;
-    Share share;
 }
 Units;
 
@@ -52,8 +53,10 @@ Units Units_PacketService(Units, const Registrar, const Packet, const Grid, cons
 
 uint64_t Units_Xor(const Units);
 
-Point Units_GetFirstTownCenterPan(const Units, const Grid, const Color);
+Point Units_GetFirstTownCenterPan(const Units, const Grid);
 
-Units Units_Restore(Units, const Restore, const Grid);
+Units Units_UnpackRestore(Units, const Restore, const Grid);
 
 Restore Units_PackRestore(const Units, const int32_t cycles);
+
+void Units_FreeAllPaths(const Units);

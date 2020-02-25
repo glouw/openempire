@@ -7,7 +7,6 @@
 
 typedef struct
 {
-    Color color;
     Status status;
     Motive motive;
     Bits bits;

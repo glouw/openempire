@@ -26,7 +26,7 @@ void Sockets_Free(const Sockets sockets)
     SDLNet_FreeSocketSet(sockets.set);
 }
 
-static Sockets Add(Sockets sockets, TCPsocket socket)
+static Sockets Add(Sockets sockets, const TCPsocket socket)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         if(sockets.socket[i] == NULL)
@@ -43,7 +43,7 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
     if(SDLNet_CheckSockets(sockets.set, 0))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
-            TCPsocket socket = sockets.socket[i];
+            const TCPsocket socket = sockets.socket[i];
             if(SDLNet_SocketReady(socket))
             {
                 static Overview zero;
@@ -80,7 +80,7 @@ static void Print(const Sockets sockets, Cache* const cache, const int32_t setpo
         const char control = cache->control[i];
         const char queue_size = cache->queue_size[i];
         const char parity_symbol = cache->is_stable ? '!' : '?';
-        TCPsocket socket = sockets.socket[i];
+        const TCPsocket socket = sockets.socket[i];
         printf("%d :: %d :: %c :: 0x%016lX :: %c :: CYCLES %d :: QUEUE %d -> %d ms\n",
                 i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
     }
@@ -93,7 +93,7 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
     const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        TCPsocket socket = sockets.socket[i];
+        const TCPsocket socket = sockets.socket[i];
         if(socket)
         {
             Packet packet = cache->packet;
@@ -125,7 +125,7 @@ static int32_t CountConnectedPlayers(const Sockets sockets)
     int32_t count = 0;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        TCPsocket socket = sockets.socket[i];
+        const TCPsocket socket = sockets.socket[i];
         if(socket != NULL)
             count++;
     }
@@ -137,7 +137,7 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
     if(ShouldSend(cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES))
     {
         const int32_t setpoint = Cache_GetCycleSetpoint(cache);
-        const int32_t max_cycle = Cache_GetCycleMax(cache);
+        const int32_t max_cycle = Cache_GetCycleMax(cache); // XXX. NEED MIN CYCLE CHECK. IF MAX AND MIN STRAY TOO FAR AWAY ITS BEST JUST TO CALL AN OUT OF SYNC.
         const int32_t max_ping = Cache_GetPingMax(cache);
         Cache_CalculateControlChars(cache, setpoint);
         Cache_CheckStability(cache, setpoint);
@@ -163,7 +163,7 @@ void Sockets_Ping(const Sockets pingers)
     if(SDLNet_CheckSockets(pingers.set, 0))
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
-            TCPsocket socket = pingers.socket[i];
+            const TCPsocket socket = pingers.socket[i];
             if(SDLNet_SocketReady(socket))
             {
                 int32_t temp = 0;
@@ -177,7 +177,7 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
 {
     if(SDLNet_CheckSockets(resets.set, 0))
     {
-        TCPsocket socket = resets.socket[COLOR_BLU];
+        const TCPsocket socket = resets.socket[COLOR_BLU];
         if(SDLNet_SocketReady(socket))
         {
             const Restore restore = Restore_Recv(socket);

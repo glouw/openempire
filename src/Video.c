@@ -117,7 +117,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawUnitSelections(vram, graphics_tiles);
     const bool should_draw = overview.event.mouse_l && !overview.event.key_left_shift;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
-    Vram_DrawMotiveRow(vram, data.interfac, units.share);
+    Vram_DrawMotiveRow(vram, data.interfac, units.stamp[units.color], units.color);
     Vram_DrawHud(vram, data.interfac);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);
@@ -147,6 +147,7 @@ static void PrintResources(const Video video, const Units units)
     const int32_t space = 77;
     const int32_t x0 = 27;
     const int32_t y0 = 11;
+    const Share stamp = units.stamp[units.color];
     typedef struct
     {
         Point point;
@@ -154,11 +155,11 @@ static void PrintResources(const Video video, const Units units)
     }
     Display;
     const Display displays[] = {
-        { { x0 + 0 * space, y0 }, units.share.status.wood  },
-        { { x0 + 1 * space, y0 }, units.share.status.food  },
-        { { x0 + 2 * space, y0 }, units.share.status.gold  },
-        { { x0 + 3 * space, y0 }, units.share.status.stone },
-        { { x0 + 4 * space, y0 }, units.share.status.population },
+        { { x0 + 0 * space, y0 }, stamp.status.wood       },
+        { { x0 + 1 * space, y0 }, stamp.status.food       },
+        { { x0 + 2 * space, y0 }, stamp.status.gold       },
+        { { x0 + 3 * space, y0 }, stamp.status.stone      },
+        { { x0 + 4 * space, y0 }, stamp.status.population },
     };
     for(int32_t i = 0; i < UTIL_LEN(displays); i++)
     {

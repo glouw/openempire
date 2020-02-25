@@ -552,9 +552,9 @@ static inline void DrawPack(const Vram vram, const Pack pack, const Bits bits)
     }
 }
 
-void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Share share)
+void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Share share, const Color color)
 {
-    const Pack pack = GetPackFromMotive(interfac, share.motive, share.color, share.status.age);
+    const Pack pack = GetPackFromMotive(interfac, share.motive, color, share.status.age);
     DrawPack(vram, pack, share.bits);
 }
 

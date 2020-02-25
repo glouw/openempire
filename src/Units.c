@@ -71,11 +71,11 @@ Units Units_New(const int32_t size, const int32_t cpu_count, const int32_t max, 
     units.size = size;
     units.max = max;
     units.cpu_count = cpu_count;
-    units.share.status.age = AGE_1;
-    units.share.status.civ = civ;
-    units.share.motive.action = ACTION_NONE;
-    units.share.motive.type = TYPE_NONE;
-    units.share.color = color;
+    units.stamp[color].status.age = AGE_1;
+    units.stamp[color].status.civ = civ;
+    units.stamp[color].motive.action = ACTION_NONE;
+    units.stamp[color].motive.type = TYPE_NONE;
+    units.color = color;
     return Alloc(units);
 }
 
@@ -93,6 +93,15 @@ static Units UnSelectAll(Units units)
     units.select_count = 0;
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i].is_selected = false;
+    return units;
+}
+
+static Units RecountSelected(Units units)
+{
+    units.select_count = 0;
+    for(int32_t i = 0; i < units.count; i++)
+        if(units.unit[i].is_selected)
+            units.select_count++;
     return units;
 }
 
@@ -121,7 +130,7 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == overview.share.color && unit->is_selected && unit->trait.max_speed > 0)
+        if(unit->color == overview.color && unit->is_selected && unit->trait.max_speed > 0)
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
@@ -297,6 +306,12 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
                 Unit_FreePath(other);
         }
     }
+}
+
+void Units_FreeAllPaths(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+        Unit_FreePath(&units.unit[i]);
 }
 
 static void ConditionallyStopAllBoids(const Units units)
@@ -523,20 +538,27 @@ static Units RepathSomeBoids(Units units, const Field field)
     return units;
 }
 
+static Status Gather(Status status, const Resource resource)
+{
+    switch(resource.type)
+    {
+        case TYPE_FOOD  : status.food  += resource.amount; break;
+        case TYPE_WOOD  : status.wood  += resource.amount; break;
+        case TYPE_GOLD  : status.gold  += resource.amount; break;
+        case TYPE_STONE : status.stone += resource.amount; break;
+        default         : break;
+    }
+    return status;
+}
+
 static Units MeleeAllBoids(Units units, const Grid grid)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        const Resource resource = Unit_Melee(&units.unit[i], grid);
+        Unit* const unit = &units.unit[i];
+        const Resource resource = Unit_Melee(unit, grid);
         if(resource.type != TYPE_NONE)
-            switch(resource.type)
-            {
-            default         : break;
-            case TYPE_FOOD  : units.share.status.food  += resource.amount; break;
-            case TYPE_WOOD  : units.share.status.wood  += resource.amount; break;
-            case TYPE_GOLD  : units.share.status.gold  += resource.amount; break;
-            case TYPE_STONE : units.share.status.stone += resource.amount; break;
-            }
+            units.stamp[unit->color].status = Gather(units.stamp[unit->color].status, resource);
     }
     return units;
 }
@@ -719,7 +741,7 @@ static int32_t MaxIndex(int32_t array[], const int32_t size)
     return index;
 }
 
-static Action GetAction(const Units units)
+static Action GetAction(const Units units, const Color color)
 {
     int32_t counts[ACTION_COUNT + 1];
     const int32_t size = UTIL_LEN(counts);
@@ -727,7 +749,7 @@ static Action GetAction(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == units.share.color)
+        if(unit->is_selected && unit->color == color)
         {
             const int32_t index = (int32_t) unit->trait.action + 1;
             counts[index]++;
@@ -736,7 +758,7 @@ static Action GetAction(const Units units)
     return (Action) (MaxIndex(counts, size) - 1);
 }
 
-static Type GetType(const Units units)
+static Type GetType(const Units units, const Color color)
 {
     int32_t counts[TYPE_COUNT + 1];
     const int32_t size = UTIL_LEN(counts);
@@ -744,7 +766,7 @@ static Type GetType(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == units.share.color)
+        if(unit->is_selected && unit->color == color)
         {
             const int32_t index = (int32_t) unit->trait.type + 1;
             counts[index]++;
@@ -753,40 +775,54 @@ static Type GetType(const Units units)
     return (Type) (MaxIndex(counts, size) - 1);
 }
 
-static Units UpdateMotive(Units units)
+static Units UpdateAllMotives(Units units)
 {
-    static Motive zero;
-    units.share.motive = zero;
-    units.share.motive.action = GetAction(units);
-    units.share.motive.type = GetType(units);
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const Color color = (Color) i;
+        static Motive zero;
+        units.stamp[i].motive = zero;
+        units.stamp[i].motive.action = GetAction(units, color);
+        units.stamp[i].motive.type = GetType(units, color);
+    }
     return units;
 }
 
-static Units CountPopulation(Units units)
+static int32_t CountPopulation(Units units, const Color color)
 {
     int32_t count = 0;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit)
-        && !unit->trait.is_inanimate)
+        && !unit->trait.is_inanimate
+        && unit->color == color)
             count++;
     }
-    units.share.status.population = count;
+    return count;
+}
+
+static Units CountAllPopulation(Units units)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const Color color = (Color) i;
+        units.stamp[i].status.population = CountPopulation(units, color);
+    }
     return units;
 }
 
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromButton(button, overview.share.status.age, overview.share.status.civ);
+    const Parts parts = Parts_FromButton(button, overview.incoming.status.age, overview.incoming.status.civ);
     if(parts.part != NULL)
     {
-        if(!Bits_Get(overview.share.bits, button.trigger))
+        if(!Bits_Get(overview.incoming.bits, button.trigger))
         {
             const int32_t amount = button.icon_type == ICONTYPE_UNIT ? 10 : 1; // XXX: REMOVE IN FUTURE - THIS IS CRAZY.
             for(int32_t i = 0; i < amount; i++)
-                units = SpawnParts(units, cart, zero, grid, overview.share.color, graphics, map, is_floating, parts, false, button.trigger);
+                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger);
         }
         Parts_Free(parts);
     }
@@ -796,7 +832,7 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-    const Button button = Button_Upgrade(Button_FromOverview(overview), overview.share.bits);
+    const Button button = Button_Upgrade(Button_FromOverview(overview), overview.incoming.bits);
     return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating);
 }
 
@@ -828,8 +864,8 @@ static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar 
 static void UpgradeByBranch(Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics)
 {
     const Graphics next = unit->trait.upgrade;
-    const Graphics tree = (Graphics) ((uint32_t) next + (uint32_t) overview.share.status.civ);
-    const bool first_age = overview.share.status.age == AGE_1;
+    const Graphics tree = (Graphics) ((uint32_t) next + (uint32_t) overview.incoming.status.civ);
+    const bool first_age = overview.incoming.status.age == AGE_1;
     const Graphics upgrade = first_age ? tree : next;
     PreservedUpgrade(unit, grid, graphics, upgrade);
 }
@@ -854,8 +890,8 @@ static Age GetNextAge(const Status status)
 static Units AgeUpBuildingByType(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Type type, const Color color)
 {
     static Point zero;
-    const Age age = GetNextAge(overview.share.status);
-    const Parts parts = Parts_FromButton(button, age, overview.share.status.civ);
+    const Age age = GetNextAge(overview.incoming.status);
+    const Parts parts = Parts_FromButton(button, age, overview.incoming.status.civ);
     Points points = Points_New(COLOR_COUNT);
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -886,11 +922,6 @@ static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid,
     return units;
 }
 
-static bool IsMyColor(const Units units, const Color color)
-{
-    return color == units.share.color;
-}
-
 // SOME BUILDINGS LIKE MILLS AND TOWNCENTERS SPAWN ADDITIONAL PARTS IN THEIR SUCCESSIVE AGES.
 // THE SIMPLE AGE UP WILL NOT WORK. THE ENTIRE THING MUST BE REMOVED AND REPLACED.
 static Units AgeUpAdvanced(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color, const Map map)
@@ -915,17 +946,16 @@ static Units AgeUpAdvanced(Units units, const Overview overview, const Grid grid
 
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    const Color color = flag->color;
-    if(IsMyColor(units, color))
-        units.share.status.age = GetNextAge(units.share.status);
-    AgeUpSimple(units, overview, grid, graphics, color);
-    return AgeUpAdvanced(units, overview, grid, graphics, color, map);
+    if(units.color == flag->color)
+        units.stamp[units.color].status.age = GetNextAge(units.stamp[units.color].status);
+    AgeUpSimple(units, overview, grid, graphics, flag->color);
+    return AgeUpAdvanced(units, overview, grid, graphics, flag->color, map);
 }
 
 static Units UpdateBits(Units units, Unit* const flag)
 {
-    if(IsMyColor(units, flag->color))
-        units.share.bits = Bits_Set(units.share.bits, flag->trigger);
+    if(units.color == flag->color)
+        units.stamp[units.color].bits = Bits_Set(units.stamp[units.color].bits, flag->trigger);
     return units;
 }
 
@@ -1018,21 +1048,21 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     UpdateEntropy(units);
     Tick(units);
     units = ManagePathFinding(units, grid, map, field);
-    units = UpdateMotive(units);
+    units = UpdateAllMotives(units);
     Decay(units);
     Expire(units);
     units = Kill(units, grid, graphics, map);
     units = RemoveGarbage(units);
     ManageStacks(units);
-    units = CountPopulation(units);
+    units = CountAllPopulation(units);
     return units;
 }
 
 Units Units_Float(Units floats, const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
 {
     floats.count = 0;
-    floats.share.status.age = units.share.status.age;
-    floats.share.motive = motive;
+    floats.stamp[floats.color].status.age = units.stamp[units.color].status.age;
+    floats.stamp[floats.color].motive = motive;
     ResetStacks(floats);
     floats = FloatUsingIcons(floats, overview, grid, graphics, map);
     StackStacks(floats);
@@ -1073,21 +1103,21 @@ uint64_t Units_Xor(const Units units)
     return parity;
 }
 
-static Unit* GetFirstTownCenter(const Units units, const Color color)
+static Unit* GetFirstTownCenter(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == color && unit->trait.type == TYPE_TOWN_CENTER)
+        if(unit->color == units.color && unit->trait.type == TYPE_TOWN_CENTER)
             return unit;
     }
     return NULL;
 }
 
-Point Units_GetFirstTownCenterPan(const Units units, const Grid grid, const Color color)
+Point Units_GetFirstTownCenterPan(const Units units, const Grid grid)
 {
     static Point zero;
-    Unit* const unit = GetFirstTownCenter(units, color);
+    Unit* const unit = GetFirstTownCenter(units);
     if(unit)
     {
         const Point cart = Unit_GetShift(unit, unit->cart);
@@ -1111,7 +1141,7 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
         },
         TRIGGER_NONE
     };
-    const Parts villager = Parts_FromButton(button, units.share.status.age, units.share.status.civ);
+    const Parts villager = Parts_FromButton(button, units.stamp[units.color].status.age, units.stamp[units.color].status.civ);
     for(int32_t i = 0; i < villagers; i++)
     {
         const Point shift = { -2, 1 + i };
@@ -1154,7 +1184,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         },
         TRIGGER_NONE
     };
-    const Parts towncenter = Parts_FromButton(button, units.share.status.age, units.share.status.civ);
+    const Parts towncenter = Parts_FromButton(button, units.stamp[units.color].status.age, units.stamp[units.color].status.civ);
     const Points points = Map_GetSlots(map);
     for(int32_t i = 0; i < users; i++)
     {
@@ -1176,23 +1206,29 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
     return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
 }
 
-Units Units_Restore(Units units, const Restore restore, const Grid grid)
+Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
 {
     units.count = restore.count;
     units.repath_index = 0;
-    for(int32_t i = 0; i < units.count; i++)
-        units.unit[i] = restore.unit[i];
+    for(int32_t i = 0; i < units.count; i++) units.unit[i]  = restore.unit[i];
+    for(int32_t i = 0; i < COLOR_COUNT; i++) units.stamp[i] = restore.stamp[i];
     // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
     ManageStacks(units);
     EngageAllBoids(units, grid);
-    return units;
+    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
+    units.command_group_next++;
+    return RecountSelected(units);
 }
 
 Restore Units_PackRestore(const Units units, const int32_t cycles)
 {
-    const Restore restore = {
-        units.unit, units.count, cycles
-    };
+    static Restore zero;
+    Restore restore = zero;
+    restore.unit = units.unit;
+    restore.count = units.count;
+    restore.cycles = cycles;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        restore.stamp[i] = units.stamp[i];
     return restore;
 }

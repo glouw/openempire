@@ -9,7 +9,7 @@
 typedef struct
 {
     Packet packet;
-    uint64_t parity[COLOR_COUNT];
+    uint64_t parity[COLOR_COUNT]; // XXX. REQUIRES 2D ARRAY WITH BUFFER TO LOOK AT ALL PARITIES.
     int32_t cycles[COLOR_COUNT];
     int32_t queue_size[COLOR_COUNT];
     int32_t pings[COLOR_COUNT];

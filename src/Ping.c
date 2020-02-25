@@ -33,12 +33,11 @@ int32_t Ping_Get(void)
 static int32_t Ping(void* const data)
 {
     Args* args = (Args*) data;
-    const Sock pinger = Sock_Connect(args->host, args->port_ping, "PING");
+    const Sock pinger = Sock_Connect(args->host, args->port_ping);
     if (!pinger.connected) {
         fprintf(stderr, "Failed to connect to server on PING channel\n");
         return;
     }
-
     while(true)
     {
         const int32_t message = 0xCAFEBABE;

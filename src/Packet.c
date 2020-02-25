@@ -26,15 +26,17 @@ Packet Packet_ZeroOverviews(Packet packet)
     return packet;
 }
 
-bool Packet_IsStable(const Packet packet)
+bool Packet_IsAlive(const Packet packet)
 {
-    return packet.turn > 0 && packet.is_stable;
+    return packet.turn > 0;
+}
+
+bool Packet_IsReady(const Packet packet)
+{
+    return Packet_IsAlive(packet) && packet.is_stable;
 }
 
 void Packet_Flush(const Sock sock)
 {
-    while(Packet_Get(sock).turn != 0)
-    {
-        // Do nothing;
-    }
+    while(Packet_Get(sock).turn != 0);
 }

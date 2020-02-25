@@ -20,7 +20,8 @@ typedef struct
     Rect selection_box;
     Point mouse_cursor;
     Event event;
-    Share share;
+    Color color;
+    Share incoming;
     int32_t xres;
     int32_t yres;
     int32_t cycles;
