@@ -64,7 +64,7 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER.
+            if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER. BLUE IS OK FOR NOW.
             {
                 Units_FreeAllPaths(units); // PATHS ARE TOO RISKY TO RESTORE.
                 const Restore restore = Units_PackRestore(units, cycles);
@@ -74,8 +74,8 @@ static void Play(const Video video, const Data data, const Args args)
             units = Units_UnpackRestore(units, restore, grid);
             cycles = restore.cycles;
             Util_Srand(overview.seed);
-            packets = Packets_Clear(packets);
-            Packet_Flush(sock);
+            packets = Packets_Clear(packets); // DISPOSES USER SPACE BUFFERING.
+            Packet_Flush(sock); // DISPOSES KERNEL SPACE BUFFERING. THIS NUKES ALL PACKETS.
             Restore_Free(restore);
         }
         else

@@ -1206,26 +1206,6 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
     return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
 }
 
-static void PrintShares(const Units units) // XXX. REMOVE LATER.
-{
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    {
-        const Share share = units.stamp[i];
-        printf("f %4d g %4d s %4d w %4d p %4d cv %d ag %d A %2d T %2d B 0x%016lX\n",
-                share.status.food,
-                share.status.gold,
-                share.status.stone,
-                share.status.wood,
-                share.status.population,
-                share.status.civ,
-                share.status.age,
-                share.motive.action,
-                share.motive.type,
-                share.bits);
-    }
-    putchar('\n');
-}
-
 Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
 {
     units.count = restore.count;
@@ -1238,9 +1218,7 @@ Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
     EngageAllBoids(units, grid);
     // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
     units.command_group_next++;
-    units = RecountSelected(units);
-    PrintShares(units); // XXX: REMOVE WHEN DEBUGGING DONE.
-    return units;
+    return RecountSelected(units);
 }
 
 Restore Units_PackRestore(const Units units, const int32_t cycles)
