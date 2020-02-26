@@ -89,33 +89,54 @@ static void Print(const Sockets sockets, Cache* const cache, const int32_t setpo
     }
 }
 
+typedef struct
+{
+    TCPsocket socket;
+    Packet packet;
+}
+SendNeedle;
+
+static int32_t RunSendNeedle(void* const args)
+{
+    SendNeedle* const needle = (SendNeedle*) args;
+    if(needle->socket)
+        assert(UTIL_TCP_SEND(needle->socket, &needle->packet) == sizeof(Packet));
+    return 0;
+}
+
 static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
     const int32_t buffer = 3;
     const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
+    Packet base = cache->packet;
+    base.turn = cache->turn;
+    base.exec_cycle = exec_cycle;
+    base.is_stable = cache->is_stable;
+    base.is_out_of_sync = cache->is_out_of_sync;
+    base.game_running = game_running;
+    base.users_connected = cache->users_connected;
+    base.users = cache->users;
+    base.seed = cache->seed;
+    base.map_power = cache->map_power;
+    if(!cache->is_stable)
+        base = Packet_ZeroOverviews(base);
+    SendNeedle needles[COLOR_COUNT];
+    SDL_Thread* threads[COLOR_COUNT];
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
+        Packet packet = base;
         const TCPsocket socket = sockets.socket[i];
+        needles[i].socket = socket;
         if(socket)
         {
-            Packet packet = cache->packet;
             packet.control = cache->control[i];
-            packet.turn = cache->turn;
-            packet.exec_cycle = exec_cycle;
             packet.client_id = i;
-            packet.is_stable = cache->is_stable;
-            packet.is_out_of_sync = cache->is_out_of_sync;
-            packet.game_running = game_running;
-            packet.users_connected = cache->users_connected;
-            packet.users = cache->users;
-            packet.seed = cache->seed;
-            packet.map_power = cache->map_power;
-            if(!cache->is_stable)
-                packet = Packet_ZeroOverviews(packet);
-            assert(UTIL_TCP_SEND(socket, &packet) == sizeof(Packet));
+            needles[i].packet = packet;
         }
     }
+    for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunSendNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
 }
 
 static bool ShouldSend(const int32_t cycles, const int32_t interval)

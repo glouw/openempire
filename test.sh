@@ -12,8 +12,7 @@ netsim()
     DEV=lo
     LATENCY=25ms
     VARIANCE=5ms
-
-    ENTROPY=2.0% # SET TO 0.1% FOR REALISTIC NETWORKING EMULATION. SET TO 2.0% FOR STRESS TESTING.
+    ENTROPY=0.1% # SET TO 0.1% FOR REALISTIC NETWORKING EMULATION. SET TO 2.0% FOR STRESS TESTING.
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY 25% duplicate $ENTROPY corrupt $ENTROPY
 }
