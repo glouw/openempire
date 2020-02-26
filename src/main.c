@@ -130,22 +130,34 @@ static void RunClient(const Args args)
     SDL_Quit();
 }
 
+static int32_t RunServerPings(void* const data)
+{
+    Args* const args = (Args*) data;
+    Sockets pings = Sockets_Init(args->port_ping);
+    while(true)
+    {
+        pings = Sockets_Accept(pings);
+        Sockets_Ping(pings);
+        SDL_Delay(1);
+    }
+    Sockets_Free(pings);
+    return 0;
+}
+
 static void RunServer(const Args args)
 {
     srand(time(NULL));
+    SDL_CreateThread(RunServerPings, "N/A", (void*) &args);
     Sockets sockets = Sockets_Init(args.port);
-    Sockets pings = Sockets_Init(args.port_ping);
     Sockets resets = Sockets_Init(args.port_reset);
     Cache cache = Cache_Init(args.users, args.map_power);
     for(int32_t cycles = 0; true; cycles++)
     {
         const int32_t t0 = SDL_GetTicks();
         sockets = Sockets_Accept(sockets);
-        pings = Sockets_Accept(pings);
         resets = Sockets_Accept(resets);
         sockets = Sockets_Recv(sockets, &cache);
         Sockets_Send(sockets, &cache, cycles, args.quiet);
-        Sockets_Ping(pings);
         Sockets_Reset(resets, &cache);
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = 10 - (t1 - t0);
@@ -153,7 +165,6 @@ static void RunServer(const Args args)
             SDL_Delay(ms);
     }
     Sockets_Free(resets);
-    Sockets_Free(pings);
     Sockets_Free(sockets);
 }
 

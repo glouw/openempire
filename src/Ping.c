@@ -45,8 +45,11 @@ static int32_t Ping(void* const data)
         assert(UTIL_TCP_SEND(pinger.server, &send) == 1);
         assert(UTIL_TCP_RECV(pinger.server, &temp) == 1);
         const int32_t t1 = SDL_GetTicks();
+        const int32_t dt = t1 - t0;
         if(temp == send)
-            Set(t1 - t0);
+            Set(dt);
+        const int32_t delay = 200 - dt;
+        SDL_Delay(delay > 0 ? delay : 0);
     }
     Sock_Disconnect(pinger);
     return 0;

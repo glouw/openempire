@@ -31,6 +31,7 @@ static Restore RecvPacked(const TCPsocket socket)
     int32_t bytes = 0;
     while(bytes < size_max)
     {
+        puts("RECV BYTES");
         bytes += SDLNet_TCP_Recv(socket, &buffer[bytes], size_max);
         printf(">> BYTES RESTORED %d %d %d\n", bytes, *size_real, size_max);
         if(bytes >= *size_real) // EARLY EXIT WHEN ALL STREAM BYTES ARE RELIABLY RECVD OVER TCP.
