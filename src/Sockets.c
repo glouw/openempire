@@ -96,9 +96,9 @@ typedef struct
 }
 SendNeedle;
 
-static int32_t RunSendNeedle(void* const args)
+static int32_t RunSendNeedle(void* const data)
 {
-    SendNeedle* const needle = (SendNeedle*) args;
+    SendNeedle* const needle = (SendNeedle*) data;
     if(needle->socket)
         assert(UTIL_TCP_SEND(needle->socket, &needle->packet) == sizeof(Packet));
     return 0;
@@ -121,8 +121,8 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
     base.map_power = cache->map_power;
     if(!cache->is_stable)
         base = Packet_ZeroOverviews(base);
-    SendNeedle needles[COLOR_COUNT];
-    SDL_Thread* threads[COLOR_COUNT];
+    SendNeedle  needles[COLOR_COUNT]; // THREADS ENSURE ALL CLIENTS GET THEIR PACKETS ROUGHLY AT THE SAME TIME.
+    SDL_Thread* threads[COLOR_COUNT]; // FOR EXAMPLE, A SLIGHT HANG ON CLIENT 2 WILL NOT DELAY CLIENT 7 AND MISS ITS EXEC CYCLE DEADLINE.
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         Packet packet = base;
@@ -200,6 +200,20 @@ void Sockets_Ping(const Sockets pingers)
         }
 }
 
+typedef struct
+{
+    TCPsocket socket;
+    Restore restore;
+}
+RestoreNeedle;
+
+static int32_t RunRestoreNeedle(void* const data)
+{
+    RestoreNeedle* const needle = (RestoreNeedle*) data;
+    Restore_Send(needle->restore, needle->socket);
+    return 0;
+}
+
 void Sockets_Reset(const Sockets resets, Cache* const cache)
 {
     if(SDLNet_CheckSockets(resets.set, 0))
@@ -208,8 +222,15 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
         if(SDLNet_SocketReady(socket))
         {
             const Restore restore = Restore_Recv(socket);
+            RestoreNeedle needles[COLOR_COUNT];
+            SDL_Thread*   threads[COLOR_COUNT];
             for(int32_t i = 0; i < COLOR_COUNT; i++)
-                Restore_Send(restore, resets.socket[i]);
+            {
+                needles[i].socket = resets.socket[i];
+                needles[i].restore = restore;
+            }
+            for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
+            for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
             cache->is_out_of_sync = false;
             Restore_Free(restore);
         }
