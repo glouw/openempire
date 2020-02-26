@@ -147,7 +147,7 @@ static int32_t RunServerPings(void* const data)
 static void RunServer(const Args args)
 {
     srand(time(NULL));
-    SDL_CreateThread(RunServerPings, "N/A", (void*) &args);
+    SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.
     Sockets sockets = Sockets_Init(args.port);
     Sockets resets = Sockets_Init(args.port_reset);
     Cache cache = Cache_Init(args.users, args.map_power);

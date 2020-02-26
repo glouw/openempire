@@ -60,7 +60,7 @@ void Ping_Init(const Args args)
     if(!is_running)
     {
         mutex = SDL_CreateMutex();
-        SDL_CreateThread(Ping, "N/A", (void*) &args);
+        SDL_CreateThread(Ping, "N/A", (void*) &args); // NO POINTER IS RETURNED AS PING THREAD WILL SHUTDOWN WITH PARENT.
         is_running = true;
     }
 }
