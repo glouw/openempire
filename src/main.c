@@ -40,6 +40,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
 
 static void Play(const Video video, const Data data, const Args args)
 {
+    Ping_Init(args);
     const Sock sock = Sock_Connect(args.host, args.port);
     const Sock reset = Sock_Connect(args.host, args.port_reset);
     Overview overview = WaitInLobby(video, sock);
@@ -62,28 +63,32 @@ static void Play(const Video video, const Data data, const Args args)
         overview = Overview_Update(overview, input, parity, cycles, size, units.stamp[units.color], ping);
         assert(UTIL_TCP_SEND(sock.server, &overview) == sizeof(overview));
         const Packet packet = Packet_Get(sock);
-        if(packet.is_stable)
-            Ping_Init(args);
         if(packet.is_out_of_sync)
         {
             if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER. BLUE IS OK FOR NOW.
             {
-                Units_FreeAllPaths(units); // PATHS ARE TOO RISKY TO RESTORE.
+                // PATHS ARE TOO RISKY TO RESTORE.
+                Units_FreeAllPaths(units);
                 const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
             }
             const Restore restore = Restore_Recv(reset.server);
             units = Units_UnpackRestore(units, restore, grid);
+            // SYNCS SEEDS AND CYCLES.
             cycles = restore.cycles;
             Util_Srand(overview.seed);
-            packets = Packets_Clear(packets); // DISPOSES USER SPACE BUFFERING.
-            Packet_Flush(sock); // DISPOSES KERNEL SPACE BUFFERING. THIS NUKES ALL PACKETS.
+            // DISPOSES USER SPACE BUFFERING.
+            packets = Packets_Clear(packets);
+            // DISPOSES KERNEL SPACE BUFFERING.
+            Packet_Flush(sock);
             Restore_Free(restore);
         }
         else
         {
             if(Packet_IsReady(packet))
                 packets = Packets_Queue(packets, packet);
+            // GIVEN LAG SPIKES, HIGH EXEC CYCLES MAY PRECEDE LOW EXEC CYCLES.
+            // THIS FLUSHES THEM OUT IN SYNC FOR ALL CLIENTS.
             packets = Packets_ClearStale(packets, cycles);
             while(Packets_MustExecute(packets, cycles))
             {
@@ -95,7 +100,8 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(packet.control != PACKET_CONTROL_SPEED_UP)
             {
-                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.stamp[units.color].motive);
+                const Share share = units.stamp[units.color];
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, share.motive);
                 Video_Draw(video, data, map, units, floats, overview, grid);
                 const int32_t t1 = SDL_GetTicks();
                 Video_Render(video, units, overview, map, t1 - t0, cycles, ping);

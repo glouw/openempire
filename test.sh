@@ -12,7 +12,7 @@ netsim()
     DEV=lo
     LATENCY=25ms
     VARIANCE=5ms
-    ENTROPY=3.1% # SET TO 0.1% FOR REALISTIC NETWORKING EMULATION. SET TO 2.0% FOR STRESS TESTING.
+    ENTROPY=0.1% # SET TO 0.1% FOR REALISTIC NETWORKING EMULATION. SET TO 2.0% FOR STRESS TESTING.
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY 25% duplicate $ENTROPY corrupt $ENTROPY
 }
@@ -31,6 +31,7 @@ batch()
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do
+        sleep 3
         D=20
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))

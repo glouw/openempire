@@ -11,8 +11,6 @@ static SDL_mutex* mutex;
 
 static int32_t ping;
 
-static bool is_running = false;
-
 static void Set(const int32_t dt)
 {
     if(SDL_TryLockMutex(mutex) == 0)
@@ -57,12 +55,8 @@ static int32_t Ping(void* const data)
 
 void Ping_Init(const Args args)
 {
-    if(!is_running)
-    {
-        mutex = SDL_CreateMutex();
-        SDL_CreateThread(Ping, "N/A", (void*) &args); // NO POINTER IS RETURNED AS PING THREAD WILL SHUTDOWN WITH PARENT.
-        is_running = true;
-    }
+    mutex = SDL_CreateMutex();
+    SDL_CreateThread(Ping, "N/A", (void*) &args); // NO POINTER IS RETURNED AS PING THREAD WILL SHUTDOWN WITH PARENT.
 }
 
 void Ping_Shutdown(void)
