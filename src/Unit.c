@@ -282,6 +282,7 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     if(!Unit_IsExempt(unit))
     {
         Unit_FreePath(unit);
+        unit->cart_goal = cart_goal;
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
         unit->path = Field_PathAStar(field, unit->cart, cart_goal);
     }
@@ -292,6 +293,7 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     if(!Unit_IsExempt(unit))
     {
         Unit_FreePath(unit);
+        unit->cart_goal = cart_goal;
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
         unit->path = Points_New(MOCK_PATH_POINTS);
         unit->path = Points_Append(unit->path, unit->cart);
@@ -474,6 +476,11 @@ bool Unit_IsDifferent(Unit* const unit, Unit* const other)
 bool Unit_HasNoPath(Unit* const unit)
 {
     return unit->path.count == 0;
+}
+
+bool Unit_HasPath(Unit* const unit)
+{
+    return unit->path.count > 0;
 }
 
 bool Unit_IsType(Unit* const unit, const Color color, const Type type)

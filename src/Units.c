@@ -308,10 +308,15 @@ static void ConditionallyStopBoids(const Units units, Unit* const unit)
     }
 }
 
-void Units_FreeAllPaths(const Units units)
+void Units_FreeAllPathsForRecovery(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
-        Unit_FreePath(&units.unit[i]);
+    {
+        Unit* const unit = &units.unit[i];
+        if(Unit_HasPath(unit))
+            unit->must_repath_with_recover = true;
+        Unit_FreePath(unit);
+    }
 }
 
 static void ConditionallyStopAllBoids(const Units units)
@@ -1203,10 +1208,25 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
 
 Units Units_Generate(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
-    return (users > 0) ? GenerateTownCenters(units, map, grid, graphics, users) : units;
+    return (users > 0)
+        ? GenerateTownCenters(units, map, grid, graphics, users)
+        : units;
 }
 
-Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
+static void RestorePaths(const Units units, const Field field)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->must_repath_with_recover)
+        {
+            Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, field);
+            unit->must_repath_with_recover = false;
+        }
+    }
+}
+
+Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid, const Field field)
 {
     units.count = restore.count;
     units.repath_index = 0;
@@ -1216,6 +1236,7 @@ Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid)
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
     ManageStacks(units);
     EngageAllBoids(units, grid);
+    RestorePaths(units, field);
     // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
     units.command_group_next++;
     return RecountSelected(units);

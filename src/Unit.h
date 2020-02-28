@@ -19,6 +19,7 @@ typedef struct Unit
     Trait trait;
     Point cart;
     Point cart_grid_offset;
+    Point cart_goal;
     Point cart_grid_offset_goal;
     Point cell;
     Point cell_last;
@@ -59,6 +60,7 @@ typedef struct Unit
     bool is_floating;
     bool is_triggered;
     bool must_skip_debris;
+    bool must_repath_with_recover;
 }
 Unit;
 
@@ -115,6 +117,8 @@ Point Unit_GetShift(Unit* const, const Point);
 bool Unit_IsDifferent(Unit* const, Unit* const);
 
 bool Unit_HasNoPath(Unit* const);
+
+bool Unit_HasPath(Unit* const);
 
 bool Unit_IsType(Unit* const, const Color, const Type);
 

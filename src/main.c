@@ -68,12 +68,12 @@ static void Play(const Video video, const Data data, const Args args)
             if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER. BLUE IS OK FOR NOW.
             {
                 // PATHS ARE TOO RISKY TO RESTORE.
-                Units_FreeAllPaths(units);
+                Units_FreeAllPathsForRecovery(units);
                 const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
             }
             const Restore restore = Restore_Recv(reset.server);
-            units = Units_UnpackRestore(units, restore, grid);
+            units = Units_UnpackRestore(units, restore, grid, field);
             // SYNCS SEEDS AND CYCLES.
             cycles = restore.cycles;
             Util_Srand(overview.seed);
