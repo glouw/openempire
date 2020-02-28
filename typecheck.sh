@@ -1,5 +1,7 @@
-# Compiles the C source using clang and gcc,
-# using both C++ and C compilers for extra strength type checking.
+#!/bin/bash
+
+# COMPILES SOURCE AS C AND C++ USING BOTH CLANG AND GCC
+# TO ENSURE TYPE SAFETY.
 
 set -e
 

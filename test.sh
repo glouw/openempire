@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# BUILDS SOURCE, ENABLES A LOSSY LOCAL HOST NETWORK, STARTS A SERVER,
+# AND STARTS SEVERAL CLIENTS OF DIFFERENT CIVILIZATION.
+
+LATENCY=25ms
+VARIANCE=5ms
+ENTROPY=2.1% # REALISM = 0.1%. STRESS TEST = 2.1%.
+XRES=1300
+YRES=700
+USERS=2
+CIVS=4
+POWER=7
+HOST=localhost
+PORT=1111
+
 build()
 {
     CPUS=$(nproc --all)
@@ -10,9 +24,6 @@ build()
 netsim()
 {
     DEV=lo
-    LATENCY=25ms
-    VARIANCE=5ms
-    ENTROPY=0.1% # SET TO 0.1% FOR REALISTIC NETWORKING EMULATION. SET TO 2.0% FOR STRESS TESTING.
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY 25% duplicate $ENTROPY corrupt $ENTROPY
 }
@@ -20,13 +31,6 @@ netsim()
 batch()
 {
     BIN=openempires
-    XRES=1300
-    YRES=700
-    USERS=2
-    CIVS=4
-    POWER=7
-    HOST=localhost
-    PORT=1111
     ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
