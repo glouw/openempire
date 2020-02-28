@@ -946,16 +946,16 @@ static Units AgeUpAdvanced(Units units, const Overview overview, const Grid grid
 
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    if(units.color == flag->color)
-        units.stamp[units.color].status.age = GetNextAge(units.stamp[units.color].status);
+    if(overview.color == flag->color)
+        units.stamp[overview.color].status.age = GetNextAge(units.stamp[overview.color].status);
     AgeUpSimple(units, overview, grid, graphics, flag->color);
     return AgeUpAdvanced(units, overview, grid, graphics, flag->color, map);
 }
 
-static Units UpdateBits(Units units, Unit* const flag)
+static Units UpdateBits(Units units, const Overview overview, Unit* const flag)
 {
-    if(units.color == flag->color)
-        units.stamp[units.color].bits = Bits_Set(units.stamp[units.color].bits, flag->trigger);
+    if(overview.color == flag->color)
+        units.stamp[overview.color].bits = Bits_Set(units.stamp[overview.color].bits, flag->trigger);
     return units;
 }
 
@@ -966,7 +966,7 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
         Unit* const flag = &units.unit[i];
         if(Unit_IsTriggerValid(flag))
         {
-            units = UpdateBits(units, flag);
+            units = UpdateBits(units, overview, flag);
             flag->is_triggered = true;
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
