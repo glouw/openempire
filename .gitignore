@@ -1,5 +1,6 @@
 *.o
 cachegrind.out*
+vgcore.*
 *.d
 *.gch
 *.vgcore
