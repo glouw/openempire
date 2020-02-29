@@ -6,7 +6,7 @@ OPEN EMPIRES
     Open Empires strives to be written in less than 15,000 lines of C99 using only
     SDL2 as an external dependency.
 
-    Open Empires borrows elements from Starcraft2 and Rome 1: Total War.
+    Open Empires borrows gameplay mechanics from Starcraft 2 and Rome Total War.
 
 DEPENDENCIES
 
