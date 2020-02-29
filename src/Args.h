@@ -22,6 +22,7 @@ typedef struct
     int32_t map_power;
     bool quiet;
     bool demo;
+    bool measure;
 }
 Args;
 

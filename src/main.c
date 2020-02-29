@@ -110,6 +110,8 @@ static void Play(const Video video, const Data data, const Args args)
                 if(ms > 0)
                     SDL_Delay(ms);
             }
+            if(args.measure && cycles == 60)
+                break;
         }
         Field_Free(field);
     }
@@ -152,7 +154,8 @@ static int32_t RunServerPings(void* const data)
 
 static void RunServer(const Args args)
 {
-    srand(time(NULL));
+    if(!args.measure)
+        srand(time(NULL));
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.
     Sockets sockets = Sockets_Init(args.port);
     Sockets resets = Sockets_Init(args.port_reset);
