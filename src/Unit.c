@@ -421,12 +421,9 @@ void Unit_Repath(Unit* const unit, const Field field)
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && unit->path.count > 0)
-    {
-        const Point cart_goal = unit->path.point[unit->path.count - 1];
         (unit->path.count > MOCK_PATH_POINTS)
-            ? Unit_FindPath(unit, cart_goal, unit->cart_grid_offset_goal, field)
-            : Unit_MockPath(unit, cart_goal, unit->cart_grid_offset_goal);
-    }
+            ? Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, field)
+            : Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal);
 }
 
 static Point Nudge(Unit* const unit)

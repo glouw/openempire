@@ -73,7 +73,7 @@ static void Play(const Video video, const Data data, const Args args)
                 Restore_Send(restore, reset.server);
             }
             const Restore restore = Restore_Recv(reset.server);
-            units = Units_UnpackRestore(units, restore, grid, field);
+            units = Units_ApplyRestore(units, restore, grid, field);
             // SYNCS SEEDS AND CYCLES.
             cycles = restore.cycles;
             Util_Srand(overview.seed);

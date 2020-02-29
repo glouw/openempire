@@ -5,7 +5,7 @@
 
 LATENCY=25ms
 VARIANCE=5ms
-ENTROPY=2.1% # REALISM = 0.1%. STRESS TEST = 2.1%.
+ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 2.1%.
 XRES=1300
 YRES=700
 USERS=2
@@ -35,7 +35,6 @@ batch()
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do
-        sleep 3
         D=20
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))

@@ -313,6 +313,9 @@ void Units_FreeAllPathsForRecovery(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
+        // PATHS ARE NOT TRANSFERRED OVER THE WIRE.
+        // SINCE UNITS ARE TRANSFERRED TO OTHER CLIENTS
+        // THEY MUST REPATH ON SAID CLIENTS ONCE RECOVERED.
         if(Unit_HasPath(unit))
             unit->must_repath_with_recover = true;
         Unit_FreePath(unit);
@@ -410,21 +413,21 @@ static void KillChildren(const Units units, Unit* const unit)
     }
 }
 
-static void Anakin(const Units units, Unit* const unit)
+static void Kill(const Units units, Unit* const unit)
 {
     Unit_Kill(unit);
     if(unit->has_children)
         KillChildren(units, unit);
 }
 
-static Units Kill(Units units, const Grid grid, const Registrar graphics, const Map map)
+static Units KillTheDead(Units units, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit) && Unit_IsDead(unit))
         {
-            Anakin(units, unit);
+            Kill(units, unit);
             if(unit->must_skip_debris)
                 continue;
             if(unit->trait.is_inanimate)
@@ -807,7 +810,7 @@ static int32_t CountPopulation(Units units, const Color color)
     return count;
 }
 
-static Units CountAllPopulation(Units units)
+static Units CountAllPopulations(Units units)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
@@ -906,7 +909,7 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
             const Point half = Point_Div(unit->trait.dimensions, 2);
             const Point cart = Point_Add(unit->cart, half);
             points = Points_Append(points, cart);
-            Anakin(units, unit);
+            Kill(units, unit);
             unit->must_skip_debris = true;
         }
     }
@@ -1056,10 +1059,10 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = UpdateAllMotives(units);
     Decay(units);
     Expire(units);
-    units = Kill(units, grid, graphics, map);
+    units = KillTheDead(units, grid, graphics, map);
     units = RemoveGarbage(units);
     ManageStacks(units);
-    units = CountAllPopulation(units);
+    units = CountAllPopulations(units);
     return units;
 }
 
@@ -1137,17 +1140,14 @@ void Units_ResetTiled(const Units units)
         units.unit[i].is_already_tiled = false;
 }
 
-static Units GenerateVillagers(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot, const Color color, const int32_t villagers)
+static Units GenerateVillagers(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot, const Color color)
 {
     static Point zero;
-    const Button button = {
-        ICONTYPE_UNIT, {
-            ICONUNIT_MALE_VILLAGER
-        },
-        TRIGGER_NONE
-    };
-    const Parts villager = Parts_FromButton(button, units.stamp[units.color].status.age, units.stamp[units.color].status.civ);
-    for(int32_t i = 0; i < villagers; i++)
+    const Button button = { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER }, TRIGGER_NONE };
+    const Age age = units.stamp[color].status.age;
+    const Civ civ = units.stamp[color].status.civ;
+    const Parts villager = Parts_FromButton(button, age, civ);
+    for(int32_t i = 0; i < CONFIG_UNITS_STARTING_VILLAGERS; i++)
     {
         const Point shift = { -2, 1 + i };
         const Point cart = Point_Add(slot, shift);
@@ -1183,25 +1183,22 @@ static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, 
 static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
 {
     static Point zero;
-    const Button button = {
-        ICONTYPE_BUILD, {
-            ICONBUILD_TOWN_CENTER
-        },
-        TRIGGER_NONE
-    };
-    const Parts towncenter = Parts_FromButton(button, units.stamp[units.color].status.age, units.stamp[units.color].status.civ);
+    const Button button = { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE };
     const Points points = Map_GetSlots(map);
     for(int32_t i = 0; i < users; i++)
     {
         const Color color = (Color) i;
+        const Age age = units.stamp[color].status.age;
+        const Civ civ = units.stamp[color].status.civ;
+        const Parts towncenter = Parts_FromButton(button, age, civ);
         const int32_t index = (i * points.count) / users;
         const Point slot = points.point[index];
         const Point fixed = Map_GetFixedSlot(map, slot);
         units = SpawnParts(units, fixed, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
-        units = GenerateVillagers(units, map, grid, graphics, fixed, color, CONFIG_UNITS_STARTING_VILLAGERS);
+        units = GenerateVillagers(units, map, grid, graphics, fixed, color);
         units = GenerateStartingTrees(units, map, grid, graphics, fixed);
+        Parts_Free(towncenter);
     }
-    Parts_Free(towncenter);
     Points_Free(points);
     return units;
 }
@@ -1226,19 +1223,30 @@ static void RestorePaths(const Units units, const Field field)
     }
 }
 
-Units Units_UnpackRestore(Units units, const Restore restore, const Grid grid, const Field field)
+static Units UnpackRestore(Units units, const Restore restore)
 {
+    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME,
+    // BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
+    units.command_group_next++;
     units.count = restore.count;
     units.repath_index = 0;
-    for(int32_t i = 0; i < units.count; i++) units.unit[i]  = restore.unit[i];
-    for(int32_t i = 0; i < COLOR_COUNT; i++) units.stamp[i] = restore.stamp[i];
-    // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE IT WILL POINT TO A SERVER MEMORY ADDRESS.
-    // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED, SO THAT IS DONE FIRST.
+    for(int32_t i = 0; i < units.count; i++)
+        units.unit[i]  = restore.unit[i];
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        units.stamp[i] = restore.stamp[i];
+    return units;
+}
+
+Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, const Field field)
+{
+    units = UnpackRestore(units, restore);
+    // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE
+    // IT WILL POINT TO A SERVER MEMORY ADDRESS.
+    // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED,
+    // SO THAT IS DONE FIRST.
     ManageStacks(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, field);
-    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME, BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
-    units.command_group_next++;
     return RecountSelected(units);
 }
 
