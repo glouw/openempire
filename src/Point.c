@@ -142,3 +142,8 @@ bool Point_IsEven(const Point point)
     return (point.x % 2) == 0
         && (point.y % 2) == 0;
 }
+
+uint64_t Point_Flatten(const Point point)
+{
+    return (uint64_t) point.y << 32 | (uint64_t) point.x;
+}

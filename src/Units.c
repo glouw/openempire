@@ -24,16 +24,15 @@ static bool CanWalk(const Units units, const Map map, const Point point)
 
 static bool CanBuild(const Units units, const Map map, Unit* const unit)
 {
-    if(unit->trait.can_expire)
-        return true;
-    for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
-    for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
-    {
-        const Point offset = { x, y };
-        const Point cart = Point_Add(unit->cart, offset);
-        if(!CanWalk(units, map, cart))
-            return false;
-    }
+    if(!unit->trait.can_expire)
+        for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+        for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+        {
+            const Point offset = { x, y };
+            const Point cart = Point_Add(unit->cart, offset);
+            if(!CanWalk(units, map, cart))
+                return false;
+        }
     return true;
 }
 
@@ -1104,9 +1103,13 @@ uint64_t Units_Xor(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        const uint64_t x = (uint64_t) unit->cell.x;
-        const uint64_t y = (uint64_t) unit->cell.y;
-        parity ^= (y << 32) | x;
+        uint64_t xorred = Point_Flatten(unit->cell);
+        xorred ^= unit->id * (int32_t) unit->color;
+        xorred ^= unit->id * (int32_t) unit->dir;
+        xorred ^= unit->id * (int32_t) unit->state;
+        xorred ^= unit->id * (int32_t) unit->file;
+        xorred ^= unit->id * (int32_t) unit->trigger;
+        parity ^= xorred;
     }
     return parity;
 }
