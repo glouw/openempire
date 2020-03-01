@@ -288,7 +288,7 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     }
 }
 
-void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field) // XXX. NEEDS A FLAG TO IGNORE ITS FINAL CART GOAL INCASE OF ATTACKING ENEMY BUILDING.
 {
     if(!Unit_IsExempt(unit))
     {
