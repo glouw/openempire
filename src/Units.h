@@ -26,7 +26,7 @@ typedef struct
     int32_t count;
     int32_t max;
     int32_t size;
-    int32_t command_group_next;
+    int32_t command_group_next; // XXX. IS THIS OKAY NOT TO BE RESTORED? CAN BE INTERNALLY TRACKED PER CLIENT.
     int32_t select_count;
     int32_t cpu_count;
     int32_t repath_index;

@@ -193,8 +193,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         {
             units.command_group_next++;
             FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
-            const Parts parts = Parts_GetRedArrows();
-            units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+            units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, Parts_GetRedArrows(), false, TRIGGER_NONE);
         }
     }
     return units;
@@ -1104,11 +1103,11 @@ uint64_t Units_Xor(const Units units)
     {
         Unit* const unit = &units.unit[i];
         uint64_t xorred = Point_Flatten(unit->cell);
-        xorred ^= unit->id * (int32_t) unit->color;
-        xorred ^= unit->id * (int32_t) unit->dir;
-        xorred ^= unit->id * (int32_t) unit->state;
-        xorred ^= unit->id * (int32_t) unit->file;
-        xorred ^= unit->id * (int32_t) unit->trigger;
+        xorred ^= (uint64_t) unit->id * (uint64_t) unit->color;
+        xorred ^= (uint64_t) unit->id * (uint64_t) unit->dir;
+        xorred ^= (uint64_t) unit->id * (uint64_t) unit->state;
+        xorred ^= (uint64_t) unit->id * (uint64_t) unit->file;
+        xorred ^= (uint64_t) unit->id * (uint64_t) unit->trigger;
         parity ^= xorred;
     }
     return parity;
@@ -1233,6 +1232,7 @@ static Units UnpackRestore(Units units, const Restore restore)
     units.command_group_next++;
     units.count = restore.count;
     units.repath_index = 0;
+    Unit_SetIdNext(restore.id_next);
     for(int32_t i = 0; i < units.count; i++)
         units.unit[i]  = restore.unit[i];
     for(int32_t i = 0; i < COLOR_COUNT; i++)
@@ -1260,6 +1260,7 @@ Restore Units_PackRestore(const Units units, const int32_t cycles)
     restore.unit = units.unit;
     restore.count = units.count;
     restore.cycles = cycles;
+    restore.id_next = Unit_GetIdNext();
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         restore.stamp[i] = units.stamp[i];
     return restore;

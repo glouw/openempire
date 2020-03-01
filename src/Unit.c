@@ -7,6 +7,18 @@
 
 #define MOCK_PATH_POINTS (2)
 
+static int32_t id_next = 0;
+
+int32_t Unit_GetIdNext(void) // NOT IDEAL, BUT NEEDS TO BE RESTORED WHEN OUT OF SYNC.
+{
+    return id_next;
+}
+
+void Unit_SetIdNext(const int32_t id)
+{
+    id_next = id;
+}
+
 static void ConditionallySkipFirstPoint(Unit* const unit)
 {
     if(unit->path.count > 1 && unit->path_index == 0)
@@ -169,14 +181,13 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
 
 Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger trigger)
 {
-    static int32_t id;
     static Unit zero;
     Unit unit = zero;
     unit.trait = Trait_Build(file);
     unit.file = file;
-    unit.id = id;
+    unit.id = id_next;
     if(!is_floating)
-        id += 1;
+        id_next++;
     unit.parent_id = -1;
     unit.color = color;
     unit.state = STATE_IDLE;
