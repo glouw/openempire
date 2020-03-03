@@ -49,7 +49,7 @@ typedef struct Unit
     int32_t fall_frames_per_dir;
     int32_t decay_frames_per_dir;
     int32_t expire_frames;
-    bool is_engaged;
+    bool is_engaged_in_melee;
     bool is_selected;
     bool must_garbage_collect;
     bool is_state_locked;

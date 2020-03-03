@@ -114,7 +114,7 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     return tiles;
 }
 
-Tile Tiles_SelectOne(const Tiles tiles, const Point click)
+Tile Tiles_Get(const Tiles tiles, const Point click)
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
@@ -125,10 +125,7 @@ Tile Tiles_SelectOne(const Tiles tiles, const Point click)
             const Point origin_click = Point_Sub(click, rect.a);
             const uint32_t pixel = Surface_GetPixel(tile.surface, origin_click.x, origin_click.y);
             if(pixel != SURFACE_COLOR_KEY)
-            {
-                Tile_Select(tile);
                 return tile;
-            }
         }
     }
     static Tile zero;

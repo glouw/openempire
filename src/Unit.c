@@ -64,7 +64,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
     unit->velocity = Point_Div(Point_Add(velocity, unit->velocity), 2); // SMOOTHEN USING PREVIOUS AND NEW VELOCITY VECTORS.
     if(unit->state == STATE_ATTACK) // OVERRIDE AND SET TO ZERO IF ATTACKING.
         unit->velocity = zero;
-    if(unit->is_engaged)
+    if(unit->is_engaged_in_melee)
     {
         const Point cell = unit->interest->trait.is_inanimate
             ? unit->interest->cell_inanimate
@@ -288,14 +288,49 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     }
 }
 
-void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field) // XXX. NEEDS A FLAG TO IGNORE ITS FINAL CART GOAL INCASE OF ATTACKING ENEMY BUILDING.
+static Point GetNextBest(Unit* const unit, const Field field)
 {
+    static Point zero;
+    const Point dimensions = unit->interest->trait.dimensions;
+    int32_t min = INT32_MAX;
+    Point out = zero;
+    for(int32_t x = -1; x < dimensions.x + 1; x++)
+    for(int32_t y = -1; y < dimensions.y + 1; y++)
+    {
+        const Point shift = { x, y };
+        const Point cart = Point_Add(unit->interest->cart, shift);
+        const Point diff = Point_Sub(unit->cart, cart);
+        const int32_t mag = Point_Mag(diff);
+        const bool can_walk = Field_IsWalkable(field, cart);
+        if(can_walk && mag < min)
+        {
+            out = cart;
+            min = mag;
+        }
+    }
+    return out;
+}
+
+void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+{
+    static Point zero;
     if(!Unit_IsExempt(unit))
     {
+        if(unit->interest
+        && unit->interest->trait.is_inanimate)
+        {
+            // CANNOT PATH INTO A BLOCK CARTESIAN SPACE IF GOAL IS AN INANIMATE OBJECT.
+            // THIS WILL CHOOSE THE NEXT BEST CARTESIAN SPACE.
+            unit->cart_goal = GetNextBest(unit, field);
+            unit->cart_grid_offset_goal = zero;
+        }
+        else
+        {
+            unit->cart_goal = cart_goal;
+            unit->cart_grid_offset_goal = cart_grid_offset_goal;
+        }
         Unit_FreePath(unit);
-        unit->cart_goal = cart_goal;
-        unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->path = Field_PathAStar(field, unit->cart, cart_goal);
+        unit->path = Field_PathAStar(field, unit->cart, unit->cart_goal);
     }
 }
 

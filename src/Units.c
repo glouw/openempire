@@ -115,9 +115,12 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
             units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
-            const Tile tile = Tiles_SelectOne(tiles, overview.mouse_cursor);
-            if(tile.reference && tile.reference->is_selected)
+            const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
+            if(tile.reference)
+            {
+                Tile_Select(tile);
                 units.select_count = overview.event.key_left_ctrl ? Tiles_SelectSimilar(tiles, tile) : 1;
+            }
         }
         Tiles_Free(tiles);
     }
@@ -182,19 +185,38 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
     return units;
 }
 
-static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field)
+static void SetSelectedInterest(const Units units, Unit* const interest)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_selected)
+            unit->interest = interest;
+    }
+}
+
+static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
 {
     if(overview.event.mouse_ru && units.select_count > 0)
     {
-        const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-        const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
-        const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
-        if(CanWalk(units, map, cart_goal))
+        const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
+        const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
+        if(tile.reference)
         {
-            units.command_group_next++;
-            FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
-            units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, Parts_GetRedArrows(), false, TRIGGER_NONE);
+            SetSelectedInterest(units, tile.reference);
+            FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, field);
         }
+        else
+        {
+            const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+            const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
+            const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
+            const Parts parts = Parts_GetRedArrows();
+            FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
+            units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+        }
+        Tiles_Free(tiles);
+        units.command_group_next++;
     }
     return units;
 }
@@ -509,12 +531,12 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
             }
             else
                 Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
-            unit->is_engaged = true;
+            unit->is_engaged_in_melee = true;
             unit->interest = closest;
         }
         else
         {
-            unit->is_engaged = false;
+            unit->is_engaged_in_melee = false;
             unit->interest = NULL;
         }
     }
@@ -1081,7 +1103,7 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
     {
         const Window window = Window_Make(overview, grid);
         units = Select(units, overview, grid, graphics, window.units);
-        units = Command(units, overview, grid, graphics, map, field);
+        units = Command(units, overview, grid, graphics, map, field, window.units);
         units = SpawnUsingIcons(units, overview, grid, graphics, map);
         units = TriggerTriggers(units, overview, grid, graphics, map);
         Window_Free(window);

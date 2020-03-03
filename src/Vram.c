@@ -435,7 +435,10 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Point center = Tile_GetHotSpotCoords(tile);
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(tile.reference->is_selected)
-            DrawEllipse(vram, rect, tile.reference->is_engaged ? 0xFF0000 : 0xFFFFFF);
+        {
+            const uint32_t color = tile.reference->is_engaged_in_melee ? 0xFF0000 : 0xFFFFFF;
+            DrawEllipse(vram, rect, color);
+        }
     }
 }
 

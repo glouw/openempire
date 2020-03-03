@@ -23,7 +23,7 @@ void Field_Set(const Field field, const Point point, const char ch)
     field.object[point.x + point.y * field.size] = ch;
 }
 
-static bool IsWalkable(const Field field, const Point point)
+bool Field_IsWalkable(const Field field, const Point point)
 {
     return IsInBounds(field, point)
         && Field_Get(field, point) == FIELD_WALKABLE_SPACE;
@@ -82,9 +82,9 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
             const Point vert = { current.point.x + delta.x, current.point.y };
             const Point horz = { current.point.x, current.point.y + delta.y };
             const Point next = Point_Add(current.point, delta);
-            if(IsWalkable(field, next)
-            && IsWalkable(field, vert)
-            && IsWalkable(field, horz))
+            if(Field_IsWalkable(field, next)
+            && Field_IsWalkable(field, vert)
+            && Field_IsWalkable(field, horz))
             {
                 const int32_t cost = cost_so_far[next.x + next.y * field.size];
                 if(cost == -1 || new_cost < cost)

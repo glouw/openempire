@@ -22,3 +22,5 @@ void Field_Free(const Field);
 char Field_Get(const Field, const Point);
 
 void Field_Set(const Field, const Point, const char ch);
+
+bool Field_IsWalkable(const Field, const Point);
