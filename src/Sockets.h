@@ -27,3 +27,5 @@ Sockets Sockets_Accept(const Sockets);
 void Sockets_Ping(const Sockets);
 
 void Sockets_Reset(const Sockets, Cache* const);
+
+void Sockets_Setup(void);

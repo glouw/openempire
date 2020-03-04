@@ -126,6 +126,7 @@ static void Play(const Video video, const Data data, const Args args)
 
 static void RunClient(const Args args)
 {
+    Sock_Setup();
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
@@ -154,6 +155,7 @@ static int32_t RunServerPings(void* const data)
 
 static void RunServer(const Args args)
 {
+    Sockets_Setup();
     if(!args.measure)
         srand(time(NULL));
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.

@@ -4,18 +4,30 @@
 #include "Util.h"
 #include "Restore.h"
 
+#include <SDL2/SDL_mutex.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
 
+static SDL_mutex* mutex;
+
+void Sockets_Setup(void)
+{
+    mutex = SDL_CreateMutex();
+}
+
 Sockets Sockets_Init(const int32_t port)
 {
     static Sockets zero;
-    IPaddress ip;
-    const int32_t errors = SDLNet_ResolveHost(&ip, NULL, port);
-    if(errors == -1)
-        Util_Bomb("SERVER :: COULD NOT RESOLVE HOST\n");
     Sockets sockets = zero;
+    IPaddress ip;
+    if(SDL_LockMutex(mutex) == 0)
+    {
+        const int32_t errors = SDLNet_ResolveHost(&ip, NULL, port);
+        if(errors == -1)
+            Util_Bomb("SERVER :: COULD NOT RESOLVE HOST\n");
+        SDL_UnlockMutex(mutex);
+    }
     sockets.self = SDLNet_TCP_Open(&ip);
     if(sockets.self == NULL)
         Util_Bomb("SERVER :: COULD NOT OPEN SERVER SOCKET\n");
@@ -177,12 +189,17 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
     }
 }
 
-Sockets Sockets_Accept(const Sockets sockets)
+Sockets Sockets_Accept(Sockets sockets)
 {
-    const TCPsocket client = SDLNet_TCP_Accept(sockets.self);
-    return (client != NULL)
-        ? Add(sockets, client)
-        : sockets;
+    TCPsocket client = NULL;
+    if(SDL_LockMutex(mutex) == 0)
+    {
+        client = SDLNet_TCP_Accept(sockets.self);
+        SDL_UnlockMutex(mutex);
+    }
+    if(client)
+        sockets = Add(sockets, client);
+    return sockets;
 }
 
 void Sockets_Ping(const Sockets pingers)
