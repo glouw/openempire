@@ -204,6 +204,17 @@ static void SetSelectedInterest(const Units units, Unit* const interest)
     }
 }
 
+static void SetSelectedAttackMove(const Units units, const Overview overview)
+{
+    const bool using_attack_move = overview.event.key_left_shift && overview.event.key_a;
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_selected)
+            unit->using_attack_move = using_attack_move;
+    }
+}
+
 static void DisengageSelected(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -237,6 +248,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
             units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
         }
+        SetSelectedAttackMove(units, overview);
         Tiles_Free(tiles);
         units.command_group_next++;
     }
@@ -549,6 +561,7 @@ static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid gri
     else
         Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
     unit->is_engaged_in_melee = true;
+    Unit_SetInterest(unit, closest);
 }
 
 static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
