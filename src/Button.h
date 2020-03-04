@@ -15,6 +15,7 @@ typedef struct
         IconBuild icon_build;
         IconUnit icon_unit;
         IconTech icon_tech;
+        IconCommand icon_command;
     };
     Trigger trigger;
 }
@@ -27,3 +28,5 @@ const char* Button_GetHotkeys(void);
 int32_t Button_GetHotkeysLen(void);
 
 Button Button_Upgrade(Button, const Bits);
+
+bool Button_UseAttackMove(const Button);

@@ -185,15 +185,6 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
     return units;
 }
 
-void Unit_SetInterest(Unit* const unit, Unit* const interest)
-{
-    unit->interest = interest;
-    if(interest)
-        unit->interest_id = interest->id;
-    else
-        unit->interest_id = -1;
-}
-
 static void SetSelectedInterest(const Units units, Unit* const interest)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -204,9 +195,8 @@ static void SetSelectedInterest(const Units units, Unit* const interest)
     }
 }
 
-static void SetSelectedAttackMove(const Units units, const Overview overview)
+static void SetSelectedAttackMove(const Units units, const bool using_attack_move)
 {
-    const bool using_attack_move = overview.event.key_left_shift && overview.event.key_a;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -227,31 +217,33 @@ static void DisengageSelected(const Units units)
 
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
 {
-    if(overview.event.mouse_ru && units.select_count > 0)
-    {
-        const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
-        const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
-        if(tile.reference
-        && tile.reference->color != overview.color)
+    const bool using_attack_move = Button_UseAttackMove(Button_FromOverview(overview));
+    if(units.select_count > 0)
+        if(overview.event.mouse_ru || using_attack_move)
         {
-            SetSelectedInterest(units, tile.reference);
-            FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, field);
+            const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
+            const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
+            if(tile.reference
+            && tile.reference->color != overview.color)
+            {
+                SetSelectedInterest(units, tile.reference);
+                FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, field);
+            }
+            else
+            {
+                SetSelectedInterest(units, NULL);
+                DisengageSelected(units);
+                const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+                const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
+                const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
+                const Parts parts = Parts_GetRedArrows();
+                FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
+                units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+            }
+            SetSelectedAttackMove(units, using_attack_move);
+            Tiles_Free(tiles);
+            units.command_group_next++;
         }
-        else
-        {
-            SetSelectedInterest(units, NULL);
-            DisengageSelected(units);
-            const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-            const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
-            const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
-            const Parts parts = Parts_GetRedArrows();
-            FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
-            units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
-        }
-        SetSelectedAttackMove(units, overview);
-        Tiles_Free(tiles);
-        units.command_group_next++;
-    }
     return units;
 }
 

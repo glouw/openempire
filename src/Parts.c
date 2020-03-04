@@ -357,6 +357,8 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
 {
     switch(button.icon_type)
     {
+    case ICONTYPE_COMMAND: // NO PARTS FOR BASIC UNIT COMMANDS
+        break;
     case ICONTYPE_BUILD:
         switch(button.icon_build)
         {

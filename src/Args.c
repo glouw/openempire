@@ -2,12 +2,6 @@
 
 #include "Util.h"
 
-static bool Check(const char* const arg, const char* const hyphen, const char* const full)
-{
-    return Util_StringEqual(arg, full)
-        || Util_StringEqual(arg, hyphen);
-}
-
 Args Args_Parse(const int32_t argc, const char* argv[])
 {
     static Args zero;
@@ -26,19 +20,19 @@ Args Args_Parse(const int32_t argc, const char* argv[])
     {
         const char* const arg = argv[i];
         const char* const next = argv[i + 1];
-        if(Check(arg, "-c",   "--color"   )) args.color = (Color) atoi(next);
-        if(Check(arg, "-p",   "--path"    )) args.path = next;
-        if(Check(arg, "-s",   "--server"  )) args.is_server = true;
-        if(Check(arg, "-x",   "--xres"    )) args.xres = atoi(next);
-        if(Check(arg, "-y",   "--yres"    )) args.yres = atoi(next);
-        if(Check(arg, "-u",   "--users"   )) args.users = atoi(next);
-        if(Check(arg, "-q",   "--quiet"   )) args.quiet = true;
-        if(Check(arg, "-v",   "--civ"     )) args.civ = (Civ) atoi(next);
-        if(Check(arg, "-d",   "--demo"    )) args.demo = true;
-        if(Check(arg, "-pp",  "--power"   )) args.map_power = atoi(next);
-        if(Check(arg, "-h",   "--host"    )) args.host = next;
-        if(Check(arg, "-ppp", "--port"    )) args.port = atoi(next);
-        if(Check(arg, "-m",   "--measure" )) args.measure = true;
+        if(Util_StringEqual(arg, "--color"  )) args.color = (Color) atoi(next);
+        if(Util_StringEqual(arg, "--path"   )) args.path = next;
+        if(Util_StringEqual(arg, "--server" )) args.is_server = true;
+        if(Util_StringEqual(arg, "--xres"   )) args.xres = atoi(next);
+        if(Util_StringEqual(arg, "--yres"   )) args.yres = atoi(next);
+        if(Util_StringEqual(arg, "--users"  )) args.users = atoi(next);
+        if(Util_StringEqual(arg, "--quiet"  )) args.quiet = true;
+        if(Util_StringEqual(arg, "--civ"    )) args.civ = (Civ) atoi(next);
+        if(Util_StringEqual(arg, "--demo"   )) args.demo = true;
+        if(Util_StringEqual(arg, "--power"  )) args.map_power = atoi(next);
+        if(Util_StringEqual(arg, "--host"   )) args.host = next;
+        if(Util_StringEqual(arg, "--port"   )) args.port = atoi(next);
+        if(Util_StringEqual(arg, "--measure")) args.measure = true;
     }
     args.port_ping = args.port + 1;
     args.port_reset = args.port + 2;

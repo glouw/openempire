@@ -545,3 +545,12 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     to->dir = from->dir;
     to->health = from->health;
 }
+
+void Unit_SetInterest(Unit* const unit, Unit* const interest)
+{
+    unit->interest = interest;
+    if(interest)
+        unit->interest_id = interest->id;
+    else
+        unit->interest_id = -1;
+}

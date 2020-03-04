@@ -27,6 +27,9 @@
     { ICONTYPE_UNIT, { ICONUNIT_FEMALE_VILLAGER }, TRIGGER_NONE     }, \
     { ICONTYPE_TECH, { ICONTECH_AGE_2           }, TRIGGER_AGE_UP_2 }
 
+#define COMMAND_AGE_1 \
+    { ICONTYPE_COMMAND, { ICONCOMMAND_ATTACK_MOVE }, TRIGGER_NONE }
+
 static const Button build_age1[] = { BUILD_AGE_1 };
 static const Button build_age2[] = { BUILD_AGE_1 };
 static const Button build_age3[] = { BUILD_AGE_1, BUILD_AGE_3 };
@@ -108,6 +111,33 @@ static int32_t GetTownCenterLen(const Age age)
     return lens[age];
 }
 
+static const Button command_age1[] = { COMMAND_AGE_1 };
+static const Button command_age2[] = { COMMAND_AGE_1 };
+static const Button command_age3[] = { COMMAND_AGE_1 };
+static const Button command_age4[] = { COMMAND_AGE_1 };
+
+static const Button* GetCommand(const Age age)
+{
+    const Button* ages[] = {
+        command_age1,
+        command_age2,
+        command_age3,
+        command_age4,
+    };
+    return ages[age];
+}
+
+static int32_t GetCommandLen(const Age age)
+{
+    const int32_t lens[] = {
+        UTIL_LEN(command_age1),
+        UTIL_LEN(command_age2),
+        UTIL_LEN(command_age3),
+        UTIL_LEN(command_age4),
+    };
+    return lens[age];
+}
+
 Buttons Buttons_FromMotive(const Motive motive, const Age age)
 {
     static Buttons zero;
@@ -119,6 +149,21 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
     case ACTION_BUILD:
         buttons.button = GetBuilding(age);
         buttons.count = GetBuildingLen(age);
+        break;
+    case ACTION_COMMAND:
+        switch(motive.type)
+        {
+        case TYPE_MILITIA:
+        case TYPE_MAN_AT_ARMS:
+        case TYPE_LONG_SWORDSMAN:
+        case TYPE_TWO_HANDED_SWORDSMAN:
+        case TYPE_CHAMPION:
+            buttons.button = GetCommand(age);
+            buttons.count = GetCommandLen(age);
+            break;
+        default:
+            break;
+        }
         break;
     case ACTION_UNIT_TECH:
         switch(motive.type)

@@ -436,7 +436,14 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(tile.reference->is_selected)
         {
-            const uint32_t color = tile.reference->is_engaged_in_melee ? 0xFF0000 : 0xFFFFFF;
+            const uint32_t color = tile.reference->is_engaged_in_melee
+                // RED.
+                ? 0xFF0000
+                : tile.reference->using_attack_move
+                    // YELLOW.
+                    ? 0xFFFF00
+                    // WHITE (DEFAULT).
+                    : 0xFFFFFF;
             DrawEllipse(vram, rect, color);
         }
     }
@@ -533,9 +540,10 @@ static inline Pack GetPackFromMotive(const Registrar interfac, const Motive moti
     static Pack zero;
     Pack pack = zero;
     pack.buttons = Buttons_FromMotive(motive, age);
-    pack.animation[ICONTYPE_BUILD] = base[FILE_INTERFAC_BUILDING_ICONS];
-    pack.animation[ICONTYPE_UNIT]  = base[FILE_INTERFAC_UNIT_ICONS];
-    pack.animation[ICONTYPE_TECH]  = base[FILE_INTERFAC_TECH_ICONS];
+    pack.animation[ICONTYPE_BUILD]   = base[FILE_INTERFAC_BUILDING_ICONS];
+    pack.animation[ICONTYPE_UNIT]    = base[FILE_INTERFAC_UNIT_ICONS];
+    pack.animation[ICONTYPE_TECH]    = base[FILE_INTERFAC_TECH_ICONS];
+    pack.animation[ICONTYPE_COMMAND] = base[FILE_INTERFAC_COMMAND_ICONS];
     return pack;
 }
 

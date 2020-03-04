@@ -92,6 +92,8 @@ Button Button_Upgrade(Button button, const Bits bits)
 {
     switch(button.icon_type)
     {
+    case ICONTYPE_COMMAND:
+        break; // NO UPGRADES FOR BASIC UNIT COMMANDS.
     case ICONTYPE_TECH:
         if(button.index == ICONTECH_AGE_2)
         {
@@ -129,4 +131,10 @@ Button Button_Upgrade(Button button, const Bits bits)
         break;
     }
     return button;
+}
+
+bool Button_UseAttackMove(const Button button)
+{
+    return button.icon_type    == ICONTYPE_COMMAND
+        && button.icon_command == ICONCOMMAND_ATTACK_MOVE;
 }

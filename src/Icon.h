@@ -45,10 +45,17 @@ IconUnit;
 
 typedef enum
 {
+    ICONCOMMAND_ATTACK_MOVE = 6,
+}
+IconCommand;
+
+typedef enum
+{
     ICONTYPE_NONE,
     ICONTYPE_BUILD,
     ICONTYPE_TECH,
     ICONTYPE_UNIT,
+    ICONTYPE_COMMAND,
     ICONTYPE_COUNT,
 }
 IconType;
