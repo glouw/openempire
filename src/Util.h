@@ -10,7 +10,9 @@
 
 #define UTIL_TCP_RECV(socket, pointer) SDLNet_TCP_Recv(socket, pointer, sizeof(*pointer))
 
-#define UTIL_SORT(pointer, count, comparator) (qsort(pointer, count, sizeof(*(pointer)), comparator))
+#define UTIL_SORT(pointer, count, comparator) (qsort(pointer, count, sizeof(*pointer), comparator))
+
+#define UTIL_SEARCH(key, pointer, count, comparator) (bsearch(key, pointer, count, sizeof(*pointer), comparator))
 
 #define UTIL_ALLOC(type, count) (type*) calloc(count, sizeof(type))
 

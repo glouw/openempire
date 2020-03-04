@@ -792,7 +792,7 @@ static void ResetInterests(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const a = &units.unit[i];
-        Unit* const b = bsearch(a, units.unit, units.count, sizeof(*a), MatchInterestId);
+        Unit* const b = UTIL_SEARCH(a, units.unit, units.count, MatchInterestId);
         if(b)
             a->interest = b;
     }
