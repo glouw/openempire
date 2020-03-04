@@ -21,12 +21,12 @@ Sockets Sockets_Init(const int32_t port)
     static Sockets zero;
     Sockets sockets = zero;
     IPaddress ip;
-    if(SDL_LockMutex(mutex) == 0)
+    if(UTIL_LOCK(mutex))
     {
         const int32_t errors = SDLNet_ResolveHost(&ip, NULL, port);
         if(errors == -1)
             Util_Bomb("SERVER :: COULD NOT RESOLVE HOST\n");
-        SDL_UnlockMutex(mutex);
+        UTIL_UNLOCK(mutex);
     }
     sockets.self = SDLNet_TCP_Open(&ip);
     if(sockets.self == NULL)
@@ -192,10 +192,10 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
 Sockets Sockets_Accept(Sockets sockets)
 {
     TCPsocket client = NULL;
-    if(SDL_LockMutex(mutex) == 0)
+    if(UTIL_LOCK(mutex))
     {
         client = SDLNet_TCP_Accept(sockets.self);
-        SDL_UnlockMutex(mutex);
+        UTIL_UNLOCK(mutex);
     }
     if(client)
         sockets = Add(sockets, client);

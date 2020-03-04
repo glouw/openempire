@@ -5,6 +5,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_mutex.h>
+
+#define UTIL_LOCK(mutex) (SDL_LockMutex(mutex) == 0)
+
+#define UTIL_UNLOCK(mutex) (SDL_UnlockMutex(mutex))
 
 #define UTIL_TCP_SEND(socket, pointer) SDLNet_TCP_Send(socket, pointer, sizeof(*pointer))
 

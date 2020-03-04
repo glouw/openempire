@@ -16,12 +16,12 @@ Sock Sock_Connect(const char* const host, const int32_t port)
     static Sock zero;
     Sock sock = zero;
     IPaddress ip;
-    if(SDL_LockMutex(mutex) == 0)
+    if(UTIL_LOCK(mutex))
     {
         const int32_t errors = SDLNet_ResolveHost(&ip, host, port);
         if(errors == -1)
             Util_Bomb("CLIENT :: COULD NOT RESOLVE HOST\n");
-        SDL_UnlockMutex(mutex);
+        UTIL_UNLOCK(mutex);
     }
     sock.server = SDLNet_TCP_Open(&ip);
     if(sock.server == NULL)

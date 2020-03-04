@@ -13,20 +13,20 @@ static int32_t ping;
 
 static void Set(const int32_t dt)
 {
-    if(SDL_TryLockMutex(mutex) == 0)
+    if(UTIL_LOCK(mutex))
     {
         ping = dt;
-        SDL_UnlockMutex(mutex);
+        UTIL_UNLOCK(mutex);
     }
 }
 
 int32_t Ping_Get(void)
 {
     int32_t out = -1;
-    if(SDL_TryLockMutex(mutex) == 0)
+    if(UTIL_LOCK(mutex))
     {
         out = ping;
-        SDL_UnlockMutex(mutex);
+        UTIL_UNLOCK(mutex);
     }
     return out;
 }
