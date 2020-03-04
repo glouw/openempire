@@ -185,13 +185,32 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
     return units;
 }
 
+void Unit_SetInterest(Unit* const unit, Unit* const interest)
+{
+    unit->interest = interest;
+    if(interest)
+        unit->interest_id = interest->id;
+    else
+        unit->interest_id = -1;
+}
+
 static void SetSelectedInterest(const Units units, Unit* const interest)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->is_selected)
-            unit->interest = interest;
+            Unit_SetInterest(unit, interest);
+    }
+}
+
+static void DisengageSelected(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_selected)
+            unit->is_engaged_in_melee = false;
     }
 }
 
@@ -201,13 +220,16 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
         const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
-        if(tile.reference)
+        if(tile.reference
+        && tile.reference->color != overview.color)
         {
             SetSelectedInterest(units, tile.reference);
             FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, field);
         }
         else
         {
+            SetSelectedInterest(units, NULL);
+            DisengageSelected(units);
             const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
             const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
             const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
@@ -516,28 +538,31 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
     return closest;
 }
 
-static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
+static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid grid)
 {
     static Point zero;
+    if(closest->trait.is_inanimate)
+    {
+        const Point cart = Grid_CellToCart(grid, closest->cell_inanimate);
+        Unit_MockPath(unit, cart, zero);
+    }
+    else
+        Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
+    unit->is_engaged_in_melee = true;
+}
+
+static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
+{
     if(!Unit_IsExempt(unit))
     {
         Unit* const closest = GetClosestBoid(units, unit, grid);
-        if(closest != NULL)
+        if(closest)
         {
-            if(closest->trait.is_inanimate)
-            {
-                const Point cart = Grid_CellToCart(grid, closest->cell_inanimate);
-                Unit_MockPath(unit, cart, zero);
-            }
+            if(unit->using_attack_move)
+                EngageWithMock(unit, closest, grid);
             else
-                Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
-            unit->is_engaged_in_melee = true;
-            unit->interest = closest;
-        }
-        else
-        {
-            unit->is_engaged_in_melee = false;
-            unit->interest = NULL;
+            if(unit->interest == closest)
+                EngageWithMock(unit, closest, grid);
         }
     }
 }
@@ -546,6 +571,16 @@ static void EngageAllBoids(const Units units, const Grid grid)
 {
     for(int32_t i = 0; i < units.count; i++)
         EngageBoids(units, &units.unit[i], grid);
+}
+
+static void DisengageAllBoids(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        unit->interest = NULL;
+        unit->is_engaged_in_melee = false;
+    }
 }
 
 // DOES NOT NEED TO BE THREADED -
@@ -704,6 +739,23 @@ static void SortGarbage(const Units units)
     UTIL_SORT(units.unit, units.count, CompareGarbage);
 }
 
+static void ResetInterests(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const a = &units.unit[i];
+        for(int32_t j = 0; j < units.count; j++)
+        {
+            Unit* const b = &units.unit[j]; // XXX. COULD FINISH SORT BY INTEREST_ID AND DO BSEARCH INSTEAD?
+            if(a->interest_id == b->id)
+            {
+                a->interest = b;
+                break;
+            }
+        }
+    }
+}
+
 static void FlagGarbage(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -737,11 +789,13 @@ static Units Resize(Units units)
     return units;
 }
 
-static Units RemoveGarbage(const Units units)
+static Units RemoveGarbage(Units units)
 {
     FlagGarbage(units);
     SortGarbage(units);
-    return Resize(units);
+    units = Resize(units);
+    ResetInterests(units);
+    return units;
 }
 
 static void UpdateEntropy(const Units units)
@@ -1270,6 +1324,7 @@ Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, co
     // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED,
     // SO THAT IS DONE FIRST.
     ManageStacks(units);
+    DisengageAllBoids(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, field);
     return RecountSelected(units);

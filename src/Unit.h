@@ -15,7 +15,7 @@
 
 typedef struct Unit
 {
-    struct Unit* interest; // XXX. THIS CANNOT BE A POINTER. MUST TRACK INTEGER INDEX AND LOOKUP UNIT.
+    struct Unit* interest;
     Trait trait;
     Point cart;
     Point cart_grid_offset;
@@ -34,6 +34,7 @@ typedef struct Unit
     State state;
     Graphics file;
     Trigger trigger;
+    int32_t interest_id;
     int32_t entropy_static;
     int32_t id;
     int32_t parent_id;
@@ -61,6 +62,7 @@ typedef struct Unit
     bool is_triggered;
     bool must_skip_debris;
     bool must_repath_with_recover;
+    bool using_attack_move;
 }
 Unit;
 
