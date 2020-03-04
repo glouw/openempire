@@ -733,35 +733,6 @@ static void Decay(const Units units)
     }
 }
 
-static int32_t CompareGarbage(const void* a, const void* b)
-{
-    Unit* const aa = (Unit*) a;
-    Unit* const bb = (Unit*) b;
-    return aa->must_garbage_collect > bb->must_garbage_collect;
-}
-
-static void SortGarbage(const Units units)
-{
-    UTIL_SORT(units.unit, units.count, CompareGarbage);
-}
-
-static void ResetInterests(const Units units)
-{
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const a = &units.unit[i];
-        for(int32_t j = 0; j < units.count; j++)
-        {
-            Unit* const b = &units.unit[j]; // XXX. COULD FINISH SORT BY INTEREST_ID AND DO BSEARCH INSTEAD?
-            if(a->interest_id == b->id)
-            {
-                a->interest = b;
-                break;
-            }
-        }
-    }
-}
-
 static void FlagGarbage(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -795,11 +766,44 @@ static Units Resize(Units units)
     return units;
 }
 
+static int32_t CompareByGarbage(const void* a, const void* b)
+{
+    Unit* const aa = (Unit*) a;
+    Unit* const bb = (Unit*) b;
+    return aa->must_garbage_collect > bb->must_garbage_collect;
+}
+
+static int32_t CompareById(const void* a, const void* b)
+{
+    Unit* const aa = (Unit*) a;
+    Unit* const bb = (Unit*) b;
+    return aa->id > bb->id;
+}
+
+static int32_t MatchInterestId(const void* a, const void* b)
+{
+    Unit* const aa = (Unit*) a;
+    Unit* const bb = (Unit*) b;
+    return (aa->interest_id == bb->id) == 0;
+}
+
+static void ResetInterests(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const a = &units.unit[i];
+        Unit* const b = bsearch(a, units.unit, units.count, sizeof(*a), MatchInterestId);
+        if(b)
+            a->interest = b;
+    }
+}
+
 static Units RemoveGarbage(Units units)
 {
     FlagGarbage(units);
-    SortGarbage(units);
+    UTIL_SORT(units.unit, units.count, CompareByGarbage);
     units = Resize(units);
+    UTIL_SORT(units.unit, units.count, CompareById);
     ResetInterests(units);
     return units;
 }
