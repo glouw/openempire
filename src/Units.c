@@ -1188,12 +1188,8 @@ uint64_t Units_Xor(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        uint64_t xorred = Point_Flatten(unit->cell);
-        xorred ^= (uint64_t) unit->id * (uint64_t) unit->color;
-        xorred ^= (uint64_t) unit->id * (uint64_t) unit->dir;
-        xorred ^= (uint64_t) unit->id * (uint64_t) unit->state;
-        xorred ^= (uint64_t) unit->id * (uint64_t) unit->file;
-        xorred ^= (uint64_t) unit->id * (uint64_t) unit->trigger;
+        const uint64_t flat = Point_Flatten(unit->cell);
+        const uint64_t xorred = flat + unit->id + unit->file + unit->health;
         parity ^= xorred;
     }
     return parity;
