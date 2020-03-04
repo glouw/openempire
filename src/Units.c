@@ -226,13 +226,14 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             if(tile.reference
             && tile.reference->color != overview.color)
             {
+                DisengageSelected(units);
                 SetSelectedInterest(units, tile.reference);
                 FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, field);
             }
             else
             {
-                SetSelectedInterest(units, NULL);
                 DisengageSelected(units);
+                SetSelectedInterest(units, NULL);
                 const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
                 const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
                 const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
