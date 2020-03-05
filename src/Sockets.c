@@ -23,9 +23,7 @@ Sockets Sockets_Init(const int32_t port)
     IPaddress ip;
     if(UTIL_LOCK(mutex))
     {
-        const int32_t errors = SDLNet_ResolveHost(&ip, NULL, port);
-        if(errors == -1)
-            Util_Bomb("SERVER :: COULD NOT RESOLVE HOST\n");
+        SDLNet_ResolveHost(&ip, NULL, port);
         UTIL_UNLOCK(mutex);
     }
     sockets.self = SDLNet_TCP_Open(&ip);

@@ -10,6 +10,7 @@
 #include "Args.h"
 #include "Util.h"
 
+#include <signal.h>
 #include <time.h>
 #include <assert.h>
 
@@ -181,6 +182,7 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
+    signal(SIGSEGV, Util_PrintTrace);
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server

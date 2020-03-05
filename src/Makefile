@@ -73,6 +73,8 @@ CPP = 0
 
 DUMP=objdump
 
+DEBUGGING = 0
+
 SANITIZE_ADDRESS = 0
 
 SANITIZE_THREAD = 0
@@ -82,6 +84,10 @@ SANITIZE_UNDEFINED = 0
 FLAGS = -O3 -march=native -flto
 
 DEBUG = -Og -g
+
+ifeq (1, $(DEBUGGING))
+FLAGS = $(DEBUG)
+endif
 
 ifeq (1, $(SANITIZE_ADDRESS))
 FLAGS = $(DEBUG) -fsanitize=address

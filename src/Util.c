@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <execinfo.h>
 
 void Util_Bomb(const char* const message, ...)
 {
@@ -74,4 +75,16 @@ uint16_t Util_Rand(void)
 bool Util_FlipCoin(void)
 {
     return Util_Rand() % 2;
+}
+
+void Util_PrintTrace(int32_t sig)
+{
+    (void) sig;
+    void* array[10];
+    const int32_t size = backtrace (array, 10);
+    char** strings = backtrace_symbols(array, size);
+    printf("Obtained %d stack frames.\n", size);
+    for(int32_t i = 0; i < size; i++)
+        printf("%s\n", strings[i]);
+    free(strings);
 }

@@ -18,9 +18,7 @@ Sock Sock_Connect(const char* const host, const int32_t port)
     IPaddress ip;
     if(UTIL_LOCK(mutex))
     {
-        const int32_t errors = SDLNet_ResolveHost(&ip, host, port);
-        if(errors == -1)
-            Util_Bomb("CLIENT :: COULD NOT RESOLVE HOST\n");
+        SDLNet_ResolveHost(&ip, host, port);
         UTIL_UNLOCK(mutex);
     }
     sock.server = SDLNet_TCP_Open(&ip);

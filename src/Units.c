@@ -1277,10 +1277,9 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         const Parts towncenter = Parts_FromButton(button, age, civ);
         const int32_t index = (i * points.count) / users;
         const Point slot = points.point[index];
-        const Point fixed = Map_GetFixedSlot(map, slot);
-        units = SpawnParts(units, fixed, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
-        units = GenerateVillagers(units, map, grid, graphics, fixed, color);
-        units = GenerateStartingTrees(units, map, grid, graphics, fixed);
+        units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
+        units = GenerateVillagers(units, map, grid, graphics, slot, color);
+        units = GenerateStartingTrees(units, map, grid, graphics, slot);
         Parts_Free(towncenter);
     }
     Points_Free(points);

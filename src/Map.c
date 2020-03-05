@@ -9,142 +9,6 @@
 #include <limits.h>
 #include <stdio.h>
 
-static void Interpolate(const Map map, const Rect rect)
-{
-    for(int32_t x = rect.a.x; x < rect.b.x; x++)
-    for(int32_t y = rect.a.y; y < rect.b.y; y++)
-        map.height[y + map.size * x] = (
-            map.height[rect.a.y + map.size * rect.a.x] * (rect.b.x - x) * (rect.b.y - y) +
-            map.height[rect.a.y + map.size * rect.b.x] * (x - rect.a.x) * (rect.b.y - y) +
-            map.height[rect.b.y + map.size * rect.a.x] * (rect.b.x - x) * (y - rect.a.y) +
-            map.height[rect.b.y + map.size * rect.b.x] * (x - rect.a.x) * (y - rect.a.y)
-        ) / ((rect.b.x - rect.a.x) * (rect.b.y - rect.a.y));
-}
-
-static void GenerateHeight(const Map map, const int32_t square)
-{
-    if(square == 2)
-        return;
-    const int32_t m = (square - 1) / 2;
-    for(int32_t x = m; x < map.size; x += 2 * m)
-    for(int32_t y = m; y < map.size; y += 2 * m)
-        map.height[x + map.size * y] += Util_Rand() % (2 * square + 1) - square;
-    for(int32_t x = 0; x < map.size - 1; x += m)
-    for(int32_t y = 0; y < map.size - 1; y += m)
-    {
-        const Rect rect = {
-            { x + 0, y + 0 },
-            { x + m, y + m },
-        };
-        Interpolate(map, rect);
-    }
-    GenerateHeight(map, m + 1);
-}
-
-static int32_t Max(const Map map)
-{
-    int32_t max = INT_MIN;
-    for(int32_t x = 0; x < map.size; x++)
-    for(int32_t y = 0; y < map.size; y++)
-    {
-        const int32_t height = map.height[y + map.size * x];
-        if(height > max)
-            max = height;
-    }
-    return max;
-}
-
-static int32_t Min(const Map map)
-{
-    int32_t min = INT_MAX;
-    for(int32_t x = 0; x < map.size; x++)
-    for(int32_t y = 0; y < map.size; y++)
-    {
-        const int32_t height = map.height[y + map.size * x];
-        if(height < min)
-            min = height;
-    }
-    return min;
-}
-
-static void Add(const Map map, const int32_t shift)
-{
-    for(int32_t x = 0; x < map.size; x++)
-    for(int32_t y = 0; y < map.size; y++)
-        map.height[y + map.size * x] += shift;
-}
-
-static void NormalizeHeight(const Map map)
-{
-    const int32_t min = Min(map);
-    const int32_t shift = abs(min);
-    Add(map, shift);
-    const int32_t max = Max(map);
-    for(int32_t x = 0; x < map.size; x++)
-    for(int32_t y = 0; y < map.size; y++)
-    {
-        int32_t* const height = &map.height[y + map.size * x];
-        *height = (*height * MAP_HEIGHT_MAX) / max;
-    }
-}
-
-static void Trim(const Map map, const Terrain inner, const Terrain outer)
-{
-    const int32_t trims = 10;
-    for(int32_t trim = 0; trim < trims; trim++)
-    {
-        Points edges = Points_New(32);
-        for(int32_t x = 1; x < map.size - 1; x++)
-        for(int32_t y = 1; y < map.size - 1; y++)
-        {
-            const Point point = { x, y };
-            if(Map_GetTerrainFile(map, point) == inner)
-            {
-                const Point points[] = {
-                    { x + 1, y + 0 },
-                    { x + 1, y + 1 },
-                    { x + 0, y + 1 },
-                    { x - 1, y - 1 },
-                    { x - 1, y + 0 },
-                    { x - 1, y - 1 },
-                    { x + 0, y - 1 },
-                    { x + 1, y - 1 },
-                };
-                int32_t count = 0;
-                for(int32_t i = 0; i < UTIL_LEN(points); i++)
-                    if(Map_GetTerrainFile(map, points[i]) == outer)
-                        count++;
-                if(count >= 5)
-                    edges = Points_Append(edges, point);
-            }
-        }
-        for(int32_t i = 0; i < edges.count; i++)
-            Map_SetTerrainFile(map, edges.point[i], outer);
-        Points_Free(edges);
-    }
-}
-
-static Terrain GetTerrainFromHeight(const int32_t height)
-{
-    if(height < MAP_HEIGHT_WATER_DEEP)    return FILE_TERRAIN_WATER_DEEP;
-    if(height < MAP_HEIGHT_WATER_NORMAL)  return FILE_TERRAIN_WATER_NORMAL;
-    if(height < MAP_HEIGHT_WATER_SHALLOW) return FILE_TERRAIN_WATER_SHALLOW;
-    if(height < MAP_HEIGHT_BEACH_SAND)    return FILE_TERRAIN_BEACH_SAND;
-    return FILE_TERRAIN_GRASS_A;
-}
-
-static void Create(const Map map)
-{
-    for(int32_t y = 0; y < map.size; y++)
-    for(int32_t x = 0; x < map.size; x++)
-    {
-        const Point point = { x, y };
-        const int32_t height = map.height[x + map.size * y];
-        const Terrain file = GetTerrainFromHeight(height);
-        Map_SetTerrainFile(map, point, file);
-    }
-}
-
 static Map PopulateMiniMapColors(Map map, const Registrar terrain)
 {
     for(int32_t i = 0; i < TERRAIN_COUNT; i++)
@@ -174,6 +38,22 @@ static Map PopulateMiniMapColors(Map map, const Registrar terrain)
     return map;
 }
 
+static void SprinkleGrass(const Map map)
+{
+    for(int32_t x = 0; x < map.size; x++)
+    for(int32_t y = 0; y < map.size; y++)
+    {
+        if(Util_FlipCoin()
+        && Util_FlipCoin()
+        && Util_FlipCoin())
+        {
+            const Point point = { x, y };
+            Map_SetTerrainFile(map, point, FILE_TERRAIN_GRASS_A);
+        }
+    }
+
+}
+
 Map Map_Make(const int32_t power, const Registrar terrain)
 {
     const Frame frame = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT].frame[0];
@@ -183,7 +63,6 @@ Map Map_Make(const int32_t power, const Registrar terrain)
     Map map = zero;
     map.size = size;
     map.file = UTIL_ALLOC(Terrain, area);
-    map.height = UTIL_ALLOC(int32_t, area);
     map.tile_width = frame.width;
     map.tile_height = frame.height;
     const Point middle = {
@@ -191,13 +70,8 @@ Map Map_Make(const int32_t power, const Registrar terrain)
         map.size / 2,
     };
     map.middle = middle;
-    map = PopulateMiniMapColors(map, terrain);
-    GenerateHeight(map, map.size);
-    NormalizeHeight(map);
-    Create(map);
-    Trim(map, FILE_TERRAIN_WATER_SHALLOW, FILE_TERRAIN_BEACH_SAND);
-    Trim(map, FILE_TERRAIN_WATER_NORMAL, FILE_TERRAIN_BEACH_SAND);
-    return map;
+    SprinkleGrass(map);
+    return PopulateMiniMapColors(map, terrain);
 }
 
 static bool InBounds(const Map map, const Point point)
@@ -223,7 +97,6 @@ void Map_SetTerrainFile(const Map map, const Point point, const Terrain file)
 void Map_Free(const Map map)
 {
     free(map.file);
-    free(map.height);
 }
 
 Points Map_GetBlendBox(const Map map, const Point inner)
@@ -292,31 +165,4 @@ Points Map_GetSlots(const Map map)
     for(int32_t i = 0; i < size; i++)
         points = Points_Append(points, slots[i]);
     return points;
-}
-
-static bool IsAreaClear(const Map map, const Point point, const int32_t width)
-{
-    for(int32_t x = -width; x < width; x++)
-    for(int32_t y = -width; y < width; y++)
-    {
-        const Point shift = { x, y };
-        const Point cart = Point_Add(point, shift);
-        const Terrain terrain = Map_GetTerrainFile(map, cart);
-        const bool none = terrain == FILE_TERRAIN_NONE;
-        if(none || !Terrain_IsWalkable(terrain)) // WATER OR SOMETHING LIKE THAT.
-            return false;
-    }
-    return true;
-}
-
-Point Map_GetFixedSlot(const Map map, const Point slot)
-{
-    const int32_t step_size = 5;
-    const Point dir = Point_Sub(map.middle, slot);
-    const Point step = Point_Normalize(dir, step_size);
-    const int32_t width = CONFIG_UNITS_STARTING_AREA_TILE_SPACE;
-    Point fixed = slot;
-    while(!IsAreaClear(map, fixed, width))
-        fixed = Point_Add(fixed, step);
-    return fixed;
 }
