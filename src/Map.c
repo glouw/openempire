@@ -63,10 +63,9 @@ static void SprinkleGrass(const Map map)
     }
 }
 
-Map Map_Make(const int32_t power, const Registrar terrain)
+Map Map_Make(const int32_t size, const Registrar terrain)
 {
     const Frame frame = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT].frame[0];
-    const int32_t size = Util_Pow(2, power) + 1;
     const int32_t area = size * size;
     static Map zero;
     Map map = zero;

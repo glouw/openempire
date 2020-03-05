@@ -128,7 +128,7 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
     base.users_connected = cache->users_connected;
     base.users = cache->users;
     base.seed = cache->seed;
-    base.map_power = cache->map_power;
+    base.map_size = cache->map_size;
     if(!cache->is_stable)
         base = Packet_ZeroOverviews(base);
     SendNeedle  needles[COLOR_COUNT]; // THREADS ENSURE ALL CLIENTS GET THEIR PACKETS ROUGHLY AT THE SAME TIME.

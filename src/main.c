@@ -29,7 +29,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
             if(packet.game_running)
             {
                 overview.users = packet.users;
-                overview.map_power = packet.map_power;
+                overview.map_size = packet.map_size;
                 overview.seed = packet.seed;
                 break;
             }
@@ -46,7 +46,7 @@ static void Play(const Video video, const Data data, const Args args)
     const Sock reset = Sock_Connect(args.host, args.port_reset);
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
-    const Map map = Map_Make(overview.map_power, data.terrain);
+    const Map map = Map_Make(overview.map_size, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     Units units  = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
     Units floats = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
@@ -162,7 +162,7 @@ static void RunServer(const Args args)
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.
     Sockets sockets = Sockets_Init(args.port);
     Sockets resets = Sockets_Init(args.port_reset);
-    Cache cache = Cache_Init(args.users, args.map_power);
+    Cache cache = Cache_Init(args.users, args.map_size);
     for(int32_t cycles = 0; true; cycles++)
     {
         const int32_t t0 = SDL_GetTicks();

@@ -3,12 +3,12 @@
 #include "Util.h"
 #include "Config.h"
 
-Cache Cache_Init(const int32_t users, const int32_t map_power)
+Cache Cache_Init(const int32_t users, const int32_t map_size)
 {
     static Cache zero;
     Cache cache = zero;
     cache.users = users;
-    cache.map_power = map_power;
+    cache.map_size = map_size;
     cache.seed = rand();
     return cache;
 }

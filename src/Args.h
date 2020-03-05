@@ -19,7 +19,7 @@ typedef struct
     int32_t xres;
     int32_t yres;
     int32_t users;
-    int32_t map_power;
+    int32_t map_size;
     bool quiet;
     bool demo;
     bool measure;

@@ -17,14 +17,14 @@ typedef struct
     int32_t users_connected;
     int32_t users;
     int32_t seed;
-    int32_t map_power;
+    int32_t map_size;
     bool is_stable;
     bool is_out_of_sync;
     char control[COLOR_COUNT];
 }
 Cache;
 
-Cache Cache_Init(const int32_t users, const int32_t map_power);
+Cache Cache_Init(const int32_t users, const int32_t map_size);
 
 void Cache_CheckStability(Cache* const, const int32_t setpoint);
 

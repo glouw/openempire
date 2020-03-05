@@ -10,7 +10,7 @@ XRES=1300
 YRES=700
 USERS=2
 CIVS=4
-POWER=7
+MAP_SIZE=128
 HOST=localhost
 PORT=1111
 
@@ -31,7 +31,7 @@ netsim()
 batch()
 {
     BIN=openempires
-    ./$BIN --server --quiet --users $USERS --power $POWER --port $PORT &
+    ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT &
     SERVER_PID=$!
     for (( i = 0; i < $USERS; i++ ))
     do
