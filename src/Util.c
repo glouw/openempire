@@ -3,7 +3,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+#ifdef __unix__
 #include <execinfo.h>
+#endif
 
 void Util_Bomb(const char* const message, ...)
 {
@@ -80,6 +83,7 @@ bool Util_FlipCoin(void)
 void Util_PrintTrace(int32_t sig)
 {
     (void) sig;
+#ifdef __unix__
     void* array[10];
     const int32_t size = backtrace (array, 10);
     char** strings = backtrace_symbols(array, size);
@@ -87,4 +91,5 @@ void Util_PrintTrace(int32_t sig)
     for(int32_t i = 0; i < size; i++)
         printf("%s\n", strings[i]);
     free(strings);
+#endif
 }
