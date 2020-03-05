@@ -38,6 +38,16 @@ static Map PopulateMiniMapColors(Map map, const Registrar terrain)
     return map;
 }
 
+static void LayDirt(const Map map)
+{
+    for(int32_t x = 0; x < map.size; x++)
+    for(int32_t y = 0; y < map.size; y++)
+    {
+        const Point point = { x, y };
+        Map_SetTerrainFile(map, point, FILE_TERRAIN_DIRT);
+    }
+}
+
 static void SprinkleGrass(const Map map)
 {
     for(int32_t x = 0; x < map.size; x++)
@@ -51,7 +61,6 @@ static void SprinkleGrass(const Map map)
             Map_SetTerrainFile(map, point, FILE_TERRAIN_GRASS_A);
         }
     }
-
 }
 
 Map Map_Make(const int32_t power, const Registrar terrain)
@@ -70,6 +79,7 @@ Map Map_Make(const int32_t power, const Registrar terrain)
         map.size / 2,
     };
     map.middle = middle;
+    LayDirt(map);
     SprinkleGrass(map);
     return PopulateMiniMapColors(map, terrain);
 }
