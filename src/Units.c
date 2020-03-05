@@ -127,7 +127,7 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Overview overview, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static void FindPathForSelected(const Units units, const Overview overview, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -136,7 +136,7 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
         {
             unit->command_group = units.command_group_next;
             unit->command_group_count = units.select_count;
-            Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, field);
+            Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
         }
     }
 }
@@ -228,17 +228,17 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             {
                 DisengageSelected(units);
                 SetSelectedInterest(units, tile.reference);
-                FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, field);
+                FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, grid, field);
             }
             else
             {
                 DisengageSelected(units);
                 SetSelectedInterest(units, NULL);
                 const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-                const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
-                const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart);
+                const Point cart_grid = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
+                const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart_grid);
                 const Parts parts = Parts_GetRedArrows();
-                FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, field);
+                FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, grid, field);
                 units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
             }
             SetSelectedAttackMove(units, using_attack_move);
@@ -591,7 +591,7 @@ static void DisengageAllBoids(const Units units)
 
 // DOES NOT NEED TO BE THREADED -
 // GIVES A MORE NATURAL FEEL TO HAVE THE PATHER REPATH IN TIME SLICES.
-static Units RepathSomeBoids(Units units, const Field field)
+static Units RepathSomeBoids(Units units, const Grid grid, const Field field)
 {
     int32_t slice = units.count / CONFIG_UNITS_REPATH_SLICE_SIZE;
     if(slice == 0)
@@ -600,7 +600,7 @@ static Units RepathSomeBoids(Units units, const Field field)
     if(end > units.count)
         end = units.count;
     for(int32_t i = units.repath_index; i < end; i++)
-        Unit_Repath(&units.unit[i], field);
+        Unit_Repath(&units.unit[i], grid, field);
     units.repath_index += slice;
     if(units.repath_index >= units.count)
         units.repath_index = 0;
@@ -634,7 +634,7 @@ static Units MeleeAllBoids(Units units, const Grid grid)
 
 static Units ProcessHardRules(Units units, const Field field, const Grid grid)
 {
-    units = RepathSomeBoids(units, field);
+    units = RepathSomeBoids(units, grid, field);
     ConditionallyStopAllBoids(units);
     EngageAllBoids(units, grid);
     return MeleeAllBoids(units, grid);
@@ -1293,14 +1293,14 @@ Units Units_Generate(Units units, const Map map, const Grid grid, const Registra
         : units;
 }
 
-static void RestorePaths(const Units units, const Field field)
+static void RestorePaths(const Units units, const Grid grid, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->must_repath_with_recover)
         {
-            Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, field);
+            Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
             unit->must_repath_with_recover = false;
         }
     }
@@ -1331,7 +1331,7 @@ Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, co
     ManageStacks(units);
     DisengageAllBoids(units);
     EngageAllBoids(units, grid);
-    RestorePaths(units, field);
+    RestorePaths(units, grid, field);
     return RecountSelected(units);
 }
 

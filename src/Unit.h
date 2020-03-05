@@ -92,7 +92,7 @@ void Unit_SetDir(Unit* const, const Point);
 
 void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal);
 
-void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Field);
+void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Grid, const Field);
 
 void Unit_Kill(Unit* const);
 
@@ -106,7 +106,7 @@ int32_t Unit_GetLastFallTick(Unit* const);
 
 Resource Unit_Melee(Unit* const, const Grid);
 
-void Unit_Repath(Unit* const, const Field);
+void Unit_Repath(Unit* const, const Grid, const Field);
 
 Point Unit_Separate(Unit* const, Unit* const);
 

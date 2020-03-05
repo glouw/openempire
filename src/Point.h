@@ -45,3 +45,7 @@ Point Point_Layout(const int32_t index, const int32_t xres, const int32_t yres);
 bool Point_IsEven(const Point);
 
 uint64_t Point_Flatten(const Point);
+
+int32_t Point_GetYFromLine(const Point i, const Point j, const int32_t x);
+
+int32_t Point_GetXFromLine(const Point i, const Point j, const int32_t y);

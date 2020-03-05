@@ -311,7 +311,63 @@ static Point GetNextBest(Unit* const unit, const Field field)
     return out;
 }
 
-void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Field field)
+static Points PathStraight(const Point a, const Point b)
+{
+    Points path = Points_New(MOCK_PATH_POINTS);
+    path = Points_Append(path, a);
+    path = Points_Append(path, b);
+    return path;
+}
+
+static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
+{
+    const Point a = unit->cell;
+    const Point b = Point_Add(
+            Grid_CartToCell(grid, unit->cart_goal),
+            Grid_OffsetToCell(unit->cart_grid_offset_goal));
+    const Point c = Point_Sub(b, a);
+    const int32_t size = grid.tile_cart_width * CONFIG_GRID_CELL_SIZE;
+    const Point dir = {
+        c.x > 0 ? 1 : c.x < 0 ? -1 : 0,
+        c.y > 0 ? 1 : c.y < 0 ? -1 : 0,
+    };
+    const Point mag = Point_Mul(dir, size);
+    Point cell = a;
+    for(int32_t steps = 0; true; steps++)
+    {
+        const Point cart = Grid_CellToCart(grid, cell);
+        if(Point_Equal(cart, unit->cart_goal))
+            break;
+        if(!Field_IsWalkable(field, cart))
+            return false;
+        if(steps > 60) // XXX. SOMETHING WENT VERY WRONG. WHY? SHOULD NOT NEED THIS HERE.
+            return false;
+        // CLIPS UNIT FROM CENTER OF A GRID TO ITS EDGE.
+        int32_t dx = 0;
+        int32_t dy = 0;
+        if(steps == 0)
+        {
+            dx = dir.x * (cell.x % size);
+            dy = dir.y * (cell.y % size);
+        }
+        const int32_t x_next = (cell.x + dx) + mag.x;
+        const int32_t y_next = (cell.y + dy) + mag.y;
+        const Point i = {
+            x_next,
+            Point_GetYFromLine(a, b, x_next),
+        };
+        const Point j = {
+            Point_GetXFromLine(a, b, y_next),
+            y_next,
+        };
+        const Point di = Point_Sub(i, cell);
+        const Point dj = Point_Sub(j, cell);
+        cell = Point_Mag(di) < Point_Mag(dj) ? i : j;
+    }
+    return true;
+}
+
+void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
 {
     static Point zero;
     if(!Unit_IsExempt(unit))
@@ -319,8 +375,6 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         if(unit->interest
         && unit->interest->trait.is_inanimate)
         {
-            // CANNOT PATH INTO A BLOCK CARTESIAN SPACE IF GOAL IS AN INANIMATE OBJECT.
-            // THIS WILL CHOOSE THE NEXT BEST CARTESIAN SPACE.
             unit->cart_goal = GetNextBest(unit, field);
             unit->cart_grid_offset_goal = zero;
         }
@@ -330,7 +384,9 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
             unit->cart_grid_offset_goal = cart_grid_offset_goal;
         }
         Unit_FreePath(unit);
-        unit->path = Field_PathAStar(field, unit->cart, unit->cart_goal);
+        unit->path = HasDirectPath(unit, grid, field)
+            ? PathStraight(unit->cart, unit->cart_goal)
+            : Field_PathAStar(field, unit->cart, unit->cart_goal);
     }
 }
 
@@ -341,9 +397,7 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         Unit_FreePath(unit);
         unit->cart_goal = cart_goal;
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->path = Points_New(MOCK_PATH_POINTS);
-        unit->path = Points_Append(unit->path, unit->cart);
-        unit->path = Points_Append(unit->path, cart_goal);
+        unit->path = PathStraight(unit->cart, cart_goal);
     }
 }
 
@@ -462,13 +516,13 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     return none;
 }
 
-void Unit_Repath(Unit* const unit, const Field field)
+void Unit_Repath(Unit* const unit, const Grid grid, const Field field)
 {
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && unit->path.count > 0)
         (unit->path.count > MOCK_PATH_POINTS)
-            ? Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, field)
+            ? Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field)
             : Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal);
 }
 
