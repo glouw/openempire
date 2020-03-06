@@ -65,6 +65,7 @@ SRCS += Video.c
 SRCS += Vram.c
 
 OBJS = $(SRCS:.c=.o)
+
 DEPS = $(SRCS:.c=.d)
 
 CLANG = 0
@@ -72,6 +73,8 @@ CLANG = 0
 CPP = 0
 
 DUMP=objdump
+
+TAGS=ctags
 
 DEBUGGING = 0
 
@@ -84,6 +87,10 @@ SANITIZE_UNDEFINED = 0
 FLAGS = -O3 -march=native -flto
 
 DEBUG = -Og -g
+
+CSTD=-std=c11
+
+CPPSTD=-std=c++11
 
 ifeq (1, $(DEBUGGING))
 FLAGS = $(DEBUG)
@@ -102,9 +109,6 @@ FLAGS = $(DEBUG) -fsanitize=undefined
 endif
 
 FLAGS += -Wall -Wextra -Wshadow -Wpedantic
-
-CSTD=-std=c11
-CPPSTD=-std=c++11
 
 ifeq (00, $(CLANG)$(CPP))
 COMPILER = gcc $(CSTD)
@@ -125,6 +129,7 @@ endif
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
 	$(DUMP) -M intel -d $(BIN) > $(BIN).s
+	$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<

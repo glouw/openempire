@@ -153,7 +153,9 @@ int32_t Point_GetYFromLine(const Point i, const Point j, const int32_t x)
     const int32_t a = i.y - j.y;
     const int32_t b = j.x - i.x;
     const int32_t c = i.x * j.y - j.x * i.y;
-    return -(a * x + c) / (b == 0 ? 1 : b);
+    if(b == 0)
+        return INT32_MAX;
+    return -(a * x + c) / b;
 }
 
 int32_t Point_GetXFromLine(const Point i, const Point j, const int32_t y)
@@ -161,5 +163,7 @@ int32_t Point_GetXFromLine(const Point i, const Point j, const int32_t y)
     const int32_t a = i.y - j.y;
     const int32_t b = j.x - i.x;
     const int32_t c = i.x * j.y - j.x * i.y;
-    return -(y * b + c) / (a == 0 ? 1 : a);
+    if(a == 0)
+        return INT32_MAX;
+    return -(y * b + c) / a;
 }

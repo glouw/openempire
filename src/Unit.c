@@ -335,13 +335,17 @@ static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
     Point cell = a;
     for(int32_t steps = 0; true; steps++)
     {
+        Point_Print(cell);
         const Point cart = Grid_CellToCart(grid, cell);
         if(Point_Equal(cart, unit->cart_goal))
-            break;
+            return true;
         if(!Field_IsWalkable(field, cart))
             return false;
         if(steps > 60) // XXX. SOMETHING WENT VERY WRONG. WHY? SHOULD NOT NEED THIS HERE.
+        {
+            puts("TOO MANY STEPS");
             return false;
+        }
         // CLIPS UNIT FROM CENTER OF A GRID TO ITS EDGE.
         int32_t dx = 0;
         int32_t dy = 0;
@@ -350,21 +354,31 @@ static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
             dx = dir.x * (cell.x % size);
             dy = dir.y * (cell.y % size);
         }
-        const int32_t x_next = (cell.x + dx) + mag.x;
-        const int32_t y_next = (cell.y + dy) + mag.y;
-        const Point i = {
-            x_next,
-            Point_GetYFromLine(a, b, x_next),
-        };
-        const Point j = {
-            Point_GetXFromLine(a, b, y_next),
-            y_next,
-        };
-        const Point di = Point_Sub(i, cell);
-        const Point dj = Point_Sub(j, cell);
-        cell = Point_Mag(di) < Point_Mag(dj) ? i : j;
+        const int32_t x_next = cell.x + dx + mag.x;
+        const int32_t y_next = cell.y + dy + mag.y;
+        const int32_t xx = Point_GetXFromLine(a, b, y_next);
+        const int32_t yy = Point_GetYFromLine(a, b, x_next);
+        const Point i = { x_next, yy };
+        const Point j = { xx, y_next };
+        if(xx == INT32_MAX)
+        {
+            puts("XMAX");
+            cell = i;
+        }
+        else
+        if(yy == INT32_MAX)
+        {
+            puts("YMAX");
+            cell = j;
+        }
+        else
+        {
+            const Point di = Point_Sub(i, cell);
+            const Point dj = Point_Sub(j, cell);
+            cell = Point_Mag(di) < Point_Mag(dj) ? i : j;
+        }
     }
-    return true;
+    return false;
 }
 
 void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
