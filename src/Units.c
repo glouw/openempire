@@ -752,8 +752,16 @@ static void FlagGarbage(const Units units)
     }
 }
 
+static int32_t CompareByGarbage(const void* a, const void* b)
+{
+    Unit* const aa = (Unit*) a;
+    Unit* const bb = (Unit*) b;
+    return aa->must_garbage_collect > bb->must_garbage_collect;
+}
+
 static Units Resize(Units units)
 {
+    UTIL_SORT(units.unit, units.count, CompareByGarbage);
     for(int32_t index = 0; index < units.count; index++)
     {
         Unit* const unit = &units.unit[index];
@@ -766,44 +774,29 @@ static Units Resize(Units units)
     return units;
 }
 
-static int32_t CompareByGarbage(const void* a, const void* b)
-{
-    Unit* const aa = (Unit*) a;
-    Unit* const bb = (Unit*) b;
-    return aa->must_garbage_collect > bb->must_garbage_collect;
-}
-
-static int32_t CompareById(const void* a, const void* b)
-{
-    Unit* const aa = (Unit*) a;
-    Unit* const bb = (Unit*) b;
-    return aa->id > bb->id;
-}
-
-static int32_t MatchInterestId(const void* a, const void* b)
-{
-    Unit* const aa = (Unit*) a;
-    Unit* const bb = (Unit*) b;
-    return (aa->interest_id == bb->id) == 0;
-}
-
 static void ResetInterests(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const a = &units.unit[i];
-        Unit* const b = UTIL_SEARCH(a, units.unit, units.count, MatchInterestId);
-        if(b)
-            a->interest = b;
+        if(a->interest_id != -1)
+            for(int32_t j = 0; j < units.count; j++) // XXX. A BINARY SERACH WOULD BE BETTER.
+            {
+                Unit* const b = &units.unit[j];
+                if(a != b
+                && a->interest_id == b->id)
+                {
+                    a->interest = b;
+                    break;
+                }
+            }
     }
 }
 
 static Units RemoveGarbage(Units units)
 {
     FlagGarbage(units);
-    UTIL_SORT(units.unit, units.count, CompareByGarbage);
     units = Resize(units);
-    UTIL_SORT(units.unit, units.count, CompareById);
     ResetInterests(units);
     return units;
 }
@@ -1324,12 +1317,9 @@ static Units UnpackRestore(Units units, const Restore restore)
 Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, const Field field)
 {
     units = UnpackRestore(units, restore);
-    // THE UNIT INTEREST POINTER WITHIN A UNIT NEEDS TO BE UPDATED ELSE
-    // IT WILL POINT TO A SERVER MEMORY ADDRESS.
-    // THE UNIT INTEREST POINTER RELIES ON THE STALE STACKS TO BE UPDATED,
-    // SO THAT IS DONE FIRST.
     ManageStacks(units);
     DisengageAllBoids(units);
+    ResetInterests(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, grid, field);
     return RecountSelected(units);
