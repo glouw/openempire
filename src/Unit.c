@@ -321,62 +321,22 @@ static Points PathStraight(const Point a, const Point b)
 
 static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
 {
+    const Point cell_a = Grid_CartToCell(grid, unit->cart_goal);
+    const Point cell_b = Grid_OffsetToCell(unit->cart_grid_offset_goal);
     const Point a = unit->cell;
-    const Point b = Point_Add(
-            Grid_CartToCell(grid, unit->cart_goal),
-            Grid_OffsetToCell(unit->cart_grid_offset_goal));
-    const Point c = Point_Sub(b, a);
-    const int32_t size = grid.tile_cart_width * CONFIG_GRID_CELL_SIZE;
-    const Point dir = {
-        c.x > 0 ? 1 : c.x < 0 ? -1 : 0,
-        c.y > 0 ? 1 : c.y < 0 ? -1 : 0,
-    };
-    const Point mag = Point_Mul(dir, size);
+    const Point b = Point_Add(cell_a, cell_b);
+    const Point dir = Point_Sub(b, a);
+    const int32_t step = 3 * CONFIG_GRID_CELL_SIZE;
+    const Point mag = Point_Normalize(dir, step);
     Point cell = a;
-    for(int32_t steps = 0; true; steps++)
+    while(true)
     {
-        Point_Print(cell);
         const Point cart = Grid_CellToCart(grid, cell);
         if(Point_Equal(cart, unit->cart_goal))
             return true;
         if(!Field_IsWalkable(field, cart))
             return false;
-        if(steps > 60) // XXX. SOMETHING WENT VERY WRONG. WHY? SHOULD NOT NEED THIS HERE.
-        {
-            puts("TOO MANY STEPS");
-            return false;
-        }
-        // CLIPS UNIT FROM CENTER OF A GRID TO ITS EDGE.
-        int32_t dx = 0;
-        int32_t dy = 0;
-        if(steps == 0)
-        {
-            dx = dir.x * (cell.x % size);
-            dy = dir.y * (cell.y % size);
-        }
-        const int32_t x_next = cell.x + dx + mag.x;
-        const int32_t y_next = cell.y + dy + mag.y;
-        const int32_t xx = Point_GetXFromLine(a, b, y_next);
-        const int32_t yy = Point_GetYFromLine(a, b, x_next);
-        const Point i = { x_next, yy };
-        const Point j = { xx, y_next };
-        if(xx == INT32_MAX)
-        {
-            puts("XMAX");
-            cell = i;
-        }
-        else
-        if(yy == INT32_MAX)
-        {
-            puts("YMAX");
-            cell = j;
-        }
-        else
-        {
-            const Point di = Point_Sub(i, cell);
-            const Point dj = Point_Sub(j, cell);
-            cell = Point_Mag(di) < Point_Mag(dj) ? i : j;
-        }
+        cell = Point_Add(cell, mag);
     }
     return false;
 }

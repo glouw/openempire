@@ -147,23 +147,3 @@ uint64_t Point_Flatten(const Point point)
 {
     return (uint64_t) point.y << 32 | (uint64_t) point.x;
 }
-
-int32_t Point_GetYFromLine(const Point i, const Point j, const int32_t x)
-{
-    const int32_t a = i.y - j.y;
-    const int32_t b = j.x - i.x;
-    const int32_t c = i.x * j.y - j.x * i.y;
-    if(b == 0)
-        return INT32_MAX;
-    return -(a * x + c) / b;
-}
-
-int32_t Point_GetXFromLine(const Point i, const Point j, const int32_t y)
-{
-    const int32_t a = i.y - j.y;
-    const int32_t b = j.x - i.x;
-    const int32_t c = i.x * j.y - j.x * i.y;
-    if(a == 0)
-        return INT32_MAX;
-    return -(y * b + c) / a;
-}
