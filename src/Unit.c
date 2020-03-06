@@ -494,10 +494,10 @@ void Unit_Repath(Unit* const unit, const Grid grid, const Field field)
 {
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
-    && unit->path.count > 0)
-        (unit->path.count > MOCK_PATH_POINTS)
-            ? Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field)
-            : Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal);
+    && Unit_HasPath(unit))
+        unit->is_engaged_in_melee
+            ? Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal) // PERFORMANCE BOOST FOR WHEN UNITS ARE FIGHTING.
+            : Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
 }
 
 static Point Nudge(Unit* const unit)
