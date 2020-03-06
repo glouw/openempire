@@ -776,7 +776,8 @@ static Units Resize(Units units)
 
 static void ResetInterests(const Units units)
 {
-    for(int32_t i = 0; i < units.count; i++)
+    const int32_t t0 = SDL_GetTicks();
+    for(int32_t i = 0; i < units.count; i++) // XXX. MAYBE THREAD IT?
     {
         Unit* const a = &units.unit[i];
         if(a->interest_id != -1)
@@ -791,6 +792,10 @@ static void ResetInterests(const Units units)
                 }
             }
     }
+    const int32_t t1 = SDL_GetTicks();
+    const int32_t dt = t1 - t0;
+    if(dt > 1)
+        printf("WARNING: INTEREST CLEANUP TAKING (%d) SECONDS\n", dt);
 }
 
 static Units RemoveGarbage(Units units)
