@@ -265,8 +265,9 @@ void Unit_Print(Unit* const unit)
 
 void ApplyStressors(Unit* const unit)
 {
+    const int32_t resistance = 3; // XXX. HOW ABOUT A RESISTANCE TRAIT ADDED TO THIS BASE RESISTANCE? EG. HORSES HAVE MORE RESISTANCE?
     const Point stressors = (unit->state == STATE_ATTACK)
-        ?  Point_Div(unit->stressors, 3)
+        ? Point_Div(unit->stressors, resistance)
         : unit->stressors;
     unit->velocity = Point_Add(unit->velocity, stressors);
 }
