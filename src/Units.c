@@ -226,6 +226,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             if(tile.reference
             && tile.reference->color != overview.color)
             {
+                tile.reference->grid_flash_timer = 0;
                 DisengageSelected(units);
                 SetSelectedInterest(units, tile.reference);
                 FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, grid, field);
@@ -713,6 +714,9 @@ static void Tick(const Units units)
         unit->state_timer++;
         unit->dir_timer++;
         unit->path_index_timer++;
+        unit->grid_flash_timer++;
+        if(unit->grid_flash_timer % CONFIG_VRAM_FLASH_TIMER_RATE == 0)
+            unit->is_flash_on ^= true;
         if(unit->is_timing_to_collect)
             unit->garbage_collection_timer++;
     }

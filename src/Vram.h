@@ -58,4 +58,6 @@ void Vram_Free(const Vram);
 
 void Vram_DrawMiniMap(const Vram, const Units, const Map);
 
+void Vram_FlashDimensionGrids(const Vram, const Registrar, const Overview, const Grid, const Units);
+
 void Vram_DrawSelectedDimensionGrids(const Vram, const Registrar, const Overview, const Grid, const Units);

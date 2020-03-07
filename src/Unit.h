@@ -46,6 +46,7 @@ typedef struct Unit
     int32_t state_timer;
     int32_t dir_timer;
     int32_t garbage_collection_timer;
+    int32_t grid_flash_timer;
     int32_t attack_frames_per_dir;
     int32_t fall_frames_per_dir;
     int32_t decay_frames_per_dir;
@@ -63,6 +64,7 @@ typedef struct Unit
     bool must_skip_debris;
     bool must_repath_with_recover;
     bool using_attack_move;
+    bool is_flash_on;
 }
 Unit;
 

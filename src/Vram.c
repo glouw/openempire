@@ -509,22 +509,38 @@ void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso_p
     }
 }
 
+void DrawDimensionGrid(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, Unit* const unit)
+{
+    for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+    for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+    {
+        const Point shift = { x, y };
+        const Point cart = Point_Add(shift, unit->cart);
+        const Point iso = Overview_CartToIso(overview, grid, cart);
+        DrawTileOutline(vram, terrain, iso, 0xFFFFFF);
+    }
+}
+
+void Vram_FlashDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        const int32_t timer = unit->grid_flash_timer;
+        if(!Unit_IsExempt(unit)
+        && timer < CONFIG_VRAM_FLASH_TIMER_MAX
+        && unit->is_flash_on)
+            DrawDimensionGrid(vram, terrain, overview, grid, unit);
+    }
+}
+
 void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(unit->is_selected && unit->trait.is_inanimate)
-        {
-            for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
-            for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
-            {
-                const Point shift = { x, y };
-                const Point cart = Point_Add(shift, unit->cart);
-                const Point iso = Overview_CartToIso(overview, grid, cart);
-                DrawTileOutline(vram, terrain, iso, 0xFFFFFF);
-            }
-        }
+            DrawDimensionGrid(vram, terrain, overview, grid, unit);
     }
 }
 
