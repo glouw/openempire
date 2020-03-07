@@ -111,7 +111,7 @@ void Map_Free(const Map map)
 Points Map_GetBlendBox(const Map map, const Point inner)
 {
     const int32_t width = 1;
-    Points points = Points_New(8);
+    Points points = Points_Make(8);
     const int32_t inner_tile = Map_GetTerrainFile(map, inner);
     for(int32_t dx = -width; dx <= width; dx++)
     for(int32_t dy = -width; dy <= width; dy++)
@@ -145,7 +145,7 @@ static Lines AppendBlendLines(Lines lines, const Map map, const Point inner)
 
 Lines Map_GetBlendLines(const Map map, const Points render_points)
 {
-    Lines lines = Lines_New(8 * render_points.count);
+    Lines lines = Lines_Make(8 * render_points.count);
     for(int32_t i = 0; i < render_points.count; i++)
     {
         const Point inner = render_points.point[i];
@@ -170,7 +170,7 @@ Points Map_GetSlots(const Map map)
         { map.middle.x + dx, map.middle.y - dy }, // NE.
     };
     const int32_t size = UTIL_LEN(slots);
-    Points points = Points_New(size);
+    Points points = Points_Make(size);
     for(int32_t i = 0; i < size; i++)
         points = Points_Append(points, slots[i]);
     return points;

@@ -12,7 +12,7 @@ typedef struct
 }
 Points;
 
-Points Points_New(const int32_t max);
+Points Points_Make(const int32_t max);
 
 Points Points_Append(Points, const Point);
 

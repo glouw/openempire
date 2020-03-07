@@ -63,7 +63,7 @@ static Units Alloc(Units units)
     return units;
 }
 
-Units Units_New(const int32_t size, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
+Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
 {
     static Units zero;
     Units units = zero;
@@ -981,7 +981,7 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
     static Point zero;
     const Age age = GetNextAge(overview.incoming.status);
     const Parts parts = Parts_FromButton(button, age, overview.incoming.status.civ);
-    Points points = Points_New(COLOR_COUNT);
+    Points points = Points_Make(COLOR_COUNT);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];

@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-Lines Lines_New(const int32_t max)
+Lines Lines_Make(const int32_t max)
 {
     Line* const line = UTIL_ALLOC(Line, max);
     const Lines lines = { line, 0, max };

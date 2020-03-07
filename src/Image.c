@@ -70,7 +70,7 @@ void Image_Free(const Image image)
 
 SDL_Surface* Image_Parse(const Image image, const Frame frame, const Palette palette, const Color color)
 {
-    SDL_Surface* const surface = Surface_New(frame.width, frame.height);
+    SDL_Surface* const surface = Surface_Make(frame.width, frame.height);
     for(int32_t y = 0; y < image.height; y++)
     {
         const Outline outline = image.outline_table[y];

@@ -16,7 +16,7 @@ static bool Inside(Point s, const Point a, const Point b, const Point c)
 Points Quad_GetRenderPoints(const Quad quad)
 {
     const int32_t boxed_area = (quad.b.x - quad.c.x) * (quad.d.y - quad.a.y);
-    Points points = Points_New(boxed_area);
+    Points points = Points_Make(boxed_area);
     for(int32_t y = quad.a.y; y < quad.d.y; y++)
     for(int32_t x = quad.c.x; x < quad.b.x; x++)
     {

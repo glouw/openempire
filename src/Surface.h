@@ -25,4 +25,4 @@ uint32_t Surface_GetPixel(SDL_Surface* const, const int32_t x, const int32_t y);
 
 void Surface_Clear(SDL_Surface* const, const uint32_t color);
 
-SDL_Surface* Surface_New(const int32_t width, const int32_t height);
+SDL_Surface* Surface_Make(const int32_t width, const int32_t height);

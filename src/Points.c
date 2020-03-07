@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-Points Points_New(const int32_t max)
+Points Points_Make(const int32_t max)
 {
     Point* point = UTIL_ALLOC(Point, max);
     const Points points = { point, 0, max };
@@ -62,7 +62,7 @@ static Points Drop(Points points, Point* point)
 
 Points Points_Reverse(Points points)
 {
-    Points out = Points_New(points.count);
+    Points out = Points_Make(points.count);
     for(int32_t i = 0; i < out.max; i++)
     {
         Point point;

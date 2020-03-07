@@ -8,7 +8,7 @@
 static SDL_Surface* ConvertByteMask(const Mode mode, Outline* const outline_table, const int32_t which_tile, const bool demo)
 {
     const uint8_t* const data = &mode.tile_byte_mask[which_tile * mode.tile_size];
-    SDL_Surface* const surface = Surface_New(mode.frame.width, mode.frame.height);
+    SDL_Surface* const surface = Surface_Make(mode.frame.width, mode.frame.height);
     int32_t index = 0;
     for(int32_t y = 0; y < mode.frame.height; y++)
     {

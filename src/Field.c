@@ -36,7 +36,7 @@ static int32_t Heuristic(const Point a, const Point b)
 
 Points Construct(const Field field, const Point start, const Point goal, const Points came_from)
 {
-    Points path = Points_New(32);
+    Points path = Points_Make(32);
     Point current = goal;
     while(!Point_Equal(current, start))
     {
@@ -53,7 +53,7 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
     const Point none = { -1, -1 };
     const int32_t area = field.size * field.size;
     int32_t* const cost_so_far = UTIL_ALLOC(int32_t, area);
-    const Points came_from = Points_New(area);
+    const Points came_from = Points_Make(area);
     for(int32_t i = 0; i < area; i++)
     {
         came_from.point[i] = none;

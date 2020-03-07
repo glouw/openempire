@@ -19,7 +19,7 @@ void Surface_Clear(SDL_Surface* const surface, const uint32_t color)
         Surface_PutPixel(surface, x, y, color);
 }
 
-SDL_Surface* Surface_New(const int32_t width, const int32_t height)
+SDL_Surface* Surface_Make(const int32_t width, const int32_t height)
 {
     SDL_Surface* const surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, SURFACE_BIT_DEPTH, SURFACE_PIXEL_FORMAT);
     Surface_Clear(surface, SURFACE_COLOR_KEY);

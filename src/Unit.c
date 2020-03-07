@@ -318,7 +318,7 @@ static Point GetNextBest(Unit* const unit, const Field field)
 
 static Points PathStraight(const Point a, const Point b)
 {
-    Points path = Points_New(MOCK_PATH_POINTS);
+    Points path = Points_Make(MOCK_PATH_POINTS);
     path = Points_Append(path, a);
     path = Points_Append(path, b);
     return path;
