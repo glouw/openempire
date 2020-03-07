@@ -553,7 +553,6 @@ static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid gri
     }
     else
         Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
-    unit->is_engaged_in_melee = true;
     Unit_SetInterest(unit, closest);
 }
 
@@ -584,7 +583,7 @@ static void DisengageAllBoids(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        unit->interest = NULL;
+        Unit_SetInterest(unit, NULL);
         unit->is_engaged_in_melee = false;
     }
 }

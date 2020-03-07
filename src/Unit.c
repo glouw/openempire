@@ -189,6 +189,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     if(!is_floating)
         id_next++;
     unit.parent_id = -1;
+    unit.interest_id = -1;
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.trait.max_health;
@@ -264,7 +265,10 @@ void Unit_Print(Unit* const unit)
 
 void ApplyStressors(Unit* const unit)
 {
-    unit->velocity = Point_Add(unit->velocity, unit->stressors);
+    const Point stressors = (unit->state == STATE_ATTACK)
+        ?  Point_Div(unit->stressors, 3)
+        : unit->stressors;
+    unit->velocity = Point_Add(unit->velocity, stressors);
 }
 
 void Unit_Flow(Unit* const unit, const Grid grid)
@@ -473,11 +477,13 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     {
         if(MustEngage(unit, grid))
         {
+            unit->is_engaged_in_melee = true;
             Unit_SetState(unit, STATE_ATTACK, true);
             Unit_Lock(unit);
         }
         if(MustDisengage(unit))
         {
+            unit->is_engaged_in_melee = false;
             unit->interest->health -= unit->trait.attack;
             Unit_Unlock(unit);
             if(unit->trait.type == TYPE_VILLAGER)
