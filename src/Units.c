@@ -715,7 +715,7 @@ static void Tick(const Units units)
         unit->dir_timer++;
         unit->path_index_timer++;
         unit->grid_flash_timer++;
-        if(unit->grid_flash_timer % CONFIG_VRAM_FLASH_TIMER_RATE == 0)
+        if((unit->grid_flash_timer % CONFIG_VRAM_FLASH_TIMER_RATE) == 0)
             unit->is_flash_on ^= true;
         if(unit->is_timing_to_collect)
             unit->garbage_collection_timer++;

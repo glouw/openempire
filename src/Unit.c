@@ -5,8 +5,6 @@
 #include "Resource.h"
 #include "Config.h"
 
-#define MOCK_PATH_POINTS (2)
-
 static int32_t id_next = 0;
 
 int32_t Unit_GetIdNext(void) // NOT IDEAL, BUT NEEDS TO BE RESTORED WHEN OUT OF SYNC.
@@ -318,7 +316,7 @@ static Point GetNextBest(Unit* const unit, const Field field)
 
 static Points PathStraight(const Point a, const Point b)
 {
-    Points path = Points_Make(MOCK_PATH_POINTS);
+    Points path = Points_Make(2);
     path = Points_Append(path, a);
     path = Points_Append(path, b);
     return path;

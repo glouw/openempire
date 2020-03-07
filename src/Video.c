@@ -115,7 +115,8 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawUnits(vram, graphics_tiles_floats);
     Vram_DrawMouseTileSelect(vram, data.terrain, overview, grid);
     Vram_DrawUnitSelections(vram, graphics_tiles);
-    Vram_FlashDimensionGrids(vram, data.terrain, overview, grid, units);
+    Vram_FlashDimensionGrids(vram, data.terrain, overview, grid, units); // XXX. USE TERRAIN TILES INSTEAD.
+    Vram_FlashUnits(vram, graphics_tiles);
     Vram_DrawSelectedDimensionGrids(vram, data.terrain, overview, grid, units);
     const bool should_draw = overview.event.mouse_l && !overview.event.key_left_shift;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);

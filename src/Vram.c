@@ -426,7 +426,6 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
-// XXX: INANIMATE OBJECTS NEED A SQUARE DRAWN AROUND THEM, NOT AN ELLIPSE.
 void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
 {
     for(int32_t i = 0; i < tiles.count; i++)
@@ -444,6 +443,21 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
                     : 0xFFFFFF;// DEFAULT
             DrawEllipse(vram, rect, color);
         }
+    }
+}
+
+void Vram_FlashUnits(const Vram vram, const Tiles tiles)
+{
+    for(int32_t i = 0; i < tiles.count; i++)
+    {
+        const Tile tile = tiles.tile[i];
+        const Point center = Tile_GetHotSpotCoords(tile);
+        const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
+        if(!Unit_IsExempt(tile.reference)
+        && !tile.reference->trait.is_inanimate
+        && tile.reference->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
+        && tile.reference->is_flash_on)
+            DrawEllipse(vram, rect, 0xFFFFFF);
     }
 }
 
@@ -484,7 +498,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
     }
 }
 
-void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso_pixel, const uint32_t color)
+void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso, const uint32_t color)
 {
     const Animation animation = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT];
     const Image image = animation.image[0];
@@ -492,9 +506,9 @@ void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso_p
     for(int32_t i = 0; i < frame.height; i++)
     {
         const Outline outline = image.outline_table[i];
-        const int32_t left  = iso_pixel.x + outline.left_padding;
-        const int32_t right = iso_pixel.x + frame.width - outline.right_padding;
-        const int32_t y = i + iso_pixel.y;
+        const int32_t left  = iso.x + outline.left_padding;
+        const int32_t right = iso.x + frame.width - outline.right_padding;
+        const int32_t y = i + iso.y;
         const Point a = { left , y };
         const Point b = { right, y };
         for(int32_t xx = 0; xx < 2; xx++)
@@ -526,10 +540,10 @@ void Vram_FlashDimensionGrids(const Vram vram, const Registrar terrain, const Ov
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        const int32_t timer = unit->grid_flash_timer;
         if(!Unit_IsExempt(unit)
-        && timer < CONFIG_VRAM_FLASH_TIMER_MAX
-        && unit->is_flash_on)
+        && unit->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
+        && unit->is_flash_on
+        && unit->trait.is_inanimate)
             DrawDimensionGrid(vram, terrain, overview, grid, unit);
     }
 }
