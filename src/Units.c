@@ -579,14 +579,10 @@ static void EngageAllBoids(const Units units, const Grid grid)
         EngageBoids(units, &units.unit[i], grid);
 }
 
-static void DisengageAllBoids(const Units units)
+static void NullInterestPointers(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        Unit_SetInterest(unit, NULL);
-        unit->is_engaged_in_melee = false;
-    }
+        units.unit[i].interest = NULL;
 }
 
 // DOES NOT NEED TO BE THREADED -
@@ -1326,7 +1322,7 @@ Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, co
 {
     units = UnpackRestore(units, restore);
     ManageStacks(units);
-    DisengageAllBoids(units);
+    NullInterestPointers(units);
     ResetInterests(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, grid, field);
