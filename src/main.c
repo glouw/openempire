@@ -127,7 +127,7 @@ static void Play(const Video video, const Data data, const Args args)
 
 static void RunClient(const Args args)
 {
-    Sock_Setup();
+    Sock_Init();
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
@@ -143,7 +143,7 @@ static void RunClient(const Args args)
 static int32_t RunServerPings(void* const data)
 {
     Args* const args = (Args*) data;
-    Sockets pings = Sockets_Init(args->port_ping);
+    Sockets pings = Sockets_Make(args->port_ping);
     while(true)
     {
         pings = Sockets_Accept(pings);
@@ -156,13 +156,13 @@ static int32_t RunServerPings(void* const data)
 
 static void RunServer(const Args args)
 {
-    Sockets_Setup();
+    Sockets_Init();
     if(!args.measure)
         srand(time(NULL));
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.
-    Sockets sockets = Sockets_Init(args.port);
-    Sockets resets = Sockets_Init(args.port_reset);
-    Cache cache = Cache_Init(args.users, args.map_size);
+    Sockets sockets = Sockets_Make(args.port);
+    Sockets resets = Sockets_Make(args.port_reset);
+    Cache cache = Cache_Make(args.users, args.map_size);
     for(int32_t cycles = 0; true; cycles++)
     {
         const int32_t t0 = SDL_GetTicks();

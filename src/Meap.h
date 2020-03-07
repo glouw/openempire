@@ -10,7 +10,7 @@ typedef struct
 }
 Meap;
 
-Meap Meap_Init(void);
+Meap Meap_Make(void);
 
 void Meap_Insert(Meap* const, const int32_t prio, const Point);
 

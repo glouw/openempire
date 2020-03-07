@@ -6,7 +6,7 @@
 
 static SDL_mutex* mutex;
 
-void Sock_Setup(void)
+void Sock_Init(void)
 {
     mutex = SDL_CreateMutex();
 }

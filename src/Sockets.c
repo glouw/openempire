@@ -11,12 +11,12 @@
 
 static SDL_mutex* mutex;
 
-void Sockets_Setup(void)
+void Sockets_Init(void)
 {
     mutex = SDL_CreateMutex();
 }
 
-Sockets Sockets_Init(const int32_t port)
+Sockets Sockets_Make(const int32_t port)
 {
     static Sockets zero;
     Sockets sockets = zero;

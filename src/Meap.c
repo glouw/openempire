@@ -25,7 +25,7 @@ static void Heapify(Meap* const meap, const int32_t index)
     }
 }
 
-Meap Meap_Init(void)
+Meap Meap_Make(void)
 {
     static Meap zero;
     Meap meap = zero;

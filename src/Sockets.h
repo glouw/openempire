@@ -14,7 +14,7 @@ typedef struct
 }
 Sockets;
 
-Sockets Sockets_Init(const int32_t port);
+Sockets Sockets_Make(const int32_t port);
 
 void Sockets_Free(const Sockets);
 
@@ -28,4 +28,4 @@ void Sockets_Ping(const Sockets);
 
 void Sockets_Reset(const Sockets, Cache* const);
 
-void Sockets_Setup(void);
+void Sockets_Init(void);

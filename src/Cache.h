@@ -24,7 +24,7 @@ typedef struct
 }
 Cache;
 
-Cache Cache_Init(const int32_t users, const int32_t map_size);
+Cache Cache_Make(const int32_t users, const int32_t map_size);
 
 void Cache_CheckStability(Cache* const, const int32_t setpoint);
 

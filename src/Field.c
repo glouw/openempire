@@ -48,7 +48,7 @@ Points Construct(const Field field, const Point start, const Point goal, const P
 
 Points Field_PathAStar(const Field field, const Point start, const Point goal)
 {
-    Meap frontier = Meap_Init();
+    Meap frontier = Meap_Make();
     Meap_Insert(&frontier, 0, start);
     const Point none = { -1, -1 };
     const int32_t area = field.size * field.size;
