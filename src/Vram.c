@@ -454,7 +454,7 @@ void Vram_FlashUnits(const Vram vram, const Tiles tiles)
         const Point center = Tile_GetHotSpotCoords(tile);
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(!Unit_IsExempt(tile.reference)
-        && !tile.reference->trait.is_inanimate
+        && tile.reference->trait.is_inanimate == false
         && tile.reference->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
         && tile.reference->is_flash_on)
             DrawEllipse(vram, rect, 0xFFFFFF);

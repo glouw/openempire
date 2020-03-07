@@ -5,6 +5,8 @@
 
 #include <assert.h>
 
+#define RESTORE_COMPLETE (0xAB)
+
 static int32_t GetRestoreHeaderByteSize(const Restore restore)
 {
     return sizeof(int32_t) // REAL SIZE (size_real) OF WHOLE STREAM IS INCLUDED.
@@ -52,6 +54,8 @@ static Restore RecvPacked(const TCPsocket socket)
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         restore.stamp[i] = stamp[i];
     free(buffer);
+    const uint8_t ack = RESTORE_COMPLETE;
+    assert(UTIL_TCP_SEND(socket, &ack) == sizeof(uint8_t));
     return restore;
 }
 
@@ -78,6 +82,10 @@ void Restore_Send(const Restore restore, const TCPsocket socket)
         assert(UTIL_TCP_SEND(socket, &restore.stamp)   == sizeof(restore.stamp));
         /* ---------- UNITS ---------- */
         SDLNet_TCP_Send(socket, restore.unit, size_units);
+        /* ----- ASSERT COMPLETE ----- */
+        uint8_t ack = 0;
+        assert(UTIL_TCP_RECV(socket, &ack) == sizeof(uint8_t));
+        assert(ack == RESTORE_COMPLETE);
     }
 }
 

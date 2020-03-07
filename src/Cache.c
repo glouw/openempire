@@ -10,6 +10,7 @@ Cache Cache_Make(const int32_t users, const int32_t map_size)
     cache.users = users;
     cache.map_size = map_size;
     cache.seed = rand();
+    cache.can_send = true;
     return cache;
 }
 

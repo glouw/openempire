@@ -20,6 +20,7 @@ typedef struct
     int32_t map_size;
     bool is_stable;
     bool is_out_of_sync;
+    bool can_send;
     char control[COLOR_COUNT];
 }
 Cache;
