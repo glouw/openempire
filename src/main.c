@@ -17,7 +17,7 @@
 static Overview WaitInLobby(const Video video, const Sock sock)
 {
     int32_t loops = 0;
-    Overview overview = Overview_Init(video.xres, video.yres);
+    Overview overview = Overview_Make(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         assert(UTIL_TCP_SEND(sock.server, &overview) == sizeof(overview));
@@ -52,7 +52,7 @@ static void Play(const Video video, const Data data, const Args args)
     Units floats = Units_New(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
     units = Units_Generate(units, map, grid, data.graphics, overview.users);
     overview.pan = Units_GetFirstTownCenterPan(units, grid);
-    Packets packets = Packets_Init();
+    Packets packets = Packets_Make();
     int32_t cycles = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -129,7 +129,7 @@ static void RunClient(const Args args)
 {
     Sock_Init();
     SDL_Init(SDL_INIT_VIDEO);
-    const Video video = Video_Setup(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
+    const Video video = Video_Make(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
     Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
     const Data data = Data_Load(args.path);
     args.demo

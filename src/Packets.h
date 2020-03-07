@@ -13,7 +13,7 @@ typedef struct
 }
 Packets;
 
-Packets Packets_Init(void);
+Packets Packets_Make(void);
 
 Packets Packets_Queue(Packets, Packet);
 

@@ -2,7 +2,7 @@
 
 #include "Util.h"
 
-Packets Packets_Init(void)
+Packets Packets_Make(void)
 {
     const int32_t max = 32;
     static Packets zero;

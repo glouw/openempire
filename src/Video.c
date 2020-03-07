@@ -39,7 +39,7 @@ void Video_PrintLobby(const Video video, const int32_t users_connected, const in
     Present(video);
 }
 
-Video Video_Setup(const int32_t xres, const int32_t yres, const char* const title)
+Video Video_Make(const int32_t xres, const int32_t yres, const char* const title)
 {
     const char* const terminus = "TerminusTTF-4.47.0.ttf";
     const Point middle = { xres / 2, yres / 2 };

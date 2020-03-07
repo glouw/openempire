@@ -30,7 +30,7 @@ typedef struct
 }
 Video;
 
-Video Video_Setup(const int32_t xres, const int32_t yres, const char* const title);
+Video Video_Make(const int32_t xres, const int32_t yres, const char* const title);
 
 void Video_Free(const Video);
 
