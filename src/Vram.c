@@ -434,16 +434,14 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Tile tile = tiles.tile[i];
         const Point center = Tile_GetHotSpotCoords(tile);
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
-        if(tile.reference->is_selected)
+        if(tile.reference->is_selected
+        && tile.reference->trait.is_inanimate == false)
         {
             const uint32_t color = tile.reference->is_engaged_in_melee
-                // RED.
-                ? 0xFF0000
+                ? 0xFF0000 // RED
                 : tile.reference->using_attack_move
-                    // YELLOW.
-                    ? 0xFFFF00
-                    // WHITE (DEFAULT).
-                    : 0xFFFFFF;
+                    ? 0xFFFF00 // YELLOW
+                    : 0xFFFFFF;// DEFAULT
             DrawEllipse(vram, rect, color);
         }
     }
@@ -486,28 +484,54 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
     }
 }
 
-void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid)
+void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso_pixel, const uint32_t color)
 {
-    const int32_t line_width = 3;
-    const uint32_t color = 0xFF0000;
     const Animation animation = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT];
     const Image image = animation.image[0];
     const Frame frame = animation.frame[0];
-    const Point snap = Overview_IsoSnapTo(overview, grid, overview.mouse_cursor);
     for(int32_t i = 0; i < frame.height; i++)
     {
         const Outline outline = image.outline_table[i];
-        const int32_t left  = snap.x + outline.left_padding;
-        const int32_t right = snap.x + frame.width - outline.right_padding;
-        const int32_t y = i + snap.y;
-        for(int32_t j = 0; j < line_width; j++)
+        const int32_t left  = iso_pixel.x + outline.left_padding;
+        const int32_t right = iso_pixel.x + frame.width - outline.right_padding;
+        const int32_t y = i + iso_pixel.y;
+        const Point a = { left , y };
+        const Point b = { right, y };
+        for(int32_t xx = 0; xx < 2; xx++)
+        for(int32_t yy = 0; yy < 2; yy++)
         {
-            const Point a = { left  - j, y };
-            const Point b = { right + j, y };
-            DrawSelectionPixel(vram, a, color);
-            DrawSelectionPixel(vram, b, color);
+            const Point shift = { xx, yy };
+            const Point aa = Point_Add(a, shift);
+            const Point bb = Point_Add(b, shift);
+            DrawSelectionPixel(vram, aa, color);
+            DrawSelectionPixel(vram, bb, color);
         }
     }
+}
+
+void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_selected && unit->trait.is_inanimate)
+        {
+            for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+            for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+            {
+                const Point shift = { x, y };
+                const Point cart = Point_Add(shift, unit->cart);
+                const Point iso = Overview_CartToIso(overview, grid, cart);
+                DrawTileOutline(vram, terrain, iso, 0xFFFFFF);
+            }
+        }
+    }
+}
+
+void Vram_DrawMouseTileSelect(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid)
+{
+    const Point snap = Overview_IsoSnapTo(overview, grid, overview.mouse_cursor);
+    DrawTileOutline(vram, terrain, snap, 0xFF0000);
 }
 
 static inline void DrawWithBounds(const Vram vram, SDL_Surface* surface, const Point offset, const Rect rect, const bool red_out)
