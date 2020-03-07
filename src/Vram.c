@@ -535,26 +535,27 @@ void DrawDimensionGrid(const Vram vram, const Registrar terrain, const Overview 
     }
 }
 
-void Vram_FlashDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Units units)
+void Vram_FlashDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Tiles tiles)
 {
-    for(int32_t i = 0; i < units.count; i++)
+    for(int32_t i = 0; i < tiles.count; i++)
     {
-        Unit* const unit = &units.unit[i];
-        if(!Unit_IsExempt(unit)
-        && unit->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
-        && unit->is_flash_on
-        && unit->trait.is_inanimate)
-            DrawDimensionGrid(vram, terrain, overview, grid, unit);
+        const Tile tile = tiles.tile[i];
+        if(!Unit_IsExempt(tile.reference)
+        && tile.reference->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
+        && tile.reference->is_flash_on
+        && tile.reference->trait.is_inanimate)
+            DrawDimensionGrid(vram, terrain, overview, grid, tile.reference);
     }
 }
 
-void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Units units)
+void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Tiles tiles)
 {
-    for(int32_t i = 0; i < units.count; i++)
+    for(int32_t i = 0; i < tiles.count; i++)
     {
-        Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->trait.is_inanimate)
-            DrawDimensionGrid(vram, terrain, overview, grid, unit);
+        const Tile tile = tiles.tile[i];
+        if(tile.reference->is_selected
+        && tile.reference->trait.is_inanimate)
+            DrawDimensionGrid(vram, terrain, overview, grid, tile.reference);
     }
 }
 
