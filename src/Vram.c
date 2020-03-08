@@ -539,12 +539,12 @@ void Vram_FlashDimensionGrids(const Vram vram, const Registrar terrain, const Ov
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
-        const Tile tile = tiles.tile[i];
-        if(!Unit_IsExempt(tile.reference)
-        && tile.reference->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
-        && tile.reference->is_flash_on
-        && tile.reference->trait.is_inanimate)
-            DrawDimensionGrid(vram, terrain, overview, grid, tile.reference);
+        Unit* const unit = tiles.tile[i].reference;
+        if(!Unit_IsExempt(unit)
+        && unit->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
+        && unit->is_flash_on
+        && unit->trait.is_inanimate)
+            DrawDimensionGrid(vram, terrain, overview, grid, unit);
     }
 }
 
@@ -552,10 +552,10 @@ void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, c
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
-        const Tile tile = tiles.tile[i];
-        if(tile.reference->is_selected
-        && tile.reference->trait.is_inanimate)
-            DrawDimensionGrid(vram, terrain, overview, grid, tile.reference);
+        Unit* const unit = tiles.tile[i].reference;
+        if(unit->is_selected
+        && unit->trait.is_inanimate)
+            DrawDimensionGrid(vram, terrain, overview, grid, unit);
     }
 }
 
