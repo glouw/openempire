@@ -233,6 +233,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
 
 void Unit_Print(Unit* const unit)
 {
+    printf("is_state_locked       :: %d\n",    unit->is_state_locked);
     printf("action                :: %d\n",    unit->trait.action);
     printf("type                  :: %d\n",    unit->trait.type);
     printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
@@ -500,9 +501,7 @@ void Unit_Repath(Unit* const unit, const Grid grid, const Field field)
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && Unit_HasPath(unit))
-        unit->is_engaged_in_melee
-            ? Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal) // PERFORMANCE BOOST FOR WHEN UNITS ARE FIGHTING.
-            : Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
+        Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
 }
 
 static Point Nudge(Unit* const unit)
@@ -577,6 +576,8 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     to->path = from->path;
     to->dir = from->dir;
     to->health = from->health;
+    to->cart_goal = from->cart_goal;
+    to->cart_grid_offset_goal = from->cart_grid_offset_goal;
 }
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
