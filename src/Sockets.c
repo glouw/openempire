@@ -225,7 +225,8 @@ RestoreNeedle;
 static int32_t RunRestoreNeedle(void* const data)
 {
     RestoreNeedle* const needle = (RestoreNeedle*) data;
-    Restore_Send(needle->restore, needle->socket);
+    if(needle->socket)
+        Restore_Send(needle->restore, needle->socket);
     return 0;
 }
 
@@ -250,6 +251,8 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
                 for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
                 cache->is_out_of_sync = false;
                 Restore_Free(restore);
+                puts("GAME SUCCESSFULLY RESTORED");
+                break;
             }
         }
     }

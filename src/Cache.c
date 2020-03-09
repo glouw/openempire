@@ -31,7 +31,6 @@ void Cache_CheckParity(Cache* const cache) // XXX. CHECKS SHOULD HAPPEN ON EVERY
                 const int32_t parity = cache->parity[i];
                 if(cycles == cycles_check && parity != parity_check)
                 {
-                    puts(">> SERVER OUT OF SYNC DETECTED");
                     cache->is_out_of_sync = true;
                     return;
                 }

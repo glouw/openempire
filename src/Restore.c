@@ -35,9 +35,7 @@ static Restore RecvPacked(const TCPsocket socket)
     int32_t bytes = 0;
     while(bytes < size_max)
     {
-        puts("RECV BYTES");
         bytes += SDLNet_TCP_Recv(socket, &buffer[bytes], size_max);
-        printf(">> BYTES RESTORED %d %d %d\n", bytes, *size_real, size_max);
         if(bytes >= *size_real) // EARLY EXIT WHEN ALL STREAM BYTES ARE RELIABLY RECVD OVER TCP.
             break;
     }
@@ -69,24 +67,21 @@ Restore Restore_Recv(const TCPsocket socket)
 
 void Restore_Send(const Restore restore, const TCPsocket socket)
 {
-    if(socket)
-    {
-        const int32_t size_header = GetRestoreHeaderByteSize(restore);
-        const int32_t size_units = restore.count * sizeof(*restore.unit);
-        const int32_t size_real = size_header + size_units;
-        /* ---------- HEADER --------- */
-        assert(UTIL_TCP_SEND(socket, &size_real)       == sizeof(int32_t));
-        assert(UTIL_TCP_SEND(socket, &restore.count)   == sizeof(int32_t));
-        assert(UTIL_TCP_SEND(socket, &restore.cycles)  == sizeof(int32_t));
-        assert(UTIL_TCP_SEND(socket, &restore.id_next) == sizeof(int32_t));
-        assert(UTIL_TCP_SEND(socket, &restore.stamp)   == sizeof(restore.stamp));
-        /* ---------- UNITS ---------- */
-        SDLNet_TCP_Send(socket, restore.unit, size_units);
-        /* ----- ASSERT COMPLETE ----- */
-        uint8_t ack = 0;
-        assert(UTIL_TCP_RECV(socket, &ack) == sizeof(uint8_t));
-        assert(ack == RESTORE_COMPLETE);
-    }
+    const int32_t size_header = GetRestoreHeaderByteSize(restore);
+    const int32_t size_units = restore.count * sizeof(*restore.unit);
+    const int32_t size_real = size_header + size_units;
+    /* ---------- HEADER --------- */
+    assert(UTIL_TCP_SEND(socket, &size_real)       == sizeof(int32_t));
+    assert(UTIL_TCP_SEND(socket, &restore.count)   == sizeof(int32_t));
+    assert(UTIL_TCP_SEND(socket, &restore.cycles)  == sizeof(int32_t));
+    assert(UTIL_TCP_SEND(socket, &restore.id_next) == sizeof(int32_t));
+    assert(UTIL_TCP_SEND(socket, &restore.stamp)   == sizeof(restore.stamp));
+    /* ---------- UNITS ---------- */
+    SDLNet_TCP_Send(socket, restore.unit, size_units);
+    /* ----- ASSERT COMPLETE ----- */
+    uint8_t ack = 0;
+    assert(UTIL_TCP_RECV(socket, &ack) == sizeof(uint8_t));
+    assert(ack == RESTORE_COMPLETE);
 }
 
 void Restore_Free(const Restore restore)
