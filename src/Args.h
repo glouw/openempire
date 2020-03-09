@@ -20,9 +20,10 @@ typedef struct
     int32_t yres;
     int32_t users;
     int32_t map_size;
-    bool quiet;
-    bool demo;
-    bool measure;
+    bool is_quiet;
+    bool is_demo;
+    bool must_measure;
+    bool is_spectator;
 }
 Args;
 

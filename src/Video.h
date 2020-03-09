@@ -40,4 +40,4 @@ void Video_RenderDataDemo(const Video, const Data, const Color);
 
 void Video_Render(const Video, const Units, const Overview, const Map, const int32_t dt, const int32_t cycles, const int32_t ping);
 
-void Video_PrintLobby(const Video, const int32_t users_connected, const int32_t users, const Color, const int32_t loops);
+void Video_PrintLobby(const Video, const int32_t users_connected, const int32_t users, const int32_t cycles, const char* const string);

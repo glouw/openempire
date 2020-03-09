@@ -16,7 +16,7 @@
 
 static Overview WaitInLobby(const Video video, const Sock sock)
 {
-    int32_t loops = 0;
+    int32_t cycles = 0;
     Overview overview = Overview_Make(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
@@ -25,7 +25,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
         if(Packet_IsAlive(packet))
         {
             overview.color = (Color) packet.client_id;
-            Video_PrintLobby(video, packet.users_connected, packet.users, overview.color, loops++);
+            Video_PrintLobby(video, packet.users_connected, packet.users, cycles++, Color_ToString(overview.color));
             if(packet.game_running)
             {
                 overview.users = packet.users;
@@ -66,7 +66,7 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            if(packet.client_id == COLOR_BLU) // XXX. MUST ASK SERVER FOR FIRST AVAIL PLAYER. BLUE IS OK FOR NOW.
+            if(args.is_spectator)
             {
                 // PATHS ARE TOO RISKY TO RESTORE.
                 Units_FreeAllPathsForRecovery(units);
@@ -101,17 +101,25 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(packet.control != PACKET_CONTROL_SPEED_UP)
             {
-                const Share share = units.stamp[units.color];
-                floats = Units_Float(floats, units, data.graphics, overview, grid, map, share.motive);
-                Video_Draw(video, data, map, units, floats, overview, grid);
-                const int32_t t1 = SDL_GetTicks();
-                Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+                if(args.is_spectator)
+                {
+                    if(Packet_IsReady(packet))
+                        Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
+                }
+                else
+                {
+                    const Share share = units.stamp[units.color];
+                    floats = Units_Float(floats, units, data.graphics, overview, grid, map, share.motive);
+                    Video_Draw(video, data, map, units, floats, overview, grid);
+                    const int32_t t1 = SDL_GetTicks();
+                    Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+                }
                 const int32_t t2 = SDL_GetTicks();
                 const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
                 if(ms > 0)
                     SDL_Delay(ms);
             }
-            if(args.measure && cycles == 60)
+            if(args.must_measure && cycles == 60)
                 break;
         }
         Field_Free(field);
@@ -130,9 +138,9 @@ static void RunClient(const Args args)
     Sock_Init();
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Make(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
-    Video_PrintLobby(video, 0, 0, COLOR_GAIA, 0);
+    Video_PrintLobby(video, 0, 0, 0, "Loading");
     const Data data = Data_Load(args.path);
-    args.demo
+    args.is_demo
         ? Video_RenderDataDemo(video, data, args.color)
         : Play(video, data, args);
     Video_Free(video);
@@ -157,7 +165,7 @@ static int32_t RunServerPings(void* const data)
 static void RunServer(const Args args)
 {
     Sockets_Init();
-    if(!args.measure)
+    if(!args.must_measure)
         srand(time(NULL));
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.
     Sockets sockets = Sockets_Make(args.port);
@@ -169,7 +177,7 @@ static void RunServer(const Args args)
         sockets = Sockets_Accept(sockets);
         resets = Sockets_Accept(resets);
         sockets = Sockets_Recv(sockets, &cache);
-        Sockets_Send(sockets, &cache, cycles, args.quiet);
+        Sockets_Send(sockets, &cache, cycles, args.is_quiet);
         Sockets_Reset(resets, &cache);
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = 10 - (t1 - t0);

@@ -20,13 +20,12 @@ static void QuickClear(const Video video)
     SDL_RenderClear(video.renderer);
 }
 
-void Video_PrintLobby(const Video video, const int32_t users_connected, const int32_t users, const Color color, const int32_t loops)
+void Video_PrintLobby(const Video video, const int32_t users_connected, const int32_t users, const int32_t cycles, const char* const string)
 {
-    const char* const string = (color == COLOR_GAIA) ? "Loading" : Color_ToString(color);
     QuickClear(video);
     const char* const periods[] = { "", ".", "..", "...", "....", "....." };
     const int32_t period = 10;
-    const int32_t index = (loops % (period * UTIL_LEN(periods))) / period;
+    const int32_t index = (cycles % (period * UTIL_LEN(periods))) / period;
     Text_Printf(video.text, video.renderer, video.middle, POSITION_MIDDLE, 0xFF, 0,
             "%s\n"
             "%d / %d\n"
