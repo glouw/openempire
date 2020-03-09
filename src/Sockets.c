@@ -75,10 +75,10 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
                     cache->pings[i] = overview.ping;
                     if(Overview_UsedAction(overview))
                         cache->packet.overview[i] = overview;
-                    Cache_CheckParity(cache);
                 }
             }
         }
+    Cache_CheckParity(cache);
     return sockets;
 }
 
@@ -116,42 +116,37 @@ static int32_t RunSendNeedle(void* const data)
 
 static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
-    if(cache->can_send)
+    const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
+    const int32_t buffer = 3;
+    const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
+    Packet base = cache->packet;
+    base.turn = cache->turn;
+    base.exec_cycle = exec_cycle;
+    base.is_stable = cache->is_stable;
+    base.is_out_of_sync = cache->is_out_of_sync;
+    base.game_running = game_running;
+    base.users_connected = cache->users_connected;
+    base.users = cache->users;
+    base.seed = cache->seed;
+    base.map_size = cache->map_size;
+    if(!cache->is_stable)
+        base = Packet_ZeroOverviews(base);
+    SendNeedle  needles[COLOR_COUNT]; // THREADS ENSURE ALL CLIENTS GET THEIR PACKETS ROUGHLY AT THE SAME TIME.
+    SDL_Thread* threads[COLOR_COUNT]; // FOR EXAMPLE, A SLIGHT HANG ON CLIENT 2 WILL NOT DELAY CLIENT 7 AND MISS ITS EXEC CYCLE DEADLINE.
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
-        const int32_t buffer = 3;
-        const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
-        Packet base = cache->packet;
-        base.turn = cache->turn;
-        base.exec_cycle = exec_cycle;
-        base.is_stable = cache->is_stable;
-        base.is_out_of_sync = cache->is_out_of_sync;
-        base.game_running = game_running;
-        base.users_connected = cache->users_connected;
-        base.users = cache->users;
-        base.seed = cache->seed;
-        base.map_size = cache->map_size;
-        if(!cache->is_stable)
-            base = Packet_ZeroOverviews(base);
-        SendNeedle  needles[COLOR_COUNT]; // THREADS ENSURE ALL CLIENTS GET THEIR PACKETS ROUGHLY AT THE SAME TIME.
-        SDL_Thread* threads[COLOR_COUNT]; // FOR EXAMPLE, A SLIGHT HANG ON CLIENT 2 WILL NOT DELAY CLIENT 7 AND MISS ITS EXEC CYCLE DEADLINE.
-        for(int32_t i = 0; i < COLOR_COUNT; i++)
+        Packet packet = base;
+        const TCPsocket socket = sockets.socket[i];
+        needles[i].socket = socket;
+        if(socket)
         {
-            Packet packet = base;
-            const TCPsocket socket = sockets.socket[i];
-            needles[i].socket = socket;
-            if(socket)
-            {
-                packet.control = cache->control[i];
-                packet.client_id = i;
-                needles[i].packet = packet;
-            }
+            packet.control = cache->control[i];
+            packet.client_id = i;
+            needles[i].packet = packet;
         }
-        for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunSendNeedle, "N/A", &needles[i]);
-        for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
-        if(base.is_out_of_sync)
-            cache->can_send = false;
     }
+    for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunSendNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
 }
 
 static bool ShouldSend(const int32_t cycles, const int32_t interval)
@@ -254,7 +249,6 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
                 for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
                 for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
                 cache->is_out_of_sync = false;
-                cache->can_send = true;
                 Restore_Free(restore);
             }
         }
