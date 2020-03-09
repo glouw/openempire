@@ -25,12 +25,14 @@ static Overview WaitInLobby(const Video video, const Sock sock)
         if(Packet_IsAlive(packet))
         {
             overview.color = (Color) packet.client_id;
-            Video_PrintLobby(video, packet.users_connected, packet.users, cycles++, Color_ToString(overview.color));
+            const char* const message = Color_ToString(overview.color);
+            Video_PrintLobby(video, packet.users_connected, packet.users, cycles++, message);
             if(packet.game_running)
             {
                 overview.users = packet.users;
                 overview.map_size = packet.map_size;
                 overview.seed = packet.seed;
+                overview.spectator = (Color) (overview.users - 1);
                 break;
             }
         }
@@ -50,7 +52,7 @@ static void Play(const Video video, const Data data, const Args args)
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     Units units  = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
     Units floats = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
-    units = Units_Generate(units, map, grid, data.graphics, overview.users);
+    units = Units_Generate(units, map, grid, data.graphics, overview.users, overview.spectator);
     overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Make();
     int32_t cycles = 0;
@@ -71,7 +73,7 @@ static void Play(const Video video, const Data data, const Args args)
             // DISPOSES KERNEL SPACE BUFFERING.
             Packet_Flush(sock);
             // DOES NOT RESTORE PATHS -- TOO RISKY.
-            if(args.is_spectator)
+            if(Overview_IsSpectator(overview))
             {
                 Units_FreeAllPathsForRecovery(units);
                 const Restore restore = Units_PackRestore(units, cycles);
@@ -101,7 +103,7 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(packet.control != PACKET_CONTROL_SPEED_UP)
             {
-                if(args.is_spectator)
+                if(Overview_IsSpectator(overview))
                 {
                     if(Packet_IsReady(packet))
                         Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");

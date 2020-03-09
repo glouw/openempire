@@ -174,3 +174,8 @@ bool Overview_UsedAction(const Overview overview)
 {
     return overview.event.mouse_lu || overview.event.mouse_ru;
 }
+
+bool Overview_IsSpectator(const Overview overview)
+{
+    return overview.color == overview.spectator;
+}

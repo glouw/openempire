@@ -43,7 +43,7 @@ Field Units_Field(const Units, const Map);
 
 void Units_ResetTiled(const Units);
 
-Units Units_Generate(Units, const Map, const Grid, const Registrar, const int32_t users);
+Units Units_Generate(Units, const Map, const Grid, const Registrar, const int32_t users, const Color spectator);
 
 Units Units_Caretake(Units, const Registrar, const Grid, const Map, const Field);
 

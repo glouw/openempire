@@ -21,6 +21,7 @@ typedef struct
     Point mouse_cursor;
     Event event;
     Color color;
+    Color spectator;
     Share incoming;
     int32_t xres;
     int32_t yres;
@@ -48,3 +49,5 @@ Point Overview_IsoSnapTo(const Overview, const Grid, const Point);
 bool Overview_IsSelectionBoxBigEnough(const Overview);
 
 bool Overview_UsedAction(const Overview);
+
+bool Overview_IsSpectator(const Overview);

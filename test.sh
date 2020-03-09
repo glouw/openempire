@@ -32,8 +32,6 @@ batch()
 {
     BIN=openempires
     ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT &
-    SERVER_PID=$!
-    ./$BIN --spectator --xres 400 --yres 300 --host $HOST --port $PORT --$CIV 0 &
     for (( i = 0; i < $(($USERS - 1)); i++ ))
     do
         D=20
@@ -42,9 +40,8 @@ batch()
         CIV=$((i % $CIVS))
         ./$BIN --xres $X --yres $Y --civ $CIV --host $HOST --port $PORT &
     done
-    LAST_PID=$!
-    wait $LAST_PID
-    kill $SERVER_PID
+    sleep 5
+    ./$BIN --xres 400 --yres 300 --host $HOST --port $PORT --$CIV 0
 }
 
 build

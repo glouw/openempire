@@ -1261,7 +1261,7 @@ static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, 
     return units;
 }
 
-static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
+static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color spectator)
 {
     static Point zero;
     const Button button = { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE };
@@ -1269,24 +1269,27 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
     for(int32_t i = 0; i < users; i++)
     {
         const Color color = (Color) i;
-        const Age age = units.stamp[color].status.age;
-        const Civ civ = units.stamp[color].status.civ;
-        const Parts towncenter = Parts_FromButton(button, age, civ);
-        const int32_t index = (i * points.count) / users;
-        const Point slot = points.point[index];
-        units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
-        units = GenerateVillagers(units, map, grid, graphics, slot, color);
-        units = GenerateStartingTrees(units, map, grid, graphics, slot);
-        Parts_Free(towncenter);
+        if(color != spectator)
+        {
+            const Age age = units.stamp[color].status.age;
+            const Civ civ = units.stamp[color].status.civ;
+            const Parts towncenter = Parts_FromButton(button, age, civ);
+            const int32_t index = (i * points.count) / users;
+            const Point slot = points.point[index];
+            units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
+            units = GenerateVillagers(units, map, grid, graphics, slot, color);
+            units = GenerateStartingTrees(units, map, grid, graphics, slot);
+            Parts_Free(towncenter);
+        }
     }
     Points_Free(points);
     return units;
 }
 
-Units Units_Generate(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users)
+Units Units_Generate(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color spectator)
 {
     return (users > 0)
-        ? GenerateTownCenters(units, map, grid, graphics, users)
+        ? GenerateTownCenters(units, map, grid, graphics, users, spectator)
         : units;
 }
 
