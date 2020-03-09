@@ -238,22 +238,25 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
 {
     if(SDLNet_CheckSockets(resets.set, 0))
     {
-        const TCPsocket socket = resets.socket[COLOR_BLU];
-        if(SDLNet_SocketReady(socket))
+        for(int32_t j = 0; j < COLOR_COUNT; j++)
         {
-            const Restore restore = Restore_Recv(socket);
-            RestoreNeedle needles[COLOR_COUNT];
-            SDL_Thread*   threads[COLOR_COUNT];
-            for(int32_t i = 0; i < COLOR_COUNT; i++)
+            const TCPsocket socket = resets.socket[j];
+            if(SDLNet_SocketReady(socket))
             {
-                needles[i].socket = resets.socket[i];
-                needles[i].restore = restore;
+                const Restore restore = Restore_Recv(socket);
+                RestoreNeedle needles[COLOR_COUNT];
+                SDL_Thread*   threads[COLOR_COUNT];
+                for(int32_t i = 0; i < COLOR_COUNT; i++)
+                {
+                    needles[i].socket = resets.socket[i];
+                    needles[i].restore = restore;
+                }
+                for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
+                for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
+                cache->is_out_of_sync = false;
+                cache->can_send = true;
+                Restore_Free(restore);
             }
-            for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
-            for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
-            cache->is_out_of_sync = false;
-            cache->can_send = true;
-            Restore_Free(restore);
         }
     }
 }
