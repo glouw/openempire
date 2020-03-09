@@ -66,9 +66,13 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
+            // DISPOSES USER SPACE BUFFERING.
+            packets = Packets_Clear(packets);
+            // DISPOSES KERNEL SPACE BUFFERING.
+            Packet_Flush(sock);
+            // DOES NOT RESTORE PATHS -- TOO RISKY.
             if(args.is_spectator)
             {
-                // PATHS ARE TOO RISKY TO RESTORE.
                 Units_FreeAllPathsForRecovery(units);
                 const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
@@ -78,10 +82,6 @@ static void Play(const Video video, const Data data, const Args args)
             // SYNCS SEEDS AND CYCLES.
             cycles = restore.cycles;
             Util_Srand(overview.seed);
-            // DISPOSES USER SPACE BUFFERING.
-            packets = Packets_Clear(packets);
-            // DISPOSES KERNEL SPACE BUFFERING.
-            Packet_Flush(sock);
             Restore_Free(restore);
         }
         else
