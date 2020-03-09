@@ -2,6 +2,7 @@
 
 #include "Packet.h"
 #include "Color.h"
+#include "History.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -21,6 +22,7 @@ typedef struct
     bool is_stable;
     bool is_out_of_sync;
     char control[COLOR_COUNT];
+    History history[COLOR_COUNT];
 }
 Cache;
 
@@ -30,7 +32,9 @@ void Cache_CheckStability(Cache* const, const int32_t setpoint);
 
 void Cache_CheckParity(Cache* const);
 
-void Cache_Clear(Cache* const);
+void Cache_ClearPacket(Cache* const);
+
+void Cache_ClearHistory(Cache* const);
 
 int32_t Cache_GetCycleSetpoint(Cache* const);
 

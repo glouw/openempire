@@ -18,18 +18,34 @@ void Cache_CheckStability(Cache* const cache, const int32_t setpoint)
     cache->is_stable = setpoint > CONFIG_SOCKETS_THRESHOLD_START;
 }
 
+static bool MisMatch(Cache* const cache, const int32_t cycles_check, const int32_t parity_check)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const History history = cache->history[i];
+        for(int32_t j = 0; j < history.count; j++)
+        {
+            const int32_t cycles = cache->cycles[i];
+            const int32_t parity = cache->parity[i];
+            if(cycles == cycles_check
+            && parity != parity_check)
+                return true;
+        }
+    }
+    return false;
+}
+
 void Cache_CheckParity(Cache* const cache) // XXX. CHECKS SHOULD HAPPEN ON EVERY INCOMING CYCLE AND PARITY, NOT THE LAST ONE FOR EVERY TURN.
 {
     if(cache->is_stable)
-        for(int32_t j = 0; j < COLOR_COUNT; j++)
+        for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
-            const int32_t cycles_check = cache->cycles[j];
-            const int32_t parity_check = cache->parity[j];
-            for(int32_t i = 0; i < COLOR_COUNT; i++)
+            const History history = cache->history[i];
+            for(int32_t j = 0; j < history.count; j++)
             {
-                const int32_t cycles = cache->cycles[i];
-                const int32_t parity = cache->parity[i];
-                if(cycles == cycles_check && parity != parity_check)
+                const int32_t cycles_check = history.cycles[j];
+                const int32_t parity_check = history.parity[j];
+                if(MisMatch(cache, cycles_check, parity_check))
                 {
                     cache->is_out_of_sync = true;
                     return;
@@ -38,11 +54,18 @@ void Cache_CheckParity(Cache* const cache) // XXX. CHECKS SHOULD HAPPEN ON EVERY
         }
 }
 
-void Cache_Clear(Cache* const cache)
+void Cache_ClearPacket(Cache* const cache)
 {
     static Packet zero;
     cache->packet = zero;
     cache->turn++;
+}
+
+void Cache_ClearHistory(Cache* const cache)
+{
+    static History zero;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        cache->history[i] = zero;
 }
 
 int32_t Cache_GetCycleSetpoint(Cache* const cache)

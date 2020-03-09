@@ -69,12 +69,15 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
                 }
                 if(bytes == sizeof(overview))
                 {
-                    cache->cycles[i] = overview.cycles;
-                    cache->parity[i] = overview.parity;
+                    const int32_t count = cache->history[i].count++;
+                    cache->history[i].cycles[count] = cache->cycles[i] = overview.cycles;
+                    cache->history[i].parity[count] = cache->parity[i] = overview.parity;
                     cache->queue_size[i] = overview.queue_size;
                     cache->pings[i] = overview.ping;
                     if(Overview_UsedAction(overview))
                         cache->packet.overview[i] = overview;
+                    if(count == CONFIG_CACHE_HISTORY_COUNT)
+                        cache->history[i].count = 0;
                 }
             }
         }
@@ -183,7 +186,7 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
         if(!quiet)
             Print(sockets, cache, setpoint, max_ping, game_running);
         Send(sockets, cache, max_cycle, max_ping, game_running);
-        Cache_Clear(cache);
+        Cache_ClearPacket(cache);
     }
 }
 
@@ -251,8 +254,9 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
                 for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
                 cache->is_out_of_sync = false;
                 Restore_Free(restore);
+                Cache_ClearHistory(cache);
                 puts("GAME SUCCESSFULLY RESTORED");
-                break;
+                return;
             }
         }
     }
