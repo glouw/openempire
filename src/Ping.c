@@ -40,8 +40,8 @@ static int32_t Ping(void* const data)
         const uint8_t send = 0xAF;
         uint8_t temp = 0x0;
         const int32_t t0 = SDL_GetTicks();
-        assert(UTIL_TCP_SEND(pinger.server, &send) == 1);
-        assert(UTIL_TCP_RECV(pinger.server, &temp) == 1);
+        assert(UTIL_TCP_SEND(pinger.server, &send) == sizeof(send));
+        assert(UTIL_TCP_RECV(pinger.server, &temp) == sizeof(temp));
         const int32_t t1 = SDL_GetTicks();
         const int32_t dt = t1 - t0;
         if(temp == send)

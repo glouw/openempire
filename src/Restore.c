@@ -54,6 +54,7 @@ static Restore RecvPacked(const TCPsocket socket)
     free(buffer);
     const uint8_t ack = RESTORE_COMPLETE;
     assert(UTIL_TCP_SEND(socket, &ack) == sizeof(uint8_t));
+    SDL_Delay(250); // XXX. THIS DELAY MAY NEED TO ACCOUNT FOR PING TIMES.
     return restore;
 }
 

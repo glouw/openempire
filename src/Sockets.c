@@ -212,8 +212,8 @@ void Sockets_Ping(const Sockets pingers)
             if(SDLNet_SocketReady(socket))
             {
                 uint8_t temp = 0;
-                assert(UTIL_TCP_RECV(socket, &temp) == sizeof(uint8_t));
-                assert(UTIL_TCP_SEND(socket, &temp) == sizeof(uint8_t));
+                assert(UTIL_TCP_RECV(socket, &temp) == sizeof(temp)); // XXX. DO NOT CHECK LENGTH AND RECOVER WHEN THINGS GO WRONG!
+                assert(UTIL_TCP_SEND(socket, &temp) == sizeof(temp));
             }
         }
 }

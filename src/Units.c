@@ -783,8 +783,7 @@ static void ResetInterests(const Units units)
             for(int32_t j = 0; j < units.count; j++) // XXX. A BINARY SERACH WOULD BE BETTER.
             {
                 Unit* const b = &units.unit[j];
-                if(a != b
-                && a->interest_id == b->id)
+                if(a->interest_id == b->id)
                 {
                     a->interest = b;
                     break;
@@ -801,6 +800,7 @@ static Units RemoveGarbage(Units units)
 {
     FlagGarbage(units);
     units = Resize(units);
+    NullInterestPointers(units);
     ResetInterests(units);
     return units;
 }
