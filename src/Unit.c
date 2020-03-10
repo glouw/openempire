@@ -484,10 +484,13 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         if(MustDisengage(unit))
         {
             unit->is_engaged_in_melee = false;
-            unit->interest->health -= unit->trait.attack;
             Unit_Unlock(unit);
-            if(unit->trait.type == TYPE_VILLAGER)
-                return CollectResource(unit);
+            if(unit->interest)
+            {
+                unit->interest->health -= unit->trait.attack;
+                if(unit->trait.type == TYPE_VILLAGER)
+                    return CollectResource(unit);
+            }
         }
     }
     else

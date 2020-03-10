@@ -451,11 +451,24 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE);
 }
 
+static void Unreference(const Units units, Unit* const unit)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const other = &units.unit[i];
+        if(other->interest_id == unit->id)
+        {
+            other->is_engaged_in_melee = false;
+            Unit_SetInterest(other, NULL);
+        }
+    }
+}
+
 static void KillChildren(const Units units, Unit* const unit)
 {
-    for(int32_t j = 0; j < units.count; j++)
+    for(int32_t i = 0; i < units.count; i++)
     {
-        Unit* const child = &units.unit[j];
+        Unit* const child = &units.unit[i];
         if(child->parent_id == unit->id)
             Unit_Kill(child);
     }
@@ -464,6 +477,7 @@ static void KillChildren(const Units units, Unit* const unit)
 static void Kill(const Units units, Unit* const unit)
 {
     Unit_Kill(unit);
+    Unreference(units, unit);
     if(unit->has_children)
         KillChildren(units, unit);
 }
@@ -555,6 +569,7 @@ static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid gri
     else
         Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
     Unit_SetInterest(unit, closest);
+    unit->using_attack_move = true;
 }
 
 static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
