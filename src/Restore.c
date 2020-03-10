@@ -52,9 +52,9 @@ static Restore RecvPacked(const TCPsocket socket)
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         restore.stamp[i] = stamp[i];
     free(buffer);
+    SDL_Delay(250); // XXX. THIS DELAY MAY NEED TO ACCOUNT FOR PING TIMES.
     const uint8_t ack = RESTORE_COMPLETE;
     assert(UTIL_TCP_SEND(socket, &ack) == sizeof(uint8_t));
-    SDL_Delay(250); // XXX. THIS DELAY MAY NEED TO ACCOUNT FOR PING TIMES.
     return restore;
 }
 

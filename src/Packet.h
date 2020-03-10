@@ -7,8 +7,6 @@
 #include <stdbool.h>
 #include <SDL2/SDL_net.h>
 
-enum { PACKET_CONTROL_SPEED_UP = '+', PACKET_CONTROL_STEADY = '*' }; // XXX. DO NOT USE CONTROL CHARS... USE INTEGER FOR CYCLE COUNT.
-
 // NO POINTERS ANYWHERE IN HERE! PERFECT FOR TCP...
 
 typedef struct
@@ -21,7 +19,7 @@ typedef struct
     int32_t users;
     int32_t seed;
     int32_t map_size;
-    char control;
+    int32_t control;
     bool is_stable;
     bool is_out_of_sync;
     bool game_running;

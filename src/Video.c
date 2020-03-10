@@ -107,7 +107,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
-#if SANITIZE_THREAD == 0
+#if SANITIZE_THREAD == 0 && CONFIG_VIDEO_RENDER_TERRAIN == 1
     // BREAKS SANITIZER - BUT THAT'S OKAY - RENDERER RACE CONDITIONS WILL NOT AFFECT SYNCING P2P.
     Vram_DrawMap(vram, data.terrain, map, overview, grid, data.blendomatic, blend_lines, terrain_tiles);
 #endif

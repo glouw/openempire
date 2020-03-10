@@ -93,11 +93,11 @@ static void Print(const Sockets sockets, Cache* const cache, const int32_t setpo
         const uint64_t parity = cache->parity[i];
         const int32_t cycles = cache->cycles[i];
         const int32_t ping = cache->pings[i];
-        const char control = cache->control[i];
+        const int32_t control = cache->control[i];
         const char queue_size = cache->queue_size[i];
         const char parity_symbol = cache->is_stable ? '!' : '?';
         const TCPsocket socket = sockets.socket[i];
-        printf("%d :: %d :: %d :: %c :: 0x%016lX :: %c :: CYCLES %d :: QUEUE %d -> %d ms\n",
+        printf("%d :: %d :: %d :: %c :: 0x%016lX :: %d :: CYCLES %d :: QUEUE %d -> %d ms\n",
                 game_running, i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
     }
 }
@@ -212,8 +212,10 @@ void Sockets_Ping(const Sockets pingers)
             if(SDLNet_SocketReady(socket))
             {
                 uint8_t temp = 0;
-                assert(UTIL_TCP_RECV(socket, &temp) == sizeof(temp)); // XXX. DO NOT CHECK LENGTH AND RECOVER WHEN THINGS GO WRONG!
-                assert(UTIL_TCP_SEND(socket, &temp) == sizeof(temp));
+                const int32_t a = UTIL_TCP_RECV(socket, &temp); // XXX. DO NOT CHECK LENGTH AND RECOVER WHEN THINGS GO WRONG!
+                const int32_t b = UTIL_TCP_SEND(socket, &temp);
+                if(a != sizeof(temp)) printf("WARNING :: SOCKETS :: a was %d bytes\n", a);
+                if(b != sizeof(temp)) printf("WARNING :: SOCKETS :: b was %d bytes\n", b);
             }
         }
 }

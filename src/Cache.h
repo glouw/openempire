@@ -21,7 +21,7 @@ typedef struct
     int32_t map_size;
     bool is_stable;
     bool is_out_of_sync;
-    char control[COLOR_COUNT];
+    int32_t control[COLOR_COUNT];
     History history[COLOR_COUNT];
 }
 Cache;

@@ -56,6 +56,7 @@ static void Play(const Video video, const Data data, const Args args)
     overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Make();
     int32_t cycles = 0;
+    int32_t loops = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
@@ -101,26 +102,27 @@ static void Play(const Video video, const Data data, const Args args)
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
             cycles++;
-            if(packet.control != PACKET_CONTROL_SPEED_UP)
+            if(packet.control != 0)
+                loops = packet.control;
+            if(loops --> 0)
+                continue;
+            if(Overview_IsSpectator(overview))
             {
-                if(Overview_IsSpectator(overview))
-                {
-                    if(Packet_IsReady(packet))
-                        Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
-                }
-                else
-                {
-                    const Share share = units.stamp[units.color];
-                    floats = Units_Float(floats, units, data.graphics, overview, grid, map, share.motive);
-                    Video_Draw(video, data, map, units, floats, overview, grid);
-                    const int32_t t1 = SDL_GetTicks();
-                    Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
-                }
-                const int32_t t2 = SDL_GetTicks();
-                const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
-                if(ms > 0)
-                    SDL_Delay(ms);
+                if(Packet_IsReady(packet))
+                    Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
             }
+            else
+            {
+                const Share share = units.stamp[units.color];
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, share.motive);
+                Video_Draw(video, data, map, units, floats, overview, grid);
+                const int32_t t1 = SDL_GetTicks();
+                Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+            }
+            const int32_t t2 = SDL_GetTicks();
+            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
+            if(ms > 0)
+                SDL_Delay(ms);
             if(args.must_measure && cycles == 60)
                 break;
         }

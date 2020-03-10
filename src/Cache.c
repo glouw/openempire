@@ -128,7 +128,13 @@ int32_t Cache_GetPingMax(Cache* const cache)
 void Cache_CalculateControlChars(Cache* const cache, const int32_t setpoint)
 {
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        cache->control[i] = (cache->cycles[i] < setpoint)
-            ? PACKET_CONTROL_SPEED_UP
-            : PACKET_CONTROL_STEADY;
+    {
+        const int32_t diff = setpoint - cache->cycles[i];
+        cache->control[i] =
+            (diff > 40) ? 5 :
+            (diff > 30) ? 4 :
+            (diff > 20) ? 3 :
+            (diff > 10) ? 2 :
+            (diff >  0) ? 1 : 0;
+    }
 }

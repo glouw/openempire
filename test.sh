@@ -6,7 +6,7 @@
 LATENCY=25ms
 VARIANCE=5ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 2.1%.
-XRES=1300
+XRES=1200
 YRES=700
 USERS=3
 CIVS=4
@@ -31,7 +31,7 @@ netsim()
 batch()
 {
     BIN=openempires
-    ./$BIN --server --users $USERS --map_size $MAP_SIZE --port $PORT &
+    ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT &
     for (( i = 0; i < $(($USERS - 1)); i++ ))
     do
         D=20
