@@ -1266,7 +1266,8 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
     static Point zero;
     const Button button = { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE };
     const Points points = Map_GetSlots(map);
-    for(int32_t i = 0; i < users; i++)
+    const int32_t players = users - 1; // DO NOT INCLUDE SPECTATOR.
+    for(int32_t i = 0; i < players; i++)
     {
         const Color color = (Color) i;
         if(color != spectator)
@@ -1274,7 +1275,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
             const Age age = units.stamp[color].status.age;
             const Civ civ = units.stamp[color].status.civ;
             const Parts towncenter = Parts_FromButton(button, age, civ);
-            const int32_t index = (i * points.count) / users;
+            const int32_t index = (i * points.count) / players;
             const Point slot = points.point[index];
             units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
             units = GenerateVillagers(units, map, grid, graphics, slot, color);
@@ -1288,7 +1289,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
 
 Units Units_Generate(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color spectator)
 {
-    return (users > 0)
+    return (users > 1)
         ? GenerateTownCenters(units, map, grid, graphics, users, spectator)
         : units;
 }
