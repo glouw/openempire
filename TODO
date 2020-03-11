@@ -1,4 +1,0 @@
-[ x ] spectator player
-[ x ] cache must have depth for parity and cycles
-[   ] speeding up clients must be by integer loop count (1, 2, 3, etc)
-[ x ] lower the window for timing out
