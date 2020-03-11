@@ -8,14 +8,14 @@ lines of C99 or less, using only SDL2 as an external dependency.
 
 ## Dependencies
 
-Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
-Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
+    Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
+    Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
 ## Building
 
-git clone https://github.com/glouw/openempires
-cd openempires
-make -C src
+    git clone https://github.com/glouw/openempires
+    cd openempires
+    make -C src
 
 ## Running
 
