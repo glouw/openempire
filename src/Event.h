@@ -29,7 +29,6 @@ typedef struct
         key_1          : 1,
         key_2          : 1,
         key_3          : 1,
-        key_left_ctrl  : 1,
         key_left_shift : 1,
         key_left_alt   : 1,
         tab            : 1;

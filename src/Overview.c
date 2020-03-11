@@ -47,7 +47,6 @@ static Overview UpdateKeys(Overview overview, const Input input)
     overview.event.key_1 = input.key[SDL_SCANCODE_1];
     overview.event.key_2 = input.key[SDL_SCANCODE_2];
     overview.event.key_3 = input.key[SDL_SCANCODE_3];
-    overview.event.key_left_ctrl  = input.key[SDL_SCANCODE_LCTRL];
     overview.event.key_left_shift = input.key[SDL_SCANCODE_LSHIFT];
     overview.event.key_left_alt   = input.key[SDL_SCANCODE_LALT];
     overview.event.tab = input.key[SDL_SCANCODE_TAB];

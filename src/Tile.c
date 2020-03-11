@@ -165,7 +165,7 @@ void Tile_Select(const Tile tile)
     if(!Unit_IsExempt(tile.reference))
     {
         tile.reference->is_selected = true;
-#if 1
+#if 0
         Unit_Print(tile.reference);
 #endif
     }

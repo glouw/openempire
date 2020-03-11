@@ -41,7 +41,7 @@ batch()
         ./$BIN --xres $X --yres $Y --civ $CIV --host $HOST --port $PORT &
     done
     # SPECTATOR MUST CONNECT LAST, SO ENSURE WITH A SLEEP THEY COME LAST.
-    sleep 1
+    sleep 2
     ./$BIN --xres 400 --yres 300 --host $HOST --port $PORT --$CIV 0
 }
 

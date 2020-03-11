@@ -119,7 +119,9 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
             if(tile.reference)
             {
                 Tile_Select(tile);
-                units.select_count = overview.event.key_left_ctrl ? Tiles_SelectSimilar(tiles, tile) : 1;
+                units.select_count = overview.event.key_left_shift
+                    ? Tiles_SelectSimilar(tiles, tile)
+                    : 1;
             }
         }
         Tiles_Free(tiles);
