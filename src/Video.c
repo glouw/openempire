@@ -107,8 +107,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);
     Vram_DrawUnitHealthBars(vram, graphics_tiles);
-#if SANITIZE_THREAD == 0 && CONFIG_VIDEO_RENDER_TERRAIN == 1
-    // BREAKS SANITIZER - BUT THAT'S OKAY - RENDERER RACE CONDITIONS WILL NOT AFFECT SYNCING P2P.
+#if SANITIZE == 0
     Vram_DrawMap(vram, data.terrain, map, overview, grid, data.blendomatic, blend_lines, terrain_tiles);
 #endif
     Vram_DrawUnits(vram, graphics_tiles_floats);
@@ -117,7 +116,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_FlashDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);
     Vram_FlashUnits(vram, graphics_tiles);
     Vram_DrawSelectedDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);
-    const bool should_draw = overview.event.mouse_l && !overview.event.key_left_shift;
+    const bool should_draw = overview.event.mouse_l && !overview.event.key_left_alt;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
     Vram_DrawMotiveRow(vram, data.interfac, units.stamp[units.color], units.color);
     Vram_DrawHud(vram, data.interfac);

@@ -233,32 +233,12 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
 
 void Unit_Print(Unit* const unit)
 {
-    printf("is_state_locked       :: %d\n",    unit->is_state_locked);
-    printf("action                :: %d\n",    unit->trait.action);
-    printf("type                  :: %d\n",    unit->trait.type);
     printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
     printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+    printf("cart_goal             :: %d %d\n", unit->cart_goal.x, unit->cart_goal.y);
     printf("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
     printf("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
-    printf("max_speed             :: %d\n",    unit->trait.max_speed);
-    printf("velocity              :: %d %d\n", unit->velocity.x, unit->velocity.y);
-    printf("path_index_timer      :: %d\n",    unit->path_index_timer);
-    printf("path_index            :: %d\n",    unit->path_index);
-    printf("path.count            :: %d\n",    unit->path.count);
-    printf("selected              :: %d\n",    unit->is_selected);
-    printf("file                  :: %d\n",    unit->file);
-    printf("file_name             :: %s\n",    unit->trait.file_name);
-    printf("id                    :: %d\n",    unit->id);
-    printf("parent_id             :: %d\n",    unit->parent_id);
-    printf("command_group         :: %d\n",    unit->command_group);
-    printf("health                :: %d\n",    unit->health);
-    printf("attack_frames_per_dir :: %d\n",    unit->attack_frames_per_dir);
-    printf("fall_frames_per_dir   :: %d\n",    unit->fall_frames_per_dir);
-    printf("decay_frames_per_dir  :: %d\n",    unit->decay_frames_per_dir);
-    printf("can_expire            :: %d\n",    unit->trait.can_expire);
-    printf("expire_frames         :: %d\n",    unit->expire_frames);
-    printf("state_timer           :: %d\n",    unit->state_timer);
-    printf("must_garbage_collect  :: %d\n",    unit->must_garbage_collect);
+    printf("cell_inanimate        :: %d %d\n", unit->cell_inanimate.x, unit->cell_inanimate.y);
     printf("\n");
 }
 
@@ -292,7 +272,7 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     }
 }
 
-static Point GetNextBest(Unit* const unit, const Field field)
+static Point GetNextBestInanimateCoord(Unit* const unit, const Field field)
 {
     static Point zero;
     const Point dimensions = unit->interest->trait.dimensions;
@@ -325,14 +305,14 @@ static Points PathStraight(const Point a, const Point b)
 
 static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
 {
-    const Point cell_a = Grid_CartToCell(grid, unit->cart_goal);
-    const Point cell_b = Grid_OffsetToCell(unit->cart_grid_offset_goal);
-    const Point a = unit->cell;
-    const Point b = Point_Add(cell_a, cell_b);
-    const Point dir = Point_Sub(b, a);
-    const int32_t step = 3 * CONFIG_GRID_CELL_SIZE;
+    const Point dir = Point_Sub(
+        Point_Add(
+            Grid_CartToCell(grid, unit->cart_goal),
+            Grid_OffsetToCell(unit->cart_grid_offset_goal)),
+        unit->cell);
+    const int32_t step = CONFIG_GRID_CELL_SIZE;
     const Point mag = Point_Normalize(dir, step);
-    Point cell = a;
+    Point cell = unit->cell;
     while(true)
     {
         const Point cart = Grid_CellToCart(grid, cell);
@@ -353,7 +333,7 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         if(unit->interest
         && unit->interest->trait.is_inanimate)
         {
-            unit->cart_goal = GetNextBest(unit, field);
+            unit->cart_goal = GetNextBestInanimateCoord(unit, field);
             unit->cart_grid_offset_goal = zero;
         }
         else
@@ -423,7 +403,6 @@ static bool MustEngage(Unit* const unit, const Grid grid)
     int32_t reach = CONFIG_UNIT_SWORD_LENGTH + width;
     if(unit->interest->trait.is_inanimate)
     {
-        reach -= width / 2;
         const Point feeler = Point_Normalize(diff, reach);
         const Point cell = Point_Add(unit->cell, feeler);
         const Point cart = Grid_CellToCart(grid, cell);
@@ -504,7 +483,9 @@ void Unit_Repath(Unit* const unit, const Grid grid, const Field field)
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && Unit_HasPath(unit))
-        Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
+        unit->is_engaged_in_melee
+            ? Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal)
+            : Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
 }
 
 static Point Nudge(Unit* const unit)

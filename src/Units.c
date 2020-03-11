@@ -106,7 +106,7 @@ static Units RecountSelected(Units units)
 
 static Units Select(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Points render_points)
 {
-    if(overview.event.mouse_lu && !overview.event.key_left_shift)
+    if(overview.event.mouse_lu && !overview.event.key_left_alt)
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
         Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
@@ -259,8 +259,8 @@ static Point SeparateBoids(const Units units, Unit* const unit)
         for(int32_t x = -width; x <= width; x++)
         for(int32_t y = -width; y <= width; y++)
         {
-            const Point cart_offset = { x, y };
-            const Point cart = Point_Add(unit->cart, cart_offset);
+            const Point shift = { x, y };
+            const Point cart = Point_Add(unit->cart, shift);
             const Stack stack = Units_GetStackCart(units, cart);
             for(int32_t i = 0; i < stack.count; i++)
             {
@@ -283,8 +283,8 @@ static Point AlignBoids(const Units units, Unit* const unit)
         for(int32_t x = -width; x <= width; x++)
         for(int32_t y = -width; y <= width; y++)
         {
-            const Point cart_offset = { x, y };
-            const Point cart = Point_Add(unit->cart, cart_offset);
+            const Point shift = { x, y };
+            const Point cart = Point_Add(unit->cart, shift);
             const Stack stack = Units_GetStackCart(units, cart);
             for(int32_t i = 0; i < stack.count; i++)
             {
@@ -523,8 +523,8 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
     for(int32_t x = -width; x <= width; x++)
     for(int32_t y = -width; y <= width; y++)
     {
-        const Point cart_offset = { x, y };
-        const Point cart = Point_Add(unit->cart, cart_offset);
+        const Point shift = { x, y };
+        const Point cart = Point_Add(unit->cart, shift);
         const Stack stack = Units_GetStackCart(units, cart);
         for(int32_t i = 0; i < stack.count; i++)
         {
@@ -942,14 +942,14 @@ static Units UseIcon(Units units, const Overview overview, const Grid grid, cons
 
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    return (overview.event.key_left_shift && overview.event.mouse_lu)
+    return (overview.event.key_left_alt && overview.event.mouse_lu)
         ? UseIcon(units, overview, grid, graphics, map, false)
         : units;
 }
 
 static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
-    return overview.event.key_left_shift
+    return overview.event.key_left_alt
         ? UseIcon(floats, overview, grid, graphics, map, true)
         : floats;
 }
@@ -1331,7 +1331,11 @@ static Units UnpackRestore(Units units, const Restore restore)
     units.repath_index = 0;
     Unit_SetIdNext(restore.id_next);
     for(int32_t i = 0; i < units.count; i++)
-        units.unit[i]  = restore.unit[i];
+    {
+        Unit* const unit = &units.unit[i];
+        *unit = restore.unit[i];
+        unit->trait.file_name = Graphics_GetString(unit->file);
+    }
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         units.stamp[i] = restore.stamp[i];
     return units;
@@ -1340,9 +1344,9 @@ static Units UnpackRestore(Units units, const Restore restore)
 Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, const Field field)
 {
     units = UnpackRestore(units, restore);
-    ManageStacks(units);
     NullInterestPointers(units);
     ResetInterests(units);
+    ManageStacks(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, grid, field);
     return RecountSelected(units);

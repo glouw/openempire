@@ -194,7 +194,9 @@ static void RunServer(const Args args)
 
 int main(const int argc, const char* argv[])
 {
+#if SANITIZE == 0
     signal(SIGSEGV, Util_PrintTrace);
+#endif
     SDLNet_Init();
     const Args args = Args_Parse(argc, argv);
     args.is_server

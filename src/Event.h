@@ -11,7 +11,6 @@ typedef struct
         mouse_lu       : 1,
         mouse_rd       : 1,
         mouse_ru       : 1,
-        key_left_shift : 1,
         key_q          : 1,
         key_w          : 1,
         key_e          : 1,
@@ -31,6 +30,8 @@ typedef struct
         key_2          : 1,
         key_3          : 1,
         key_left_ctrl  : 1,
+        key_left_shift : 1,
+        key_left_alt   : 1,
         tab            : 1;
 }
 Event;
