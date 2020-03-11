@@ -7,7 +7,6 @@
 #include <SDL2/SDL_mutex.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <assert.h>
 
 static SDL_mutex* mutex;
 
@@ -113,7 +112,7 @@ static int32_t RunSendNeedle(void* const data)
 {
     SendNeedle* const needle = (SendNeedle*) data;
     if(needle->socket)
-        assert(UTIL_TCP_SEND(needle->socket, &needle->packet) == sizeof(Packet));
+        UTIL_TCP_SEND(needle->socket, &needle->packet);
     return 0;
 }
 

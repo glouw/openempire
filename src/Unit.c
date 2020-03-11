@@ -431,18 +431,10 @@ static Resource CollectResource(Unit* const unit)
     };
     switch(unit->interest->trait.type)
     {
-    case TYPE_TREE:
-        resource.type = TYPE_WOOD;
-        break;
-    case TYPE_STONE_MINE:
-        resource.type = TYPE_STONE;
-        break;
-    case TYPE_GOLD_MINE:
-        resource.type = TYPE_GOLD;
-        break;
-    case TYPE_BERRY_BUSH:
-        resource.type = TYPE_FOOD;
-        break;
+    case TYPE_TREE       : resource.type = TYPE_WOOD;  break;
+    case TYPE_STONE_MINE : resource.type = TYPE_STONE; break;
+    case TYPE_GOLD_MINE  : resource.type = TYPE_GOLD;  break;
+    case TYPE_BERRY_BUSH : resource.type = TYPE_FOOD;  break;
     default:
         break;
     }
@@ -568,6 +560,7 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     to->path = from->path;
     to->dir = from->dir;
     to->health = from->health;
+    to->using_attack_move = from->using_attack_move;
     to->cart_goal = from->cart_goal;
     to->cart_grid_offset_goal = from->cart_grid_offset_goal;
 }
