@@ -6,14 +6,19 @@
 #include <stdio.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_mutex.h>
+#include <assert.h>
 
 #define UTIL_LOCK(mutex) (SDL_LockMutex(mutex) == 0)
 
 #define UTIL_UNLOCK(mutex) (SDL_UnlockMutex(mutex))
 
-#define UTIL_TCP_SEND(socket, pointer) SDLNet_TCP_Send(socket, pointer, sizeof(*pointer))
+#define UTIL_TCP_SEND_NO_ASSERT(socket, pointer) SDLNet_TCP_Send(socket, pointer, sizeof(*pointer))
 
-#define UTIL_TCP_RECV(socket, pointer) SDLNet_TCP_Recv(socket, pointer, sizeof(*pointer))
+#define UTIL_TCP_RECV_NO_ASSERT(socket, pointer) SDLNet_TCP_Recv(socket, pointer, sizeof(*pointer))
+
+#define UTIL_TCP_SEND(socket, pointer) assert(UTIL_TCP_SEND_NO_ASSERT(socket, pointer) == sizeof(*pointer))
+
+#define UTIL_TCP_RECV(socket, pointer) assert(UTIL_TCP_RECV_NO_ASSERT(socket, pointer) == sizeof(*pointer))
 
 #define UTIL_SORT(pointer, count, comparator) (qsort(pointer, count, sizeof(*pointer), comparator))
 

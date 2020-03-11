@@ -40,10 +40,8 @@ static int32_t Ping(void* const data)
         const uint8_t send = 0xAF;
         uint8_t temp = 0x0;
         const int32_t t0 = SDL_GetTicks();
-        const int32_t a = UTIL_TCP_SEND(pinger.server, &send);
-        const int32_t b = UTIL_TCP_RECV(pinger.server, &temp);
-        if(a != sizeof(send)) printf("WARNING :: PING :: a was %d bytes\n", a);
-        if(b != sizeof(temp)) printf("WARNING :: PING :: b was %d bytes\n", b);
+        UTIL_TCP_SEND(pinger.server, &send);
+        UTIL_TCP_RECV(pinger.server, &temp);
         const int32_t t1 = SDL_GetTicks();
         const int32_t dt = t1 - t0;
         if(temp == send)

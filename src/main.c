@@ -12,7 +12,6 @@
 
 #include <signal.h>
 #include <time.h>
-#include <assert.h>
 
 static Overview WaitInLobby(const Video video, const Sock sock)
 {
@@ -20,7 +19,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
     Overview overview = Overview_Make(video.xres, video.yres);
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
-        assert(UTIL_TCP_SEND(sock.server, &overview) == sizeof(overview));
+        UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(Packet_IsAlive(packet))
         {

@@ -54,7 +54,7 @@ static Restore RecvPacked(const TCPsocket socket)
     free(buffer);
     SDL_Delay(250); // XXX. THIS DELAY MAY NEED TO ACCOUNT FOR PING TIMES.
     const uint8_t ack = RESTORE_COMPLETE;
-    assert(UTIL_TCP_SEND(socket, &ack) == sizeof(uint8_t));
+    UTIL_TCP_SEND(socket, &ack);
     return restore;
 }
 
@@ -72,16 +72,16 @@ void Restore_Send(const Restore restore, const TCPsocket socket)
     const int32_t size_units = restore.count * sizeof(*restore.unit);
     const int32_t size_real = size_header + size_units;
     /* ---------- HEADER --------- */
-    assert(UTIL_TCP_SEND(socket, &size_real)       == sizeof(int32_t));
-    assert(UTIL_TCP_SEND(socket, &restore.count)   == sizeof(int32_t));
-    assert(UTIL_TCP_SEND(socket, &restore.cycles)  == sizeof(int32_t));
-    assert(UTIL_TCP_SEND(socket, &restore.id_next) == sizeof(int32_t));
-    assert(UTIL_TCP_SEND(socket, &restore.stamp)   == sizeof(restore.stamp));
+    UTIL_TCP_SEND(socket, &size_real);
+    UTIL_TCP_SEND(socket, &restore.count);
+    UTIL_TCP_SEND(socket, &restore.cycles);
+    UTIL_TCP_SEND(socket, &restore.id_next);
+    UTIL_TCP_SEND(socket, &restore.stamp);
     /* ---------- UNITS ---------- */
     SDLNet_TCP_Send(socket, restore.unit, size_units);
     /* ----- ASSERT COMPLETE ----- */
     uint8_t ack = 0;
-    assert(UTIL_TCP_RECV(socket, &ack) == sizeof(uint8_t));
+    UTIL_TCP_RECV(socket, &ack);
     assert(ack == RESTORE_COMPLETE);
 }
 

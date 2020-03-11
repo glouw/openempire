@@ -60,7 +60,7 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
             {
                 static Overview zero;
                 Overview overview = zero;
-                const int32_t bytes = UTIL_TCP_RECV(socket, &overview);
+                const int32_t bytes = UTIL_TCP_RECV_NO_ASSERT(socket, &overview);
                 if(bytes <= 0)
                 {
                     SDLNet_TCP_DelSocket(sockets.set, socket);
@@ -211,10 +211,8 @@ void Sockets_Ping(const Sockets pingers)
             if(SDLNet_SocketReady(socket))
             {
                 uint8_t temp = 0;
-                const int32_t a = UTIL_TCP_RECV(socket, &temp); // XXX. DO NOT CHECK LENGTH AND RECOVER WHEN THINGS GO WRONG!
-                const int32_t b = UTIL_TCP_SEND(socket, &temp);
-                if(a != sizeof(temp)) printf("WARNING :: SOCKETS :: a was %d bytes\n", a);
-                if(b != sizeof(temp)) printf("WARNING :: SOCKETS :: b was %d bytes\n", b);
+                UTIL_TCP_RECV(socket, &temp);
+                UTIL_TCP_SEND(socket, &temp);
             }
         }
 }
