@@ -1,112 +1,97 @@
-## OPEN EMPIRES
+# Open Empires
 
-![Kiku](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
+![](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
 
+Open Empires is an educational multi-player RTS engine capable of interfacing
+with the Age of Empires II and The Conquerors art assets.
 
-    Open Empires is an educational multi-player RTS engine capable of interfacing
-    with the Age of Empires II and The Conquerors art assets.
+Open Empires strives to be written in less than 15,000 lines of C99 using only
+SDL2 as an external dependency.
 
-    Open Empires strives to be written in less than 15,000 lines of C99 using only
-    SDL2 as an external dependency.
+Open Empires borrows gameplay mechanics from Starcraft 2 and Rome Total War.
 
-    Open Empires borrows gameplay mechanics from Starcraft 2 and Rome Total War.
+## Dependencies
 
-# DEPENDENCIES
+Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
+Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
-    Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
-    Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
+## Building
 
-# BUILDING
+git clone https://github.com/glouw/openempires
+cd openempires
+make -C src
 
-    git clone https://github.com/glouw/openempires
-    cd openempires
-    make -C src
+## Running
 
-# RUNNING
+To test the client-server model, run:
 
-    To test the client-server model, run:
+    ./test.sh
 
-        ./test.sh
+Note that this test script runs netem which purposely emulates a
+very laggy and lossy network. Change ENTROPY within test.sh to 0.1%
+to set realistic playing conditions. For development,
+set ENTROPY to 1.0% to stress test the networking engine more efficiently.
 
-    Note that this test script runs netem which purposely emulates a
-    very laggy and lossy network. Change ENTROPY within test.sh to 0.1%
-    to set realistic playing conditions. For development,
-    set ENTROPY to 1.0% to stress test the networking engine more efficiently.
+Otherwise, assuming everything is on localhost, first start the server:
 
-    Otherwise, assuming everything is on localhost, first start the server:
+    ./openempires --server --port 1234
 
-        ./openempires --server --port 1234
+Second, start the client by specifying your window resolution and
+installation data folder path:
 
-    Second, start the client by specifying your window resolution and
-    installation data folder path:
+    ./openempires --host localhost --port 1234 --xres 1440 --yres 900 \
+        --path "/path/to/data/folder"
 
-        ./openempires --host localhost --port 1234 --xres 1440 --yres 900 \
-            --path "/path/to/data/folder"
+## Structure
 
-# STATUS
+C source lives in src/ folder and is compilable by both C++11 and C11
+compilers. C source is separated by typedefs, implemented with .[ch]
+files. General purpose scripts may live in the top level.
 
-    [x] Multithreaded software renderer
-    [x] Random map generation
-    [x] Resources
-    [x] 8 player TCP client / server model
-    [x] Melee combat
-    [x] Unit upgrades
-    [x] All ages and building updates
-    [x] Out of sync recovery
-    [ ] Ranged combat
-    [ ] Unit and building build times and resource use
-    [ ] Sound
+Structs are passed by value such that functions calls modify no more than
+one argument at a time. Link time optimization removes most of the heavy
+function argument copying.
 
-# STRUCTURE
+To simplify the lockstep engine, double and floating points are not used,
+and the standard math library is not linked with the final binary.
 
-    C source lives in src/ folder and is compilable by both C++11 and C11
-    compilers. C source is separated by typedefs, implemented with .[ch]
-    files. General purpose scripts may live in the top level.
+## Legal
 
-    Structs are passed by value such that functions calls modify no more than
-    one argument at a time. Link time optimization removes most of the heavy
-    function argument copying.
+Open Empires was written from scratch with the highest regards of the
+original copyright holders.
 
-    To simplify the lockstep engine, double and floating points are not used,
-    and the standard math library is not linked with the final binary.
+Open Empires is *NOT* a binary decompilation of Age of Empires II,
+and its expansion, The Conquerors.
 
-# LEGAL
+Data, art, and sound files from Age of Empires II - or its expansion,
+The Conquerors - ARE NOT, AND NEVER WILL BE, SUPPLIED.
+To play Open Empires you must legally own the original boxed-set
+version of Age of Empires II and The Conquerors, preferably the
+Gold Edition.
 
-    Open Empires was written from scratch with the highest regards of the
-    original copyright holders.
+Age of Empires II and The Conquerors are copyright (©) by Microsoft
+Corporation and Ensemble Studios.
+Open Empires was created under Microsoft's Game Content Usage Rules:
 
-    Open Empires is *NOT* a binary decompilation of Age of Empires II,
-    and its expansion, The Conquerors.
+    https://www.xbox.com/en-us/developers/rules
 
-    Data, art, and sound files from Age of Empires II - or its expansion,
-    The Conquerors - ARE NOT, AND NEVER WILL BE, SUPPLIED.
-    To play Open Empires you must legally own the original boxed-set
-    version of Age of Empires II and The Conquerors, preferably the
-    Gold Edition.
+Open Empires uses assets from Age of Empires II and The Conquerors,
+and it is not endorsed by or affiliated with Microsoft.
 
-    Age of Empires II and The Conquerors are copyright (©) by Microsoft
-    Corporation and Ensemble Studios.
-    Open Empires was created under Microsoft's Game Content Usage Rules:
+## Credits
 
-        https://www.xbox.com/en-us/developers/rules
+Thanks to:
 
-    Open Empires uses assets from Age of Empires II and The Conquerors,
-    and it is not endorsed by or affiliated with Microsoft.
+    * SFTech OpenAge team for their fantastic documentation on the
+      inner workings of the SLP and DRS file formats. See:
+          https://github.com/SFTtech/openage
 
-# CREDITS
+    * The developers and artists from Ensemble Studios for the many
+      gifted childhood memories
 
-    Thanks to:
+    * Forgotten Empires for keeping the spirit of Age of Empires II alive
 
-        * SFTech OpenAge team for their fantastic documentation on the
-          inner workings of the SLP and DRS file formats. See:
-              https://github.com/SFTtech/openage
+Dedicated to Ondrej whom I met hiking across England as he hiked from
+Scotland to Spain.
 
-        * The developers and artists from Ensemble Studios for the many
-          gifted childhood memories
-
-        * Forgotten Empires for keeping the spirit of Age of Empires II alive
-
-    Dedicated to Ondrej whom I met hiking across England as he hiked from
-    Scotland to Spain.
-
-    For the Josh Master. Volare, my friend, wherever you are.
+For the Josh Master. Volare, my friend, wherever you are.
