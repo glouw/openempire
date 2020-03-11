@@ -519,7 +519,7 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
     static Point zero;
     const int32_t width = 2;
     Unit* closest = NULL;
-    int32_t max = INT32_MAX;
+    int32_t min = INT32_MAX;
     for(int32_t x = -width; x <= width; x++)
     for(int32_t y = -width; y <= width; y++)
     {
@@ -545,11 +545,11 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
                     cell = other->cell;
                 const Point diff = Point_Sub(cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
-                if(mag < max)
+                if(mag < min)
                 {
                     if(other->trait.is_inanimate)
-                        other->cell_inanimate = cell;
-                    max = mag;
+                        unit->cell_interest_inanimate = cell;
+                    min = mag;
                     closest = other;
                 }
             }
@@ -563,7 +563,7 @@ static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid gri
     static Point zero;
     if(closest->trait.is_inanimate)
     {
-        const Point cart = Grid_CellToCart(grid, closest->cell_inanimate);
+        const Point cart = Grid_CellToCart(grid, unit->cell_interest_inanimate);
         Unit_MockPath(unit, cart, zero);
     }
     else

@@ -65,7 +65,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
     if(unit->is_engaged_in_melee)
     {
         const Point cell = unit->interest->trait.is_inanimate
-            ? unit->interest->cell_inanimate
+            ? unit->cell_interest_inanimate
             : unit->interest->cell;
         const Point dir = Point_Sub(cell, unit->cell);
         Unit_SetDir(unit, dir);
@@ -238,7 +238,7 @@ void Unit_Print(Unit* const unit)
     printf("cart_goal             :: %d %d\n", unit->cart_goal.x, unit->cart_goal.y);
     printf("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
     printf("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
-    printf("cell_inanimate        :: %d %d\n", unit->cell_inanimate.x, unit->cell_inanimate.y);
+    printf("cell_inanimate        :: %d %d\n", unit->cell_interest_inanimate.x, unit->cell_interest_inanimate.y);
     printf("\n");
 }
 
@@ -396,13 +396,13 @@ static bool MustEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(
             unit->interest->trait.is_inanimate
-                ? unit->interest->cell_inanimate
+                ? unit->cell_interest_inanimate
                 : unit->interest->cell,
             unit->cell);
     const int32_t width = UTIL_MAX(unit->trait.width, unit->interest->trait.width);
-    int32_t reach = CONFIG_UNIT_SWORD_LENGTH + width;
     if(unit->interest->trait.is_inanimate)
     {
+        const int32_t reach = CONFIG_UNIT_SWORD_LENGTH + (width / 2);
         const Point feeler = Point_Normalize(diff, reach);
         const Point cell = Point_Add(unit->cell, feeler);
         const Point cart = Grid_CellToCart(grid, cell);
@@ -412,7 +412,10 @@ static bool MustEngage(Unit* const unit, const Grid grid)
         return Rect_ContainsPoint(rect, cart);
     }
     else
+    {
+        const int32_t reach = CONFIG_UNIT_SWORD_LENGTH + width;
         return Point_Mag(diff) < reach;
+    }
 }
 
 static Resource CollectResource(Unit* const unit)
