@@ -49,8 +49,8 @@ static void Play(const Video video, const Data data, const Args args)
     Util_Srand(overview.seed);
     const Map map = Map_Make(overview.map_size, data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
-    Units units  = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color, args.civ);
-    Units floats = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color, args.civ);
+    Units units  = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color);
+    Units floats = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color);
     units = Units_Generate(units, map, grid, data.graphics, overview.users, overview.spectator);
     overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Make();

@@ -22,7 +22,7 @@ void Palette_Print(const Palette palette)
 Palette Palette_Load(const Drs interfac, const int32_t palette_offset)
 {
     const Table table = Drs_GetBinaryTable(interfac, 0);
-    const File file = Table_GetFile(table, 67 + palette_offset);
+    const File file = Table_GetFile(table, 45 + palette_offset);
     fseek(interfac.fp, file.data_offset, SEEK_SET);
     static Palette zero;
     Palette palette = zero;

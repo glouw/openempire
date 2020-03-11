@@ -63,7 +63,7 @@ static Units Alloc(Units units)
     return units;
 }
 
-Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max, const Color color, const Civ civ)
+Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max, const Color color)
 {
     static Units zero;
     Units units = zero;
@@ -71,7 +71,6 @@ Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max,
     units.max = max;
     units.cpu_count = cpu_count;
     units.stamp[color].status.age = AGE_1;
-    units.stamp[color].status.civ = civ;
     units.stamp[color].motive.action = ACTION_NONE;
     units.stamp[color].motive.type = TYPE_NONE;
     units.color = color;
@@ -921,7 +920,7 @@ static Units CountAllPopulations(Units units)
 static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromButton(button, overview.incoming.status.age, overview.incoming.status.civ);
+    const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
     if(parts.part != NULL)
     {
         if(!Bits_Get(overview.incoming.bits, button.trigger))
@@ -967,16 +966,7 @@ static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar 
     Unit_Preserve(unit, &temp);
 }
 
-static void UpgradeByBranch(Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics)
-{
-    const Graphics next = unit->trait.upgrade;
-    const Graphics tree = (Graphics) ((uint32_t) next + (uint32_t) overview.incoming.status.civ);
-    const bool first_age = overview.incoming.status.age == AGE_1;
-    const Graphics upgrade = first_age ? tree : next;
-    PreservedUpgrade(unit, grid, graphics, upgrade);
-}
-
-static void AgeUpSimple(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color)
+static void AgeUpSimple(Units units, const Grid grid, const Registrar graphics, const Color color)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -984,7 +974,7 @@ static void AgeUpSimple(Units units, const Overview overview, const Grid grid, c
         if(unit->color == color
         && unit->trait.upgrade != FILE_GRAPHICS_NONE
         && unit->trait.is_inanimate)
-            UpgradeByBranch(unit, overview, grid, graphics);
+            PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
     }
 }
 
@@ -997,7 +987,7 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
 {
     static Point zero;
     const Age age = GetNextAge(overview.incoming.status);
-    const Parts parts = Parts_FromButton(button, age, overview.incoming.status.civ);
+    const Parts parts = Parts_FromButton(button, age);
     Points points = Points_Make(COLOR_COUNT);
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -1054,7 +1044,7 @@ static Units AgeUp(Units units, Unit* const flag, const Overview overview, const
 {
     if(overview.color == flag->color)
         units.stamp[overview.color].status.age = GetNextAge(units.stamp[overview.color].status);
-    AgeUpSimple(units, overview, grid, graphics, flag->color);
+    AgeUpSimple(units, grid, graphics, flag->color);
     return AgeUpAdvanced(units, overview, grid, graphics, flag->color, map);
 }
 
@@ -1243,8 +1233,7 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     static Point zero;
     const Button button = { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER }, TRIGGER_NONE };
     const Age age = units.stamp[color].status.age;
-    const Civ civ = units.stamp[color].status.civ;
-    const Parts villager = Parts_FromButton(button, age, civ);
+    const Parts villager = Parts_FromButton(button, age);
     for(int32_t i = 0; i < CONFIG_UNITS_STARTING_VILLAGERS; i++)
     {
         const Point shift = { -2, 1 + i };
@@ -1255,28 +1244,28 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     return units;
 }
 
-static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
-{
-    static Point zero;
-    const int32_t dis = CONFIG_UNITS_STARTING_TREE_TILES_FROM_TOWNCENTER;
-    const Point point[] = {
-        {  dis,    0 },
-        {    0,  dis },
-        {    0, -dis },
-        { -dis,    0 },
-    };
-    const Parts parts = Parts_GetForestTree();
-    for(int32_t i = 0; i < UTIL_LEN(point); i++)
-    {
-        const Point cart = Point_Add(slot, point[i]);
-        Point shift;
-        shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
-        shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
-        const Point shifted = Point_Add(cart, shift);
-        units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
-    }
-    return units;
-}
+// static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
+// {
+//     static Point zero;
+//     const int32_t dis = CONFIG_UNITS_STARTING_TREE_TILES_FROM_TOWNCENTER;
+//     const Point point[] = {
+//         {  dis,    0 },
+//         {    0,  dis },
+//         {    0, -dis },
+//         { -dis,    0 },
+//     };
+//     const Parts parts = Parts_GetForestTree();
+//     for(int32_t i = 0; i < UTIL_LEN(point); i++)
+//     {
+//         const Point cart = Point_Add(slot, point[i]);
+//         Point shift;
+//         shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
+//         shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
+//         const Point shifted = Point_Add(cart, shift);
+//         units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+//     }
+//     return units;
+// }
 
 static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color spectator)
 {
@@ -1290,13 +1279,12 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         if(color != spectator)
         {
             const Age age = units.stamp[color].status.age;
-            const Civ civ = units.stamp[color].status.civ;
-            const Parts towncenter = Parts_FromButton(button, age, civ);
+            const Parts towncenter = Parts_FromButton(button, age);
             const int32_t index = (i * points.count) / players;
             const Point slot = points.point[index];
             units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
             units = GenerateVillagers(units, map, grid, graphics, slot, color);
-            units = GenerateStartingTrees(units, map, grid, graphics, slot);
+            // units = GenerateStartingTrees(units, map, grid, graphics, slot);
             Parts_Free(towncenter);
         }
     }

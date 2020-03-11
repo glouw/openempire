@@ -1,128 +1,109 @@
 // * SHADOWS MUST BE DEFINED LAST FOR PARTS SUCH THAT SHADOWS MAY BE TOGGLED BY SUBTRACTING 1 FROM PART COUNT.
-// * PARTS MUST ONLY BE DEFINED AS NORTH EUROPEAN; CIV OFFSETS (+1, +2, +3) CHANGE BUILDING SKINS TO ASIA, ARAB, AND WEST EUROPE, RESPECTIVELY.
-// * SOME PART COLLECTIONS, LIKE THE ASIAN MILL, DO NOT PATTERN MATCH OTHER PART COLLECTIONS (EG. NO SHADOW UNLIKE OTHER MILLS) AND REQUIRE SPECIAL CARE.
 
 #include "Parts.h"
 
 #include "Util.h"
 
 static Part flag_a[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_FLAG_TALL }
+    { {0,0}, FILE_GRAPHICS_FLAG_TALL }
 };
 static Part flag_b[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_FLAG_MEDIUM }
+    { {0,0}, FILE_GRAPHICS_FLAG_MEDIUM }
 };
 static Part villager_male[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_MALE_VILLAGER_IDLE }
+    { {0,0}, FILE_GRAPHICS_MALE_VILLAGER_IDLE }
 };
 static Part villager_female[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE }
+    { {0,0}, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE }
 };
 static Part red_arrows[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_RIGHT_CLICK_RED_ARROWS }
+    { {0,0}, FILE_GRAPHICS_RIGHT_CLICK_RED_ARROWS }
 };
 static Part smoke_a[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_SMALLER_EXPLOSION_SMOKE }
+    { {0,0}, FILE_GRAPHICS_SMALLER_EXPLOSION_SMOKE }
 };
-static Part fire_a[] = { { {0,0}, false, false, FILE_GRAPHICS_FIRE_SMALL_A  } };
-static Part fire_b[] = { { {0,0}, false, false, FILE_GRAPHICS_FIRE_SMALL_B  } };
-static Part fire_c[] = { { {0,0}, false, false, FILE_GRAPHICS_FIRE_SMALL_C  } };
-static Part fire_d[] = { { {0,0}, false, false, FILE_GRAPHICS_FIRE_MEDIUM_A } };
-static Part fire_e[] = { { {0,0}, false, false, FILE_GRAPHICS_FIRE_MEDIUM_B } };
+static Part fire_a[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_A  } };
+static Part fire_b[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_B  } };
+static Part fire_c[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_C  } };
+static Part fire_d[] = { { {0,0}, FILE_GRAPHICS_FIRE_MEDIUM_A } };
+static Part fire_e[] = { { {0,0}, FILE_GRAPHICS_FIRE_MEDIUM_B } };
 
 static Part town_center_age1[] = {
-    { {-0,0}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_TOP },
-    { {-2,2}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT },
-    { {-2,2}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-    { {-1,1}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-    { {-2,2}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE },
-    { {-2,2}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-    { {-1,1}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-    { {-1,1}, false, false, FILE_GRAPHICS_AGE_1_TOWN_CENTER_SHADOW },
+    { {-0,0}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_TOP },
+    { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_SHADOW },
 };
 static Part town_center_age2[] = {
-    { {-0,0}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_TOP },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_TOWN_CENTER_SHADOW },
+    { {-0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_TOP },
+    { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_SHADOW },
 };
 static Part town_center_age3[] = {
-    { {-0,0}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_TOP },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_TOWN_CENTER_SHADOW },
+    { {-0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_TOP },
+    { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT },
+    { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
+    { {-1,1}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
+    { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE },
+    { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
+    { {-1,1}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
+    { {-1,1}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_SHADOW },
 };
-static Part town_center_age4[] = {
-    { {-0,0}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_TOP },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_FLOORING },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE },
-    { {-2,2}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
-    { {-1,1}, true, false, FILE_GRAPHICS_AGE_4_NORTH_EUROPE_TOWN_CENTER_SHADOW },
-};
-static Part barracks_age1[] = { { {0,0}, false, false, FILE_GRAPHICS_AGE_1_BARRACKS } };
-static Part barracks_age2[] = { { {0,0}, true,  false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_BARRACKS } };
-static Part barracks_age3[] = { { {0,0}, true,  false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_BARRACKS } };
+static Part barracks_age1[] = { { {0,0}, FILE_GRAPHICS_AGE_1_BARRACKS } };
+static Part barracks_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_BARRACKS } };
+static Part barracks_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_BARRACKS } };
 static Part mill_age1[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_AGE_1_MILL },
-    { {0,0}, false, false, FILE_GRAPHICS_AGE_1_MILL_DONKEY },
+    { {0,0}, FILE_GRAPHICS_AGE_1_MILL },
+    { {0,0}, FILE_GRAPHICS_AGE_1_MILL_DONKEY },
 };
 static Part mill_age2[] = {
-    { {0,0}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_MILL },
-    { {0,0}, true, false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_MILL_ANIMATION },
-    { {0,0}, true, true,  FILE_GRAPHICS_AGE_2_NORTH_EUROPE_MILL_SHADOW },
+    { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL },
+    { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_ANIMATION },
+    { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW },
 };
 static Part mill_age3[] = {
-    { {0,0}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_MILL },
-    { {0,0}, true, false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_MILL_ANIMATION },
-    { {0,0}, true, true,  FILE_GRAPHICS_AGE_3_NORTH_EUROPE_MILL_SHADOW },
+    { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_MILL },
+    { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_MILL_ANIMATION },
+    { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_MILL_SHADOW },
 };
-static Part house_age1[] = { { {0,0}, false, false, FILE_GRAPHICS_AGE_1_HOUSE } };
-static Part house_age2[] = { { {0,0}, true,  false, FILE_GRAPHICS_AGE_2_NORTH_EUROPE_HOUSE } };
-static Part house_age3[] = { { {0,0}, true,  false, FILE_GRAPHICS_AGE_3_NORTH_EUROPE_HOUSE } };
+static Part house_age1[] = { { {0,0}, FILE_GRAPHICS_AGE_1_HOUSE } };
+static Part house_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_HOUSE } };
+static Part house_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_HOUSE } };
 static Part outpost[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_OUTPOST },
-    { {0,0}, false, false, FILE_GRAPHICS_OUTPOST_SHADOW },
+    { {0,0}, FILE_GRAPHICS_OUTPOST },
+    { {0,0}, FILE_GRAPHICS_OUTPOST_SHADOW },
 };
 static Part stone_camp[] = {
-    { {0,0}, true, false, FILE_GRAPHICS_NORTH_EUROPE_STONE_MINING_CAMP },
+    { {0,0}, FILE_GRAPHICS_WEST_EUROPE_STONE_MINING_CAMP },
 };
 static Part lumber_camp[] = {
-    { {0,0}, true, false, FILE_GRAPHICS_NORTH_EUROPE_LUMBER_CAMP },
+    { {0,0}, FILE_GRAPHICS_WEST_EUROPE_LUMBER_CAMP },
 };
 static Part castle[] = {
-    { {0,0}, true, false, FILE_GRAPHICS_NORTH_EUROPE_CASTLE },
-    { {0,0}, true, false, FILE_GRAPHICS_NORTH_EUROPE_CASTLE_SHADOW },
+    { {0,0}, FILE_GRAPHICS_WEST_EUROPE_CASTLE },
+    { {0,0}, FILE_GRAPHICS_WEST_EUROPE_CASTLE_SHADOW },
 };
 static Part militia[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_MILITIA_IDLE }
+    { {0,0}, FILE_GRAPHICS_MILITIA_IDLE }
 };
 static Part man_at_arms[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_MAN_AT_ARMS_IDLE }
+    { {0,0}, FILE_GRAPHICS_MAN_AT_ARMS_IDLE }
 };
 static Part long_swordsman[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_LONG_SWORDSMAN_IDLE }
-};
-static Part two_handed_swordsman[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_TWO_HANDED_SWORDSMAN_IDLE }
-};
-static Part champion[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_CHAMPION_IDLE }
+    { {0,0}, FILE_GRAPHICS_LONG_SWORDSMAN_IDLE }
 };
 static Part forest_tree[] = {
-    { {0,0}, false, false, FILE_GRAPHICS_FOREST_TREE },
-    { {0,0}, false, false, FILE_GRAPHICS_FOREST_TREE_SHADOW },
+    { {0,0}, FILE_GRAPHICS_FOREST_TREE },
+    { {0,0}, FILE_GRAPHICS_FOREST_TREE_SHADOW },
 };
 
 static Parts GetAgeUpFlag(void)
@@ -203,7 +184,6 @@ static Parts GetTownCenter(const Age age)
     case AGE_1: parts.part = town_center_age1; parts.count = UTIL_LEN(town_center_age1); break;
     case AGE_2: parts.part = town_center_age2; parts.count = UTIL_LEN(town_center_age2); break;
     case AGE_3: parts.part = town_center_age3; parts.count = UTIL_LEN(town_center_age3); break;
-    case AGE_4: parts.part = town_center_age4; parts.count = UTIL_LEN(town_center_age4); break;
     }
     return parts;
 }
@@ -215,33 +195,21 @@ static Parts GetBarracks(const Age age)
     {
     case AGE_1: parts.part = barracks_age1; parts.count = UTIL_LEN(barracks_age1); break;
     case AGE_2: parts.part = barracks_age2; parts.count = UTIL_LEN(barracks_age2); break;
-    case AGE_3:
-    case AGE_4: parts.part = barracks_age3; parts.count = UTIL_LEN(barracks_age3); break;
+    case AGE_3: parts.part = barracks_age3; parts.count = UTIL_LEN(barracks_age3); break;
     }
     return parts;
 }
 
-static Parts DropAsianMillShadow(Parts parts, const Civ civ, const Age age)
-{
-    if(civ == CIV_ASIA)
-        if(age == AGE_2
-        || age == AGE_3
-        || age == AGE_4)
-            parts.count -= 1;
-    return parts;
-}
-
-static Parts GetMill(const Age age, const Civ civ)
+static Parts GetMill(const Age age)
 {
     Parts parts = { NULL, 0 };
     switch(age)
     {
         case AGE_1: parts.part = mill_age1; parts.count = UTIL_LEN(mill_age1); break;
         case AGE_2: parts.part = mill_age2; parts.count = UTIL_LEN(mill_age2); break;
-        case AGE_3:
-        case AGE_4: parts.part = mill_age3; parts.count = UTIL_LEN(mill_age3); break;
+        case AGE_3: parts.part = mill_age3; parts.count = UTIL_LEN(mill_age3); break;
     }
-    return DropAsianMillShadow(parts, civ, age);
+    return parts;
 }
 
 static Parts GetHouse(const Age age)
@@ -251,8 +219,7 @@ static Parts GetHouse(const Age age)
     {
         case AGE_1: parts.part = house_age1; parts.count = UTIL_LEN(house_age1); break;
         case AGE_2: parts.part = house_age2; parts.count = UTIL_LEN(house_age2); break;
-        case AGE_3:
-        case AGE_4: parts.part = house_age3; parts.count = UTIL_LEN(house_age3); break;
+        case AGE_3: parts.part = house_age3; parts.count = UTIL_LEN(house_age3); break;
     }
     return parts;
 }
@@ -313,22 +280,6 @@ static Parts GetLongSwordsMan(void)
     return parts;
 }
 
-static Parts GetTwoHandedSwordsMan(void)
-{
-    const Parts parts = {
-        two_handed_swordsman, UTIL_LEN(two_handed_swordsman)
-    };
-    return parts;
-}
-
-static Parts GetChampion(void)
-{
-    const Parts parts = {
-        champion, UTIL_LEN(champion)
-    };
-    return parts;
-}
-
 static Parts Copy(const Parts parts)
 {
     Part* part = UTIL_ALLOC(Part, parts.count);
@@ -338,22 +289,7 @@ static Parts Copy(const Parts parts)
     return copy;
 }
 
-static void SetCiv(const Parts parts, const Civ civ)
-{
-    for(int32_t i = 0; i < parts.count; i++)
-    {
-        Part* const part = &parts.part[i];
-        if(part->can_civ)
-        {
-            const int32_t offset = Part_MustSubtractIndex(part, civ)
-                ? civ - 1
-                : civ;
-            part->file = (Graphics) (part->file + offset);
-        }
-    }
-}
-
-static Parts Lookup(const Button button, const Age age, const Civ civ)
+static Parts Lookup(const Button button, const Age age)
 {
     switch(button.icon_type)
     {
@@ -362,38 +298,33 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
     case ICONTYPE_BUILD:
         switch(button.icon_build)
         {
-        case ICONBUILD_BARRACKS    : return GetBarracks  (age     );
-        case ICONBUILD_MILL        : return GetMill      (age, civ);
-        case ICONBUILD_HOUSE       : return GetHouse     (age     );
-        case ICONBUILD_OUTPOST     : return GetOutpost   (        );
-        case ICONBUILD_STONE_CAMP  : return GetStoneCamp (        );
-        case ICONBUILD_LUMBER_CAMP : return GetLumberCamp(        );
-        case ICONBUILD_TOWN_CENTER : return GetTownCenter(age     );
-        case ICONBUILD_CASTLE      : return GetCastle    (        );
+        case ICONBUILD_BARRACKS    : return GetBarracks  (age);
+        case ICONBUILD_MILL        : return GetMill      (age);
+        case ICONBUILD_HOUSE       : return GetHouse     (age);
+        case ICONBUILD_OUTPOST     : return GetOutpost   (   );
+        case ICONBUILD_STONE_CAMP  : return GetStoneCamp (   );
+        case ICONBUILD_LUMBER_CAMP : return GetLumberCamp(   );
+        case ICONBUILD_TOWN_CENTER : return GetTownCenter(age);
+        case ICONBUILD_CASTLE      : return GetCastle    (   );
         }
         break;
     case ICONTYPE_TECH:
         switch(button.icon_tech)
         {
-        case ICONTECH_AGE_2                         :
-        case ICONTECH_AGE_3                         :
-        case ICONTECH_AGE_4                         : return GetAgeUpFlag();
-        case ICONTECH_RESEARCH_MAN_AT_ARMS          :
-        case ICONTECH_RESEARCH_LONG_SWORDSMAN       :
-        case ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN :
-        case ICONTECH_RESEARCH_CHAMPION             : return GetMilitiaResearchFlag();
+        case ICONTECH_AGE_2                   :
+        case ICONTECH_AGE_3                   : return GetAgeUpFlag();
+        case ICONTECH_RESEARCH_MAN_AT_ARMS    :
+        case ICONTECH_RESEARCH_LONG_SWORDSMAN : return GetMilitiaResearchFlag();
         }
         break;
     case ICONTYPE_UNIT:
         switch(button.icon_unit)
         {
-        case ICONUNIT_MILITIA              : return GetMilitia           ();
-        case ICONUNIT_MAN_AT_ARMS          : return GetManAtArms         ();
-        case ICONUNIT_LONG_SWORDSMAN       : return GetLongSwordsMan     ();
-        case ICONUNIT_TWO_HANDED_SWORDSMAN : return GetTwoHandedSwordsMan();
-        case ICONUNIT_CHAMPION             : return GetChampion          ();
-        case ICONUNIT_MALE_VILLAGER        : return GetMaleVillager      ();
-        case ICONUNIT_FEMALE_VILLAGER      : return GetFemaleVillager    ();
+        case ICONUNIT_MILITIA         : return GetMilitia       ();
+        case ICONUNIT_MAN_AT_ARMS     : return GetManAtArms     ();
+        case ICONUNIT_LONG_SWORDSMAN  : return GetLongSwordsMan ();
+        case ICONUNIT_MALE_VILLAGER   : return GetMaleVillager  ();
+        case ICONUNIT_FEMALE_VILLAGER : return GetFemaleVillager();
         }
         break;
     case ICONTYPE_NONE:
@@ -404,11 +335,9 @@ static Parts Lookup(const Button button, const Age age, const Civ civ)
     return zero;
 }
 
-Parts Parts_FromButton(const Button button, const Age age, const Civ civ)
+Parts Parts_FromButton(const Button button, const Age age)
 {
-    const Parts copy = Copy(Lookup(button, age, civ));
-    SetCiv(copy, civ);
-    return copy;
+    return Copy(Lookup(button, age));
 }
 
 void Parts_Free(const Parts parts)

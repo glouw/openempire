@@ -2,7 +2,6 @@
 
 #include "Age.h"
 #include "Part.h"
-#include "Civ.h"
 #include "Button.h"
 
 #include <stdint.h>
@@ -14,7 +13,7 @@ typedef struct
 }
 Parts;
 
-Parts Parts_FromButton(const Button, const Age, const Civ);
+Parts Parts_FromButton(const Button, const Age);
 
 void Parts_Free(const Parts);
 

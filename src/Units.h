@@ -33,7 +33,7 @@ typedef struct
 }
 Units;
 
-Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max, const Color, const Civ);
+Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max, const Color);
 
 void Units_Free(const Units);
 

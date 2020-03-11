@@ -21,27 +21,14 @@ reqs_upgrade_to_long_swordsman[] = {
     TRIGGER_UPGRADE_MAN_AT_ARMS,
     TRIGGER_AGE_UP_4
 },
-reqs_upgrade_to_two_handed_swordsman[] = {
-    TRIGGER_UPGRADE_LONG_SWORDSMAN,
-    TRIGGER_AGE_UP_4
-},
 reqs_upgrade_icon_to_age_3[] = {
     TRIGGER_AGE_UP_2
-},
-reqs_upgrade_icon_to_age_4[] = {
-    TRIGGER_AGE_UP_3
 },
 reqs_upgrade_icon_to_man_at_arms[] = {
     TRIGGER_UPGRADE_MILITIA
 },
 reqs_upgrade_icon_to_long_swordsman[] = {
     TRIGGER_UPGRADE_MAN_AT_ARMS
-},
-reqs_upgrade_icon_to_two_handed_swordsman[] = {
-    TRIGGER_UPGRADE_LONG_SWORDSMAN
-},
-reqs_upgrade_icon_to_champion[] = {
-    TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN
 };
 
 static const char hotkeys[] = {
@@ -99,17 +86,13 @@ Button Button_Upgrade(Button button, const Bits bits)
         {
             if(TRIGGERED(bits, reqs_upgrade_icon_to_age_3))
                 button = Next(button, TRIGGER_AGE_UP_3, ICONTECH_AGE_3);
-            if(TRIGGERED(bits, reqs_upgrade_icon_to_age_4))
-                button = Next(button, TRIGGER_AGE_UP_4, ICONTECH_AGE_4);
         }
         if(button.index == ICONTECH_RESEARCH_MAN_AT_ARMS)
         {
             if(TRIGGERED(bits, reqs_upgrade_to_man_at_arms))
                 button = Next(button, TRIGGER_UPGRADE_MAN_AT_ARMS, ICONTECH_RESEARCH_LONG_SWORDSMAN);
             if(TRIGGERED(bits, reqs_upgrade_to_long_swordsman))
-                button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN, ICONTECH_RESEARCH_TWO_HANDED_SWORDSMAN);
-            if(TRIGGERED(bits, reqs_upgrade_to_two_handed_swordsman))
-                button = Next(button, TRIGGER_UPGRADE_TWO_HANDED_SWORDSMAN, ICONTECH_RESEARCH_CHAMPION);
+                button = Next(button, TRIGGER_UPGRADE_LONG_SWORDSMAN, ICONTECH_RESEARCH_LONG_SWORDSMAN); // XXX: WHAT IS NEXT ??????
         }
         break;
     case ICONTYPE_UNIT:
@@ -119,10 +102,6 @@ Button Button_Upgrade(Button button, const Bits bits)
                 button = Next(button, TRIGGER_NONE, ICONUNIT_MAN_AT_ARMS);
             if(TRIGGERED(bits, reqs_upgrade_icon_to_long_swordsman))
                 button = Next(button, TRIGGER_NONE, ICONUNIT_LONG_SWORDSMAN);
-            if(TRIGGERED(bits, reqs_upgrade_icon_to_two_handed_swordsman))
-                button = Next(button, TRIGGER_NONE, ICONUNIT_TWO_HANDED_SWORDSMAN);
-            if(TRIGGERED(bits, reqs_upgrade_icon_to_champion))
-                button = Next(button, TRIGGER_NONE, ICONUNIT_CHAMPION);
         }
         break;
     case ICONTYPE_NONE:

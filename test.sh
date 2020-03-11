@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# BUILDS SOURCE, ENABLES A LOSSY LOCAL HOST NETWORK, STARTS A SERVER,
-# AND STARTS SEVERAL CLIENTS OF DIFFERENT CIVILIZATION.
+# BUILDS SOURCE, ENABLES A LOSSY LOCAL HOST NETWORK, STARTS A SERVER, AND STARTS SEVERAL CLIENTS
 
 LATENCY=25ms
 VARIANCE=5ms
@@ -9,7 +8,6 @@ ENTROPY=0.3% # REALISM = 0.1%. STRESS TEST = 2.1%.
 XRES=1000
 YRES=600
 USERS=3
-CIVS=4
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -37,12 +35,11 @@ batch()
         D=20
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))
-        CIV=$((i % $CIVS))
-        ./$BIN --xres $X --yres $Y --civ $CIV --host $HOST --port $PORT &
+        ./$BIN --xres $X --yres $Y --host $HOST --port $PORT &
     done
     # SPECTATOR MUST CONNECT LAST, SO ENSURE WITH A SLEEP THEY COME LAST.
     sleep 2
-    ./$BIN --xres 400 --yres 300 --host $HOST --port $PORT --$CIV 0
+    ./$BIN --xres 400 --yres 300 --host $HOST --port $PORT
 }
 
 build

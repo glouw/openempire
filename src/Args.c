@@ -14,7 +14,6 @@ Args Args_Parse(const int32_t argc, const char* argv[])
     args.yres = 600;
     args.users = 1;
     args.map_size = 64;
-    args.civ = CIV_NORTH_EUROPE;
     for(int32_t i = 0; i < argc; i++)
     {
         const char* const arg = argv[i];
@@ -24,7 +23,6 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Util_StringEqual(arg, "--xres"     )) args.xres = atoi(next);
         if(Util_StringEqual(arg, "--yres"     )) args.yres = atoi(next);
         if(Util_StringEqual(arg, "--users"    )) args.users = atoi(next);
-        if(Util_StringEqual(arg, "--civ"      )) args.civ = (Civ) atoi(next);
         if(Util_StringEqual(arg, "--map_size" )) args.map_size = atoi(next);
         if(Util_StringEqual(arg, "--host"     )) args.host = next;
         if(Util_StringEqual(arg, "--port"     )) args.port = atoi(next);
