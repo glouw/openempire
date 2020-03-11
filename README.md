@@ -2,13 +2,11 @@
 
 ![](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
 
-Open Empires is an educational multi-player RTS engine capable of interfacing
-with the Age of Empires II and The Conquerors art assets.
+Open Empires is an educational multi-player RTS engine which interfaces
+with the Age of Empires II trial assets.
 
 Open Empires strives to be written in less than 15,000 lines of C99 using only
 SDL2 as an external dependency.
-
-Open Empires borrows gameplay mechanics from Starcraft 2 and Rome Total War.
 
 ## Dependencies
 
@@ -32,15 +30,26 @@ very laggy and lossy network. Change ENTROPY within test.sh to 0.1%
 to set realistic playing conditions. For development,
 set ENTROPY to 1.0% to stress test the networking engine more efficiently.
 
-Otherwise, assuming everything is on localhost, first start the server:
+Otherwise, assuming everything is on localhost, first start the server
+by specifying the server, port, and the number of users who will be playing:
 
-    ./openempires --server --port 1234
+    ./openempires --server --port 1234 --users 3
 
-Second, start the client by specifying your window resolution and
-installation data folder path:
+Keep note, that 3 users implies 2 human players, and 1 anti-cheat bot
+who spectates the game and detects and restores out of syncs.
 
-    ./openempires --host localhost --port 1234 --xres 1440 --yres 900 \
-        --path "/path/to/data/folder"
+Second, start 3 clients (you, on your computer, a friend on their computer,
+and the anti-cheat bot on a computer you trust). Specify your window resolution
+and installation data folder path:
+
+    ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
+
+From here on its the game you know and love. Some small tweaks have been added
+to ease the control aspect:
+
+    W A S D : pans the camera
+    left shift + left click: selects multiple of the same unit
+    left alt + Q W E R T ... Z X C V B: selects a building to place, or a unit command to execute.
 
 ## Structure
 
