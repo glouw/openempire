@@ -1,12 +1,10 @@
 # Open Empires
 
-![](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
-
 Open Empires is an educational multi-player RTS engine which interfaces
-with the Age of Empires II trial assets.
+with the Age of Empires II Trial assets and strives to be written in 15,000
+lines of C99 or less, using only SDL2 as an external dependency.
 
-Open Empires strives to be written in less than 15,000 lines of C99 using only
-SDL2 as an external dependency.
+![](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
 
 ## Dependencies
 
@@ -21,7 +19,8 @@ make -C src
 
 ## Running
 
-To test the client-server model, run:
+Once the trial version of Age of Empires 2 (the original, not the Conquerors!)
+has been installed, you may test the client-server model with the test bash script:
 
     ./test.sh
 
@@ -38,7 +37,7 @@ by specifying the server, port, and the number of users who will be playing:
 Keep note, that 3 users implies 2 human players, and 1 anti-cheat bot
 who spectates the game and detects and restores out of syncs.
 
-Second, start 3 clients (you, on your computer, a friend on their computer,
+Second, start said 3 clients (you, on your computer, a friend on their computer,
 and the anti-cheat bot on a computer you trust). Specify your window resolution
 and installation data folder path:
 
@@ -73,10 +72,8 @@ Open Empires is *NOT* a binary decompilation of Age of Empires II,
 and its expansion, The Conquerors.
 
 Data, art, and sound files from Age of Empires II - or its expansion,
-The Conquerors - ARE NOT, AND NEVER WILL BE, SUPPLIED.
-To play Open Empires you must legally own the original boxed-set
-version of Age of Empires II and The Conquerors, preferably the
-Gold Edition.
+The Conquerors, for trial and non-trial assets alike - ARE NOT,
+AND NEVER WILL BE, SUPPLIED.
 
 Age of Empires II and The Conquerors are copyright (©) by Microsoft
 Corporation and Ensemble Studios.
