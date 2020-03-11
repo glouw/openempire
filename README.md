@@ -68,21 +68,18 @@ and the standard math library is not linked with the final binary.
 Open Empires was written from scratch with the highest regards of the
 original copyright holders.
 
-Open Empires is *NOT* a binary decompilation of Age of Empires II,
-and its expansion, The Conquerors.
+Open Empires is *NOT* a binary decompilation of Age of Empires II.
 
-Data, art, and sound files from Age of Empires II - or its expansion,
-The Conquerors, for trial and non-trial assets alike - ARE NOT,
-AND NEVER WILL BE, SUPPLIED.
+Data, art, and sound files from Age of Empires II, for trial and non-trial
+assets alike - ARE NOT, AND NEVER WILL BE, SUPPLIED.
 
-Age of Empires II and The Conquerors are copyright (©) by Microsoft
-Corporation and Ensemble Studios.
+Age of Empires II is copyright (©) by Microsoft Corporation and Ensemble Studios.
 Open Empires was created under Microsoft's Game Content Usage Rules:
 
     https://www.xbox.com/en-us/developers/rules
 
-Open Empires uses assets from Age of Empires II and The Conquerors,
-and it is not endorsed by or affiliated with Microsoft.
+Open Empires uses assets from Age of Empires II, and it is not endorsed by
+or affiliated with Microsoft.
 
 ## Credits
 
