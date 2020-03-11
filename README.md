@@ -1,4 +1,7 @@
-OPEN EMPIRES
+## OPEN EMPIRES
+
+![Kiku](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
+
 
     Open Empires is an educational multi-player RTS engine capable of interfacing
     with the Age of Empires II and The Conquerors art assets.
@@ -8,18 +11,18 @@ OPEN EMPIRES
 
     Open Empires borrows gameplay mechanics from Starcraft 2 and Rome Total War.
 
-DEPENDENCIES
+# DEPENDENCIES
 
     Arch   : pacman -S sdl2 sdl2_net sdl2_ttf
     Ubuntu : apt-get install libsdl2-dev libsdl2-net-dev libsdl2-ttf-dev
 
-BUILDING
+# BUILDING
 
     git clone https://github.com/glouw/openempires
     cd openempires
     make -C src
 
-RUNNING
+# RUNNING
 
     To test the client-server model, run:
 
@@ -40,7 +43,7 @@ RUNNING
         ./openempires --host localhost --port 1234 --xres 1440 --yres 900 \
             --path "/path/to/data/folder"
 
-STATUS
+# STATUS
 
     [x] Multithreaded software renderer
     [x] Random map generation
@@ -54,7 +57,7 @@ STATUS
     [ ] Unit and building build times and resource use
     [ ] Sound
 
-STRUCTURE
+# STRUCTURE
 
     C source lives in src/ folder and is compilable by both C++11 and C11
     compilers. C source is separated by typedefs, implemented with .[ch]
@@ -67,7 +70,7 @@ STRUCTURE
     To simplify the lockstep engine, double and floating points are not used,
     and the standard math library is not linked with the final binary.
 
-LEGAL
+# LEGAL
 
     Open Empires was written from scratch with the highest regards of the
     original copyright holders.
@@ -90,7 +93,7 @@ LEGAL
     Open Empires uses assets from Age of Empires II and The Conquerors,
     and it is not endorsed by or affiliated with Microsoft.
 
-CREDITS
+# CREDITS
 
     Thanks to:
 
