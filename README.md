@@ -88,14 +88,14 @@ and it is not endorsed by or affiliated with Microsoft.
 
 Thanks to:
 
-    * SFTech OpenAge team for their fantastic documentation on the
-      inner workings of the SLP and DRS file formats. See:
-          https://github.com/SFTtech/openage
+* SFTech OpenAge team for their fantastic documentation on the
+  inner workings of the SLP and DRS file formats. See:
+      https://github.com/SFTtech/openage
 
-    * The developers and artists from Ensemble Studios for the many
-      gifted childhood memories
+* The developers and artists from Ensemble Studios for the many
+  gifted childhood memories
 
-    * Forgotten Empires for keeping the spirit of Age of Empires II alive
+* Forgotten Empires for keeping the spirit of Age of Empires II alive
 
 Dedicated to Ondrej whom I met hiking across England as he hiked from
 Scotland to Spain.
