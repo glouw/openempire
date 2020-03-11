@@ -233,13 +233,16 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
 
 void Unit_Print(Unit* const unit)
 {
-    printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
-    printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
-    printf("cart_goal             :: %d %d\n", unit->cart_goal.x, unit->cart_goal.y);
-    printf("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
-    printf("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
-    printf("cell_inanimate        :: %d %d\n", unit->cell_interest_inanimate.x, unit->cell_interest_inanimate.y);
-    printf("\n");
+    if(unit)
+    {
+        printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
+        printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
+        printf("cart_goal             :: %d %d\n", unit->cart_goal.x, unit->cart_goal.y);
+        printf("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
+        printf("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
+        printf("cell_inanimate        :: %d %d\n", unit->cell_interest_inanimate.x, unit->cell_interest_inanimate.y);
+        printf("\n");
+    }
 }
 
 void ApplyStressors(Unit* const unit)

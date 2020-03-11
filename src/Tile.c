@@ -165,10 +165,8 @@ void Tile_Select(const Tile tile)
     if(!Unit_IsExempt(tile.reference))
     {
         tile.reference->is_selected = true;
-        if(tile.reference)
-        {
-            printf("TILE %p\n", tile.reference);
-            Unit_Print(tile.reference);
-        }
+#if 0
+        Unit_Print(tile.reference);
+#endif
     }
 }
