@@ -808,7 +808,7 @@ static void ResetInterests(const Units units)
     const int32_t t1 = SDL_GetTicks();
     const int32_t dt = t1 - t0;
     if(dt > 1)
-        printf("WARNING: INTEREST CLEANUP TAKING (%d) SECONDS\n", dt);
+        printf("WARNING: INTEREST CLEANUP TAKING (%d) MILISECONDS -- WHY ARE YOU NOT USING BSEARCH AT THE VERY LEAST!?\n", dt);
 }
 
 static Units RemoveGarbage(Units units)

@@ -308,6 +308,8 @@ static Points PathStraight(const Point a, const Point b)
 
 static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
 {
+    if(Point_Equal(unit->cart, unit->cart_goal))
+        return true;
     const Point dir = Point_Sub(
         Point_Add(
             Grid_CartToCell(grid, unit->cart_goal),
@@ -319,10 +321,10 @@ static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
     while(true)
     {
         const Point cart = Grid_CellToCart(grid, cell);
-        if(Point_Equal(cart, unit->cart_goal))
-            return true;
         if(!Field_IsWalkable(field, cart))
             return false;
+        if(Point_Equal(cart, unit->cart_goal))
+            return true;
         cell = Point_Add(cell, mag);
     }
     return false;
