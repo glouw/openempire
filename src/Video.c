@@ -147,7 +147,7 @@ static void PrintResources(const Video video, const Units units)
 {
     const int32_t space = 77;
     const int32_t x0 = 27;
-    const int32_t y0 = 11;
+    const int32_t y0 = 5;
     const Share stamp = units.stamp[units.color];
     typedef struct
     {

@@ -386,7 +386,6 @@ static bool EqualDimension(Point dimensions, const Graphics file)
     const Point _2x2_ = FILE_DIMENSIONS_2X2;
     const Point _3x3_ = FILE_DIMENSIONS_3X3;
     const Point _4x4_ = FILE_DIMENSIONS_4X4;
-    const Point _5x5_ = FILE_DIMENSIONS_5X5;
     switch(file)
     {
         default:
@@ -394,7 +393,6 @@ static bool EqualDimension(Point dimensions, const Graphics file)
         case FILE_GRAPHICS_RUBBLE_2X2: return Point_Equal(_2x2_, dimensions);
         case FILE_GRAPHICS_RUBBLE_3X3: return Point_Equal(_3x3_, dimensions);
         case FILE_GRAPHICS_RUBBLE_4X4: return Point_Equal(_4x4_, dimensions);
-        case FILE_GRAPHICS_RUBBLE_5X5: return Point_Equal(_5x5_, dimensions);
     }
 }
 
@@ -439,7 +437,6 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         FILE_GRAPHICS_RUBBLE_2X2,
         FILE_GRAPHICS_RUBBLE_3X3,
         FILE_GRAPHICS_RUBBLE_4X4,
-        FILE_GRAPHICS_RUBBLE_5X5,
     };
     Graphics file = FILE_GRAPHICS_NONE;
     for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
@@ -1244,28 +1241,28 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     return units;
 }
 
-// static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
-// {
-//     static Point zero;
-//     const int32_t dis = CONFIG_UNITS_STARTING_TREE_TILES_FROM_TOWNCENTER;
-//     const Point point[] = {
-//         {  dis,    0 },
-//         {    0,  dis },
-//         {    0, -dis },
-//         { -dis,    0 },
-//     };
-//     const Parts parts = Parts_GetForestTree();
-//     for(int32_t i = 0; i < UTIL_LEN(point); i++)
-//     {
-//         const Point cart = Point_Add(slot, point[i]);
-//         Point shift;
-//         shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
-//         shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
-//         const Point shifted = Point_Add(cart, shift);
-//         units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
-//     }
-//     return units;
-// }
+static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, const Registrar graphics, const Point slot)
+{
+    static Point zero;
+    const int32_t dis = CONFIG_UNITS_STARTING_TREE_TILES_FROM_TOWNCENTER;
+    const Point point[] = {
+        {  dis,    0 },
+        {    0,  dis },
+        {    0, -dis },
+        { -dis,    0 },
+    };
+    const Parts parts = Parts_GetForestTree();
+    for(int32_t i = 0; i < UTIL_LEN(point); i++)
+    {
+        const Point cart = Point_Add(slot, point[i]);
+        Point shift;
+        shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
+        shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
+        const Point shifted = Point_Add(cart, shift);
+        units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+    }
+    return units;
+}
 
 static Units GenerateTownCenters(Units units, const Map map, const Grid grid, const Registrar graphics, const int32_t users, const Color spectator)
 {
@@ -1284,7 +1281,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
             const Point slot = points.point[index];
             units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
             units = GenerateVillagers(units, map, grid, graphics, slot, color);
-            // units = GenerateStartingTrees(units, map, grid, graphics, slot);
+            units = GenerateStartingTrees(units, map, grid, graphics, slot);
             Parts_Free(towncenter);
         }
     }

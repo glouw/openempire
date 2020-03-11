@@ -4,11 +4,8 @@
 
 #include "Util.h"
 
-static Part flag_a[] = {
+static Part flag[] = {
     { {0,0}, FILE_GRAPHICS_FLAG_TALL }
-};
-static Part flag_b[] = {
-    { {0,0}, FILE_GRAPHICS_FLAG_MEDIUM }
 };
 static Part villager_male[] = {
     { {0,0}, FILE_GRAPHICS_MALE_VILLAGER_IDLE }
@@ -106,18 +103,10 @@ static Part forest_tree[] = {
     { {0,0}, FILE_GRAPHICS_FOREST_TREE_SHADOW },
 };
 
-static Parts GetAgeUpFlag(void)
+static Parts GetFlag(void)
 {
     const Parts parts = {
-        flag_a, UTIL_LEN(flag_a)
-    };
-    return parts;
-}
-
-static Parts GetMilitiaResearchFlag(void)
-{
-    const Parts parts = {
-        flag_b, UTIL_LEN(flag_b)
+        flag, UTIL_LEN(flag)
     };
     return parts;
 }
@@ -312,9 +301,9 @@ static Parts Lookup(const Button button, const Age age)
         switch(button.icon_tech)
         {
         case ICONTECH_AGE_2                   :
-        case ICONTECH_AGE_3                   : return GetAgeUpFlag();
+        case ICONTECH_AGE_3                   :
         case ICONTECH_RESEARCH_MAN_AT_ARMS    :
-        case ICONTECH_RESEARCH_LONG_SWORDSMAN : return GetMilitiaResearchFlag();
+        case ICONTECH_RESEARCH_LONG_SWORDSMAN : return GetFlag();
         }
         break;
     case ICONTYPE_UNIT:

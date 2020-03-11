@@ -6,7 +6,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
 {
     static Args zero;
     Args args = zero;
-    args.path = "/home/gl/.steam/steam/steamapps/common/Age2HD/Directory/data/";
+    args.path = "/home/gl/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data/";
     args.color = COLOR_BLU;
     args.host = "localhost";
     args.port = 1234;
