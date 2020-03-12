@@ -454,7 +454,7 @@ static void Unreference(const Units units, Unit* const unit)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const other = &units.unit[i];
-        if(other->interest_id == unit->id)
+        if(other->interest == unit)
         {
             other->is_engaged_in_melee = false;
             Unit_SetInterest(other, NULL);
@@ -786,27 +786,28 @@ static Units Resize(Units units)
     return units;
 }
 
-static void ResetInterests(const Units units)
+static int32_t CompareById(const void* a, const void* b)
 {
-    const int32_t t0 = SDL_GetTicks();
-    for(int32_t i = 0; i < units.count; i++) // XXX. MAYBE THREAD IT?
+    Unit* const aa = (Unit*) a;
+    Unit* const bb = (Unit*) b;
+    return aa->id - bb->id;
+}
+
+static void ResetInterests(Units units)
+{
+    UTIL_SORT(units.unit, units.count, CompareById);
+    for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const a = &units.unit[i];
         if(a->interest_id != -1)
-            for(int32_t j = 0; j < units.count; j++) // XXX. A BINARY SERACH WOULD BE BETTER.
-            {
-                Unit* const b = &units.unit[j];
-                if(a->interest_id == b->id)
-                {
-                    a->interest = b;
-                    break;
-                }
-            }
+        {
+            Unit key;
+            key.id = a->interest_id;
+            Unit* const b = UTIL_SEARCH(units.unit, Unit, units.count, &key, CompareById);
+            if(b)
+                a->interest = b;
+        }
     }
-    const int32_t t1 = SDL_GetTicks();
-    const int32_t dt = t1 - t0;
-    if(dt > 1)
-        printf("WARNING: INTEREST CLEANUP TAKING (%d) MILISECONDS -- WHY ARE YOU NOT USING BSEARCH AT THE VERY LEAST!?\n", dt);
 }
 
 static Units RemoveGarbage(Units units)
