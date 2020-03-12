@@ -449,45 +449,45 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE);
 }
 
-static void Unreference(const Units units, Unit* const unit)
+static void Unreference(const Units units, Unit* const flagged)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
-        Unit* const other = &units.unit[i];
-        if(other->interest == unit)
+        Unit* const unit = &units.unit[i];
+        if(unit->interest == flagged)
         {
-            other->is_engaged_in_melee = false;
-            Unit_SetInterest(other, NULL);
+            unit->is_engaged_in_melee = false;
+            Unit_SetInterest(unit, NULL);
         }
     }
 }
 
-static void KillChildren(const Units units, Unit* const unit)
+static void FlagChildren(const Units units, Unit* const unit)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const child = &units.unit[i];
         if(child->parent_id == unit->id)
-            Unit_Kill(child);
+            Unit_Flag(child);
     }
 }
 
-static void Kill(const Units units, Unit* const unit)
+static void Flag(const Units units, Unit* const unit)
 {
-    Unit_Kill(unit);
+    Unit_Flag(unit);
     Unreference(units, unit);
     if(unit->has_children)
-        KillChildren(units, unit);
+        FlagChildren(units, unit);
 }
 
-static Units KillTheDead(Units units, const Grid grid, const Registrar graphics, const Map map)
+static Units FlagTheDead(Units units, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit) && Unit_IsDead(unit))
         {
-            Kill(units, unit);
+            Flag(units, unit);
             if(unit->must_skip_debris)
                 continue;
             if(unit->trait.is_inanimate)
@@ -559,15 +559,16 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
 static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid grid)
 {
     static Point zero;
+    Point cart = zero;
+    Point offset = zero;
     if(closest->trait.is_inanimate)
-    {
-        const Point cart = Grid_CellToCart(grid, unit->cell_interest_inanimate);
-        Unit_MockPath(unit, cart, zero);
-    }
+        cart = Grid_CellToCart(grid, unit->cell_interest_inanimate);
     else
-        Unit_MockPath(unit, closest->cart, closest->cart_grid_offset);
-    Unit_SetInterest(unit, closest);
-    unit->using_attack_move = true;
+    {
+        cart = closest->cart;
+        offset = closest->cart_grid_offset;
+    }
+    Unit_MockPath(unit, cart, offset);
 }
 
 static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
@@ -577,11 +578,13 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
         Unit* const closest = GetClosestBoid(units, unit, grid);
         if(closest)
         {
-            if(unit->using_attack_move)
+            if(unit->using_attack_move
+            || unit->interest == closest)
+            {
                 EngageWithMock(unit, closest, grid);
-            else
-            if(unit->interest == closest)
-                EngageWithMock(unit, closest, grid);
+                Unit_SetInterest(unit, closest);
+                unit->using_attack_move = true;
+            }
         }
     }
 }
@@ -995,7 +998,7 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
             const Point half = Point_Div(unit->trait.dimensions, 2);
             const Point cart = Point_Add(unit->cart, half);
             points = Points_Append(points, cart);
-            Kill(units, unit);
+            Flag(units, unit);
             unit->must_skip_debris = true;
         }
     }
@@ -1145,7 +1148,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = UpdateAllMotives(units);
     Decay(units);
     Expire(units);
-    units = KillTheDead(units, grid, graphics, map);
+    units = FlagTheDead(units, grid, graphics, map);
     units = RemoveGarbage(units);
     ManageStacks(units);
     units = CountAllPopulations(units);

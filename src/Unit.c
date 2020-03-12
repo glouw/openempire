@@ -364,7 +364,7 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     }
 }
 
-void Unit_Kill(Unit* const unit)
+void Unit_Flag(Unit* const unit)
 {
     unit->health = 0;
     unit->is_selected = false;

@@ -96,7 +96,7 @@ void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_off
 
 void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Grid, const Field);
 
-void Unit_Kill(Unit* const);
+void Unit_Flag(Unit* const);
 
 int32_t Unit_GetLastExpireTick(Unit* const);
 
