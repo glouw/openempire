@@ -19,36 +19,48 @@ lines of C99 or less, using only SDL2 as an external dependency.
 
 ## Running
 
-Once the trial version of Age of Empires 2 (the original, not the Conquerors!)
-has been installed, you may test the client-server model with the test bash script:
+Install the trial version of Age of Empires II - The Age of Kings.
+You can find a copy of it on the internet archive:
+
+    https://archive.org/details/AgeofEmpiresIITheAgeofKings_1020
+
+The EULA agreement states that you may share the installer as a whole,
+but individual files installed by the installer may not be shared.
+Once installed, the quickest way to get the client server model tested
+is to edit GAME_PATH in test.sh to be your game's installation DATA folder.
+Once this is done, run:
 
     ./test.sh
 
-Note that this test script runs netem which purposely emulates a
-very laggy and lossy network. Change ENTROPY within test.sh to 0.1%
-to set realistic playing conditions. For development,
-set ENTROPY to 1.0% to stress test the networking engine more efficiently.
+This test script runs netem which purposely emulates a laggy lossy network.
+Change ENTROPY within test.sh to 0.1% to set realistic playing conditions.
+For development, set ENTROPY to 1.0% to stress test the networking engine more efficiently.
 
-Otherwise, assuming everything is on localhost, first start the server
-by specifying the server, port, and the number of users who will be playing:
+Otherwise, if you are looking to piece-wise setup the server and client on localhost,
+first start the server by specifying the port and the number of users who will be playing:
 
     ./openempires --server --port 1234 --users 3
 
 Keep note, that 3 users implies 2 human players, and 1 anti-cheat bot
 who spectates the game and detects and restores out of syncs.
 
-Second, start said 3 clients (you, on your computer, a friend on their computer,
-and the anti-cheat bot on a computer you trust). Specify your window resolution
-and installation data folder path:
+Second, start these 3 clients (you, on your computer, a friend on their computer,
+and the anti-cheat bot on a computer you trust). The anti cheat bot must be started last.
+For instance, to start 1 client:
 
     ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
 
 From here on its the game you know and love. Some small tweaks have been added
 to ease the control aspect:
 
-    W A S D : pans the camera
-    left shift + left click: selects multiple of the same unit
-    left alt + Q W E R T ... Z X C V B: selects a building to place, or a unit command to execute.
+    W A S D :
+        pans the camera
+
+    Left shift + left click:
+        selects multiple of the same unit
+
+    Left alt + Q W E R T ... Z X C V B:
+        selects a building to place, or a unit command to execute.
 
 ## Structure
 
