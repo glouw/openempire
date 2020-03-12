@@ -131,14 +131,14 @@ void Cache_CalculateControlChars(Cache* const cache, const int32_t setpoint)
     {
         const int32_t diff = setpoint - cache->cycles[i];
         cache->control[i] =
-            (diff > 24) ? 9 :
-            (diff > 21) ? 8 :
-            (diff > 18) ? 7 :
-            (diff > 15) ? 6 :
-            (diff > 12) ? 5 :
-            (diff >  9) ? 4 :
-            (diff >  6) ? 3 :
-            (diff >  3) ? 2 :
+            (diff > 16) ? 9 :
+            (diff > 14) ? 8 :
+            (diff > 12) ? 7 :
+            (diff > 10) ? 6 :
+            (diff >  8) ? 5 :
+            (diff >  6) ? 4 :
+            (diff >  4) ? 3 :
+            (diff >  2) ? 2 :
             (diff >  0) ? 1 : 0;
     }
 }
