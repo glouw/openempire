@@ -16,24 +16,9 @@
     { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_CASTLE      }, TRIGGER_NONE }
 
-#define BARRACKS_AGE_1 \
-    { ICONTYPE_UNIT, { ICONUNIT_MILITIA }, TRIGGER_NONE }
-
-#define BARRACKS_AGE_2 \
-    { ICONTYPE_TECH, { ICONTECH_RESEARCH_MAN_AT_ARMS }, TRIGGER_UPGRADE_MILITIA }
-
-#define TOWN_CENTER_AGE_1                                              \
-    { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER   }, TRIGGER_NONE     }, \
-    { ICONTYPE_UNIT, { ICONUNIT_FEMALE_VILLAGER }, TRIGGER_NONE     }, \
-    { ICONTYPE_TECH, { ICONTECH_AGE_2           }, TRIGGER_AGE_UP_2 }
-
-#define COMMAND_AGE_1 \
-    { ICONTYPE_COMMAND, { ICONCOMMAND_ATTACK_MOVE }, TRIGGER_NONE }
-
 static const Button build_age1[] = { BUILD_AGE_1 };
 static const Button build_age2[] = { BUILD_AGE_1 };
 static const Button build_age3[] = { BUILD_AGE_1, BUILD_AGE_3 };
-static const Button build_age4[] = { BUILD_AGE_1, BUILD_AGE_3 };
 
 static const Button* GetBuilding(const Age age)
 {
@@ -41,7 +26,6 @@ static const Button* GetBuilding(const Age age)
         build_age1,
         build_age2,
         build_age3,
-        build_age4,
     };
     return ages[age];
 }
@@ -52,15 +36,23 @@ static int32_t GetBuildingLen(const Age age)
         UTIL_LEN(build_age1),
         UTIL_LEN(build_age2),
         UTIL_LEN(build_age3),
-        UTIL_LEN(build_age4),
     };
     return lens[age];
 }
 
+#define BARRACKS_AGE_1 \
+    { ICONTYPE_UNIT, { ICONUNIT_MILITIA  }, TRIGGER_NONE }, \
+    { ICONTYPE_UNIT, { ICONUNIT_SPEARMAN }, TRIGGER_NONE }
+
+#define BARRACKS_AGE_2 \
+    { ICONTYPE_TECH, { ICONTECH_RESEARCH_MAN_AT_ARMS }, TRIGGER_UPGRADE_MILITIA }
+
+#define BARRACKS_AGE_3 \
+    { ICONTYPE_TECH, { ICONTECH_RESEARCH_PIKEMAN }, TRIGGER_UPGRADE_SPEARMAN }
+
 static const Button barracks_age1[] = { BARRACKS_AGE_1 };
 static const Button barracks_age2[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
-static const Button barracks_age3[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
-static const Button barracks_age4[] = { BARRACKS_AGE_1, BARRACKS_AGE_2 };
+static const Button barracks_age3[] = { BARRACKS_AGE_1, BARRACKS_AGE_2, BARRACKS_AGE_3 };
 
 static const Button* GetBarracks(const Age age)
 {
@@ -68,7 +60,6 @@ static const Button* GetBarracks(const Age age)
         barracks_age1,
         barracks_age2,
         barracks_age3,
-        barracks_age4,
     };
     return ages[age];
 }
@@ -79,15 +70,18 @@ static int32_t GetBarracksLen(const Age age)
         UTIL_LEN(barracks_age1),
         UTIL_LEN(barracks_age2),
         UTIL_LEN(barracks_age3),
-        UTIL_LEN(barracks_age4),
     };
     return lens[age];
 }
 
+#define TOWN_CENTER_AGE_1                                              \
+    { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER   }, TRIGGER_NONE     }, \
+    { ICONTYPE_UNIT, { ICONUNIT_FEMALE_VILLAGER }, TRIGGER_NONE     }, \
+    { ICONTYPE_TECH, { ICONTECH_AGE_2           }, TRIGGER_AGE_UP_2 }
+
 static const Button towncenter_age1[] = { TOWN_CENTER_AGE_1 };
 static const Button towncenter_age2[] = { TOWN_CENTER_AGE_1 };
 static const Button towncenter_age3[] = { TOWN_CENTER_AGE_1 };
-static const Button towncenter_age4[] = { TOWN_CENTER_AGE_1 };
 
 static const Button* GetTownCenter(const Age age)
 {
@@ -95,7 +89,6 @@ static const Button* GetTownCenter(const Age age)
         towncenter_age1,
         towncenter_age2,
         towncenter_age3,
-        towncenter_age4,
     };
     return ages[age];
 }
@@ -106,15 +99,16 @@ static int32_t GetTownCenterLen(const Age age)
         UTIL_LEN(towncenter_age1),
         UTIL_LEN(towncenter_age2),
         UTIL_LEN(towncenter_age3),
-        UTIL_LEN(towncenter_age4),
     };
     return lens[age];
 }
 
+#define COMMAND_AGE_1 \
+    { ICONTYPE_COMMAND, { ICONCOMMAND_ATTACK_MOVE }, TRIGGER_NONE }
+
 static const Button command_age1[] = { COMMAND_AGE_1 };
 static const Button command_age2[] = { COMMAND_AGE_1 };
 static const Button command_age3[] = { COMMAND_AGE_1 };
-static const Button command_age4[] = { COMMAND_AGE_1 };
 
 static const Button* GetCommand(const Age age)
 {
@@ -122,7 +116,6 @@ static const Button* GetCommand(const Age age)
         command_age1,
         command_age2,
         command_age3,
-        command_age4,
     };
     return ages[age];
 }
@@ -133,7 +126,6 @@ static int32_t GetCommandLen(const Age age)
         UTIL_LEN(command_age1),
         UTIL_LEN(command_age2),
         UTIL_LEN(command_age3),
-        UTIL_LEN(command_age4),
     };
     return lens[age];
 }
@@ -156,8 +148,6 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
         case TYPE_MILITIA:
         case TYPE_MAN_AT_ARMS:
         case TYPE_LONG_SWORDSMAN:
-        case TYPE_TWO_HANDED_SWORDSMAN:
-        case TYPE_CHAMPION:
             buttons.button = GetCommand(age);
             buttons.count = GetCommandLen(age);
             break;
@@ -186,5 +176,7 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
 
 bool Buttons_IsIndexValid(const Buttons buttons, const int32_t index)
 {
-    return index != -1 && buttons.button != NULL && index < buttons.count;
+    return index != -1
+        && buttons.button != NULL
+        && index < buttons.count;
 }

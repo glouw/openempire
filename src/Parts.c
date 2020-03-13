@@ -98,6 +98,12 @@ static Part man_at_arms[] = {
 static Part long_swordsman[] = {
     { {0,0}, FILE_GRAPHICS_LONG_SWORDSMAN_IDLE }
 };
+static Part spearman[] = {
+    { {0,0}, FILE_GRAPHICS_SPEARMAN_IDLE }
+};
+static Part pikeman[] = {
+    { {0,0}, FILE_GRAPHICS_PIKEMAN_IDLE }
+};
 static Part forest_tree[] = {
     { {0,0}, FILE_GRAPHICS_FOREST_TREE },
     { {0,0}, FILE_GRAPHICS_FOREST_TREE_SHADOW },
@@ -253,6 +259,22 @@ static Parts GetMilitia(void)
     return parts;
 }
 
+static Parts GetSpearman(void)
+{
+    const Parts parts = {
+        spearman, UTIL_LEN(spearman)
+    };
+    return parts;
+}
+
+static Parts GetPikeman(void)
+{
+    const Parts parts = {
+        pikeman, UTIL_LEN(pikeman)
+    };
+    return parts;
+}
+
 static Parts GetManAtArms(void)
 {
     const Parts parts = {
@@ -302,6 +324,7 @@ static Parts Lookup(const Button button, const Age age)
         {
         case ICONTECH_AGE_2                   :
         case ICONTECH_AGE_3                   :
+        case ICONTECH_RESEARCH_PIKEMAN        :
         case ICONTECH_RESEARCH_MAN_AT_ARMS    :
         case ICONTECH_RESEARCH_LONG_SWORDSMAN : return GetFlag();
         }
@@ -309,6 +332,8 @@ static Parts Lookup(const Button button, const Age age)
     case ICONTYPE_UNIT:
         switch(button.icon_unit)
         {
+        case ICONUNIT_SPEARMAN        : return GetSpearman      ();
+        case ICONUNIT_PIKEMAN         : return GetPikeman       ();
         case ICONUNIT_MILITIA         : return GetMilitia       ();
         case ICONUNIT_MAN_AT_ARMS     : return GetManAtArms     ();
         case ICONUNIT_LONG_SWORDSMAN  : return GetLongSwordsMan ();
