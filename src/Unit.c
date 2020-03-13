@@ -462,7 +462,6 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         }
         if(MustDisengage(unit))
         {
-            unit->is_engaged_in_melee = false;
             Unit_Unlock(unit);
             if(unit->interest)
             {

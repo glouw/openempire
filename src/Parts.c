@@ -6,26 +6,25 @@
 
 static Part flag[] = {
     { {0,0}, FILE_GRAPHICS_FLAG_TALL }
-};
-static Part villager_male[] = {
+},
+villager_male[] = {
     { {0,0}, FILE_GRAPHICS_MALE_VILLAGER_IDLE }
-};
-static Part villager_female[] = {
+},
+villager_female[] = {
     { {0,0}, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE }
-};
-static Part red_arrows[] = {
+},
+red_arrows[] = {
     { {0,0}, FILE_GRAPHICS_RIGHT_CLICK_RED_ARROWS }
-};
-static Part smoke_a[] = {
+},
+smoke_a[] = {
     { {0,0}, FILE_GRAPHICS_SMALLER_EXPLOSION_SMOKE }
-};
-static Part fire_a[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_A  } };
-static Part fire_b[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_B  } };
-static Part fire_c[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_C  } };
-static Part fire_d[] = { { {0,0}, FILE_GRAPHICS_FIRE_MEDIUM_A } };
-static Part fire_e[] = { { {0,0}, FILE_GRAPHICS_FIRE_MEDIUM_B } };
-
-static Part town_center_age1[] = {
+},
+fire_a[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_A  } },
+fire_b[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_B  } },
+fire_c[] = { { {0,0}, FILE_GRAPHICS_FIRE_SMALL_C  } },
+fire_d[] = { { {0,0}, FILE_GRAPHICS_FIRE_MEDIUM_A } },
+fire_e[] = { { {0,0}, FILE_GRAPHICS_FIRE_MEDIUM_B } },
+town_center_age1[] = {
     { {-0,0}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_TOP },
     { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT },
     { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
@@ -34,8 +33,8 @@ static Part town_center_age1[] = {
     { {-2,2}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
     { {-1,1}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
     { {-1,1}, FILE_GRAPHICS_AGE_1_TOWN_CENTER_SHADOW },
-};
-static Part town_center_age2[] = {
+},
+town_center_age2[] = {
     { {-0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_TOP },
     { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT },
     { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
@@ -44,8 +43,8 @@ static Part town_center_age2[] = {
     { {-2,2}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
     { {-1,1}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
     { {-1,1}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_SHADOW },
-};
-static Part town_center_age3[] = {
+},
+town_center_age3[] = {
     { {-0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_TOP },
     { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT },
     { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A },
@@ -54,57 +53,62 @@ static Part town_center_age3[] = {
     { {-2,2}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A },
     { {-1,1}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B },
     { {-1,1}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_SHADOW },
-};
-static Part barracks_age1[] = { { {0,0}, FILE_GRAPHICS_AGE_1_BARRACKS } };
-static Part barracks_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_BARRACKS } };
-static Part barracks_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_BARRACKS } };
-static Part mill_age1[] = {
+},
+barracks_age1[] = { { {0,0}, FILE_GRAPHICS_AGE_1_BARRACKS } },
+barracks_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_BARRACKS } },
+barracks_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_BARRACKS } },
+stable_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_STABLE } },
+stable_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_STABLE } },
+mill_age1[] = {
     { {0,0}, FILE_GRAPHICS_AGE_1_MILL },
     { {0,0}, FILE_GRAPHICS_AGE_1_MILL_DONKEY },
-};
-static Part mill_age2[] = {
+},
+mill_age2[] = {
     { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL },
     { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_ANIMATION },
     { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW },
-};
-static Part mill_age3[] = {
+},
+mill_age3[] = {
     { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_MILL },
     { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_MILL_ANIMATION },
     { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_MILL_SHADOW },
-};
-static Part house_age1[] = { { {0,0}, FILE_GRAPHICS_AGE_1_HOUSE } };
-static Part house_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_HOUSE } };
-static Part house_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_HOUSE } };
-static Part outpost[] = {
+},
+house_age1[] = { { {0,0}, FILE_GRAPHICS_AGE_1_HOUSE } },
+house_age2[] = { { {0,0}, FILE_GRAPHICS_AGE_2_WEST_EUROPE_HOUSE } },
+house_age3[] = { { {0,0}, FILE_GRAPHICS_AGE_3_WEST_EUROPE_HOUSE } },
+outpost[] = {
     { {0,0}, FILE_GRAPHICS_OUTPOST },
     { {0,0}, FILE_GRAPHICS_OUTPOST_SHADOW },
-};
-static Part stone_camp[] = {
+},
+stone_camp[] = {
     { {0,0}, FILE_GRAPHICS_WEST_EUROPE_STONE_MINING_CAMP },
-};
-static Part lumber_camp[] = {
+},
+lumber_camp[] = {
     { {0,0}, FILE_GRAPHICS_WEST_EUROPE_LUMBER_CAMP },
-};
-static Part castle[] = {
+},
+castle[] = {
     { {0,0}, FILE_GRAPHICS_WEST_EUROPE_CASTLE },
     { {0,0}, FILE_GRAPHICS_WEST_EUROPE_CASTLE_SHADOW },
-};
-static Part militia[] = {
+},
+militia[] = {
     { {0,0}, FILE_GRAPHICS_MILITIA_IDLE }
-};
-static Part man_at_arms[] = {
+},
+scout[] = {
+    { {0,0}, FILE_GRAPHICS_SCOUT_IDLE }
+},
+man_at_arms[] = {
     { {0,0}, FILE_GRAPHICS_MAN_AT_ARMS_IDLE }
-};
-static Part long_swordsman[] = {
+},
+long_swordsman[] = {
     { {0,0}, FILE_GRAPHICS_LONG_SWORDSMAN_IDLE }
-};
-static Part spearman[] = {
+},
+spearman[] = {
     { {0,0}, FILE_GRAPHICS_SPEARMAN_IDLE }
-};
-static Part pikeman[] = {
+},
+pikeman[] = {
     { {0,0}, FILE_GRAPHICS_PIKEMAN_IDLE }
-};
-static Part forest_tree[] = {
+},
+forest_tree[] = {
     { {0,0}, FILE_GRAPHICS_FOREST_TREE },
     { {0,0}, FILE_GRAPHICS_FOREST_TREE_SHADOW },
 };
@@ -179,6 +183,18 @@ static Parts GetTownCenter(const Age age)
     case AGE_1: parts.part = town_center_age1; parts.count = UTIL_LEN(town_center_age1); break;
     case AGE_2: parts.part = town_center_age2; parts.count = UTIL_LEN(town_center_age2); break;
     case AGE_3: parts.part = town_center_age3; parts.count = UTIL_LEN(town_center_age3); break;
+    }
+    return parts;
+}
+
+static Parts GetStable(const Age age)
+{
+    Parts parts = { NULL, 0 };
+    switch(age)
+    {
+        case AGE_1: break;
+        case AGE_2: parts.part = stable_age2; parts.count = UTIL_LEN(stable_age2); break;
+        case AGE_3: parts.part = stable_age3; parts.count = UTIL_LEN(stable_age3); break;
     }
     return parts;
 }
@@ -275,6 +291,14 @@ static Parts GetPikeman(void)
     return parts;
 }
 
+static Parts GetScout(void)
+{
+    const Parts parts = {
+        scout, UTIL_LEN(scout)
+    };
+    return parts;
+}
+
 static Parts GetManAtArms(void)
 {
     const Parts parts = {
@@ -310,6 +334,7 @@ static Parts Lookup(const Button button, const Age age)
         switch(button.icon_build)
         {
         case ICONBUILD_BARRACKS    : return GetBarracks  (age);
+        case ICONBUILD_STABLE      : return GetStable    (age);
         case ICONBUILD_MILL        : return GetMill      (age);
         case ICONBUILD_HOUSE       : return GetHouse     (age);
         case ICONBUILD_OUTPOST     : return GetOutpost   (   );
@@ -334,6 +359,7 @@ static Parts Lookup(const Button button, const Age age)
         {
         case ICONUNIT_SPEARMAN        : return GetSpearman      ();
         case ICONUNIT_PIKEMAN         : return GetPikeman       ();
+        case ICONUNIT_SCOUT           : return GetScout         ();
         case ICONUNIT_MILITIA         : return GetMilitia       ();
         case ICONUNIT_MAN_AT_ARMS     : return GetManAtArms     ();
         case ICONUNIT_LONG_SWORDSMAN  : return GetLongSwordsMan ();

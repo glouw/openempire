@@ -5,20 +5,23 @@
 #include "Util.h"
 
 #define BUILD_AGE_1                                              \
-    { ICONTYPE_BUILD, { ICONBUILD_BARRACKS    }, TRIGGER_NONE }, \
-    { ICONTYPE_BUILD, { ICONBUILD_MILL        }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_HOUSE       }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_OUTPOST     }, TRIGGER_NONE }, \
+    { ICONTYPE_BUILD, { ICONBUILD_MILL        }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_STONE_CAMP  }, TRIGGER_NONE }, \
-    { ICONTYPE_BUILD, { ICONBUILD_LUMBER_CAMP }, TRIGGER_NONE }
+    { ICONTYPE_BUILD, { ICONBUILD_LUMBER_CAMP }, TRIGGER_NONE }, \
+    { ICONTYPE_BUILD, { ICONBUILD_BARRACKS    }, TRIGGER_NONE }
+
+#define BUILD_AGE_2                                              \
+    { ICONTYPE_BUILD, { ICONBUILD_STABLE      }, TRIGGER_NONE }  \
 
 #define BUILD_AGE_3                                              \
     { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_CASTLE      }, TRIGGER_NONE }
 
 static const Button build_age1[] = { BUILD_AGE_1 };
-static const Button build_age2[] = { BUILD_AGE_1 };
-static const Button build_age3[] = { BUILD_AGE_1, BUILD_AGE_3 };
+static const Button build_age2[] = { BUILD_AGE_1, BUILD_AGE_2 };
+static const Button build_age3[] = { BUILD_AGE_1, BUILD_AGE_2, BUILD_AGE_3 };
 
 static const Button* GetBuilding(const Age age)
 {
@@ -70,6 +73,33 @@ static int32_t GetBarracksLen(const Age age)
         UTIL_LEN(barracks_age1),
         UTIL_LEN(barracks_age2),
         UTIL_LEN(barracks_age3),
+    };
+    return lens[age];
+}
+
+#define STABLE_AGE_2 \
+    { ICONTYPE_UNIT, { ICONUNIT_SCOUT }, TRIGGER_NONE }
+
+static const Button stable_age1[] = { STABLE_AGE_2 };
+static const Button stable_age2[] = { STABLE_AGE_2 };
+static const Button stable_age3[] = { STABLE_AGE_2 };
+
+static const Button* GetStable(const Age age)
+{
+    const Button* ages[] = {
+        stable_age1,
+        stable_age2,
+        stable_age3,
+    };
+    return ages[age];
+}
+
+static int32_t GetStableLen(const Age age)
+{
+    const int32_t lens[] = {
+        UTIL_LEN(stable_age1),
+        UTIL_LEN(stable_age2),
+        UTIL_LEN(stable_age3),
     };
     return lens[age];
 }
@@ -148,6 +178,9 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
         case TYPE_MILITIA:
         case TYPE_MAN_AT_ARMS:
         case TYPE_LONG_SWORDSMAN:
+        case TYPE_SCOUT:
+        case TYPE_SPEARMAN:
+        case TYPE_PIKEMAN:
             buttons.button = GetCommand(age);
             buttons.count = GetCommandLen(age);
             break;
@@ -161,6 +194,10 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
         case TYPE_BARRACKS:
             buttons.button = GetBarracks(age);
             buttons.count = GetBarracksLen(age);
+            break;
+        case TYPE_STABLE:
+            buttons.button = GetStable(age);
+            buttons.count = GetStableLen(age);
             break;
         case TYPE_TOWN_CENTER:
             buttons.button = GetTownCenter(age);
