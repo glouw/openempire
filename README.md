@@ -19,22 +19,27 @@ lines of C99 or less, using only SDL2 as an external dependency.
 
 ## Running
 
-Install the trial version of Age of Empires II - The Age of Kings.
-You can find a copy of it on the internet archive:
+Get a copy of Age of Empires II trial version from the internet archive:
 
-    https://archive.org/details/AgeofEmpiresIITheAgeofKings_1020
+    https://archive.org/download/AgeofEmpiresIITheAgeofKings_1020/AoE2demo.zip
 
-The EULA agreement states that you may share the installer as a whole,
-but individual files installed by the installer may not be shared.
+Unzip, and run the installation .exe with wine. The game's asset data folder
+can be found in the root directory of the game's installation:
+
+    "$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data"
+
+*The EULA agreement states that you may share the installer as a whole,
+but individual files installed by the installer may not be shared across computers.*
+
 Once installed, the quickest way to get the client server model tested
-is to edit GAME_PATH in test.sh to be your game's installation DATA folder.
-Once this is done, run:
+is to edit GAME_PATH in test.sh to be your game's installation DATA folder,
+although if you are on a UNIX like machine this should already be correctly set.
+Once done, run:
 
     ./test.sh
 
 This test script runs netem which purposely emulates a laggy lossy network.
-Change ENTROPY within test.sh to 0.1% to set realistic playing conditions.
-For development, set ENTROPY to 1.0% to stress test the networking engine more efficiently.
+Change ENTROPY within test.sh to to set realistic or development playing conditions.
 
 Otherwise, if you are looking to piece-wise setup the server and client on localhost,
 first start the server by specifying the port and the number of users who will be playing:
@@ -49,6 +54,8 @@ and the anti-cheat bot on a computer you trust). The anti cheat bot must be star
 For instance, to start 1 client:
 
     ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
+
+The data folder path is that path folder path as previously outline above.
 
 From here on its the game you know and love. Some small tweaks have been added
 to ease the control aspect:
