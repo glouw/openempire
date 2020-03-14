@@ -377,26 +377,6 @@ static void ConditionallyStopAllBoids(const Units units)
         ConditionallyStopBoids(units, &units.unit[i]);
 }
 
-static bool EqualDimension(Point dimensions, const Graphics file)
-{
-    const int32_t min = UTIL_MIN(dimensions.x, dimensions.y);
-    dimensions.x = min;
-    dimensions.y = min;
-    const Point _1x1_ = FILE_DIMENSIONS_1X1;
-    const Point _2x2_ = FILE_DIMENSIONS_2X2;
-    const Point _3x3_ = FILE_DIMENSIONS_3X3;
-    const Point _4x4_ = FILE_DIMENSIONS_4X4;
-    switch(file)
-    {
-        default:
-            // 1X1, BEING THE SMALLEST, IS MOST SANE DEFAULT CASE.
-        case FILE_GRAPHICS_RUBBLE_1X1: return Point_Equal(_1x1_, dimensions);
-        case FILE_GRAPHICS_RUBBLE_2X2: return Point_Equal(_2x2_, dimensions);
-        case FILE_GRAPHICS_RUBBLE_3X3: return Point_Equal(_3x3_, dimensions);
-        case FILE_GRAPHICS_RUBBLE_4X4: return Point_Equal(_4x4_, dimensions);
-    }
-}
-
 static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Map map)
 {
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
@@ -443,7 +423,7 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
     for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
     {
         const Graphics rubble = rubbles[i];
-        if(EqualDimension(unit->trait.dimensions, rubble))
+        if(Graphics_EqualDimension(rubble, unit->trait.dimensions))
             file = rubble;
     }
     if(file != FILE_GRAPHICS_NONE)
@@ -1207,12 +1187,12 @@ uint64_t Units_Xor(const Units units)
     {
         const Status status =  units.stamp[i].status;
         parity ^=
-            (uint64_t) (status.age       ) << 60 |
-            (uint64_t) (status.population) << 48 |
-            (uint64_t) (status.food      ) << 36 |
-            (uint64_t) (status.wood      ) << 24 |
-            (uint64_t) (status.gold      ) << 12 |
-            (uint64_t) (status.stone     ) <<  0;
+            ((uint64_t) (status.age       ) << 60) |
+            ((uint64_t) (status.population) << 48) |
+            ((uint64_t) (status.food      ) << 36) |
+            ((uint64_t) (status.wood      ) << 24) |
+            ((uint64_t) (status.gold      ) << 12) |
+            ((uint64_t) (status.stone     ) <<  0);
     }
     return parity;
 }
@@ -1222,7 +1202,8 @@ static Unit* GetFirstTownCenter(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == units.color && unit->trait.type == TYPE_TOWN_CENTER)
+        if(unit->color == units.color
+        && unit->trait.type == TYPE_TOWN_CENTER)
             return unit;
     }
     return NULL;

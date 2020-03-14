@@ -195,3 +195,23 @@ bool Graphics_GetMidding(const Graphics graphics)
     }
     return false;
 }
+
+bool Graphics_EqualDimension(const Graphics file, Point dimensions)
+{
+    const int32_t min = UTIL_MIN(dimensions.x, dimensions.y);
+    dimensions.x = min;
+    dimensions.y = min;
+    const Point _1x1_ = FILE_DIMENSIONS_1X1;
+    const Point _2x2_ = FILE_DIMENSIONS_2X2;
+    const Point _3x3_ = FILE_DIMENSIONS_3X3;
+    const Point _4x4_ = FILE_DIMENSIONS_4X4;
+    switch(file)
+    {
+        default:
+        // 1X1, BEING THE SMALLEST, IS MOST SANE DEFAULT CASE.
+        case FILE_GRAPHICS_RUBBLE_1X1: case FILE_GRAPHICS_CONSTRUCTION_1X1: return Point_Equal(_1x1_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_2X2: case FILE_GRAPHICS_CONSTRUCTION_2X2: return Point_Equal(_2x2_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_3X3: case FILE_GRAPHICS_CONSTRUCTION_3X3: return Point_Equal(_3x3_, dimensions);
+        case FILE_GRAPHICS_RUBBLE_4X4: case FILE_GRAPHICS_CONSTRUCTION_4X4: return Point_Equal(_4x4_, dimensions);
+    }
+}
