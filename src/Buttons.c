@@ -166,8 +166,6 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
     Buttons buttons = zero;
     switch(motive.action)
     {
-    default:
-        break;
     case ACTION_BUILD:
         buttons.button = GetBuilding(age);
         buttons.count = GetBuildingLen(age);
@@ -184,7 +182,34 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
             buttons.button = GetCommand(age);
             buttons.count = GetCommandLen(age);
             break;
-        default:
+        // EXEMPT - PREFERABLE TO BE EXPLICIT. DEFAULT
+        // WILL SILENTLY HIDE NEWLY ADDED TYPES.
+        case TYPE_NONE:
+        case TYPE_VILLAGER:
+        case TYPE_FIRE:
+        case TYPE_SHADOW:
+        case TYPE_SMOKE:
+        case TYPE_OUTPOST:
+        case TYPE_TOWN_CENTER:
+        case TYPE_BERRY_BUSH:
+        case TYPE_KNIGHT:
+        case TYPE_GOLD_MINE:
+        case TYPE_STONE_MINE:
+        case TYPE_MINING_CAMP:
+        case TYPE_MILL:
+        case TYPE_LUMBER_CAMP:
+        case TYPE_CASTLE:
+        case TYPE_BARRACKS:
+        case TYPE_STABLE:
+        case TYPE_HOUSE:
+        case TYPE_RUBBLE:
+        case TYPE_TREE:
+        case TYPE_FLAG:
+        case TYPE_FOOD:
+        case TYPE_WOOD:
+        case TYPE_GOLD:
+        case TYPE_STONE:
+        case TYPE_COUNT:
             break;
         }
         break;
@@ -203,9 +228,40 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
             buttons.button = GetTownCenter(age);
             buttons.count = GetTownCenterLen(age);
             break;
-        default:
+        case TYPE_NONE:
+        case TYPE_MILITIA:
+        case TYPE_MAN_AT_ARMS:
+        case TYPE_SPEARMAN:
+        case TYPE_VILLAGER:
+        case TYPE_FIRE:
+        case TYPE_SHADOW:
+        case TYPE_SMOKE:
+        case TYPE_OUTPOST:
+        case TYPE_BERRY_BUSH:
+        case TYPE_KNIGHT:
+        case TYPE_GOLD_MINE:
+        case TYPE_STONE_MINE:
+        case TYPE_MINING_CAMP:
+        case TYPE_MILL:
+        case TYPE_LUMBER_CAMP:
+        case TYPE_CASTLE:
+        case TYPE_HOUSE:
+        case TYPE_RUBBLE:
+        case TYPE_SCOUT:
+        case TYPE_LONG_SWORDSMAN:
+        case TYPE_PIKEMAN:
+        case TYPE_TREE:
+        case TYPE_FLAG:
+        case TYPE_FOOD:
+        case TYPE_WOOD:
+        case TYPE_GOLD:
+        case TYPE_STONE:
+        case TYPE_COUNT:
             break;
         }
+        break;
+    case ACTION_NONE:
+    case ACTION_COUNT:
         break;
     }
     return buttons;

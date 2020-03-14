@@ -8,9 +8,9 @@ GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empire
 LATENCY=25ms
 VARIANCE=5ms
 ENTROPY=0.02% # REALISM = 0.02%. STRESS TEST = 2.1%.
-XRES=1200
+XRES=1300
 YRES=700
-USERS=3
+USERS=2
 MAP_SIZE=64
 HOST=localhost
 PORT=1111

@@ -55,10 +55,10 @@ For instance, to start 1 client:
 
     ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
 
-The data folder path is that path folder path as previously outline above.
+The data folder path is the same path previously outline above.
 
 From here on its the game you know and love. Some small tweaks have been added
-to ease the control aspect:
+to ease some of the controls:
 
     W A S D :
         pans the camera

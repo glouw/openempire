@@ -979,15 +979,10 @@ static void AgeUpSimple(Units units, const Grid grid, const Registrar graphics, 
     }
 }
 
-static Age GetNextAge(const Status status)
-{
-    return (Age) ((int32_t) status.age + 1);
-}
-
 static Units AgeUpBuildingByType(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Type type, const Color color)
 {
     static Point zero;
-    const Age age = GetNextAge(overview.incoming.status);
+    const Age age = units.stamp[overview.color].status.age;
     const Parts parts = Parts_FromButton(button, age);
     Points points = Points_Make(COLOR_COUNT);
     for(int32_t i = 0; i < units.count; i++)
@@ -1041,6 +1036,11 @@ static Units AgeUpAdvanced(Units units, const Overview overview, const Grid grid
     return units;
 }
 
+static Age GetNextAge(const Status status)
+{
+    return (Age) ((int32_t) status.age + 1);
+}
+
 static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     if(overview.color == flag->color)
@@ -1068,12 +1068,17 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
             switch(flag->trigger)
             {
-            case TRIGGER_AGE_UP_2               :
-            case TRIGGER_AGE_UP_3               : return AgeUp(units, flag, overview, grid, graphics, map);
-            case TRIGGER_UPGRADE_MILITIA        : return UpgradeByType(units, flag, grid, graphics, TYPE_MILITIA);
-            case TRIGGER_UPGRADE_MAN_AT_ARMS    : return UpgradeByType(units, flag, grid, graphics, TYPE_MAN_AT_ARMS);
-            case TRIGGER_UPGRADE_SPEARMAN       : return UpgradeByType(units, flag, grid, graphics, TYPE_SPEARMAN);
-            case TRIGGER_NONE                   : return units; // KEEP COMPILER QUIET.
+            case TRIGGER_AGE_UP_2:
+            case TRIGGER_AGE_UP_3:
+                return AgeUp(units, flag, overview, grid, graphics, map);
+            case TRIGGER_UPGRADE_MILITIA:
+            case TRIGGER_UPGRADE_MAN_AT_ARMS:
+            case TRIGGER_UPGRADE_SPEARMAN:
+                // NOT THE CAST.
+                // TRIGGERS MAP 1:1 WITH TYPES FOR SIMPLE UPGRADES.
+                return UpgradeByType(units, flag, grid, graphics, (Type) flag->trigger);
+            case TRIGGER_NONE:
+                return units; // KEEP COMPILER QUIET.
             }
         }
     }

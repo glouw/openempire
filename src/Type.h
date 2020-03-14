@@ -3,6 +3,11 @@
 typedef enum
 {
     TYPE_NONE = -1,
+    // --- BEGIN SIMPLE UPGRADEABLE TYPE - MAPS 1:1 WITH TRIGGERS.
+    TYPE_MILITIA,
+    TYPE_MAN_AT_ARMS,
+    TYPE_SPEARMAN,
+    // --- END.
     TYPE_VILLAGER,
     TYPE_FIRE,
     TYPE_SHADOW,
@@ -22,20 +27,16 @@ typedef enum
     TYPE_HOUSE,
     TYPE_RUBBLE,
     TYPE_SCOUT,
-    TYPE_MILITIA,
-    TYPE_MAN_AT_ARMS,
     TYPE_LONG_SWORDSMAN,
-    TYPE_SPEARMAN,
     TYPE_PIKEMAN,
     TYPE_TREE,
     TYPE_FLAG,
-
-    // RESOURCES.
+    // --- BEGIN RESOURCES.
     TYPE_FOOD,
     TYPE_WOOD,
     TYPE_GOLD,
     TYPE_STONE,
-
+    // --- END.
     TYPE_COUNT,
 }
 Type;
