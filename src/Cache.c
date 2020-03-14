@@ -127,18 +127,21 @@ int32_t Cache_GetPingMax(Cache* const cache)
 
 void Cache_CalculateControlChars(Cache* const cache, const int32_t setpoint)
 {
+    const int32_t kp = 2;
+    const int32_t ki = 16;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const int32_t diff = setpoint - cache->cycles[i];
-        cache->control[i] =
-            (diff > 16) ? 9 :
-            (diff > 14) ? 8 :
-            (diff > 12) ? 7 :
-            (diff > 10) ? 6 :
-            (diff >  8) ? 5 :
-            (diff >  6) ? 4 :
-            (diff >  4) ? 3 :
-            (diff >  2) ? 2 :
-            (diff >  0) ? 1 : 0;
+        const int32_t cycles = cache->cycles[i];
+        if(cycles > 0)
+        {
+            const int32_t diff = setpoint - cycles;
+            cache->integral[i] += diff;
+            const int32_t ep = diff / kp;
+            const int32_t ei = cache->integral[i] / ki;
+            const int32_t control = ep + ei;
+            printf("%d %d :: %d ... %d\n", ep, ei, control, cache->integral[i]);
+            if(control >= 0)
+                cache->control[i] = control;
+        }
     }
 }

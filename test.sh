@@ -26,7 +26,7 @@ netsim()
 {
     DEV=lo
     sudo tc qdisc del dev $DEV root netem
-    sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY 25% duplicate $ENTROPY corrupt $ENTROPY
+    sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY #25% duplicate $ENTROPY corrupt $ENTROPY
 }
 
 batch()

@@ -23,6 +23,7 @@ typedef struct
     bool is_out_of_sync;
     int32_t control[COLOR_COUNT];
     History history[COLOR_COUNT];
+    int32_t integral[COLOR_COUNT];
 }
 Cache;
 

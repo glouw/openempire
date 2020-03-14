@@ -119,7 +119,7 @@ static int32_t RunSendNeedle(void* const data)
 static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
-    const int32_t buffer = 3;
+    const int32_t buffer = 3; // XXX. THIS BUFFER NEEDS TO BE LARGER IF ONE OF THE CLIENT IS DRIVING HARDER WITH ITS CONTROL VALUE.
     const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
     Packet base = cache->packet;
     base.turn = cache->turn;
