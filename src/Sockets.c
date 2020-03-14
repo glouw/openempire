@@ -178,7 +178,7 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
             cache->is_out_of_sync = true;
         const int32_t setpoint = Cache_GetCycleSetpoint(cache);
         const int32_t max_ping = Cache_GetPingMax(cache);
-        Cache_CalculateControlChars(cache, setpoint);
+        Cache_CalculateControl(cache, setpoint);
         Cache_CheckStability(cache, setpoint);
         cache->users_connected = CountConnectedPlayers(sockets);
         const bool game_running = Cache_GetGameRunning(cache);

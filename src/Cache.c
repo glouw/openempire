@@ -125,7 +125,7 @@ int32_t Cache_GetPingMax(Cache* const cache)
     return max;
 }
 
-void Cache_CalculateControlChars(Cache* const cache, const int32_t setpoint)
+void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
     const int32_t kp = 2;
     const int32_t ki = 16;
@@ -139,7 +139,6 @@ void Cache_CalculateControlChars(Cache* const cache, const int32_t setpoint)
             const int32_t ep = diff / kp;
             const int32_t ei = cache->integral[i] / ki;
             const int32_t control = ep + ei;
-            printf("%d %d :: %d ... %d\n", ep, ei, control, cache->integral[i]);
             if(control >= 0)
                 cache->control[i] = control;
         }

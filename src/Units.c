@@ -1203,6 +1203,17 @@ uint64_t Units_Xor(const Units units)
         const uint64_t xorred = flat + unit->id + unit->file + unit->health;
         parity ^= xorred;
     }
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const Status status =  units.stamp[i].status;
+        parity ^=
+            (uint64_t) (status.age       ) << 60 |
+            (uint64_t) (status.population) << 48 |
+            (uint64_t) (status.food      ) << 36 |
+            (uint64_t) (status.wood      ) << 24 |
+            (uint64_t) (status.gold      ) << 12 |
+            (uint64_t) (status.stone     ) <<  0;
+    }
     return parity;
 }
 
