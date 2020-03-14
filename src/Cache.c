@@ -35,7 +35,7 @@ static bool MisMatch(Cache* const cache, const int32_t cycles_check, const int32
     return false;
 }
 
-void Cache_CheckParity(Cache* const cache) // XXX. CHECKS SHOULD HAPPEN ON EVERY INCOMING CYCLE AND PARITY, NOT THE LAST ONE FOR EVERY TURN.
+void Cache_CheckParity(Cache* const cache)
 {
     if(cache->is_stable)
         for(int32_t i = 0; i < COLOR_COUNT; i++)
