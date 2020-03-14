@@ -389,6 +389,7 @@ static bool EqualDimension(Point dimensions, const Graphics file)
     switch(file)
     {
         default:
+            // 1X1, BEING THE SMALLEST, IS MOST SANE DEFAULT CASE.
         case FILE_GRAPHICS_RUBBLE_1X1: return Point_Equal(_1x1_, dimensions);
         case FILE_GRAPHICS_RUBBLE_2X2: return Point_Equal(_2x2_, dimensions);
         case FILE_GRAPHICS_RUBBLE_3X3: return Point_Equal(_3x3_, dimensions);
@@ -627,7 +628,9 @@ static Status Gather(Status status, const Resource resource)
         case TYPE_WOOD  : status.wood  += resource.amount; break;
         case TYPE_GOLD  : status.gold  += resource.amount; break;
         case TYPE_STONE : status.stone += resource.amount; break;
-        default         : break;
+        default:
+            // THERE ARE ONLY 4 TYPES FOR ALL OF TIME. DEFAULT IS FINE.
+            break;
     }
     return status;
 }
@@ -727,7 +730,7 @@ static void Tick(const Units units)
         unit->dir_timer++;
         unit->path_index_timer++;
         unit->grid_flash_timer++;
-        if((unit->grid_flash_timer % CONFIG_VRAM_FLASH_TIMER_RATE) == 0)
+        if(Unit_FlashTimerTick(unit))
             unit->is_flash_on ^= true;
         if(unit->is_timing_to_collect)
             unit->garbage_collection_timer++;

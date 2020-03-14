@@ -436,6 +436,8 @@ static Resource CollectResource(Unit* const unit)
     case TYPE_GOLD_MINE  : resource.type = TYPE_GOLD;  break;
     case TYPE_BERRY_BUSH : resource.type = TYPE_FOOD;  break;
     default:
+        // DEFAULT IS FINE.
+        // BY LAW THERE ARE ONLY 4 RESOURCES TYPES IN AGE II.
         break;
     }
     return resource;
@@ -571,4 +573,9 @@ void Unit_SetInterest(Unit* const unit, Unit* const interest)
         unit->interest_id = interest->id;
     else
         unit->interest_id = -1;
+}
+
+bool Unit_FlashTimerTick(Unit* const unit)
+{
+    return (unit->grid_flash_timer % CONFIG_VRAM_FLASH_TIMER_RATE) == 0;
 }

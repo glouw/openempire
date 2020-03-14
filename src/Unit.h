@@ -135,3 +135,5 @@ int32_t Unit_GetIdNext(void);
 void Unit_SetIdNext(const int32_t id);
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest);
+
+bool Unit_FlashTimerTick(Unit* const);

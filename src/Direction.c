@@ -14,6 +14,8 @@ Direction Direction_Fix(const Direction dir, bool* const flip_vert)
         case DIRECTION_E : return DIRECTION_W;
         case DIRECTION_SE: return DIRECTION_SW;
         default:
+            // KEEP COMPILER QUIET.
+            // THESE ARE THE ONLY THREE TRUE KNOWN CASES FOR ALL OF TIME.
             break;
         }
     }
