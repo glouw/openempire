@@ -28,8 +28,9 @@ can be found in the root directory of the game's installation:
 
     "$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data"
 
-*The EULA agreement states that you may share the installer as a whole,
-but individual files installed by the installer may not be shared across computers.*
+A copy of the Trial version EULA agreement has been pasted in the LICENCE file
+for your reference. In using Open Empires alongside the Trial Assets, you consent to
+the terms within this EULA.
 
 Once installed, the quickest way to get the client server model tested
 is to edit GAME_PATH in test.sh to be your game's installation DATA folder,
