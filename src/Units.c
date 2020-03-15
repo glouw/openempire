@@ -228,7 +228,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         {
             const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
-            if(tile.reference)
+            if(tile.reference && !Unit_IsExempt(tile.reference))
             {
                 tile.reference->grid_flash_timer = 0;
                 DisengageSelected(units);
@@ -566,9 +566,12 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
             if(unit->using_attack_move
             || unit->interest == closest)
             {
-                EngageWithMock(unit, closest, grid);
-                Unit_SetInterest(unit, closest);
-                unit->using_attack_move = true;
+                if(!unit->is_state_locked)
+                {
+                    EngageWithMock(unit, closest, grid);
+                    Unit_SetInterest(unit, closest);
+                    unit->using_attack_move = true;
+                }
             }
         }
     }
