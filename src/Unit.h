@@ -144,4 +144,6 @@ Graphics Unit_GetConstructionFile(Unit* const);
 
 void Unit_SetParent(Unit* const, Unit* const parent);
 
-bool Unit_IsConstructing(Unit* const);
+bool Unit_IsConstruction(Unit* const);
+
+bool Unit_AreEnemies(Unit* const unit, Unit* const other);

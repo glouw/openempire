@@ -433,12 +433,12 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
         *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE, false);
 }
 
-static void DisengageFrom(const Units units, Unit* const flagged)
+static void DisengageFrom(const Units units, Unit* const other)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->interest == flagged)
+        if(unit->interest == other)
         {
             unit->is_engaged_in_melee = false;
             Unit_SetInterest(unit, NULL);
@@ -511,7 +511,8 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(other->color != unit->color && !Unit_IsExempt(other)) // XXX: USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
+            if(Unit_IsConstruction(other)
+            || Unit_AreEnemies(unit, other))
             {
                 Point cell = zero;
                 if(other->trait.is_inanimate)
@@ -922,7 +923,7 @@ static Units CountAllPopulations(Units units)
     return units;
 }
 
-static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating, const bool is_being_built)
+static Units SpawnWithButton(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating, const bool is_being_built)
 {
     const Point zero = { 0,0 };
     const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
@@ -943,7 +944,7 @@ static Units UseIcon(Units units, const Overview overview, const Grid grid, cons
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
     const Button button = Button_Upgrade(Button_FromOverview(overview), overview.incoming.bits);
-    return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating, is_being_built);
+    return SpawnWithButton(units, overview, grid, graphics, map, button, cart, is_floating, is_being_built);
 }
 
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
@@ -1152,8 +1153,12 @@ static void CompleteConstruction(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->health >= unit->trait.max_health)
+        if(unit->health >= unit->trait.max_health 
+        && unit->is_being_built)
+        {
+            DisengageFrom(units, unit);
             unit->is_being_built = false;
+        }
     }
 }
 

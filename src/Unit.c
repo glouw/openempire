@@ -239,6 +239,7 @@ void Unit_Print(Unit* const unit)
     if(unit)
     {
         printf("is_being_built        :: %d\n", unit->is_being_built);
+        printf("interest              :: 0x%16p\n", (void*) unit->interest);
         printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
         printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
         printf("cart_goal             :: %d %d\n", unit->cart_goal.x, unit->cart_goal.y);
@@ -265,9 +266,14 @@ void Unit_Flow(Unit* const unit, const Grid grid)
     CapSpeed(unit);
 }
 
+static bool SameColor(Unit* const unit, Unit* const other)
+{
+    return unit->color == other->color;
+}
+
 bool Unit_InPlatoon(Unit* const unit, Unit* const other)
 {
-    return unit->command_group == other->command_group && unit->color == other->color;
+    return unit->command_group == other->command_group && SameColor(unit, other);
 }
 
 void Unit_SetDir(Unit* const unit, const Point dir)
@@ -401,7 +407,7 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
-static bool MustEngage(Unit* const unit, const Grid grid)
+static bool CanEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(
             unit->interest->trait.is_inanimate
@@ -427,12 +433,8 @@ static bool MustEngage(Unit* const unit, const Grid grid)
     }
 }
 
-static Resource CollectResource(Unit* const unit)
+static Resource Collect(Resource resource, Unit* const unit)
 {
-    Resource resource = {
-        TYPE_NONE,
-        unit->trait.attack
-    };
     switch(unit->interest->trait.type)
     {
     case TYPE_TREE       : resource.type = TYPE_WOOD;  break;
@@ -454,15 +456,33 @@ static bool MustDisengage(Unit* const unit)
         && !Unit_IsDead(unit->interest);
 }
 
+static void Build(Unit* const unit, Unit* const other)
+{
+    if(Unit_IsConstruction(other))
+        other->health += unit->trait.attack;
+}
+
+static Resource Extract(Unit* const unit, Unit* const other)
+{
+    Resource resource = {
+        TYPE_NONE,
+        unit->trait.attack
+    };
+    if(other->trait.is_resource)
+        resource = Collect(resource, unit);
+    other->health -= unit->trait.attack;
+    return resource;
+}
+
 Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
     Unit* const other = unit->interest;
     if(other != NULL
     && !Unit_IsExempt(unit)
     && !Unit_IsExempt(other)
-    && unit != other) // DO NOT MELEE SELF.
+    && Unit_IsDifferent(unit, other)) // DO NOT MELEE SELF.
     {
-        if(MustEngage(unit, grid))
+        if(CanEngage(unit, grid))
         {
             unit->is_engaged_in_melee = true;
             Unit_SetState(unit, STATE_ATTACK, true);
@@ -475,14 +495,10 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
             {
                 if(unit->trait.type == TYPE_VILLAGER)
                 {
-                    if(Unit_IsConstructing(other))
-                        other->health += unit->trait.attack;
+                    if(SameColor(unit, other))
+                        Build(unit, other);
                     else
-                    {
-                        other->health -= unit->trait.attack;
-                        if(other->trait.is_resource)
-                            return CollectResource(unit);
-                    }
+                        return Extract(unit, other);
                 }
                 else
                     other->health -= unit->trait.attack;
@@ -623,7 +639,12 @@ void Unit_SetParent(Unit* const child, Unit* const parent)
         child->interest_id = -1;
 }
 
-bool Unit_IsConstructing(Unit* const unit)
+bool Unit_IsConstruction(Unit* const unit)
 {
     return unit->trait.is_inanimate && unit->is_being_built;
+}
+
+bool Unit_AreEnemies(Unit* const unit, Unit* const other)
+{
+    return !SameColor(unit, other) && !Unit_IsExempt(other); // XXX: USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
 }

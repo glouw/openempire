@@ -73,7 +73,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
                     continue;
                 else
                 {
-                    const Graphics file = Unit_IsConstructing(ref)
+                    const Graphics file = Unit_IsConstruction(ref)
                         ? Unit_GetConstructionFile(ref)
                         : ref->file;
                     const Animation animation = graphics.animation[ref->color][file];

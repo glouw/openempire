@@ -493,7 +493,8 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
             center.y - CONFIG_VRAM_UNIT_HEALTH_HEIGHT,
         };
         Unit* const unit = tile.reference;
-        if(unit->is_selected)
+        if(unit->is_selected
+        || unit->is_being_built)
             DrawHealthBar(vram, top, unit->health, unit->trait.max_health, unit->trait.is_inanimate);
     }
 }
