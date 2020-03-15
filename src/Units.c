@@ -987,30 +987,6 @@ static void AgeUpSimple(Units units, const Grid grid, const Registrar graphics, 
     }
 }
 
-static Units AgeUpBuildingByType(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Type type, const Color color)
-{
-    static Point zero;
-    const Age age = units.stamp[overview.color].status.age;
-    const Parts parts = Parts_FromButton(button, age);
-    Points points = Points_Make(COLOR_COUNT);
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        if(Unit_IsType(unit, color, type))
-        {
-            const Point half = Point_Div(unit->trait.dimensions, 2);
-            const Point cart = Point_Add(unit->cart, half);
-            points = Points_Append(points, cart);
-            Flag(units, unit);
-            unit->must_skip_debris = true;
-        }
-    }
-    for(int32_t i = 0; i < points.count; i++)
-        units = SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE, false); // XXX. THIS WILL AUTO FINISH BUILDINGS?
-    Points_Free(points);
-    return units;
-}
-
 static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Type type)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -1022,39 +998,17 @@ static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid,
     return units;
 }
 
-// SOME BUILDINGS LIKE MILLS AND TOWNCENTERS SPAWN ADDITIONAL PARTS IN THEIR SUCCESSIVE AGES.
-// THE SIMPLE AGE UP WILL NOT WORK. THE ENTIRE THING MUST BE REMOVED AND REPLACED.
-static Units AgeUpAdvanced(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Color color, const Map map)
-{
-    typedef struct
-    {
-        Button button;
-        Type type;
-    }
-    Print;
-    const Print prints[] = {
-        { { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE }, TYPE_TOWN_CENTER },
-        { { ICONTYPE_BUILD, { ICONBUILD_MILL        }, TRIGGER_NONE }, TYPE_MILL        },
-    };
-    for(int32_t i = 0; i < UTIL_LEN(prints); i++)
-    {
-        const Print print = prints[i];
-        units = AgeUpBuildingByType(units, overview, grid, graphics, map, print.button, print.type, color);
-    }
-    return units;
-}
-
 static Age GetNextAge(const Status status)
 {
     return (Age) ((int32_t) status.age + 1);
 }
 
-static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics)
 {
     if(overview.color == flag->color)
         units.stamp[overview.color].status.age = GetNextAge(units.stamp[overview.color].status);
     AgeUpSimple(units, grid, graphics, flag->color);
-    return AgeUpAdvanced(units, overview, grid, graphics, flag->color, map);
+    return units;
 }
 
 static Units UpdateBits(Units units, const Overview overview, Unit* const flag)
@@ -1064,7 +1018,7 @@ static Units UpdateBits(Units units, const Overview overview, Unit* const flag)
     return units;
 }
 
-static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
+static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -1078,7 +1032,7 @@ static Units TriggerTriggers(Units units, const Overview overview, const Grid gr
             {
             case TRIGGER_AGE_UP_2:
             case TRIGGER_AGE_UP_3:
-                return AgeUp(units, flag, overview, grid, graphics, map);
+                return AgeUp(units, flag, overview, grid, graphics);
             case TRIGGER_UPGRADE_MILITIA:
             case TRIGGER_UPGRADE_MAN_AT_ARMS:
             case TRIGGER_UPGRADE_SPEARMAN:
@@ -1200,7 +1154,7 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
         units = Select(units, overview, grid, graphics, window.units);
         units = Command(units, overview, grid, graphics, map, field, window.units);
         units = SpawnUsingIcons(units, overview, grid, graphics, map);
-        units = TriggerTriggers(units, overview, grid, graphics, map);
+        units = TriggerTriggers(units, overview, grid, graphics);
         Window_Free(window);
     }
     return units;

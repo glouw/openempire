@@ -98,7 +98,8 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
         {
             const int32_t bound = 100;
             const int32_t percent = (bound * reference->health) / reference->trait.max_health;
-            dynamics.index = (animation.count * percent) / bound;
+            const int32_t index = (animation.count * percent) / bound;
+            dynamics.index = index == animation.count ? index - 1 : index;
         }
         else
         {
