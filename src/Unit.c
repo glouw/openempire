@@ -177,7 +177,7 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
     return graphics.animation[unit->color][unit->file].count;
 }
 
-Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger trigger)
+Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger trigger, const bool is_being_built)
 {
     static Unit zero;
     Unit unit = zero;
@@ -186,11 +186,14 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.id = id_next;
     if(!is_floating)
         id_next++;
+    unit.is_being_built = is_being_built;
     unit.parent_id = -1;
     unit.interest_id = -1;
     unit.color = color;
     unit.state = STATE_IDLE;
-    unit.health = unit.trait.max_health;
+    unit.health = unit.is_being_built
+        ? 1 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
+        : unit.trait.max_health;
     unit.is_floating = is_floating;
     unit.trigger = trigger;
     if(!is_floating)
@@ -235,6 +238,7 @@ void Unit_Print(Unit* const unit)
 {
     if(unit)
     {
+        printf("is_being_built        :: %d\n", unit->is_being_built);
         printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
         printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
         printf("cart_goal             :: %d %d\n", unit->cart_goal.x, unit->cart_goal.y);
@@ -452,9 +456,11 @@ static bool MustDisengage(Unit* const unit)
 
 Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
-    if(unit->interest != NULL
+    Unit* const other = unit->interest;
+    if(other != NULL
     && !Unit_IsExempt(unit)
-    && !Unit_IsExempt(unit->interest))
+    && !Unit_IsExempt(other)
+    && unit != other) // DO NOT MELEE SELF.
     {
         if(MustEngage(unit, grid))
         {
@@ -465,11 +471,21 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         if(MustDisengage(unit))
         {
             Unit_Unlock(unit);
-            if(unit->interest)
+            if(other)
             {
-                unit->interest->health -= unit->trait.attack;
                 if(unit->trait.type == TYPE_VILLAGER)
-                    return CollectResource(unit);
+                {
+                    if(Unit_IsConstructing(other))
+                        other->health += unit->trait.attack;
+                    else
+                    {
+                        other->health -= unit->trait.attack;
+                        if(other->trait.is_resource)
+                            return CollectResource(unit);
+                    }
+                }
+                else
+                    other->health -= unit->trait.attack;
             }
         }
     }
@@ -564,6 +580,7 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     to->using_attack_move = from->using_attack_move;
     to->cart_goal = from->cart_goal;
     to->cart_grid_offset_goal = from->cart_grid_offset_goal;
+    to->is_being_built = from->is_being_built;
 }
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
@@ -578,4 +595,35 @@ void Unit_SetInterest(Unit* const unit, Unit* const interest)
 bool Unit_FlashTimerTick(Unit* const unit)
 {
     return (unit->grid_flash_timer % CONFIG_VRAM_FLASH_TIMER_RATE) == 0;
+}
+
+Graphics Unit_GetConstructionFile(Unit* const unit)
+{
+    const Graphics constructions[] = {
+        FILE_GRAPHICS_CONSTRUCTION_1X1,
+        FILE_GRAPHICS_CONSTRUCTION_2X2,
+        FILE_GRAPHICS_CONSTRUCTION_3X3,
+        FILE_GRAPHICS_CONSTRUCTION_4X4,
+    };
+    for(int32_t i = 0; i < UTIL_LEN(constructions); i++)
+    {
+        const Graphics construction = constructions[i];
+        if(Graphics_EqualDimension(construction, unit->trait.dimensions))
+            return construction;
+    }
+    return FILE_GRAPHICS_NONE;
+}
+
+void Unit_SetParent(Unit* const child, Unit* const parent)
+{
+    child->parent = parent;
+    if(parent)
+        child->parent_id = parent->id;
+    else
+        child->interest_id = -1;
+}
+
+bool Unit_IsConstructing(Unit* const unit)
+{
+    return unit->trait.is_inanimate && unit->is_being_built;
 }

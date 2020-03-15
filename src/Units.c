@@ -165,20 +165,24 @@ static void SetChildren(Unit unit[], const int32_t count)
 {
     if(count > 1)
     {
-        unit[0].has_children = true;
+        Unit* const parent = &unit[0];
+        parent->has_children = true;
         for(int32_t i = 1; i < count; i++)
-            unit[i].parent_id = unit[0].id;
+        {
+            Unit* const child = &unit[i];
+            Unit_SetParent(child, parent);
+        }
     }
 }
 
-static Units SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions, const Trigger trigger)
+static Units SpawnParts(Units units, const Point cart, const Point offset, const Grid grid, const Color color, const Registrar graphics, const Map map, const bool is_floating, const Parts parts, const bool ignore_collisions, const Trigger trigger, const bool is_being_built)
 {
     Unit* const temp = UTIL_ALLOC(Unit, parts.count);
     for(int32_t i = 0; i < parts.count; i++)
     {
         const Part part = parts.part[i];
         const Point cart_part = Point_Add(cart, part.cart);
-        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, trigger);
+        temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, trigger, is_being_built);
     }
     SetChildren(temp, parts.count);
     units = BulkAppend(units, map, temp, parts.count, ignore_collisions);
@@ -224,8 +228,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         {
             const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
-            if(tile.reference
-            && tile.reference->color != overview.color)
+            if(tile.reference)
             {
                 tile.reference->grid_flash_timer = 0;
                 DisengageSelected(units);
@@ -241,7 +244,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
                 const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart_grid);
                 const Parts parts = Parts_GetRedArrows();
                 FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, grid, field);
-                units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+                units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE, false);
             }
             SetSelectedAttackMove(units, using_attack_move);
             Tiles_Free(tiles);
@@ -391,7 +394,7 @@ static Units SpamFire(Units units, Unit* const unit, const Grid grid, const Regi
             Util_Rand() % h - h / 2,
         };
         const Parts parts = Parts_GetFire();
-        units = SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
+        units = SpawnParts(units, cart, grid_offset, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE, false);
     }
     return units;
 }
@@ -405,7 +408,7 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
         const Point shift = { x, y };
         const Point cart = Point_Add(unit->cart, shift);
         const Parts parts = Parts_GetSmoke();
-        units = SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE);
+        units = SpawnParts(units, cart, zero, grid, COLOR_GAIA, graphics, map, false, parts, true, TRIGGER_NONE, false);
     }
     return units;
 }
@@ -427,10 +430,10 @@ void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
             file = rubble;
     }
     if(file != FILE_GRAPHICS_NONE)
-        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE);
+        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE, false);
 }
 
-static void Unreference(const Units units, Unit* const flagged)
+static void DisengageFrom(const Units units, Unit* const flagged)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -456,7 +459,7 @@ static void FlagChildren(const Units units, Unit* const unit)
 static void Flag(const Units units, Unit* const unit)
 {
     Unit_Flag(unit);
-    Unreference(units, unit);
+    DisengageFrom(units, unit);
     if(unit->has_children)
         FlagChildren(units, unit);
 }
@@ -779,20 +782,38 @@ static int32_t CompareById(const void* a, const void* b)
     return aa->id - bb->id;
 }
 
-static void ResetInterests(Units units)
+static void ResetInterest(const Units units, Unit* const unit)
+{
+    if(unit->interest_id != -1)
+    {
+        Unit key;
+        key.id = unit->interest_id;
+        Unit* const found = UTIL_SEARCH(units.unit, Unit, units.count, &key, CompareById);
+        if(found)
+            unit->interest = found;
+    }
+}
+
+static void ResetParent(const Units units, Unit* const unit)
+{
+    if(unit->parent_id != -1)
+    {
+        Unit key;
+        key.id = unit->parent_id;
+        Unit* const found = UTIL_SEARCH(units.unit, Unit, units.count, &key, CompareById);
+        if(found)
+            unit->parent = found;
+    }
+}
+
+static void ResetPointers(Units units)
 {
     UTIL_SORT(units.unit, units.count, CompareById);
     for(int32_t i = 0; i < units.count; i++)
     {
-        Unit* const a = &units.unit[i];
-        if(a->interest_id != -1)
-        {
-            Unit key;
-            key.id = a->interest_id;
-            Unit* const b = UTIL_SEARCH(units.unit, Unit, units.count, &key, CompareById);
-            if(b)
-                a->interest = b;
-        }
+        Unit* const unit = &units.unit[i];
+        ResetInterest(units, unit);
+        ResetParent(units, unit);
     }
 }
 
@@ -801,7 +822,7 @@ static Units RemoveGarbage(Units units)
     FlagGarbage(units);
     units = Resize(units);
     NullInterestPointers(units);
-    ResetInterests(units);
+    ResetPointers(units);
     return units;
 }
 
@@ -901,7 +922,7 @@ static Units CountAllPopulations(Units units)
     return units;
 }
 
-static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating)
+static Units ButtonLookup(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating, const bool is_being_built)
 {
     const Point zero = { 0,0 };
     const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
@@ -911,31 +932,31 @@ static Units ButtonLookup(Units units, const Overview overview, const Grid grid,
         {
             const int32_t amount = button.icon_type == ICONTYPE_UNIT ? 10 : 1; // XXX: REMOVE IN FUTURE - THIS IS CRAZY.
             for(int32_t i = 0; i < amount; i++)
-                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger);
+                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
         }
         Parts_Free(parts);
     }
     return units;
 }
 
-static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating)
+static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating, const bool is_being_built)
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
     const Button button = Button_Upgrade(Button_FromOverview(overview), overview.incoming.bits);
-    return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating);
+    return ButtonLookup(units, overview, grid, graphics, map, button, cart, is_floating, is_being_built);
 }
 
 static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     return (overview.event.key_left_alt && overview.event.mouse_lu)
-        ? UseIcon(units, overview, grid, graphics, map, false)
+        ? UseIcon(units, overview, grid, graphics, map, false, true)
         : units;
 }
 
 static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
 {
     return overview.event.key_left_alt
-        ? UseIcon(floats, overview, grid, graphics, map, true)
+        ? UseIcon(floats, overview, grid, graphics, map, true, false)
         : floats;
 }
 
@@ -946,7 +967,7 @@ static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar 
     const Point offset = unit->trait.is_inanimate ? none : unit->cart_grid_offset;
     Unit temp = zero;
     Unit_Preserve(&temp, unit);
-    *unit = Unit_Make(unit->cart, offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE);
+    *unit = Unit_Make(unit->cart, offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE, false);
     Unit_Preserve(unit, &temp);
 }
 
@@ -981,7 +1002,7 @@ static Units AgeUpBuildingByType(Units units, const Overview overview, const Gri
         }
     }
     for(int32_t i = 0; i < points.count; i++)
-        units = SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE);
+        units = SpawnParts(units, points.point[i], zero, grid, color, graphics, map, false, parts, true, TRIGGER_NONE, false); // XXX. THIS WILL AUTO FINISH BUILDINGS?
     Points_Free(points);
     return units;
 }
@@ -1126,10 +1147,21 @@ static void ManageStacks(const Units units)
     StackStacks(units);
 }
 
+static void CompleteConstruction(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->health >= unit->trait.max_health)
+            unit->is_being_built = false;
+    }
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
     Tick(units);
+    CompleteConstruction(units);
     units = ManagePathFinding(units, grid, map, field);
     units = UpdateAllMotives(units);
     Decay(units);
@@ -1237,7 +1269,7 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
     {
         const Point shift = { -2, 1 + i };
         const Point cart = Point_Add(slot, shift);
-        units = SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE);
+        units = SpawnParts(units, cart, zero, grid, color, graphics, map, false, villager, false, TRIGGER_NONE, false);
     }
     Parts_Free(villager);
     return units;
@@ -1261,7 +1293,7 @@ static Units GenerateStartingTrees(Units units, const Map map, const Grid grid, 
         shift.x = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
         shift.y = Util_Rand() % (CONFIG_UNITS_STARTING_TREE_TILE_RANDOMNESS + 1);
         const Point shifted = Point_Add(cart, shift);
-        units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE);
+        units = SpawnParts(units, shifted, zero, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE, false);
     }
     return units;
 }
@@ -1281,7 +1313,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
             const Parts towncenter = Parts_FromButton(button, age);
             const int32_t index = (i * points.count) / players;
             const Point slot = points.point[index];
-            units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE);
+            units = SpawnParts(units, slot, zero, grid, color, graphics, map, false, towncenter, false, TRIGGER_NONE, false);
             units = GenerateVillagers(units, map, grid, graphics, slot, color);
             units = GenerateStartingTrees(units, map, grid, graphics, slot);
             Parts_Free(towncenter);
@@ -1334,7 +1366,7 @@ Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, co
 {
     units = UnpackRestore(units, restore);
     NullInterestPointers(units);
-    ResetInterests(units);
+    ResetPointers(units);
     ManageStacks(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, grid, field);

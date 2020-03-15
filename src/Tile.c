@@ -94,13 +94,21 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
     Dynamics dynamics = { 0, false };
     if(reference->trait.is_single_frame)
     {
-        const bool parent_exists = reference->parent_id != -1;
-        int32_t id = parent_exists
-            ? reference->parent_id
-            : reference->id;
-        if(reference->is_floating)
-            id = 0;
-        dynamics.index = id % animation.count;
+        if(reference->is_being_built)
+        {
+            const int32_t bound = 100;
+            const int32_t percent = (bound * reference->health) / reference->trait.max_health;
+            dynamics.index = (animation.count * percent) / bound;
+        }
+        else
+        {
+            int32_t id = reference->parent
+                ? reference->parent_id
+                : reference->id;
+            if(reference->is_floating)
+                id = 0;
+            dynamics.index = id % animation.count;
+        }
     }
     else
     if(reference->trait.is_multi_state)
@@ -165,7 +173,7 @@ void Tile_Select(const Tile tile)
     if(!Unit_IsExempt(tile.reference))
     {
         tile.reference->is_selected = true;
-#if 0
+#if 1
         Unit_Print(tile.reference);
 #endif
     }

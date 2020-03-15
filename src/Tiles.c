@@ -65,11 +65,22 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             Unit* const ref = stack.reference[j];
             if(!ref->is_already_tiled)
             {
-                const Animation animation = graphics.animation[ref->color][ref->file];
-                const Point overrider = ref->trait.is_inanimate ? ref->cart : point;
-                tile[unit_count] = Tile_GetGraphics(overview, grid, overrider, ref->cart_grid_offset, animation, ref);
-                unit_count++;
                 ref->is_already_tiled = true;
+                // SKIP THE RENDER FOR CHILDREN OF BUILDINGS BEING BUILT.
+                if(ref->trait.is_inanimate
+                && ref->parent
+                && ref->parent->is_being_built)
+                    continue;
+                else
+                {
+                    const Graphics file = Unit_IsConstructing(ref)
+                        ? Unit_GetConstructionFile(ref)
+                        : ref->file;
+                    const Animation animation = graphics.animation[ref->color][file];
+                    const Point overrider = ref->trait.is_inanimate ? ref->cart : point;
+                    tile[unit_count] = Tile_GetGraphics(overview, grid, overrider, ref->cart_grid_offset, animation, ref);
+                    unit_count++;
+                }
             }
         }
     }

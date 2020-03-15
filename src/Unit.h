@@ -16,6 +16,7 @@
 typedef struct Unit
 {
     struct Unit* interest;
+    struct Unit* parent;
     Trait trait;
     Point cart;
     Point cart_grid_offset;
@@ -35,9 +36,9 @@ typedef struct Unit
     Graphics file;
     Trigger trigger;
     int32_t interest_id;
+    int32_t parent_id;
     int32_t entropy_static;
     int32_t id;
-    int32_t parent_id;
     int32_t path_index;
     int32_t path_index_timer;
     int32_t command_group;
@@ -65,10 +66,11 @@ typedef struct Unit
     bool must_repath_with_recover;
     bool using_attack_move;
     bool is_flash_on;
+    bool is_being_built;
 }
 Unit;
 
-Unit Unit_Make(Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger);
+Unit Unit_Make(Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger, const bool is_being_built);
 
 void Unit_UpdatePathIndex(Unit* const, const int32_t index, const bool reset_path_index_timer);
 
@@ -137,3 +139,9 @@ void Unit_SetIdNext(const int32_t id);
 void Unit_SetInterest(Unit* const unit, Unit* const interest);
 
 bool Unit_FlashTimerTick(Unit* const);
+
+Graphics Unit_GetConstructionFile(Unit* const);
+
+void Unit_SetParent(Unit* const, Unit* const parent);
+
+bool Unit_IsConstructing(Unit* const);

@@ -8,6 +8,7 @@ Trait Trait_Build(const Graphics file)
     static Trait zero;
     Trait trait = zero;
     trait.file_name       = Graphics_GetString(file);
+    trait.is_resource     = Graphics_GetResource(file);
     trait.dimensions      = Graphics_GetDimensions(file);
     trait.type            = Graphics_GetType(file);
     trait.max_speed       = Graphics_GetMaxSpeed(file);

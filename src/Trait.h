@@ -23,6 +23,7 @@ typedef struct
     bool is_walkable;
     bool is_multi_state;
     bool is_inanimate;
+    bool is_resource;
     bool can_expire;
     bool is_detail;
     bool needs_midding;
