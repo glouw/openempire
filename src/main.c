@@ -101,10 +101,13 @@ static void Play(const Video video, const Data data, const Args args)
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
             cycles++;
-            if(packet.control != 0)
-                loops = packet.control;
-            if(loops --> 0)
-                continue;
+            if(!Overview_IsSpectator(overview))
+            {
+                if(packet.control != 0)
+                    loops = packet.control;
+                if(loops --> 0)
+                    continue;
+            }
             if(Overview_IsSpectator(overview))
             {
                 if(Packet_IsReady(packet))

@@ -994,9 +994,9 @@ static Units AgeUp(Units units, Unit* const flag, const Overview overview, const
         && unit->trait.upgrade != FILE_GRAPHICS_NONE
         && unit->trait.is_inanimate)
         {
-            PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
-            if(unit->file == FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL)
+            if(unit->file == FILE_GRAPHICS_AGE_1_MILL)
                 units = AppendMissing(units, unit, grid, graphics, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW);
+            PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
         }
     }
     return units;

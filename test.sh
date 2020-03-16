@@ -7,10 +7,10 @@
 GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data/";
 LATENCY=25ms
 VARIANCE=5ms
-ENTROPY=0.0% # REALISM = 0.1%. STRESS TEST = 1.1%.
-XRES=1300
+ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
+XRES=1000
 YRES=700
-USERS=3
+USERS=2
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -31,7 +31,7 @@ netsim()
 
 server()
 {
-    ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT
+    ./$BIN --server --users $USERS --map_size $MAP_SIZE --port $PORT
 }
 
 client()

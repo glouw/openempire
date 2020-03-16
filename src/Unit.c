@@ -192,7 +192,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.is_being_built
-        ? 1 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
+        ? unit.trait.max_health / 2 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
         : unit.trait.max_health;
     unit.is_floating = is_floating;
     unit.trigger = trigger;
