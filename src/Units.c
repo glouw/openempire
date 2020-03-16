@@ -975,16 +975,43 @@ static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar 
     Unit_Preserve(unit, &temp);
 }
 
-static void AgeUpSimple(Units units, const Grid grid, const Registrar graphics, const Color color)
+static Age GetNextAge(const Status status)
 {
+    return (Age) ((int32_t) status.age + 1);
+}
+
+static Units AppendMissing(const Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Graphics file)
+{
+    static Point zero;
+    Unit missing = Unit_Make(unit->cart, zero, grid, file, unit->color, graphics, false, false, TRIGGER_NONE, unit->is_being_built);
+    Unit_SetParent(&missing, unit);
+    return Append(units, missing);
+}
+
+static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics)
+{
+    if(overview.color == flag->color)
+        units.stamp[overview.color].status.age = GetNextAge(units.stamp[overview.color].status);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == color
+        if(unit->color == flag->color
         && unit->trait.upgrade != FILE_GRAPHICS_NONE
         && unit->trait.is_inanimate)
+        {
             PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
+            if(unit->file == FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL)
+                units = AppendMissing(units, unit, grid, graphics, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW);
+        }
     }
+    return units;
+}
+
+static Units UpdateBits(Units units, const Overview overview, Unit* const flag)
+{
+    if(overview.color == flag->color)
+        units.stamp[overview.color].bits = Bits_Set(units.stamp[overview.color].bits, flag->trigger);
+    return units;
 }
 
 static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Type type)
@@ -994,27 +1021,8 @@ static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid,
         Unit* const unit = &units.unit[i];
         if(Unit_IsType(unit, flag->color, type))
             PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
+
     }
-    return units;
-}
-
-static Age GetNextAge(const Status status)
-{
-    return (Age) ((int32_t) status.age + 1);
-}
-
-static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics)
-{
-    if(overview.color == flag->color)
-        units.stamp[overview.color].status.age = GetNextAge(units.stamp[overview.color].status);
-    AgeUpSimple(units, grid, graphics, flag->color);
-    return units;
-}
-
-static Units UpdateBits(Units units, const Overview overview, Unit* const flag)
-{
-    if(overview.color == flag->color)
-        units.stamp[overview.color].bits = Bits_Set(units.stamp[overview.color].bits, flag->trigger);
     return units;
 }
 
