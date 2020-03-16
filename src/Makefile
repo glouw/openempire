@@ -125,16 +125,14 @@ ifeq (11, $(CLANG)$(CPP))
 COMPILER = clang++ $(CPPSTD)
 endif
 
+UNAME := $(shell uname)
+
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	if [ "$(uname)" == "Darwin" ]; then
-		# for Mac OS X platform
-		$(DUMP) -disassemble-all -d $(BIN) > $(BIN).s  # removed intel
-	else
-		# not tested for Windows
-		$(DUMP) -M intel -d $(BIN) > $(BIN).s
+	@if [ $(UNAME) = "Linux" ]; then 		   \
+		$(DUMP) -M intel -d $(BIN) > $(BIN).s; \
 	fi
-	$(TAGS) *[ch] .
+	@$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DDEBUGGING=$(DEBUGGING) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
