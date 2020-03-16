@@ -529,12 +529,14 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
                 const Point diff = Point_Sub(cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
                 if(mag < min)
-                {
-                    if(other->trait.is_inanimate)
-                        unit->cell_interest_inanimate = cell;
-                    min = mag;
-                    closest = other;
-                }
+                    if(unit->interest == other
+                    || unit->interest == NULL)
+                    {
+                        if(other->trait.is_inanimate)
+                            unit->cell_interest_inanimate = cell;
+                        min = mag;
+                        closest = other;
+                    }
             }
         }
     }
@@ -558,22 +560,17 @@ static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid gri
 
 static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
 {
-    if(!Unit_IsExempt(unit))
+    if(!Unit_IsExempt(unit) && !unit->is_state_locked)
     {
         Unit* const closest = GetClosestBoid(units, unit, grid);
         if(closest)
-        {
             if(unit->using_attack_move
             || unit->interest == closest)
             {
-                if(!unit->is_state_locked)
-                {
-                    EngageWithMock(unit, closest, grid);
-                    Unit_SetInterest(unit, closest);
-                    unit->using_attack_move = true;
-                }
+                EngageWithMock(unit, closest, grid);
+                Unit_SetInterest(unit, closest);
+                unit->using_attack_move = true;
             }
-        }
     }
 }
 
