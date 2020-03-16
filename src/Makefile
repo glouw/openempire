@@ -127,7 +127,13 @@ endif
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	$(DUMP) -M intel -d $(BIN) > $(BIN).s
+	if [ "$(uname)" == "Darwin" ]; then
+		# for Mac OS X platform
+		$(DUMP) -disassemble-all -d $(BIN) > $(BIN).s  # removed intel
+	else
+		# not tested for Windows
+		$(DUMP) -M intel -d $(BIN) > $(BIN).s
+	fi
 	$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile
