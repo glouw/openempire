@@ -587,6 +587,7 @@ bool Unit_IsTriggerValid(Unit* const flag)
 
 void Unit_Preserve(Unit* const to, const Unit* const from)
 {
+    to->cell = from->cell;
     to->id = from->id;
     to->parent_id = from->parent_id;
     to->has_children = from->has_children;

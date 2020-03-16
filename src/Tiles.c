@@ -40,10 +40,20 @@ static int32_t CompareByDetail(const void* a, const void* b)
     return da < db;
 }
 
+static int32_t CompareByFlag(const void* a, const void* b)
+{
+    Tile* const aa = (Tile*) a;
+    Tile* const bb = (Tile*) b;
+    const bool fa = aa->reference->trait.type == TYPE_FLAG;
+    const bool fb = bb->reference->trait.type == TYPE_FLAG;
+    return fa < fb;
+}
+
 static void Sort(const Tiles tiles)
 {
     UTIL_SORT(tiles.tile, tiles.count, CompareBySurface);
     UTIL_SORT(tiles.tile, tiles.count, CompareByDetail);
+    UTIL_SORT(tiles.tile, tiles.count, CompareByFlag);
     UTIL_SORT(tiles.tile, tiles.count, CompareByY);
 }
 
