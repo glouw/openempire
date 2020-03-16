@@ -23,6 +23,5 @@ Trait Trait_Build(const Graphics file)
     trait.is_inanimate    = Graphics_GetInanimate(file);
     trait.can_expire      = Graphics_GetExpire(file);
     trait.is_detail       = Graphics_GetDetail(file);
-    trait.needs_midding   = Graphics_GetMidding(file);
     return trait;
 }

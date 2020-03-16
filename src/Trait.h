@@ -26,7 +26,6 @@ typedef struct
     bool is_resource;
     bool can_expire;
     bool is_detail;
-    bool needs_midding;
 }
 Trait;
 
