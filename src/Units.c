@@ -157,11 +157,7 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t l
             if(!CanBuild(units, map, &unit[i]))
                 return units;
     for(int32_t i = 0; i < len; i++)
-    {
-        const Unit copy = unit[i];
-        units.stamp[units.color].busy = Bits_Set(units.stamp[units.color].busy, copy.trigger);
-        units = Append(units, copy);
-    }
+        units = Append(units, unit[i]);
     return units;
 }
 
@@ -475,7 +471,6 @@ static Units FlagTheDead(Units units, const Grid grid, const Registrar graphics,
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit) && Unit_IsDead(unit))
         {
-            units.stamp[units.color].busy = Bits_Clear(units.stamp[units.color].busy, unit->trigger);
             Flag(units, unit);
             if(unit->must_skip_debris)
                 continue;
@@ -996,10 +991,9 @@ static Units AppendMissing(const Units units, Unit* const unit, const Grid grid,
     return Append(units, missing);
 }
 
-static Units AgeUp(Units units, Unit* const flag, const Overview overview, const Grid grid, const Registrar graphics)
+static Units AgeUp(Units units, Unit* const flag, const Grid grid, const Registrar graphics)
 {
-    if(overview.color == flag->color)
-        units.stamp[overview.color].status.age = GetNextAge(units.stamp[overview.color].status);
+    units.stamp[flag->color].status.age = GetNextAge(units.stamp[flag->color].status);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -1012,13 +1006,6 @@ static Units AgeUp(Units units, Unit* const flag, const Overview overview, const
             PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
         }
     }
-    return units;
-}
-
-static Units UpdateBits(Units units, const Overview overview, Unit* const flag)
-{
-    if(overview.color == flag->color)
-        units.stamp[overview.color].bits = Bits_Set(units.stamp[overview.color].bits, flag->trigger);
     return units;
 }
 
@@ -1038,29 +1025,34 @@ static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid,
     return units;
 }
 
-static Units TriggerTriggers(Units units, const Overview overview, const Grid grid, const Registrar graphics)
+static Units TriggerTriggers(Units units, const Grid grid, const Registrar graphics)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const flag = &units.unit[i];
-        if(Unit_IsTriggerValid(flag))
+        if(!flag->is_triggered && flag->trigger != TRIGGER_NONE)
         {
-            units = UpdateBits(units, overview, flag);
-            flag->is_triggered = true;
-            // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
-            switch(flag->trigger)
+            if(flag->is_being_built)
+                units.stamp[flag->color].busy = Bits_Set(units.stamp[flag->color].busy, flag->trigger);
+            else
             {
-            case TRIGGER_AGE_UP_2:
-            case TRIGGER_AGE_UP_3:
-                return AgeUp(units, flag, overview, grid, graphics);
-            case TRIGGER_UPGRADE_MILITIA:
-            case TRIGGER_UPGRADE_MAN_AT_ARMS:
-            case TRIGGER_UPGRADE_SPEARMAN:
-                // NOT THE CAST.
-                // TRIGGERS MAP 1:1 WITH TYPES FOR SIMPLE UPGRADES.
-                return UpgradeByType(units, flag, grid, graphics, (Type) flag->trigger);
-            case TRIGGER_NONE:
-                return units; // KEEP COMPILER QUIET.
+                units.stamp[flag->color].bits = Bits_Set(units.stamp[flag->color].bits, flag->trigger);
+                flag->is_triggered = true;
+                // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
+                switch(flag->trigger)
+                {
+                case TRIGGER_AGE_UP_2:
+                case TRIGGER_AGE_UP_3:
+                    return AgeUp(units, flag, grid, graphics);
+                case TRIGGER_UPGRADE_MILITIA:
+                case TRIGGER_UPGRADE_MAN_AT_ARMS:
+                case TRIGGER_UPGRADE_SPEARMAN:
+                    // NOT THE CAST.
+                    // TRIGGERS MAP 1:1 WITH TYPES FOR SIMPLE UPGRADES.
+                    return UpgradeByType(units, flag, grid, graphics, (Type) flag->trigger);
+                case TRIGGER_NONE:
+                    return units; // KEEP COMPILER QUIET.
+                }
             }
         }
     }
@@ -1168,6 +1160,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     Expire(units);
     units = FlagTheDead(units, grid, graphics, map);
     units = RemoveGarbage(units);
+    units = TriggerTriggers(units, grid, graphics);
     ManageStacks(units);
     return CountAllPopulations(units);
 }
@@ -1193,7 +1186,7 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
         units = Command(units, overview, grid, graphics, map, field, window.units);
         Window_Free(window);
     }
-    return TriggerTriggers(units, overview, grid, graphics);
+    return units;
 }
 
 Units Units_PacketService(Units units, const Registrar graphics, const Packet packet, const Grid grid, const Map map, const Field field)

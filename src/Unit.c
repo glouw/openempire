@@ -580,13 +580,6 @@ bool Unit_IsType(Unit* const unit, const Color color, const Type type)
     return unit->color == color && !Unit_IsExempt(unit) && unit->trait.type == type;
 }
 
-bool Unit_IsTriggerValid(Unit* const flag)
-{
-    return !flag->is_triggered
-        && !flag->is_being_built
-        &&  flag->trigger != TRIGGER_NONE;
-}
-
 void Unit_Preserve(Unit* const to, const Unit* const from)
 {
     to->cell = from->cell;
