@@ -966,8 +966,8 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
     const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
     if(parts.part != NULL)
     {
-        if(!Bits_Get(overview.incoming.bits, button.trigger)
-        && !Bits_Get(overview.incoming.busy, button.trigger))
+        if(!Bits_Get(units.share[overview.color].bits, button.trigger)
+        && !Bits_Get(units.share[overview.color].busy, button.trigger))
         {
             const int32_t amount = button.icon_type == ICONTYPE_UNIT ? 10 : 1; // XXX: REMOVE IN FUTURE - THIS IS CRAZY.
             for(int32_t i = 0; i < amount; i++)
