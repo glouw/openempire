@@ -498,7 +498,6 @@ static void Expire(const Units units)
 
 static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid)
 {
-    static Point zero;
     const int32_t width = 2;
     Unit* closest = NULL;
     int32_t min = INT32_MAX;
@@ -511,36 +510,63 @@ static Unit* GetClosestBoid(const Units units, Unit* const unit, const Grid grid
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const other = stack.reference[i];
-            if(Unit_IsConstruction(other)
-            || Unit_AreEnemies(unit, other))
+            if(Unit_AreEnemies(unit, other))
             {
-                Point cell = zero;
-                if(other->trait.is_inanimate)
-                {
-                    cell = Grid_CartToCell(grid, cart);
-                    const Point mid = {
-                        CONFIG_GRID_CELL_SIZE / 2,
-                        CONFIG_GRID_CELL_SIZE / 2,
-                    };
-                    cell = Point_Add(cell, mid);
-                }
-                else
-                    cell = other->cell;
+                const Point cell = other->trait.is_inanimate
+                    ? Grid_CartToCell(grid, cart)
+                    : other->cell;
                 const Point diff = Point_Sub(cell, unit->cell);
                 const int32_t mag = Point_Mag(diff);
                 if(mag < min)
-                    if(unit->interest == other
-                    || unit->interest == NULL)
-                    {
-                        if(other->trait.is_inanimate)
-                            unit->cell_interest_inanimate = cell;
-                        min = mag;
-                        closest = other;
-                    }
+                {
+                    min = mag;
+                    closest = other;
+                }
             }
         }
     }
     return closest;
+}
+
+static bool InterestInRange(const Units units, Unit* const unit)
+{
+    const int32_t width = 1;
+    for(int32_t x = -width; x <= width; x++)
+    for(int32_t y = -width; y <= width; y++)
+    {
+        const Point shift = { x, y };
+        const Point cart = Point_Add(unit->cart, shift);
+        const Stack stack = Units_GetStackCart(units, cart);
+        for(int32_t i = 0; i < stack.count; i++)
+        {
+            Unit* const other = stack.reference[i];
+            if(other == unit->interest)
+                return true;
+        }
+    }
+    return false;
+}
+
+static void UpdateCellInterestInanimate(Unit* const unit, const Grid grid)
+{
+    if(unit->interest->trait.is_inanimate)
+    {
+        int32_t min = INT32_MAX;
+        for(int32_t x = 0; x < unit->interest->trait.dimensions.x; x++)
+        for(int32_t y = 0; y < unit->interest->trait.dimensions.y; y++)
+        {
+            const Point shift = { x, y };
+            const Point cart = Point_Add(unit->interest->cart, shift);
+            const Point cell = Grid_CartToCell(grid, cart);
+            const Point diff = Point_Sub(unit->cell, cell);
+            const int32_t mag = Point_Mag(diff);
+            if(mag < min)
+            {
+                unit->cell_interest_inanimate = cell;
+                min = mag;
+            }
+        }
+    }
 }
 
 static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid grid)
@@ -562,18 +588,22 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
 {
     if(!Unit_IsExempt(unit) && !unit->is_state_locked)
     {
-        Unit* const closest = GetClosestBoid(units, unit, grid);
-        if(closest)
+        if(unit->using_attack_move)
         {
-            if(closest->trait.type == TYPE_FLAG)
-                return;
-            if(unit->using_attack_move
-            || unit->interest == closest)
+            Unit* const closest = GetClosestBoid(units, unit, grid);
+            if(closest
+            && closest->trait.type != TYPE_FLAG)
             {
-                EngageWithMock(unit, closest, grid);
                 Unit_SetInterest(unit, closest);
-                unit->using_attack_move = true;
+                UpdateCellInterestInanimate(unit, grid);
+                EngageWithMock(unit, closest, grid);
             }
+        }
+        else
+        if(InterestInRange(units, unit))
+        {
+            UpdateCellInterestInanimate(unit, grid);
+            EngageWithMock(unit, unit->interest, grid);
         }
     }
 }
