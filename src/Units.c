@@ -860,7 +860,9 @@ static Action GetAction(const Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == color)
+        if(unit->is_selected
+        && unit->color == color
+        && !unit->is_being_built)
         {
             const int32_t index = (int32_t) unit->trait.action + 1;
             counts[index]++;
@@ -877,7 +879,8 @@ static Type GetType(const Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == color)
+        if(unit->is_selected
+        && unit->color == color)
         {
             const int32_t index = (int32_t) unit->trait.type + 1;
             counts[index]++;
@@ -1155,8 +1158,8 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
     {
         const Window window = Window_Make(overview, grid);
         units = Select(units, overview, grid, graphics, window.units);
-        units = Command(units, overview, grid, graphics, map, field, window.units);
         units = SpawnUsingIcons(units, overview, grid, graphics, map);
+        units = Command(units, overview, grid, graphics, map, field, window.units);
         units = TriggerTriggers(units, overview, grid, graphics);
         Window_Free(window);
     }
