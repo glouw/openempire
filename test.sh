@@ -19,7 +19,7 @@ build()
 {
     CPUS=$(nproc --all)
     T=$(($CPUS + 1))
-    make -j$T -C src
+    make -C src
 }
 
 netsim()
@@ -55,6 +55,6 @@ batch()
     client 400 300
 }
 
-build
+#build
 netsim
 batch

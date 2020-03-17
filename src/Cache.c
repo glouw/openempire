@@ -127,8 +127,8 @@ int32_t Cache_GetPingMax(Cache* const cache)
 
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
-    const int32_t kp = 2;
-    const int32_t ki = 16;
+    const int32_t kp = 16;
+    const int32_t ki = 32;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const int32_t cycles = cache->cycles[i];
@@ -136,11 +136,10 @@ void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
         {
             const int32_t diff = setpoint - cycles;
             cache->integral[i] += diff;
-            const int32_t ep = diff / kp;
-            const int32_t ei = cache->integral[i] / ki;
-            const int32_t control = ep + ei;
-            if(control >= 0)
-                cache->control[i] = control;
+            const int32_t ep = diff;
+            const int32_t ei = cache->integral[i];
+            const int32_t control = (ki * ep + kp * ei) / (kp * ki);
+            cache->control[i] = control;
         }
     }
 }

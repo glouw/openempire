@@ -55,7 +55,7 @@ static void Play(const Video video, const Data data, const Args args)
     overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Make();
     int32_t cycles = 0;
-    int32_t loops = 0;
+    int32_t control = 0;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
@@ -101,12 +101,17 @@ static void Play(const Video video, const Data data, const Args args)
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
             cycles++;
-            if(!Overview_IsSpectator(overview))
+            if(packet.control != 0)
+                control = packet.control;
+            if(control > 0)
             {
-                if(packet.control != 0)
-                    loops = packet.control;
-                if(loops --> 0)
-                    continue;
+                control--;
+                continue;
+            }
+            if(control < 0)
+            {
+                control++;
+                SDL_Delay(10);
             }
             if(Overview_IsSpectator(overview))
             {

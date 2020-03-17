@@ -129,10 +129,8 @@ UNAME := $(shell uname)
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	@if [ $(UNAME) = "Linux" ]; then 		   \
-		$(DUMP) -M intel -d $(BIN) > $(BIN).s; \
-	fi
-	@$(TAGS) *[ch] .
+	$(DUMP) -M intel --disassemble-all $(BIN) > $(BIN).s; \
+	$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DDEBUGGING=$(DEBUGGING) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
