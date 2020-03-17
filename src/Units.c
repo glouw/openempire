@@ -227,6 +227,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
         if(overview.event.mouse_ru || using_attack_move)
         {
             const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
+            Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
             if(tile.reference && !Unit_IsExempt(tile.reference))
             {
