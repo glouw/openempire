@@ -70,9 +70,9 @@ Units Units_Make(const int32_t size, const int32_t cpu_count, const int32_t max,
     units.size = size;
     units.max = max;
     units.cpu_count = cpu_count;
-    units.stamp[color].status.age = AGE_1;
-    units.stamp[color].motive.action = ACTION_NONE;
-    units.stamp[color].motive.type = TYPE_NONE;
+    units.share[color].status.age = AGE_1;
+    units.share[color].motive.action = ACTION_NONE;
+    units.share[color].motive.type = TYPE_NONE;
     units.color = color;
     return Alloc(units);
 }
@@ -630,7 +630,7 @@ static Units MeleeAllBoids(Units units, const Grid grid)
         Unit* const unit = &units.unit[i];
         const Resource resource = Unit_Melee(unit, grid);
         if(resource.type != TYPE_NONE)
-            units.stamp[unit->color].status = Gather(units.stamp[unit->color].status, resource);
+            units.share[unit->color].status = Gather(units.share[unit->color].status, resource);
     }
     return units;
 }
@@ -899,9 +899,9 @@ static Units UpdateAllMotives(Units units)
     {
         const Color color = (Color) i;
         static Motive zero;
-        units.stamp[i].motive = zero;
-        units.stamp[i].motive.action = GetAction(units, color);
-        units.stamp[i].motive.type = GetType(units, color);
+        units.share[i].motive = zero;
+        units.share[i].motive.action = GetAction(units, color);
+        units.share[i].motive.type = GetType(units, color);
     }
     return units;
 }
@@ -925,7 +925,7 @@ static Units CountAllPopulations(Units units)
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const Color color = (Color) i;
-        units.stamp[i].status.population = CountPopulation(units, color);
+        units.share[i].status.population = CountPopulation(units, color);
     }
     return units;
 }
@@ -995,7 +995,7 @@ static Units AppendMissing(const Units units, Unit* const unit, const Grid grid,
 
 static Units UpgradeInanimate(Units units, Unit* const flag, const Grid grid, const Registrar graphics)
 {
-    units.stamp[flag->color].status.age = GetNextAge(units.stamp[flag->color].status);
+    units.share[flag->color].status.age = GetNextAge(units.share[flag->color].status);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -1037,8 +1037,8 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
         const Trigger trigger = flag->trigger;
         if(!flag->is_triggered && trigger != TRIGGER_NONE)
         {
-            Bits* const bits = &units.stamp[flag->color].bits;
-            Bits* const busy = &units.stamp[flag->color].busy;
+            Bits* const bits = &units.share[flag->color].bits;
+            Bits* const busy = &units.share[flag->color].busy;
             if(flag->is_being_built)
                 *busy = Bits_Set(*busy, trigger);
             else
@@ -1177,8 +1177,8 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
 Units Units_Float(Units floats, const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
 {
     floats.count = 0;
-    floats.stamp[floats.color].status.age = units.stamp[units.color].status.age;
-    floats.stamp[floats.color].motive = motive;
+    floats.share[floats.color].status.age = units.share[units.color].status.age;
+    floats.share[floats.color].motive = motive;
     ResetStacks(floats);
     floats = FloatUsingIcons(floats, overview, grid, graphics, map);
     StackStacks(floats);
@@ -1217,7 +1217,7 @@ uint64_t Units_Xor(const Units units)
     }
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const Status status =  units.stamp[i].status;
+        const Status status =  units.share[i].status;
         parity ^=
             ((uint64_t) (status.age       ) << 60) |
             ((uint64_t) (status.population) << 48) |
@@ -1263,7 +1263,7 @@ static Units GenerateVillagers(Units units, const Map map, const Grid grid, cons
 {
     static Point zero;
     const Button button = { ICONTYPE_UNIT, { ICONUNIT_MALE_VILLAGER }, TRIGGER_NONE };
-    const Age age = units.stamp[color].status.age;
+    const Age age = units.share[color].status.age;
     const Parts villager = Parts_FromButton(button, age);
     for(int32_t i = 0; i < CONFIG_UNITS_STARTING_VILLAGERS; i++)
     {
@@ -1309,7 +1309,7 @@ static Units GenerateTownCenters(Units units, const Map map, const Grid grid, co
         const Color color = (Color) i;
         if(color != spectator)
         {
-            const Age age = units.stamp[color].status.age;
+            const Age age = units.share[color].status.age;
             const Parts towncenter = Parts_FromButton(button, age);
             const int32_t index = (i * points.count) / players;
             const Point slot = points.point[index];
@@ -1358,7 +1358,7 @@ static Units UnpackRestore(Units units, const Restore restore)
         unit->trait.file_name = Graphics_GetString(unit->file);
     }
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        units.stamp[i] = restore.stamp[i];
+        units.share[i] = restore.share[i];
     return units;
 }
 
@@ -1382,6 +1382,6 @@ Restore Units_PackRestore(const Units units, const int32_t cycles)
     restore.cycles = cycles;
     restore.id_next = Unit_GetIdNext();
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        restore.stamp[i] = units.stamp[i];
+        restore.share[i] = units.share[i];
     return restore;
 }

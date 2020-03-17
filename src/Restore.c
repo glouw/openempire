@@ -13,7 +13,7 @@ static int32_t GetRestoreHeaderByteSize(const Restore restore)
          + sizeof(restore.count)
          + sizeof(restore.cycles)
          + sizeof(restore.id_next)
-         + sizeof(restore.stamp);
+         + sizeof(restore.share);
 }
 
 static Restore RecvPacked(const TCPsocket socket)
@@ -29,9 +29,9 @@ static Restore RecvPacked(const TCPsocket socket)
     const int32_t* const count     = (int32_t*) &buffer[ 4]; // WAS CHOSEN TO BE INCLUDED IN THE STREAM.
     const int32_t* const cycles    = (int32_t*) &buffer[ 8]; // IT IS CHICKEN AND EGG, BUT IT IS MORE RELIABLE.
     const int32_t* const id_next   = (int32_t*) &buffer[12]; // THAN SPLITTING THE RECIEVER INTO TWO RECV CALLS.
-    const Share  * const stamp     = (Share  *) &buffer[16];
+    const Share  * const share     = (Share  *) &buffer[16];
     /* ---------- UNITS ---------- */
-    const Unit * const unit = (Unit*) &buffer[16 + sizeof(restore.stamp)];
+    const Unit * const unit = (Unit*) &buffer[16 + sizeof(restore.share)];
     int32_t bytes = 0;
     while(bytes < size_max)
     {
@@ -50,7 +50,7 @@ static Restore RecvPacked(const TCPsocket socket)
     restore.id_next = *id_next;
     restore.cycles = *cycles;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
-        restore.stamp[i] = stamp[i];
+        restore.share[i] = share[i];
     free(buffer);
     SDL_Delay(250); // XXX. THIS DELAY MAY NEED TO ACCOUNT FOR PING TIMES.
     const uint8_t ack = RESTORE_COMPLETE;
@@ -76,7 +76,7 @@ void Restore_Send(const Restore restore, const TCPsocket socket)
     UTIL_TCP_SEND(socket, &restore.count);
     UTIL_TCP_SEND(socket, &restore.cycles);
     UTIL_TCP_SEND(socket, &restore.id_next);
-    UTIL_TCP_SEND(socket, &restore.stamp);
+    UTIL_TCP_SEND(socket, &restore.share);
     /* ---------- UNITS ---------- */
     SDLNet_TCP_Send(socket, restore.unit, size_units);
     /* ----- ASSERT COMPLETE ----- */

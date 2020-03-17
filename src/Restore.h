@@ -12,7 +12,7 @@ typedef struct
     int32_t count;
     int32_t cycles;
     int32_t id_next;
-    Share stamp[COLOR_COUNT];
+    Share share[COLOR_COUNT];
 }
 Restore;
 

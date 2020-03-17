@@ -22,7 +22,7 @@ typedef struct
     Unit* unit;
     Stack* stack;
     Color color;
-    Share stamp[COLOR_COUNT];
+    Share share[COLOR_COUNT];
     int32_t count;
     int32_t max;
     int32_t size;

@@ -23,6 +23,7 @@ static Overview WaitInLobby(const Video video, const Sock sock)
         const Packet packet = Packet_Get(sock);
         if(Packet_IsAlive(packet))
         {
+            // SERVER ASSIGNS COLOR - SORRY, THERE IS NO ELEGANT WAY TO CHOOSE A COLOR.
             overview.color = (Color) packet.client_id;
             const char* const message = Color_ToString(overview.color);
             Video_PrintLobby(video, packet.users_connected, packet.users, cycles++, message);
@@ -63,16 +64,20 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.stamp[units.color], ping);
+        // THE OVERVIEW IS SENT TO THE SERVER, WHICH IS THEN RETURNED WITH
+        // ALL OTHER CLIENT OVERVIEWS IN THE FORM OF A "PACKET".
+        // BEFORE THIS, THE "SHARE" STRUCT FROM UNITS IS COPIED TO THE OVERVIEW
+        // WITHIN THIS OVERVIEW UPDATE FUNCTION.
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping);
         UTIL_TCP_SEND(sock.server, &overview);
+        // PACKETS ARE DROPPED FOR NUMEROUS REASONS.
+        // IF A PACKET IS DROPPED, THE PACKET WILL MISS ITS CYCLE EXEC DEADLINE,
+        // AND ALL CLIENTS WILL GET A COPY OF UNITS FROM THE SPECTATOR.
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            // DISPOSES USER SPACE BUFFERING.
             packets = Packets_Clear(packets);
-            // DISPOSES KERNEL SPACE BUFFERING.
             Packet_Flush(sock);
-            // DOES NOT RESTORE PATHS -- TOO RISKY.
             if(Overview_IsSpectator(overview))
             {
                 Units_FreeAllPathsForRecovery(units);
@@ -81,7 +86,6 @@ static void Play(const Video video, const Data data, const Args args)
             }
             const Restore restore = Restore_Recv(reset.server);
             units = Units_ApplyRestore(units, restore, grid, field);
-            // SYNCS SEEDS AND CYCLES.
             cycles = restore.cycles;
             Util_Srand(overview.seed);
             Restore_Free(restore);
@@ -93,13 +97,19 @@ static void Play(const Video video, const Data data, const Args args)
             // GIVEN LAG SPIKES, HIGH EXEC CYCLES MAY PRECEDE LOW EXEC CYCLES.
             // THIS FLUSHES THEM OUT IN SYNC FOR ALL CLIENTS.
             packets = Packets_ClearStale(packets, cycles);
+            // ALL CLIENTS EXECUTE THEIR OVERVIEW AT THE EXACT SAME EXEC CYCLE.
             while(Packets_MustExecute(packets, cycles))
             {
                 Packet dequeued;
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
+            // THE CARETAKE FUNCTION HANDLES PATH FINDING.
             units = Units_Caretake(units, data.graphics, grid, map, field);
+            // THIS SPEED CONTROL WIlL SLOW DOWN OR SPEED UP THE CLIENT.
+            // SPEED UPS ARE EASY - JUST SKIP THE RENDER.
+            // SLOW DOWNS ARE EASY - JUST SLOW DOWN BY A REASONABLE DELAY.
+            // ASSUME THE SPECTATOR BOT IS ALWAYS IN THE LEAD.
             cycles++;
             if(packet.control != 0)
                 control = packet.control;
@@ -120,8 +130,10 @@ static void Play(const Video video, const Data data, const Args args)
             }
             else
             {
-                const Share share = units.stamp[units.color];
-                floats = Units_Float(floats, units, data.graphics, overview, grid, map, share.motive);
+                // THESE FLOATING UNITS ARE MORESO A GIMMICK.
+                // THEY SHOW WHERE THE BUILDING WILL BE PLACED.
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share[units.color].motive);
+                // THESE TWO VIDEO FUNCTIONS HANDLE ALL THE RENDERING HEAVY LIFTING.
                 Video_Draw(video, data, map, units, floats, overview, grid);
                 const int32_t t1 = SDL_GetTicks();
                 Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
@@ -130,6 +142,7 @@ static void Play(const Video video, const Data data, const Args args)
             const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
             if(ms > 0)
                 SDL_Delay(ms);
+            // SOMETIMES CACHEGRIND IS NICE TO USE TO MEASURE INSTRUCTION CACHE PERFORMANCE.
             if(args.must_measure && cycles == 60)
                 break;
         }
@@ -178,7 +191,7 @@ static void RunServer(const Args args)
     Sockets_Init();
     if(!args.must_measure)
         srand(time(NULL));
-    SDL_CreateThread(RunServerPings, "N/A", (void*) &args); // NO POINTER RETURNED - THREAD WILL SHUTDOWN WITH PARENT PROCESS SHUTTING DOWN.
+    SDL_CreateThread(RunServerPings, "N/A", (void*) &args);
     Sockets sockets = Sockets_Make(args.port);
     Sockets resets = Sockets_Make(args.port_reset);
     Cache cache = Cache_Make(args.users, args.map_size);
@@ -202,6 +215,7 @@ static void RunServer(const Args args)
 int main(const int argc, const char* argv[])
 {
 #if SANITIZE == 0
+    // DOES NOT PLAY NICELY WITH GCC ADDRESS SANITIZERS.
     signal(SIGSEGV, Util_PrintTrace);
 #endif
     SDLNet_Init();
