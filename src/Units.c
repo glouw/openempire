@@ -971,10 +971,12 @@ static Units FloatUsingIcons(Units floats, const Overview overview, const Grid g
 
 static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar graphics, const Graphics upgrade)
 {
-    static Unit zero;
-    Unit temp = zero;
+    static Point zero;
+    static Unit none;
+    Unit temp = none;
     Unit_Preserve(&temp, unit);
-    *unit = Unit_Make(unit->cart, unit->cart_grid_offset, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE, false);
+    // POSITION IS MAINTAINED.
+    *unit = Unit_Make(zero, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE, false);
     Unit_Preserve(unit, &temp);
 }
 
@@ -991,25 +993,27 @@ static Units AppendMissing(const Units units, Unit* const unit, const Grid grid,
     return Append(units, missing);
 }
 
-static Units AgeUp(Units units, Unit* const flag, const Grid grid, const Registrar graphics)
+static Units UpgradeInanimate(Units units, Unit* const flag, const Grid grid, const Registrar graphics)
 {
     units.stamp[flag->color].status.age = GetNextAge(units.stamp[flag->color].status);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == flag->color
-        && unit->trait.upgrade != FILE_GRAPHICS_NONE
-        && unit->trait.is_inanimate)
+        if(unit->color == flag->color)
         {
-            if(unit->file == FILE_GRAPHICS_AGE_1_MILL)
-                units = AppendMissing(units, unit, grid, graphics, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW);
-            PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
+            const Graphics upgrade = unit->trait.upgrade;
+            if(upgrade != FILE_GRAPHICS_NONE && unit->trait.is_inanimate)
+            {
+                if(unit->file == FILE_GRAPHICS_AGE_1_MILL)
+                    units = AppendMissing(units, unit, grid, graphics, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW);
+                PreservedUpgrade(unit, grid, graphics, upgrade);
+            }
         }
     }
     return units;
 }
 
-static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Type type)
+static Units UpgradeType(const Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Type type)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -1030,28 +1034,33 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const flag = &units.unit[i];
-        if(!flag->is_triggered && flag->trigger != TRIGGER_NONE)
+        const Trigger trigger = flag->trigger;
+        if(!flag->is_triggered && trigger != TRIGGER_NONE)
         {
+            Bits* const bits = &units.stamp[flag->color].bits;
+            Bits* const busy = &units.stamp[flag->color].busy;
             if(flag->is_being_built)
-                units.stamp[flag->color].busy = Bits_Set(units.stamp[flag->color].busy, flag->trigger);
+                *busy = Bits_Set(*busy, trigger);
             else
             {
-                units.stamp[flag->color].bits = Bits_Set(units.stamp[flag->color].bits, flag->trigger);
+                *bits = Bits_Set(*bits, trigger);
                 flag->is_triggered = true;
-                // SEE EARLY RETURN - ONLY ONE TRIGGER CAN RUN AT A TIME.
-                switch(flag->trigger)
+                // ONLY ONE TRIGGER CAN RUN AT A TIME.
+                switch(trigger)
                 {
                 case TRIGGER_AGE_UP_2:
                 case TRIGGER_AGE_UP_3:
-                    return AgeUp(units, flag, grid, graphics);
+                    return UpgradeInanimate(units, flag, grid, graphics);
                 case TRIGGER_UPGRADE_MILITIA:
                 case TRIGGER_UPGRADE_MAN_AT_ARMS:
                 case TRIGGER_UPGRADE_SPEARMAN:
-                    // NOT THE CAST.
+                {
                     // TRIGGERS MAP 1:1 WITH TYPES FOR SIMPLE UPGRADES.
-                    return UpgradeByType(units, flag, grid, graphics, (Type) flag->trigger);
+                    const Type type = (Type) trigger;
+                    return UpgradeType(units, flag, grid, graphics, type);
+                }
                 case TRIGGER_NONE:
-                    return units; // KEEP COMPILER QUIET.
+                    return units;
                 }
             }
         }

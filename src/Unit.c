@@ -583,6 +583,8 @@ bool Unit_IsType(Unit* const unit, const Color color, const Type type)
 void Unit_Preserve(Unit* const to, const Unit* const from)
 {
     to->cell = from->cell;
+    to->cart = from->cart;
+    to->cart_grid_offset = from->cart_grid_offset;
     to->id = from->id;
     to->parent_id = from->parent_id;
     to->has_children = from->has_children;
