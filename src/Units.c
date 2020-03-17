@@ -157,7 +157,11 @@ static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t l
             if(!CanBuild(units, map, &unit[i]))
                 return units;
     for(int32_t i = 0; i < len; i++)
-        units = Append(units, unit[i]);
+    {
+        const Unit copy = unit[i];
+        units.stamp[units.color].busy = Bits_Set(units.stamp[units.color].busy, copy.trigger);
+        units = Append(units, copy);
+    }
     return units;
 }
 
@@ -471,6 +475,7 @@ static Units FlagTheDead(Units units, const Grid grid, const Registrar graphics,
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit) && Unit_IsDead(unit))
         {
+            units.stamp[units.color].busy = Bits_Clear(units.stamp[units.color].busy, unit->trigger);
             Flag(units, unit);
             if(unit->must_skip_debris)
                 continue;
@@ -564,6 +569,9 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
     {
         Unit* const closest = GetClosestBoid(units, unit, grid);
         if(closest)
+        {
+            if(closest->trait.type == TYPE_FLAG)
+                return;
             if(unit->using_attack_move
             || unit->interest == closest)
             {
@@ -571,6 +579,7 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
                 Unit_SetInterest(unit, closest);
                 unit->using_attack_move = true;
             }
+        }
     }
 }
 
@@ -932,7 +941,8 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
     const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
     if(parts.part != NULL)
     {
-        if(!Bits_Get(overview.incoming.bits, button.trigger))
+        if(!Bits_Get(overview.incoming.bits, button.trigger)
+        && !Bits_Get(overview.incoming.busy, button.trigger))
         {
             const int32_t amount = button.icon_type == ICONTYPE_UNIT ? 10 : 1; // XXX: REMOVE IN FUTURE - THIS IS CRAZY.
             for(int32_t i = 0; i < amount; i++)
@@ -1018,7 +1028,11 @@ static Units UpgradeByType(const Units units, Unit* const flag, const Grid grid,
     {
         Unit* const unit = &units.unit[i];
         if(Unit_IsType(unit, flag->color, type))
-            PreservedUpgrade(unit, grid, graphics, unit->trait.upgrade);
+        {
+            const Graphics upgrade = unit->trait.upgrade;
+            if(upgrade != FILE_GRAPHICS_NONE)
+                PreservedUpgrade(unit, grid, graphics, upgrade);
+        }
 
     }
     return units;
@@ -1111,16 +1125,33 @@ static void ManageStacks(const Units units)
     StackStacks(units);
 }
 
-static void CompleteConstruction(const Units units)
+static void CompleteInanimateConstruction(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->health >= unit->trait.max_health 
-        && unit->is_being_built)
+        if(unit->trait.is_inanimate)
         {
-            DisengageFrom(units, unit);
-            unit->is_being_built = false;
+            if(unit->health >= unit->trait.max_health
+            && unit->is_being_built)
+            {
+                DisengageFrom(units, unit);
+                unit->is_being_built = false;
+            }
+        }
+    }
+}
+
+static void BuildAnimate(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(!unit->trait.is_inanimate && unit->is_being_built)
+        {
+            unit->health += 1;
+            if(unit->health == unit->trait.max_health)
+                unit->is_being_built = false;
         }
     }
 }
@@ -1129,7 +1160,8 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
 {
     UpdateEntropy(units);
     Tick(units);
-    CompleteConstruction(units);
+    BuildAnimate(units);
+    CompleteInanimateConstruction(units);
     units = ManagePathFinding(units, grid, map, field);
     units = UpdateAllMotives(units);
     Decay(units);
@@ -1137,8 +1169,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = FlagTheDead(units, grid, graphics, map);
     units = RemoveGarbage(units);
     ManageStacks(units);
-    units = CountAllPopulations(units);
-    return units;
+    return CountAllPopulations(units);
 }
 
 Units Units_Float(Units floats, const Units units, const Registrar graphics, const Overview overview, const Grid grid, const Map map, const Motive motive)
@@ -1160,10 +1191,9 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
         units = Select(units, overview, grid, graphics, window.units);
         units = SpawnUsingIcons(units, overview, grid, graphics, map);
         units = Command(units, overview, grid, graphics, map, field, window.units);
-        units = TriggerTriggers(units, overview, grid, graphics);
         Window_Free(window);
     }
-    return units;
+    return TriggerTriggers(units, overview, grid, graphics);
 }
 
 Units Units_PacketService(Units units, const Registrar graphics, const Packet packet, const Grid grid, const Map map, const Field field)

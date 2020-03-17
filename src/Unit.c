@@ -192,7 +192,7 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.color = color;
     unit.state = STATE_IDLE;
     unit.health = unit.is_being_built
-        ? unit.trait.max_health / 2 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
+        ? 1 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
         : unit.trait.max_health;
     unit.is_floating = is_floating;
     unit.trigger = trigger;
@@ -235,6 +235,8 @@ void Unit_Print(Unit* const unit)
 {
     if(unit)
     {
+        printf("health                :: %d\n", unit->health);
+        printf("max_health            :: %d\n", unit->trait.max_health);
         printf("is_being_built        :: %d\n", unit->is_being_built);
         printf("interest              :: 0x%16p\n", (void*) unit->interest);
         printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
@@ -477,7 +479,8 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     if(other != NULL
     && !Unit_IsExempt(unit)
     && !Unit_IsExempt(other)
-    && Unit_IsDifferent(unit, other)) // DO NOT MELEE SELF.
+    && Unit_IsDifferent(unit, other) // DO NOT MELEE SELF.
+    && other->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
     {
         if(CanEngage(unit, grid))
         {
@@ -579,7 +582,9 @@ bool Unit_IsType(Unit* const unit, const Color color, const Type type)
 
 bool Unit_IsTriggerValid(Unit* const flag)
 {
-    return !flag->is_triggered && flag->trigger != TRIGGER_NONE;
+    return !flag->is_triggered
+        && !flag->is_being_built
+        &&  flag->trigger != TRIGGER_NONE;
 }
 
 void Unit_Preserve(Unit* const to, const Unit* const from)

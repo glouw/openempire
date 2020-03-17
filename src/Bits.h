@@ -9,6 +9,8 @@ typedef uint64_t Bits;
 
 Bits Bits_Set(Bits, const Trigger);
 
+Bits Bits_Clear(Bits, const Trigger);
+
 bool Bits_Get(Bits, const Trigger);
 
 void Bits_Print(const Bits);

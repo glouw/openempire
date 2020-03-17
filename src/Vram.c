@@ -603,18 +603,19 @@ static inline Pack GetPackFromMotive(const Registrar interfac, const Motive moti
     return pack;
 }
 
-static inline void DrawPack(const Vram vram, const Pack pack, const Bits bits)
+static inline void DrawPack(const Vram vram, const Pack pack, const Share share)
 {
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
-        const Button button = Button_Upgrade(pack.buttons.button[index], bits);
+        const Button button = Button_Upgrade(pack.buttons.button[index], share.bits);
         SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.index];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         const Rect rect = {
             { 0, 0 },
             { surface->w, surface->h }
         };
-        const bool red_out = Bits_Get(bits, button.trigger);
+        const bool red_out = Bits_Get(share.bits, button.trigger)
+                          || Bits_Get(share.busy, button.trigger);
         DrawWithBounds(vram, surface, offset, rect, red_out);
     }
 }
@@ -622,7 +623,7 @@ static inline void DrawPack(const Vram vram, const Pack pack, const Bits bits)
 void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Share share, const Color color)
 {
     const Pack pack = GetPackFromMotive(interfac, share.motive, color, share.status.age);
-    DrawPack(vram, pack, share.bits);
+    DrawPack(vram, pack, share);
 }
 
 void Vram_DrawHud(const Vram vram, const Registrar interfac)

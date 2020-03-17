@@ -10,5 +10,6 @@ typedef struct
     Status status;
     Motive motive;
     Bits bits;
+    Bits busy;
 }
 Share;

@@ -4,11 +4,22 @@
 
 Bits Bits_Set(Bits bits, const Trigger trigger)
 {
+    if(trigger == TRIGGER_NONE)
+        return bits;
     return bits |= (1 << (int32_t) trigger);
+}
+
+Bits Bits_Clear(Bits bits, const Trigger trigger)
+{
+    if(trigger == TRIGGER_NONE)
+        return bits;
+    return bits &= ~(1 << (int32_t) trigger);
 }
 
 bool Bits_Get(const Bits bits, const Trigger trigger)
 {
+    if(trigger == TRIGGER_NONE)
+        return false;
     return (bits >> trigger) & 0x1;
 }
 
