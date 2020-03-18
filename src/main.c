@@ -64,8 +64,8 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        // THE OVERVIEW IS SENT TO THE SERVER, WHICH IS THEN RETURNED WITH // ALL OTHER CLIENT OVERVIEWS IN THE FORM OF A "PACKET".
-        // BEFORE THIS, THE "SHARE" STRUCT FROM UNITS IS COPIED TO THE OVERVIEW // WITHIN THIS OVERVIEW UPDATE FUNCTION.
+        // THE OVERVIEW IS SENT TO THE SERVER, WHICH IS THEN RETURNED WITH ALL OTHER CLIENT OVERVIEWS IN THE FORM OF A "PACKET".
+        // BEFORE THIS, THE "SHARE" STRUCT FROM UNITS IS COPIED TO THE OVERVIEW WITHIN THIS OVERVIEW UPDATE FUNCTION.
         overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping);
         UTIL_TCP_SEND(sock.server, &overview);
         // IF A PACKET IS DROPPED, THE PACKET WILL MISS ITS CYCLE EXEC DEADLINE, AND ALL CLIENTS WILL GET A COPY OF UNITS FROM THE SPECTATOR.
@@ -100,20 +100,12 @@ static void Play(const Video video, const Data data, const Args args)
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
-            // THIS SPEED CONTROL WIlL SLOW DOWN OR SPEED UP THE CLIENT. SPEED UP SKIPS THE RECESSION. SLOW DOWN DELAYS THE CLIENT.
             cycles++;
+            // THIS SPEED CONTROL WILL SLOW DOWN OR SPEED UP THE CLIENT BY DELAYING OR SKIPPING THE RENDER, RESPECTIVELY.
             if(packet.control != 0)
                 control = packet.control;
-            if(control > 0)
-            {
-                control--;
-                continue;
-            }
-            if(control < 0)
-            {
-                control++;
-                SDL_Delay(5);
-            }
+            if(control > 0) { control--; continue; }
+            if(control < 0) { control++; SDL_Delay(5); }
             if(Overview_IsSpectator(overview))
             {
                 if(Packet_IsReady(packet))
