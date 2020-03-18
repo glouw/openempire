@@ -284,27 +284,60 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     }
 }
 
-static Point GetNextBestInanimateCoord(Unit* const unit, const Field field)
+typedef struct
 {
-    static Point zero;
-    const Point dimensions = unit->interest->trait.dimensions;
-    int32_t min = INT32_MAX;
-    Point out = zero;
-    for(int32_t x = -1; x < dimensions.x + 1; x++)
-    for(int32_t y = -1; y < dimensions.y + 1; y++)
+    Point point;
+    int32_t mag;
+}
+Mag;
+
+static int32_t CompareByMag(const void* a, const void* b)
+{
+    Mag* const aa = (Mag*) a;
+    Mag* const bb = (Mag*) b;
+    const int32_t ma = aa->mag;
+    const int32_t mb = bb->mag;
+    return ma < mb;
+}
+
+static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const Field field) // XXX. DEPENDING ON NUMBER OF UNITS SELECTED, RANDOMLY SPREAD OUT.
+{
+#define WIDTH (4)
+#define SIDES (4)
+#define CORNERS (4)
+#define MAX (SIDES * WIDTH + CORNERS)
+    Mag mags[MAX];
+    for(int32_t i = 0; i < MAX; i++)
     {
-        const Point shift = { x, y };
-        const Point cart = Point_Add(unit->interest->cart, shift);
-        const Point diff = Point_Sub(unit->cart, cart);
-        const int32_t mag = Point_Mag(diff);
-        const bool can_walk = Field_IsWalkable(field, cart);
-        if(can_walk && mag < min)
-        {
-            out = cart;
-            min = mag;
-        }
+        static Mag zero;
+        mags[i] = zero;
     }
-    return out;
+    const Unit* const interest = unit->interest;
+    int32_t count = 0;
+    const int32_t xx = interest->trait.dimensions.x + 1;
+    const int32_t yy = interest->trait.dimensions.y + 1;
+    for(int32_t x = -1; x < xx; x++)
+    for(int32_t y = -1; y < yy; y++)
+        if(x == -1 || y == -1 || x == xx || y == yy) // ONLY LOOK AT BORDER.
+        {
+            const Point shift = { x, y };
+            const Point cart = Point_Add(interest->cart, shift);
+            if(Field_IsWalkable(field, cart))
+            {
+                const Point cell = Grid_CartToCell(grid, cart);
+                const Point diff = Point_Sub(unit->cell, cell);
+                const Mag mag = {
+                    cart, Point_Mag(diff)
+                };
+                mags[count++] = mag;
+            }
+        }
+    UTIL_SORT(mags, count, CompareByMag);
+    return mags[0].point;
+#undef MAX
+#undef SIDES
+#undef CORNERS
+#undef MAX
 }
 
 static Points PathStraight(const Point a, const Point b)
@@ -347,7 +380,7 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         if(unit->interest
         && unit->interest->trait.is_inanimate)
         {
-            unit->cart_goal = GetNextBestInanimateCoord(unit, field);
+            unit->cart_goal = GetNextBestInanimateCoord(unit, grid, field);
             unit->cart_grid_offset_goal = zero;
         }
         else
