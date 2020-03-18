@@ -99,7 +99,7 @@ Open Empires was created under Microsoft's Game Content Usage Rules:
     https://www.xbox.com/en-us/developers/rules
 
 Open Empires uses assets from Age of Empires II, and it is not endorsed by
-or affiliated with Microsoft.
+or affiliated with Microsoft or Ensemble Studios.
 
 ## Credits
 

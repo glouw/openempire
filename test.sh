@@ -31,7 +31,7 @@ netsim()
 
 server()
 {
-    ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT
+    ./$BIN --server --users $USERS --map_size $MAP_SIZE --port $PORT
 }
 
 client()
@@ -55,6 +55,6 @@ batch()
     client 400 300
 }
 
-#build
+build
 netsim
 batch

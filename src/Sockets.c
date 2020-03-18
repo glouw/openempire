@@ -75,7 +75,7 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
                     cache->pings[i] = overview.ping;
                     if(Overview_UsedAction(overview))
                         cache->packet.overview[i] = overview;
-                    if(count == CONFIG_CACHE_HISTORY_COUNT)
+                    if(count == CONFIG_HISTORY_COUNT)
                         cache->history[i].count = 0;
                 }
             }
