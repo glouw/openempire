@@ -121,7 +121,7 @@ int32_t Cache_GetPingMax(Cache* const cache)
 
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
-    const int32_t kp =  64;
+    const int32_t kp =  32;
     const int32_t ki = 128;
     const int32_t si = 512; // XXX. INTEGRAL SATURATE... ARBITRARY?
     for(int32_t i = 0; i < COLOR_COUNT; i++)
