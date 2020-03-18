@@ -14,12 +14,12 @@ typedef struct
     Overview overview[COLOR_COUNT];
     int32_t turn;
     int32_t exec_cycle;
-    int32_t client_id;
-    int32_t users_connected;
-    int32_t users;
-    int32_t seed;
-    int32_t map_size;
-    int32_t control;
+    int16_t client_id;
+    int16_t users_connected;
+    int16_t users;
+    uint16_t seed;
+    int16_t map_size;
+    int16_t control;
     bool is_stable;
     bool is_out_of_sync;
     bool game_running;

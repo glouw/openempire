@@ -89,15 +89,38 @@ static void Print(const Sockets sockets, Cache* const cache, const int32_t setpo
     printf("TURN %d :: SETPOINT %d :: MAX_PING %d\n", cache->turn, setpoint, max_ping);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const uint64_t parity = cache->parity[i];
-        const int32_t cycles = cache->cycles[i];
-        const int32_t ping = cache->pings[i];
-        const int32_t control = cache->control[i];
-        const char queue_size = cache->queue_size[i];
+        const uint64_t parity    = cache->parity[i];
+        const int32_t cycles     = cache->cycles[i];
+        const int32_t ping       = cache->pings[i];
+        const int32_t control    = cache->control[i];
+        const int32_t integral   = cache->integral[i];
+        const int32_t queue_size = cache->queue_size[i];
         const char parity_symbol = cache->is_stable ? '!' : '?';
         const TCPsocket socket = sockets.socket[i];
-        printf("%d :: %d :: %d :: %c :: 0x%016lX :: %d :: CYCLES %d :: QUEUE %d -> %d ms\n",
-                game_running, i, socket != NULL, parity_symbol, parity, control, cycles, queue_size, ping);
+        printf(/*  0 */ "%d :: "
+               /*  1 */ "%d :: "
+               /*  2 */ "%d :: "
+               /*  3 */ "%c :: "
+               /*  4 */ "0x%016lX :: "
+               /*  5 */ "QUEU %d :: "
+               /*  6 */ "PING %3d :: "
+               /*  7 */ "OVER %ld :: "
+               /*  8 */ "PACK %ld ::"
+               /*  9 */ "CTRL %d :: "
+               /* 10 */ "INTG %3d :: "
+               /* 11 */ "CYCS %d\n",
+               /*  0 */ game_running,
+               /*  1 */ i,
+               /*  2 */ socket != NULL,
+               /*  3 */ parity_symbol,
+               /*  4 */ parity,
+               /*  5 */ queue_size,
+               /*  6 */ ping,
+               /*  7 */ sizeof(Overview),
+               /*  8 */ sizeof(Packet),
+               /*  9 */ control,
+               /* 10 */ integral,
+               /* 11 */ cycles);
     }
 }
 

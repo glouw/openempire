@@ -1,5 +1,9 @@
 BIN = ../openempires
 
+DUMP=objdump
+
+TAGS=ctags
+
 LIBS  = -lSDL2
 LIBS += -lSDL2_ttf
 LIBS += -lSDL2_net
@@ -70,10 +74,6 @@ DEPS = $(SRCS:.c=.d)
 CLANG = 0
 
 CPP = 0
-
-DUMP=objdump
-
-TAGS=ctags
 
 DEBUGGING = 0
 

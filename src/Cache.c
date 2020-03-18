@@ -65,23 +65,17 @@ void Cache_ClearHistory(Cache* const cache)
 {
     static History zero;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
         cache->history[i] = zero;
+        cache->integral[i] = 0;
+    }
 }
 
 int32_t Cache_GetCycleSetpoint(Cache* const cache)
 {
-    int32_t setpoint = 0;
-    int32_t count = 0;
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-    {
-        const int32_t cycles = cache->cycles[i];
-        if(cycles > 0)
-        {
-            setpoint += cycles;
-            count++;
-        }
-    }
-    return (count > 0) ? (setpoint / count) : 0;
+    const int32_t spectator = cache->users - 1;
+    const int32_t setpoint = cache->cycles[spectator];
+    return setpoint;
 }
 
 int32_t Cache_GetCycleMax(Cache* const cache)
@@ -127,8 +121,9 @@ int32_t Cache_GetPingMax(Cache* const cache)
 
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
-    const int32_t kp = 16;
-    const int32_t ki = 32;
+    const int32_t kp =  64;
+    const int32_t ki = 128;
+    const int32_t si = 512; // XXX. INTEGRAL SATURATE... ARBITRARY?
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const int32_t cycles = cache->cycles[i];
@@ -136,6 +131,8 @@ void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
         {
             const int32_t diff = setpoint - cycles;
             cache->integral[i] += diff;
+            if(cache->integral[i] < -si) cache->integral[i] = -si;
+            if(cache->integral[i] > +si) cache->integral[i] = +si;
             const int32_t ep = diff;
             const int32_t ei = cache->integral[i];
             const int32_t control = (ki * ep + kp * ei) / (kp * ki);

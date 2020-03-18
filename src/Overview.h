@@ -26,11 +26,11 @@ typedef struct
     int32_t xres;
     int32_t yres;
     int32_t cycles;
-    int32_t queue_size;
-    int32_t ping;
-    int32_t map_size;
-    int32_t seed;
-    int32_t users;
+    int16_t queue_size;
+    int16_t ping;
+    int16_t map_size;
+    uint16_t seed;
+    int16_t users;
 }
 Overview;
 
