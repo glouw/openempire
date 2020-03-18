@@ -150,14 +150,50 @@ static Units Append(Units units, const Unit unit)
     return units;
 }
 
-static Units BulkAppend(Units units, const Map map, Unit unit[], const int32_t len, const bool ignore_collisions)
+static bool OutOfBounds(const Units units, const Point point)
+{
+    return point.x < 0
+        || point.y < 0
+        || point.x >= units.size
+        || point.y >= units.size;
+}
+
+static Stack* GetStack(const Units units, const Point p)
+{
+    return &units.stack[p.x + p.y * units.size];
+}
+
+static void SafeAppend(const Units units, Unit* const unit, const Point cart)
+{
+    if(!OutOfBounds(units, cart))
+        Stack_Append(GetStack(units, cart), unit);
+}
+
+static void ProperAppend(const Units units, Unit* const unit)
+{
+    if(unit->trait.is_inanimate)
+        for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+        for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+        {
+            const Point point = { x, y };
+            const Point cart = Point_Add(point, unit->cart);
+            SafeAppend(units, unit, cart);
+        }
+    else SafeAppend(units, unit, unit->cart);
+}
+
+static Units BulkAppend(Units units, const Map map, Unit* const temp, const int32_t len, const bool ignore_collisions)
 {
     if(!ignore_collisions)
         for(int32_t i = 0; i < len; i++)
-            if(!CanBuild(units, map, &unit[i]))
+            if(!CanBuild(units, map, &temp[i]))
                 return units;
     for(int32_t i = 0; i < len; i++)
-        units = Append(units, unit[i]);
+    {
+        units = Append(units, temp[i]);
+        Unit* const last = &units.unit[units.count - 1];
+        ProperAppend(units, last);
+    }
     return units;
 }
 
@@ -220,22 +256,43 @@ static void DisengageSelected(const Units units)
     }
 }
 
+static void GotoTile(const Units units, Unit* const unit, const Grid grid, const Overview overview, const Field field)
+{
+    unit->grid_flash_timer = 0;
+    DisengageSelected(units);
+    SetSelectedInterest(units, unit);
+    FindPathForSelected(units, overview, unit->cart, unit->cart_grid_offset, grid, field);
+}
+
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
 {
-    const bool using_attack_move = Button_UseAttackMove(Button_FromOverview(overview));
+    const Button button = Button_FromOverview(overview);
+    const bool using_attack_move = Button_UseAttackMove(button);
+    const bool using_building_icon = button.icon_type == ICONTYPE_BUILD;
     if(units.select_count > 0)
+    {
+        if(overview.event.mouse_lu && using_building_icon)
+        {
+            const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+            const Stack stack = Units_GetStackCart(units, cart_goal);
+            for(int32_t i = 0; i < stack.count; i++)
+            {
+                Unit* const reference = stack.reference[i];
+                if(!Unit_IsExempt(reference))
+                {
+                    GotoTile(units, reference, grid, overview, field);
+                    break;
+                }
+            }
+        }
+        else
         if(overview.event.mouse_ru || using_attack_move)
         {
             const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
             Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
             if(tile.reference && !Unit_IsExempt(tile.reference))
-            {
-                tile.reference->grid_flash_timer = 0;
-                DisengageSelected(units);
-                SetSelectedInterest(units, tile.reference);
-                FindPathForSelected(units, overview, tile.reference->cart, tile.reference->cart_grid_offset, grid, field);
-            }
+                GotoTile(units, tile.reference, grid, overview, field);
             else
             {
                 DisengageSelected(units);
@@ -251,6 +308,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             Tiles_Free(tiles);
             units.command_group_next++;
         }
+    }
     return units;
 }
 
@@ -1099,19 +1157,6 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
     return units;
 }
 
-static bool OutOfBounds(const Units units, const Point point)
-{
-    return point.x < 0
-        || point.y < 0
-        || point.x >= units.size
-        || point.y >= units.size;
-}
-
-static Stack* GetStack(const Units units, const Point p)
-{
-    return &units.stack[p.x + p.y * units.size];
-}
-
 Stack Units_GetStackCart(const Units units, const Point p)
 {
     static Stack zero;
@@ -1128,26 +1173,12 @@ static void ResetStacks(const Units units)
     }
 }
 
-static void SafeAppend(const Units units, Unit* const unit, const Point cart)
-{
-    if(!OutOfBounds(units, cart))
-        Stack_Append(GetStack(units, cart), unit);
-}
-
 static void StackStacks(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->trait.is_inanimate)
-            for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
-            for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
-            {
-                const Point point = { x, y };
-                const Point cart = Point_Add(point, unit->cart);
-                SafeAppend(units, unit, cart);
-            }
-        else SafeAppend(units, unit, unit->cart);
+        ProperAppend(units, unit);
     }
 }
 
