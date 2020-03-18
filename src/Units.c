@@ -256,7 +256,7 @@ static void DisengageSelected(const Units units)
     }
 }
 
-static void GotoTile(const Units units, Unit* const unit, const Grid grid, const Overview overview, const Field field)
+static void PathSelectedTo(const Units units, Unit* const unit, const Grid grid, const Overview overview, const Field field)
 {
     unit->grid_flash_timer = 0;
     DisengageSelected(units);
@@ -280,7 +280,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
                 Unit* const reference = stack.reference[i];
                 if(!Unit_IsExempt(reference))
                 {
-                    GotoTile(units, reference, grid, overview, field);
+                    PathSelectedTo(units, reference, grid, overview, field);
                     break;
                 }
             }
@@ -292,7 +292,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
             if(tile.reference && !Unit_IsExempt(tile.reference))
-                GotoTile(units, tile.reference, grid, overview, field);
+                PathSelectedTo(units, tile.reference, grid, overview, field);
             else
             {
                 DisengageSelected(units);
