@@ -302,8 +302,8 @@ static int32_t CompareByMag(const void* a, const void* b)
 
 static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const Field field) // XXX. DEPENDING ON NUMBER OF UNITS SELECTED, RANDOMLY SPREAD OUT.
 {
-#define WIDTH (4)
-#define SIDES (4)
+#define WIDTH   (4)
+#define SIDES   (4)
 #define CORNERS (4)
 #define MAX (SIDES * WIDTH + CORNERS)
     Mag mags[MAX];
@@ -318,7 +318,8 @@ static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const 
     const int32_t yy = interest->trait.dimensions.y + 1;
     for(int32_t x = -1; x < xx; x++)
     for(int32_t y = -1; y < yy; y++)
-        if(x == -1 || y == -1 || x == xx || y == yy) // ONLY LOOK AT BORDER.
+        if(x == -1 || y == -1
+        || x == xx || y == yy) // ONLY LOOK AT BORDER.
         {
             const Point shift = { x, y };
             const Point cart = Point_Add(interest->cart, shift);
@@ -326,9 +327,7 @@ static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const 
             {
                 const Point cell = Grid_CartToCell(grid, cart);
                 const Point diff = Point_Sub(unit->cell, cell);
-                const Mag mag = {
-                    cart, Point_Mag(diff)
-                };
+                const Mag mag = { cart, Point_Mag(diff) };
                 mags[count++] = mag;
             }
         }

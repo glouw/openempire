@@ -328,8 +328,11 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
-                const Point force = Unit_Separate(unit, other);
-                out = Point_Sub(out, force);
+                if(!other->trait.is_inanimate)
+                {
+                    const Point force = Unit_Separate(unit, other);
+                    out = Point_Sub(out, force);
+                }
             }
         }
     }
@@ -608,21 +611,22 @@ static bool InterestInRange(const Units units, Unit* const unit)
 
 static void UpdateCellInterestInanimate(Unit* const unit, const Grid grid)
 {
-    if(unit->interest->trait.is_inanimate)
+    Unit* const interest = unit->interest;
+    if(interest->trait.is_inanimate)
     {
         int32_t min = INT32_MAX;
-        for(int32_t x = 0; x < unit->interest->trait.dimensions.x; x++)
-        for(int32_t y = 0; y < unit->interest->trait.dimensions.y; y++)
+        for(int32_t x = 0; x < interest->trait.dimensions.x; x++)
+        for(int32_t y = 0; y < interest->trait.dimensions.y; y++)
         {
             const Point shift = { x, y };
-            const Point cart = Point_Add(unit->interest->cart, shift);
+            const Point cart = Point_Add(interest->cart, shift);
             const Point cell = Grid_CartToCell(grid, cart);
             const Point diff = Point_Sub(unit->cell, cell);
             const int32_t mag = Point_Mag(diff);
             if(mag < min)
             {
-                unit->cell_interest_inanimate = cell;
                 min = mag;
+                unit->cell_interest_inanimate = cell;
             }
         }
     }
