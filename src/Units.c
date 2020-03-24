@@ -1031,11 +1031,7 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
     {
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
-        {
-            const int32_t amount = button.icon_type == ICONTYPE_UNIT ? 10 : 1; // XXX: REMOVE IN FUTURE - THIS IS CRAZY.
-            for(int32_t i = 0; i < amount; i++)
-                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
-        }
+            units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
         Parts_Free(parts);
     }
     return units;
@@ -1218,7 +1214,10 @@ static void BuildAnimate(const Units units)
         {
             unit->health += 1;
             if(unit->health == unit->trait.max_health)
+            {
                 unit->is_being_built = false;
+                unit->is_floating = false;
+            }
         }
     }
 }

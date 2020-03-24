@@ -187,6 +187,9 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     if(!is_floating)
         id_next++;
     unit.is_being_built = is_being_built;
+    unit.is_floating = is_floating;
+    if(unit.is_being_built && !unit.trait.is_inanimate)
+        unit.is_floating = true;
     unit.parent_id = -1;
     unit.interest_id = -1;
     unit.color = color;
@@ -194,7 +197,6 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
     unit.health = unit.is_being_built
         ? 1 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
         : unit.trait.max_health;
-    unit.is_floating = is_floating;
     unit.trigger = trigger;
     if(!is_floating)
     {
@@ -582,7 +584,9 @@ bool Unit_IsDead(Unit* const unit)
 
 bool Unit_IsExempt(Unit* const unit)
 {
-    return State_IsDead(unit->state) || unit->trait.is_detail || unit->must_garbage_collect;
+    return State_IsDead(unit->state)
+        || unit->trait.is_detail
+        || unit->must_garbage_collect;
 }
 
 Point Unit_GetShift(Unit* const unit, const Point cart)
