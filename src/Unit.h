@@ -145,3 +145,5 @@ void Unit_SetParent(Unit* const, Unit* const parent);
 bool Unit_IsConstruction(Unit* const);
 
 bool Unit_AreEnemies(Unit* const unit, Unit* const other);
+
+void Unit_LayFarm(Unit* const, const Map);

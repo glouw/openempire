@@ -682,3 +682,20 @@ bool Unit_AreEnemies(Unit* const unit, Unit* const other)
 {
     return !SameColor(unit, other) && !Unit_IsExempt(other); // XXX: USE ALLY SYSTEM INSTEAD OF COLOR FREE FOR ALL.
 }
+
+void Unit_LayFarm(Unit* const unit, const Map map)
+{
+    const int32_t width = 2;
+    for(int32_t x = -width; x < unit->trait.dimensions.x + width; x++)
+    for(int32_t y = -width; y < unit->trait.dimensions.y + width; y++)
+        if(x < 0
+        || y < 0
+        || x >= unit->trait.dimensions.x
+        || y >= unit->trait.dimensions.y)
+        {
+            const Point shift = { x, y };
+            const Point cart = Point_Add(unit->cart, shift);
+            Map_SetTerrainFile(map, cart, FILE_TERRAIN_FARM_READY);
+        }
+}
+

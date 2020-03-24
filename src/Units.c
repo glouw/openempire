@@ -163,13 +163,13 @@ static Stack* GetStack(const Units units, const Point p)
     return &units.stack[p.x + p.y * units.size];
 }
 
-static void SafeAppend(const Units units, Unit* const unit, const Point cart)
+static void SafeStackAppend(const Units units, Unit* const unit, const Point cart)
 {
     if(!OutOfBounds(units, cart))
         Stack_Append(GetStack(units, cart), unit);
 }
 
-static void ProperAppend(const Units units, Unit* const unit)
+static void ProperStackAppend(const Units units, Unit* const unit)
 {
     if(unit->trait.is_inanimate)
         for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
@@ -177,9 +177,9 @@ static void ProperAppend(const Units units, Unit* const unit)
         {
             const Point point = { x, y };
             const Point cart = Point_Add(point, unit->cart);
-            SafeAppend(units, unit, cart);
+            SafeStackAppend(units, unit, cart);
         }
-    else SafeAppend(units, unit, unit->cart);
+    else SafeStackAppend(units, unit, unit->cart);
 }
 
 static Units BulkAppend(Units units, const Map map, Unit* const temp, const int32_t len, const bool ignore_collisions)
@@ -192,7 +192,7 @@ static Units BulkAppend(Units units, const Map map, Unit* const temp, const int3
     {
         units = Append(units, temp[i]);
         Unit* const last = &units.unit[units.count - 1];
-        ProperAppend(units, last);
+        ProperStackAppend(units, last);
     }
     return units;
 }
@@ -1178,7 +1178,7 @@ static void StackStacks(const Units units)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        ProperAppend(units, unit);
+        ProperStackAppend(units, unit);
     }
 }
 
@@ -1188,7 +1188,7 @@ static void ManageStacks(const Units units)
     StackStacks(units);
 }
 
-static void CompleteInanimateConstruction(const Units units)
+static void CompleteInanimateConstruction(const Units units, const Map map)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -1200,6 +1200,8 @@ static void CompleteInanimateConstruction(const Units units)
             {
                 DisengageFrom(units, unit);
                 unit->is_being_built = false;
+                if(unit->trait.type == TYPE_MILL)
+                    Unit_LayFarm(unit, map);
             }
         }
     }
@@ -1227,7 +1229,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     UpdateEntropy(units);
     Tick(units);
     BuildAnimate(units);
-    CompleteInanimateConstruction(units);
+    CompleteInanimateConstruction(units, map);
     units = ManagePathFinding(units, grid, map, field);
     units = UpdateAllMotives(units);
     Decay(units);
