@@ -440,7 +440,9 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
                 ? 0xFF0000 // RED
                 : tile.reference->using_attack_move
                     ? 0xFFFF00 // YELLOW
-                    : 0xFFFFFF;// DEFAULT
+                    : tile.reference->has_direct
+                        ? 0x00FF00
+                        : 0xFFFFFF;// DEFAULT
             DrawEllipse(vram, rect, color);
         }
     }

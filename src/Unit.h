@@ -67,6 +67,7 @@ typedef struct Unit
     bool using_attack_move;
     bool is_flash_on;
     bool is_being_built;
+    bool has_direct;
 }
 Unit;
 

@@ -175,7 +175,7 @@ void Tile_Select(const Tile tile)
     if(!Unit_IsExempt(unit)
     && !unit->is_floating)
         unit->is_selected = true;
-#if 0
+#if 1
     Unit_Print(unit);
 #endif
 }

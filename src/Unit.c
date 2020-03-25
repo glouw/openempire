@@ -233,6 +233,7 @@ void Unit_Print(Unit* const unit)
 {
     if(unit)
     {
+        printf("has_direct            :: %d\n", unit->has_direct);
         printf("health                :: %d\n", unit->health);
         printf("max_health            :: %d\n", unit->trait.max_health);
         printf("is_being_built        :: %d\n", unit->is_being_built);
@@ -295,7 +296,7 @@ static int32_t CompareByMag(const void* a, const void* b)
     Mag* const bb = (Mag*) b;
     const int32_t ma = aa->mag;
     const int32_t mb = bb->mag;
-    return ma < mb;
+    return ma > mb;
 }
 
 static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const Field field) // XXX. DEPENDING ON NUMBER OF UNITS SELECTED, RANDOMLY SPREAD OUT.
@@ -312,12 +313,13 @@ static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const 
     }
     const Unit* const interest = unit->interest;
     int32_t count = 0;
-    const int32_t xx = interest->trait.dimensions.x + 1;
-    const int32_t yy = interest->trait.dimensions.y + 1;
-    for(int32_t x = -1; x < xx; x++)
-    for(int32_t y = -1; y < yy; y++)
-        if(x == -1 || y == -1
-        || x == xx || y == yy) // ONLY LOOK AT BORDER.
+    const int32_t width = 1;
+    for(int32_t x = -width; x < interest->trait.dimensions.x + width; x++)
+    for(int32_t y = -width; y < interest->trait.dimensions.y + width; y++)
+        if(x == -width
+        || y == -width
+        || x == interest->trait.dimensions.x
+        || y == interest->trait.dimensions.y)
         {
             const Point shift = { x, y };
             const Point cart = Point_Add(interest->cart, shift);
@@ -330,6 +332,10 @@ static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const 
             }
         }
     UTIL_SORT(mags, count, CompareByMag);
+#if 0
+    for(int32_t i = 0; i < MAX; i++)
+        Point_Print(mags[i].point);
+#endif
     return mags[0].point;
 #undef MAX
 #undef SIDES
@@ -386,7 +392,8 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
             unit->cart_grid_offset_goal = cart_grid_offset_goal;
         }
         Unit_FreePath(unit);
-        unit->path = HasDirectPath(unit, grid, field)
+        unit->has_direct = HasDirectPath(unit, grid, field);
+        unit->path = unit->has_direct
             ? PathStraight(unit->cart, unit->cart_goal)
             : Field_PathAStar(field, unit->cart, unit->cart_goal);
     }
