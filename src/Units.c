@@ -930,30 +930,11 @@ static void UpdateEntropy(const Units units)
         units.unit[i].entropy = Point_Rand();
 }
 
-static void Zero(int32_t array[], const int32_t size)
-{
-    for(int32_t i = 0; i < size; i++)
-        array[i] = 0;
-}
-
-static int32_t MaxIndex(int32_t array[], const int32_t size)
-{
-    int32_t max = 0;
-    int32_t index = 0;
-    for(int32_t i = 0; i < size; i++)
-        if(array[i] > max)
-        {
-            max = array[i];
-            index = i;
-        }
-    return index;
-}
-
 static Action GetAction(const Units units, const Color color)
 {
     int32_t counts[ACTION_COUNT + 1];
     const int32_t size = UTIL_LEN(counts);
-    Zero(counts, size);
+    Util_ZeroIntArray(counts, size);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -965,14 +946,14 @@ static Action GetAction(const Units units, const Color color)
             counts[index]++;
         }
     }
-    return (Action) (MaxIndex(counts, size) - 1);
+    return (Action) (Util_MaxIntIndex(counts, size) - 1);
 }
 
 static Type GetType(const Units units, const Color color)
 {
     int32_t counts[TYPE_COUNT + 1];
     const int32_t size = UTIL_LEN(counts);
-    Zero(counts, size);
+    Util_ZeroIntArray(counts, size);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -983,7 +964,7 @@ static Type GetType(const Units units, const Color color)
             counts[index]++;
         }
     }
-    return (Type) (MaxIndex(counts, size) - 1);
+    return (Type) (Util_MaxIntIndex(counts, size) - 1);
 }
 
 static Units UpdateAllMotives(Units units)
@@ -1040,22 +1021,9 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
 static Units UseIcon(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const bool is_floating, const bool is_being_built)
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-    const Button button = Button_Upgrade(Button_FromOverview(overview), overview.incoming.bits);
-    return SpawnWithButton(units, overview, grid, graphics, map, button, cart, is_floating, is_being_built);
-}
-
-static Units SpawnUsingIcons(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
-{
-    return (overview.event.key_left_alt && overview.event.mouse_lu)
-        ? UseIcon(units, overview, grid, graphics, map, false, true)
-        : units;
-}
-
-static Units FloatUsingIcons(Units floats, const Overview overview, const Grid grid, const Registrar graphics, const Map map)
-{
-    return overview.event.key_left_alt
-        ? UseIcon(floats, overview, grid, graphics, map, true, false)
-        : floats;
+    const Button button = Button_FromOverview(overview);
+    const Button upgrade = Button_Upgrade(button, overview.incoming.bits);
+    return SpawnWithButton(units, overview, grid, graphics, map, upgrade, cart, is_floating, is_being_built);
 }
 
 static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar graphics, const Graphics upgrade)
@@ -1247,7 +1215,8 @@ Units Units_Float(Units floats, const Units units, const Registrar graphics, con
     floats.share[floats.color].status.age = units.share[units.color].status.age;
     floats.share[floats.color].motive = motive;
     ResetStacks(floats);
-    floats = FloatUsingIcons(floats, overview, grid, graphics, map);
+    if(overview.event.key_left_alt)
+        floats = UseIcon(floats, overview, grid, graphics, map, true, false);
     StackStacks(floats);
     return floats;
 }
@@ -1258,7 +1227,8 @@ static Units Service(Units units, const Registrar graphics, const Overview overv
     {
         const Window window = Window_Make(overview, grid);
         units = Select(units, overview, grid, graphics, window.units);
-        units = SpawnUsingIcons(units, overview, grid, graphics, map);
+        if(overview.event.key_left_alt && overview.event.mouse_lu)
+            units = UseIcon(units, overview, grid, graphics, map, false, true);
         units = Command(units, overview, grid, graphics, map, field, window.units);
         Window_Free(window);
     }

@@ -93,3 +93,22 @@ void Util_PrintTrace(int32_t sig)
     free(strings);
 #endif
 }
+
+void Util_ZeroIntArray(int32_t array[], const int32_t size)
+{
+    for(int32_t i = 0; i < size; i++)
+        array[i] = 0;
+}
+
+int32_t Util_MaxIntIndex(int32_t array[], const int32_t size)
+{
+    int32_t max = 0;
+    int32_t index = 0;
+    for(int32_t i = 0; i < size; i++)
+        if(array[i] > max)
+        {
+            max = array[i];
+            index = i;
+        }
+    return index;
+}

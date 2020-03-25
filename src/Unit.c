@@ -71,11 +71,7 @@ static void GotoGoal(Unit* const unit, const Point delta)
         Unit_SetDir(unit, dir);
     }
     else
-    {
-        const bool align = Point_Mag(unit->group_alignment) > CONFIG_UNIT_ALIGNMENT_DEADZONE;
-        const Point dir = align ? unit->group_alignment : unit->velocity;
-        Unit_SetDir(unit, dir);
-    }
+        Unit_SetDir(unit, unit->velocity);
 }
 
 static void MoveAlongPath(Unit* const unit, const Grid grid)
