@@ -131,13 +131,13 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
         Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
         units = UnSelectAll(units, overview.color);
         if(Overview_IsSelectionBoxBigEnough(overview))
-            Tiles_SelectWithBox(tiles, overview.selection_box);
+            Tiles_SelectWithBox(tiles, overview.selection_box, overview.color);
         else
         {
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
             if(tile.reference)
             {
-                Tile_Select(tile);
+                Tile_Select(tile, overview.color);
                 if(overview.event.key_left_shift)
                     Tiles_SelectSimilar(tiles, tile);
             }

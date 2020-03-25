@@ -164,14 +164,14 @@ int32_t Tiles_SelectSimilar(const Tiles tiles, const Tile similar)
         if(t_a == t_b
         && c_a == c_b)
         {
-            Tile_Select(tile);
+            Tile_Select(tile, c_b);
             count++;
         }
     }
     return count;
 }
 
-int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
+int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect, const Color color)
 {
     int32_t count = 0;
     const Rect box = Rect_CorrectOrientation(rect);
@@ -182,7 +182,7 @@ int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect)
             continue;
         if(Tile_IsHotspotInRect(tile, box))
         {
-            Tile_Select(tile);
+            Tile_Select(tile, color);
             count++;
         }
     }

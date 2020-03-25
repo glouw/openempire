@@ -44,6 +44,6 @@ Rect Tile_GetFrameOutline(const Tile);
 
 bool Tile_IsHotspotInRect(const Tile, const Rect);
 
-void Tile_Select(const Tile);
+void Tile_Select(const Tile, const Color);
 
 Tile Tile_Clip(Tile tile, const Rect);

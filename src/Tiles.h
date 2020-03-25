@@ -21,7 +21,7 @@ Tile Tiles_Get(const Tiles, const Point);
 
 int32_t Tiles_SelectSimilar(const Tiles, const Tile);
 
-int32_t Tiles_SelectWithBox(const Tiles, const Rect);
+int32_t Tiles_SelectWithBox(const Tiles, const Rect, const Color);
 
 void Tiles_SortByHeight(const Tiles);
 
