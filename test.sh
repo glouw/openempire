@@ -6,7 +6,7 @@
 
 GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data/";
 LATENCY=25ms
-VARIANCE=2ms
+VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
 XRES=1000
 YRES=700
