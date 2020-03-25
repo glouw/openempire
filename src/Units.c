@@ -86,20 +86,40 @@ void Units_Free(const Units units)
     free(units.unit);
 }
 
-static Units UnSelectAll(Units units)
+static Units UnSelectAll(Units units, const Color color)
 {
-    units.select_count = 0;
+    Share share = units.share[color];
+    share.select_count = 0;
+    share.select_count_inanimate = 0;
     for(int32_t i = 0; i < units.count; i++)
-        units.unit[i].is_selected = false;
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->color == color)
+            unit->is_selected = false;
+    }
+    units.share[color] = share;
     return units;
 }
 
-static Units RecountSelected(Units units)
+static Units RecountSelected(Units units, const Color color)
 {
-    units.select_count = 0;
+    Share share = units.share[color];
+    share.select_count = 0;
+    share.select_count_inanimate = 0;
     for(int32_t i = 0; i < units.count; i++)
-        if(units.unit[i].is_selected)
-            units.select_count++;
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->is_selected)
+        {
+            if(unit->color == color)
+            {
+                share.select_count += 1;
+                if(unit->trait.is_inanimate)
+                    share.select_count_inanimate += 1;
+            }
+        }
+    }
+    units.share[color] = share;
     return units;
 }
 
@@ -109,21 +129,21 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
         Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
-        units = UnSelectAll(units);
+        units = UnSelectAll(units, overview.color);
         if(Overview_IsSelectionBoxBigEnough(overview))
-            units.select_count = Tiles_SelectWithBox(tiles, overview.selection_box);
+            Tiles_SelectWithBox(tiles, overview.selection_box);
         else
         {
             const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
             if(tile.reference)
             {
                 Tile_Select(tile);
-                units.select_count = overview.event.key_left_shift
-                    ? Tiles_SelectSimilar(tiles, tile)
-                    : 1;
+                if(overview.event.key_left_shift)
+                    Tiles_SelectSimilar(tiles, tile);
             }
         }
         Tiles_Free(tiles);
+        return RecountSelected(units, overview.color);
     }
     return units;
 }
@@ -135,8 +155,7 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
         Unit* const unit = &units.unit[i];
         if(unit->color == overview.color && unit->is_selected && unit->trait.max_speed > 0)
         {
-            unit->command_group = units.command_group_next;
-            unit->command_group_count = units.select_count;
+            unit->command_group = overview.incoming.command_group_next;
             Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
         }
     }
@@ -226,42 +245,83 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
     return units;
 }
 
-static void SetSelectedInterest(const Units units, Unit* const interest)
+static void SetSelectedInterest(const Units units, const Color color, Unit* const interest)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
+        if(unit->is_selected
+        && unit->color == color)
             Unit_SetInterest(unit, interest);
     }
 }
 
-static void SetSelectedAttackMove(const Units units, const bool using_attack_move)
+static void SetSelectedAttackMove(const Units units, const Color color, const bool using_attack_move)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
+        if(unit->is_selected
+        && unit->color == color)
             unit->using_attack_move = using_attack_move;
     }
 }
 
-static void DisengageSelected(const Units units)
+static void DisengageSelected(const Units units, const Color color)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
+        if(unit->is_selected
+        && unit->color == color)
             unit->is_engaged_in_melee = false;
     }
 }
 
-static void PathSelectedTo(const Units units, Unit* const unit, const Grid grid, const Overview overview, const Field field)
+static void PathSelectedToUnit(const Units units, Unit* const unit, const Grid grid, const Overview overview, const Field field)
 {
     unit->grid_flash_timer = 0;
-    DisengageSelected(units);
-    SetSelectedInterest(units, unit);
+    DisengageSelected(units, overview.color);
+    SetSelectedInterest(units, overview.color, unit);
     FindPathForSelected(units, overview, unit->cart, unit->cart_grid_offset, grid, field);
+}
+
+static void MoveToNewConstruction(const Units units, const Overview overview, const Grid grid, const Field field)
+{
+    const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+    const Stack stack = Units_GetStackCart(units, cart_goal);
+    for(int32_t i = 0; i < stack.count; i++)
+    {
+        Unit* const reference = stack.reference[i];
+        if(!Unit_IsExempt(reference))
+        {
+            PathSelectedToUnit(units, reference, grid, overview, field);
+            break;
+        }
+    }
+}
+
+static Units MoveTo(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
+{
+    const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
+    Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
+    const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
+    if(tile.reference && !Unit_IsExempt(tile.reference))
+        PathSelectedToUnit(units, tile.reference, grid, overview, field);
+    else
+    {
+        DisengageSelected(units, overview.color);
+        SetSelectedInterest(units, overview.color, NULL);
+        const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+        const Point cart_grid = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
+        const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart_grid);
+        const Parts parts = Parts_GetRedArrows();
+        FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, grid, field);
+        units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE, false);
+    }
+    Tiles_Free(tiles);
+    units.share[overview.color].command_group_next += 1;
+    return units;
 }
 
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
@@ -269,44 +329,15 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
     const Button button = Button_FromOverview(overview);
     const bool using_attack_move = Button_UseAttackMove(button);
     const bool using_building_icon = button.icon_type == ICONTYPE_BUILD;
-    if(units.select_count > 0)
+    if(overview.incoming.select_count > 0)
     {
         if(overview.event.mouse_lu && using_building_icon)
-        {
-            const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-            const Stack stack = Units_GetStackCart(units, cart_goal);
-            for(int32_t i = 0; i < stack.count; i++)
-            {
-                Unit* const reference = stack.reference[i];
-                if(!Unit_IsExempt(reference))
-                {
-                    PathSelectedTo(units, reference, grid, overview, field);
-                    break;
-                }
-            }
-        }
+            MoveToNewConstruction(units, overview, grid, field);
         else
         if(overview.event.mouse_ru || using_attack_move)
         {
-            const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
-            Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
-            const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
-            if(tile.reference && !Unit_IsExempt(tile.reference))
-                PathSelectedTo(units, tile.reference, grid, overview, field);
-            else
-            {
-                DisengageSelected(units);
-                SetSelectedInterest(units, NULL);
-                const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-                const Point cart_grid = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
-                const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart_grid);
-                const Parts parts = Parts_GetRedArrows();
-                FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, grid, field);
-                units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE, false);
-            }
-            SetSelectedAttackMove(units, using_attack_move);
-            Tiles_Free(tiles);
-            units.command_group_next++;
+            units = MoveTo(units, overview, grid, graphics, map, field, render_points);
+            SetSelectedAttackMove(units, overview.color, using_attack_move);
         }
     }
     return units;
@@ -1014,6 +1045,7 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
     const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
     if(parts.part != NULL)
     {
+        // BITS ARE GOTTEN FROM UNITS BECAUSE TRIGGER SPEED WILL OUTMATCH OVERVIEW SPEED.
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
             units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
@@ -1258,7 +1290,7 @@ uint64_t Units_Xor(const Units units)
     }
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const Status status =  units.share[i].status;
+        const Status status = units.share[i].status;
         parity ^=
             ((uint64_t) (status.age       ) << 60) |
             ((uint64_t) (status.population) << 48) |
@@ -1386,9 +1418,8 @@ static void RestorePaths(const Units units, const Grid grid, const Field field)
 
 static Units UnpackRestore(Units units, const Restore restore)
 {
-    // GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME,
+    // XXX. GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME,
     // BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
-    units.command_group_next++;
     units.count = restore.count;
     units.repath_index = 0;
     Unit_SetIdNext(restore.id_next);
@@ -1411,7 +1442,9 @@ Units Units_ApplyRestore(Units units, const Restore restore, const Grid grid, co
     ManageStacks(units);
     EngageAllBoids(units, grid);
     RestorePaths(units, grid, field);
-    return RecountSelected(units);
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        units = RecountSelected(units, (Color) i);
+    return units;
 }
 
 Restore Units_PackRestore(const Units units, const int32_t cycles)

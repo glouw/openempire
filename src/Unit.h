@@ -42,7 +42,6 @@ typedef struct Unit
     int32_t path_index;
     int32_t path_index_timer;
     int32_t command_group;
-    int32_t command_group_count;
     int32_t health;
     int32_t state_timer;
     int32_t dir_timer;

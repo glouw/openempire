@@ -197,7 +197,14 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.color = color;
     unit.state = STATE_IDLE;
     // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%
-    unit.health = is_being_built ? 1 : unit.trait.max_health;
+    unit.health =
+        is_being_built ?
+#if 1
+        unit.trait.max_health - 1
+#else
+        1
+#endif
+        : unit.trait.max_health;
     unit.trigger = trigger;
     // BUILDINGS CAN BE PLACED BY THEIR MIDDLE SQUARE, AND NOT TOP LEFT SQUARE, WITH AT_CENTER ENABLED
     Point temp = cart;
