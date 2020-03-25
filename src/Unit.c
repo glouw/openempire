@@ -173,7 +173,7 @@ static int32_t GetExpireFrames(Unit* const unit, const Registrar graphics)
     return graphics.animation[unit->color][unit->file].count;
 }
 
-Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger trigger, const bool is_being_built)
+Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Graphics file, const Color color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger trigger, const bool is_being_built)
 {
     static Unit zero;
     Unit unit = zero;
@@ -184,27 +184,30 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
         id_next++;
     unit.is_being_built = is_being_built;
     unit.is_floating = is_floating;
-    if(unit.is_being_built && !unit.trait.is_inanimate)
-        unit.is_floating = true;
-    unit.parent_id = -1;
-    unit.interest_id = -1;
-    unit.color = color;
-    unit.state = STATE_IDLE;
-    unit.health = unit.is_being_built
-        ? 1 // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%.
-        : unit.trait.max_health;
-    unit.trigger = trigger;
     if(!is_floating)
     {
         unit.entropy = Point_Rand();
         unit.entropy_static = Util_Rand();
     }
+    // FLOATING IS OVERWRITTEN FOR ANIMATES THAT ARE BEING BUILT
+    if(is_being_built && !unit.trait.is_inanimate)
+        unit.is_floating = true;
+    unit.parent_id = -1;
+    unit.interest_id = -1;
+    unit.color = color;
+    unit.state = STATE_IDLE;
+    // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%
+    unit.health = is_being_built ? 1 : unit.trait.max_health;
+    unit.trigger = trigger;
+    // BUILDINGS CAN BE PLACED BY THEIR MIDDLE SQUARE, AND NOT TOP LEFT SQUARE, WITH AT_CENTER ENABLED
+    Point temp = cart;
     if(at_center)
     {
         const Point center = Point_Div(unit.trait.dimensions, 2);
-        cart = Point_Sub(cart, center);
+        temp = Point_Sub(temp, center);
     }
-    unit.cell = Grid_CartToCell(grid, cart);
+    unit.cell = Grid_CartToCell(grid, temp);
+    // EVEN SIZED DIMENSIONS DO NOT PLAY NICELY AND NEED TO BE SHIFTED HALF A BLOCK BEFORE BEING PLACED
     if(Point_IsEven(unit.trait.dimensions))
     {
         const Point shift = {
@@ -214,15 +217,18 @@ Unit Unit_Make(Point cart, const Point offset, const Grid grid, const Graphics f
         unit.cell = Point_Sub(unit.cell, shift);
     }
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
+    // CART AND OFFSET VALUES ARE RECALCULATED FROM CELL, AS CELL IS THE SMALLEST GRANULAR MEASUREMENT SIZE
     UpdateCart(&unit, grid);
-    if(unit.trait.can_expire)
-        unit.expire_frames = GetExpireFrames(&unit, graphics);
+    // THESE FRAME COUNTS ARE HIGHLY USED DURING COMBAT AND ARE CACHED WITHIN THE UNIT FOR QUICK ACCESS
     if(unit.trait.is_multi_state)
     {
         unit.attack_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_ATTACK);
         unit.fall_frames_per_dir   = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir  = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
+    // FIRE AND RUBBLE WILL EVENTUALLY CLEAN UP OVER TIME, WHILE OTHERS MARKED CAN_EXPIRE WILL BE CLEANED UP AFTER ONE ANIMATION CYCLE
+    if(unit.trait.can_expire)
+        unit.expire_frames = GetExpireFrames(&unit, graphics);
     if(unit.trait.type == TYPE_FIRE
     || unit.trait.type == TYPE_RUBBLE)
         unit.is_timing_to_collect = true;

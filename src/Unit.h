@@ -71,7 +71,7 @@ typedef struct Unit
 }
 Unit;
 
-Unit Unit_Make(Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger, const bool is_being_built);
+Unit Unit_Make(const Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger, const bool is_being_built);
 
 void Unit_UpdatePathIndex(Unit* const, const int32_t index, const bool reset_path_index_timer);
 
