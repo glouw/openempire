@@ -148,3 +148,5 @@ bool Unit_IsConstruction(Unit* const);
 bool Unit_AreEnemies(Unit* const unit, Unit* const other);
 
 void Unit_LayFarm(Unit* const, const Map);
+
+bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other);

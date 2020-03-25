@@ -328,6 +328,10 @@ static Point SeparateBoids(const Units units, Unit* const unit)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
+                // FLOATING ANIMATES CAN CLIP FLOATING ANIMATES ONLY.
+                // LIKEWISE, NON FLOATING ANIMATES CAN CLIP NON FLOATING ANIMATES ONLY.
+                if(Unit_CanAnimateClipAnimate(unit, other))
+                    continue;
                 if(!other->trait.is_inanimate)
                 {
                     const Point force = Unit_Separate(unit, other);

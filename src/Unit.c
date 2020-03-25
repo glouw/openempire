@@ -708,3 +708,13 @@ void Unit_LayFarm(Unit* const unit, const Map map)
         }
 }
 
+static bool IsFloatingDifferent(Unit* const unit, Unit* const other)
+{
+    return unit->is_floating && !other->is_floating;
+}
+
+bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other)
+{
+    return IsFloatingDifferent(other, unit)
+        || IsFloatingDifferent(unit, other);
+}
