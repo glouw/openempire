@@ -82,7 +82,7 @@ Overview Overview_Update(Overview overview, const Input input, const uint64_t pa
     overview.parity = parity;
     overview.cycles = cycles;
     overview.queue_size = queue_size;
-    overview.incoming = share;
+    overview.share = share;
     overview.ping = ping == -1 ? overview.ping : ping;
     return overview;
 }

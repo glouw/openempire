@@ -22,7 +22,7 @@ typedef struct
     Event event;
     Color color;
     Color spectator;
-    Share incoming;
+    Share share;
     int32_t xres;
     int32_t yres;
     int32_t cycles;

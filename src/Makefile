@@ -129,7 +129,7 @@ UNAME := $(shell uname)
 
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
-	$(DUMP) -M intel --disassemble-all $(BIN) > $(BIN).s
+	$(DUMP) -M intel --disassemble $(BIN) > $(BIN).s
 	$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile

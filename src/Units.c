@@ -155,7 +155,7 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
         Unit* const unit = &units.unit[i];
         if(unit->color == overview.color && unit->is_selected && unit->trait.max_speed > 0)
         {
-            unit->command_group = overview.incoming.command_group_next;
+            unit->command_group = overview.share.command_group_next;
             Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
         }
     }
@@ -329,7 +329,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
     const Button button = Button_FromOverview(overview);
     const bool using_attack_move = Button_UseAttackMove(button);
     const bool using_building_icon = button.icon_type == ICONTYPE_BUILD;
-    if(overview.incoming.select_count > 0)
+    if(overview.share.select_count > 0)
     {
         if(overview.event.mouse_lu && using_building_icon)
             MoveToNewConstruction(units, overview, grid, field);
@@ -1042,14 +1042,14 @@ static Units CountAllPopulations(Units units)
 static Units SpawnWithButton(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Button button, const Point cart, const bool is_floating, const bool is_being_built)
 {
     const Point zero = { 0,0 };
-    const Parts parts = Parts_FromButton(button, overview.incoming.status.age);
+    const Parts parts = Parts_FromButton(button, overview.share.status.age);
     if(parts.part)
     {
         // BITS ARE GOTTEN FROM UNITS BECAUSE TRIGGER SPEED WILL OUTMATCH OVERVIEW SPEED.
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
         {
-            int32_t count = overview.incoming.select_count_inanimate;
+            int32_t count = overview.share.select_count_inanimate;
             if(count == 0
             || parts.part->file == FILE_GRAPHICS_FLAG_TALL) // SKIP MULTIPLE BUILDS.
                 count = 1;
@@ -1065,7 +1065,7 @@ static Units UseIcon(Units units, const Overview overview, const Grid grid, cons
 {
     const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
     const Button button = Button_FromOverview(overview);
-    const Button upgrade = Button_Upgrade(button, overview.incoming.bits);
+    const Button upgrade = Button_Upgrade(button, overview.share.bits);
     return SpawnWithButton(units, overview, grid, graphics, map, upgrade, cart, is_floating, is_being_built);
 }
 
