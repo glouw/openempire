@@ -101,29 +101,38 @@ static void Play(const Video video, const Data data, const Args args)
             }
             units = Units_Caretake(units, data.graphics, grid, map, field);
             cycles++;
+            if(args.must_measure && cycles == 60)
+                break;
             // THIS SPEED CONTROL WILL SLOW DOWN OR SPEED UP THE CLIENT BY DELAYING OR SKIPPING THE RENDER, RESPECTIVELY.
             if(packet.control != 0)
                 control = packet.control;
-            if(control > 0) { control--; continue; }
-            if(control < 0) { control++; SDL_Delay(5); }
-            if(Overview_IsSpectator(overview))
+            if(control < 0)
             {
-                if(Packet_IsReady(packet))
-                    Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
+                control++;
+                SDL_Delay(5);
             }
             else
+            if(control > 0)
+                control--;
+            else
             {
-                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share[units.color].motive);
-                Video_Draw(video, data, map, units, floats, overview, grid);
-                const int32_t t1 = SDL_GetTicks();
-                Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+                if(Overview_IsSpectator(overview))
+                {
+                    if(Packet_IsReady(packet))
+                        Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
+                }
+                else
+                {
+                    floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share[units.color].motive);
+                    Video_Draw(video, data, map, units, floats, overview, grid);
+                    const int32_t t1 = SDL_GetTicks();
+                    Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+                }
+                const int32_t t2 = SDL_GetTicks();
+                const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
+                if(ms > 0)
+                    SDL_Delay(ms);
             }
-            const int32_t t2 = SDL_GetTicks();
-            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
-            if(ms > 0)
-                SDL_Delay(ms);
-            if(args.must_measure && cycles == 60)
-                break;
         }
         Field_Free(field);
     }

@@ -90,7 +90,6 @@ static Units UnSelectAll(Units units, const Color color)
 {
     Share share = units.share[color];
     share.select_count = 0;
-    share.select_count_inanimate = 0;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -105,19 +104,11 @@ static Units RecountSelected(Units units, const Color color)
 {
     Share share = units.share[color];
     share.select_count = 0;
-    share.select_count_inanimate = 0;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected)
-        {
-            if(unit->color == color)
-            {
-                share.select_count += 1;
-                if(unit->trait.is_inanimate)
-                    share.select_count_inanimate += 1;
-            }
-        }
+        if(unit->is_selected && unit->color == color)
+            share.select_count += 1;
     }
     units.share[color] = share;
     return units;
@@ -1048,14 +1039,7 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
         // BITS ARE GOTTEN FROM UNITS BECAUSE TRIGGER SPEED WILL OUTMATCH OVERVIEW SPEED.
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
-        {
-            int32_t count = overview.share.select_count_inanimate;
-            if(count == 0
-            || parts.part->file == FILE_GRAPHICS_FLAG_TALL) // SKIP MULTIPLE BUILDS.
-                count = 1;
-            for(int32_t i = 0; i < count; i++)
-                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
-        }
+            units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
         Parts_Free(parts);
     }
     return units;

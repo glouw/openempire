@@ -75,36 +75,28 @@ CLANG = 0
 
 CPP = 0
 
-DEBUGGING = 0
-
 SANITIZE_ADDRESS = 0
 
 SANITIZE_THREAD = 0
 
 SANITIZE_UNDEFINED = 0
 
-FLAGS = -O3 -march=native -flto
-
-DEBUG = -Og -g
+FLAGS = -O3 -g -march=native -flto
 
 CSTD=-std=c11
 
 CPPSTD=-std=c++11
 
-ifeq (1, $(DEBUGGING))
-FLAGS = $(DEBUG)
-endif
-
 ifeq (1, $(SANITIZE_ADDRESS))
-FLAGS = $(DEBUG) -fsanitize=address
+FLAGS += -fsanitize=address
 endif
 
 ifeq (1, $(SANITIZE_THREAD))
-FLAGS = $(DEBUG) -fsanitize=thread
+FLAGS += -fsanitize=thread
 endif
 
 ifeq (1, $(SANITIZE_UNDEFINED))
-FLAGS = $(DEBUG) -fsanitize=undefined
+FLAGS += -fsanitize=undefined
 endif
 
 FLAGS += -Wall -Wextra -Wshadow -Wpedantic
@@ -133,7 +125,7 @@ $(BIN): $(OBJS) $(DEPS)
 	$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile
-	$(COMPILER) $(FLAGS) -DDEBUGGING=$(DEBUGGING) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
+	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<
 
 -include *.d
 

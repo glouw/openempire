@@ -12,7 +12,6 @@ typedef struct
     Bits bits;
     Bits busy;
     int32_t select_count;
-    int32_t select_count_inanimate; // XXX. NOT NEEDED.
     int32_t command_group_next;
 }
 Share;
