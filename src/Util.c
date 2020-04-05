@@ -80,20 +80,6 @@ bool Util_FlipCoin(void)
     return Util_Rand() % 2;
 }
 
-void Util_PrintTrace(int32_t sig)
-{
-    (void) sig;
-#ifdef __unix__
-    void* array[10];
-    const int32_t size = backtrace (array, 10);
-    char** strings = backtrace_symbols(array, size);
-    printf("Obtained %d stack frames.\n", size);
-    for(int32_t i = 0; i < size; i++)
-        printf("%s\n", strings[i]);
-    free(strings);
-#endif
-}
-
 void Util_ZeroIntArray(int32_t array[], const int32_t size)
 {
     for(int32_t i = 0; i < size; i++)

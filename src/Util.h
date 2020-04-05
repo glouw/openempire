@@ -56,8 +56,6 @@ uint16_t Util_Rand(void);
 
 bool Util_FlipCoin(void);
 
-void Util_PrintTrace(int32_t sig);
-
 void Util_ZeroIntArray(int32_t array[], const int32_t size);
 
 int32_t Util_MaxIntIndex(int32_t array[], const int32_t size);
