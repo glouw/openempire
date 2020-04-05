@@ -425,6 +425,7 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
 void Unit_Flag(Unit* const unit)
 {
     unit->health = 0;
+    unit->is_being_built = false;
     unit->is_selected = false;
     if(unit->trait.is_inanimate)
         unit->must_garbage_collect = true;

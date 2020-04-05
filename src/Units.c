@@ -228,6 +228,8 @@ static Units BulkAppend(Units units, const Map map, Unit* const temp, const Colo
             Unit* const parent = FoundCreator(units, &unit, color);
             if(parent == NULL)
                 return units;
+            else
+                Unit_SetParent(&unit, parent);
         }
         units = Append(units, unit);
         Unit* const last = &units.unit[units.count - 1];
@@ -1243,6 +1245,7 @@ static void BuildAnimate(const Units units)
             {
                 unit->is_being_built = false;
                 unit->is_floating = false;
+                Unit_SetParent(unit, NULL);
             }
         }
     }
