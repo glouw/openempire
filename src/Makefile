@@ -81,25 +81,23 @@ SANITIZE_THREAD = 0
 
 SANITIZE_UNDEFINED = 0
 
-FLAGS = -O3 -g -march=native -flto
+FLAGS = -O3 -march=native -flto -Wall -Wextra -Wshadow -Wpedantic
 
 CSTD=-std=c11
 
 CPPSTD=-std=c++11
 
 ifeq (1, $(SANITIZE_ADDRESS))
-FLAGS += -fsanitize=address
+FLAGS += -g -fsanitize=address
 endif
 
 ifeq (1, $(SANITIZE_THREAD))
-FLAGS += -fsanitize=thread
+FLAGS += -g -fsanitize=thread
 endif
 
 ifeq (1, $(SANITIZE_UNDEFINED))
-FLAGS += -fsanitize=undefined
+FLAGS += -g -fsanitize=undefined
 endif
-
-FLAGS += -Wall -Wextra -Wshadow -Wpedantic
 
 ifeq (00, $(CLANG)$(CPP))
 COMPILER = gcc $(CSTD)
