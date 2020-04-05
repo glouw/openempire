@@ -469,7 +469,8 @@ static inline void DrawHealthBar(const Vram vram, const Point top, Unit* const u
     const int32_t h = 2;
     const int32_t hh =  h / 2;
     const int32_t hw =  w / 2;
-    const int32_t percent = (w * unit->health) / unit->trait.max_health;
+    const int32_t max_health = unit->trait.max_health;
+    const int32_t percent = (w * unit->health) / (max_health == 0 ? 1 : max_health);
     const int32_t y0 = top.y - hh;
     const int32_t y1 = top.y + hh;
     const int32_t x0 = top.x - hw;

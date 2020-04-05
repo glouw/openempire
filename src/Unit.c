@@ -201,7 +201,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.health = is_being_built ? 1 : unit.trait.max_health;
 #else
     if(unit.trait.max_health > 0)
-        unit.health = unit.trait.max_health - 1;
+        unit.health = (2 * unit.trait.max_health) / 3;
 #endif
     unit.trigger = trigger;
     // BUILDINGS CAN BE PLACED BY THEIR MIDDLE SQUARE, AND NOT TOP LEFT SQUARE, WITH AT_CENTER ENABLED
@@ -685,7 +685,7 @@ void Unit_SetParent(Unit* const child, Unit* const parent)
     if(parent)
         child->parent_id = parent->id;
     else
-        child->interest_id = -1;
+        child->parent_id = -1;
 }
 
 bool Unit_IsConstruction(Unit* const unit)

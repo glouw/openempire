@@ -9,7 +9,7 @@
 
 typedef enum
 {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) name = file,
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) name = file,
     FILE_X_GRAPHICS
 #undef FILE_X
 }
@@ -50,3 +50,5 @@ Graphics Graphics_GetUpgrade(const Graphics);
 bool Graphics_EqualDimension(const Graphics, Point);
 
 bool Graphics_GetResource(const Graphics);
+
+Type Graphics_GetCreator(const Graphics);

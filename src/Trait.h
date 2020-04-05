@@ -19,6 +19,7 @@ typedef struct
     int32_t width;
     Action action;
     Graphics upgrade;
+    Type creator;
     bool is_single_frame;
     bool is_walkable;
     bool is_multi_state;

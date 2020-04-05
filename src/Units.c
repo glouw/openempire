@@ -192,7 +192,29 @@ static void ProperStackAppend(const Units units, Unit* const unit)
     else SafeStackAppend(units, unit, unit->cart);
 }
 
-static Units BulkAppend(Units units, const Map map, Unit* const temp, const int32_t len, const bool ignore_collisions)
+static Unit* FoundCreator(const Units units, Unit* const unit, const Color color)
+{
+    for(int32_t j = 0; j < units.count; j++)
+    {
+        Unit* const parent = &units.unit[j];
+        if(Unit_IsType(parent, color, unit->trait.creator))
+        {
+            const int32_t width = 2;
+            const Rect rect = {{
+                parent->cart.x - width,
+                parent->cart.y - width,
+            },{
+                parent->cart.x + width + parent->trait.dimensions.x,
+                parent->cart.y + width + parent->trait.dimensions.y,
+            }};
+            if(Rect_ContainsPoint(rect, unit->cart))
+                return parent;
+        }
+    }
+    return NULL;
+}
+
+static Units BulkAppend(Units units, const Map map, Unit* const temp, const Color color, const int32_t len, const bool ignore_collisions, const bool is_being_built)
 {
     if(!ignore_collisions)
         for(int32_t i = 0; i < len; i++)
@@ -200,7 +222,14 @@ static Units BulkAppend(Units units, const Map map, Unit* const temp, const int3
                 return units;
     for(int32_t i = 0; i < len; i++)
     {
-        units = Append(units, temp[i]);
+        Unit unit = temp[i];
+        if(unit.trait.creator != TYPE_NONE && is_being_built)
+        {
+            Unit* const parent = FoundCreator(units, &unit, color);
+            if(parent == NULL)
+                return units;
+        }
+        units = Append(units, unit);
         Unit* const last = &units.unit[units.count - 1];
         ProperStackAppend(units, last);
     }
@@ -231,7 +260,7 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
         temp[i] = Unit_Make(cart_part, offset, grid, part.file, color, graphics, true, is_floating, trigger, is_being_built);
     }
     SetChildren(temp, parts.count);
-    units = BulkAppend(units, map, temp, parts.count, ignore_collisions);
+    units = BulkAppend(units, map, temp, color, parts.count, ignore_collisions, is_being_built);
     free(temp);
     return units;
 }

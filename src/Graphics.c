@@ -9,7 +9,7 @@ const char* Graphics_GetString(const Graphics graphics)
 #if CONFIG_DISABLE_STRINGS == 1
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return #name;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return #name;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -23,7 +23,7 @@ uint8_t Graphics_GetHeight(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return prio;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return prio;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -34,7 +34,7 @@ bool Graphics_GetWalkable(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return walkable;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return walkable;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -45,7 +45,7 @@ Type Graphics_GetType(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return type;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return type;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -56,7 +56,7 @@ int32_t Graphics_GetMaxSpeed(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return max_speed;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return max_speed;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -67,7 +67,7 @@ int32_t Graphics_GetHealth(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return health;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return health;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -78,7 +78,7 @@ int32_t Graphics_GetAttack(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return attack;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return attack;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -89,7 +89,7 @@ int32_t Graphics_GetWidth(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return width;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return width;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -100,7 +100,7 @@ bool Graphics_GetSingleFrame(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return single_frame;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return single_frame;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -111,7 +111,7 @@ bool Graphics_GetMultiState(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return multi_state;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return multi_state;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -122,7 +122,7 @@ bool Graphics_GetExpire(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return expire;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return expire;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -133,7 +133,7 @@ Point Graphics_GetDimensions(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: { const Point dim = dimensions; return dim; }
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: { const Point dim = dimensions; return dim; }
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -145,7 +145,7 @@ bool Graphics_GetInanimate(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return inanimate;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return inanimate;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -156,7 +156,7 @@ Action Graphics_GetAction(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return action;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return action;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -167,7 +167,7 @@ bool Graphics_GetDetail(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return detail;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return detail;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -178,7 +178,7 @@ Graphics Graphics_GetUpgrade(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return upgrade;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return upgrade;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -189,7 +189,7 @@ bool Graphics_GetResource(const Graphics graphics)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, upgrade, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return resource;
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return resource;
         FILE_X_GRAPHICS
 #undef FILE_X
     }
@@ -214,4 +214,15 @@ bool Graphics_EqualDimension(const Graphics file, Point dimensions)
         case FILE_GRAPHICS_RUBBLE_3X3: case FILE_GRAPHICS_CONSTRUCTION_3X3: return Point_Equal(_3x3_, dimensions);
         case FILE_GRAPHICS_RUBBLE_4X4: case FILE_GRAPHICS_CONSTRUCTION_4X4: return Point_Equal(_4x4_, dimensions);
     }
+}
+
+Type Graphics_GetCreator(const Graphics graphics)
+{
+    switch(graphics)
+    {
+#define FILE_X(name, file, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: return creator;
+        FILE_X_GRAPHICS
+#undef FILE_X
+    }
+    return TYPE_NONE;
 }
