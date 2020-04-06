@@ -37,6 +37,7 @@ typedef struct Unit
     Trigger trigger;
     int32_t interest_id;
     int32_t parent_id;
+    int32_t child_lock_id;
     int32_t entropy_static;
     int32_t id;
     int32_t path_index;
@@ -67,6 +68,7 @@ typedef struct Unit
     bool is_flash_on;
     bool is_being_built;
     bool has_direct;
+    bool has_parent_lock;
 }
 Unit;
 
@@ -149,3 +151,5 @@ bool Unit_AreEnemies(Unit* const unit, Unit* const other);
 void Unit_LayFarm(Unit* const, const Map);
 
 bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other);
+
+void Unit_AdvanceBuildAnimate(Unit* const, const bool allowed_to_unlock_parent);

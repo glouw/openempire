@@ -64,11 +64,8 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        // THE OVERVIEW IS SENT TO THE SERVER, WHICH IS THEN RETURNED WITH ALL OTHER CLIENT OVERVIEWS IN THE FORM OF A "PACKET".
-        // BEFORE THIS, THE "SHARE" STRUCT FROM UNITS IS COPIED TO THE OVERVIEW WITHIN THIS OVERVIEW UPDATE FUNCTION.
         overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping);
         UTIL_TCP_SEND(sock.server, &overview);
-        // IF A PACKET IS DROPPED, THE PACKET WILL MISS ITS CYCLE EXEC DEADLINE, AND ALL CLIENTS WILL GET A COPY OF UNITS FROM THE SPECTATOR.
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
@@ -90,9 +87,7 @@ static void Play(const Video video, const Data data, const Args args)
         {
             if(Packet_IsReady(packet))
                 packets = Packets_Queue(packets, packet);
-            // GIVEN LAG SPIKES, HIGH EXEC CYCLES MAY PRECEDE LOW EXEC CYCLES. THIS FLUSHES THEM OUT IN SYNC FOR ALL CLIENTS.
             packets = Packets_ClearStale(packets, cycles);
-            // ALL CLIENTS EXECUTE THEIR OVERVIEW AT THE EXACT SAME EXEC CYCLE.
             while(Packets_MustExecute(packets, cycles))
             {
                 Packet dequeued;
@@ -103,15 +98,8 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(args.must_measure && cycles == 60)
                 break;
-            // THIS SPEED CONTROL WILL SLOW DOWN OR SPEED UP THE CLIENT BY DELAYING OR SKIPPING THE RENDER, RESPECTIVELY.
             if(packet.control != 0)
                 control = packet.control;
-            if(control < 0)
-            {
-                control++;
-                SDL_Delay(5);
-            }
-            else
             if(control > 0)
                 control--;
             else
@@ -126,12 +114,19 @@ static void Play(const Video video, const Data data, const Args args)
                     floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share[units.color].motive);
                     Video_Draw(video, data, map, units, floats, overview, grid);
                     const int32_t t1 = SDL_GetTicks();
-                    Video_Render(video, units, overview, map, t1 - t0, cycles, ping);
+                    const int32_t dt = t1 - t0;
+                    Video_Render(video, units, overview, map, dt, cycles, ping);
                 }
                 const int32_t t2 = SDL_GetTicks();
-                const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - (t2 - t0);
+                const int32_t dt = t2 - t0;
+                const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - dt;
                 if(ms > 0)
                     SDL_Delay(ms);
+                if(control < 0)
+                {
+                    control++;
+                    SDL_Delay(1);
+                }
             }
         }
         Field_Free(field);

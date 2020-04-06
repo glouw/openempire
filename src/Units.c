@@ -192,7 +192,7 @@ static void ProperStackAppend(const Units units, Unit* const unit)
     else SafeStackAppend(units, unit, unit->cart);
 }
 
-static Unit* FoundCreator(const Units units, Unit* const unit, const Color color)
+static Unit* FoundCreator(const Units units, Unit* const unit, const Color color) // XXX. CREATOR MUST HAVE LEAST AMOUNT OF CHILDREN.
 {
     for(int32_t j = 0; j < units.count; j++)
     {
@@ -1240,13 +1240,19 @@ static void BuildAnimate(const Units units)
         Unit* const unit = &units.unit[i];
         if(!unit->trait.is_inanimate && unit->is_being_built)
         {
-            unit->health += 1;
-            if(unit->health == unit->trait.max_health)
+            Unit* const parent = unit->parent;
+            if(parent)
             {
-                unit->is_being_built = false;
-                unit->is_floating = false;
-                Unit_SetParent(unit, NULL);
+                if(parent->child_lock_id == -1)
+                {
+                    parent->child_lock_id = unit->id;
+                    unit->has_parent_lock = true;
+                }
+                if(parent->child_lock_id == unit->id)
+                    Unit_AdvanceBuildAnimate(unit, true);
             }
+            else
+                Unit_AdvanceBuildAnimate(unit, false);
         }
     }
 }

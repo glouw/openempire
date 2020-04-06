@@ -192,6 +192,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     // FLOATING IS OVERWRITTEN FOR ANIMATES THAT ARE BEING BUILT
     if(is_being_built && !unit.trait.is_inanimate)
         unit.is_floating = true;
+    unit.child_lock_id = -1;
     unit.parent_id = -1;
     unit.interest_id = -1;
     unit.color = color;
@@ -634,19 +635,25 @@ bool Unit_IsType(Unit* const unit, const Color color, const Type type)
 
 void Unit_Preserve(Unit* const to, const Unit* const from)
 {
-    to->cell = from->cell;
-    to->cart = from->cart;
-    to->cart_grid_offset = from->cart_grid_offset;
-    to->id = from->id;
-    to->parent_id = from->parent_id;
-    to->has_children = from->has_children;
-    to->path = from->path;
-    to->dir = from->dir;
-    to->health = from->health;
-    to->using_attack_move = from->using_attack_move;
-    to->cart_goal = from->cart_goal;
-    to->cart_grid_offset_goal = from->cart_grid_offset_goal;
-    to->is_being_built = from->is_being_built;
+#define COPY(a, b, what) to->what = from->what
+    COPY(to, from, cell);
+    COPY(to, from, cart);
+    COPY(to, from, cart_grid_offset);
+    COPY(to, from, id);
+    COPY(to, from, parent_id);
+    COPY(to, from, interest_id);
+    COPY(to, from, child_lock_id);
+    COPY(to, from, has_parent_lock);
+    COPY(to, from, has_children);
+    COPY(to, from, path);
+    COPY(to, from, dir);
+    COPY(to, from, health);
+    COPY(to, from, using_attack_move);
+    COPY(to, from, cart_goal);
+    COPY(to, from, cart_grid_offset_goal);
+    COPY(to, from, is_being_built);
+    COPY(to, from, is_floating);
+#undef COPY
 }
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
@@ -724,4 +731,18 @@ bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other)
 {
     return IsFloatingDifferent(other, unit)
         || IsFloatingDifferent(unit, other);
+}
+
+void Unit_AdvanceBuildAnimate(Unit* const unit, const bool allowed_to_unlock_parent)
+{
+    unit->health += 1;
+    if(unit->health >= unit->trait.max_health)
+    {
+        if(allowed_to_unlock_parent)
+            unit->parent->child_lock_id = -1;
+        unit->is_being_built = false;
+        unit->is_floating = false;
+        unit->has_parent_lock = false;
+        Unit_SetParent(unit, NULL);
+    }
 }
