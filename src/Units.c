@@ -12,6 +12,7 @@
 #include "Config.h"
 
 #include <stdlib.h>
+#include <limits.h>
 
 static bool CanWalk(const Units units, const Map map, const Point point)
 {
@@ -194,6 +195,8 @@ static void ProperStackAppend(const Units units, Unit* const unit)
 
 static Unit* FoundCreator(const Units units, Unit* const unit, const Color color) // XXX. CREATOR MUST HAVE LEAST AMOUNT OF CHILDREN.
 {
+    int32_t child_count_min = INT_MAX;
+    Unit* out = NULL;
     for(int32_t j = 0; j < units.count; j++)
     {
         Unit* const parent = &units.unit[j];
@@ -208,10 +211,16 @@ static Unit* FoundCreator(const Units units, Unit* const unit, const Color color
                 parent->cart.y + width + parent->trait.dimensions.y,
             }};
             if(Rect_ContainsPoint(rect, unit->cart))
-                return parent;
+            {
+                if(parent->child_count < child_count_min && parent->is_selected)
+                {
+                    out = parent;
+                    child_count_min = parent->child_count;
+                }
+            }
         }
     }
-    return NULL;
+    return out;
 }
 
 static Units BulkAppend(Units units, const Map map, Unit* const temp, const Color color, const int32_t len, const bool ignore_collisions, const bool is_being_built)
