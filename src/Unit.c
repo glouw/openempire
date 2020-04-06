@@ -245,6 +245,8 @@ void Unit_Print(Unit* const unit)
 {
     if(unit)
     {
+        printf("child_count           :: %d\n", unit->child_count);
+        printf("has_children          :: %d\n", unit->has_children);
         printf("string                :: %s\n", Graphics_GetString(unit->file));
         printf("has_direct            :: %d\n", unit->has_direct);
         printf("health                :: %d\n", unit->health);
@@ -691,7 +693,11 @@ void Unit_SetParent(Unit* const child, Unit* const parent)
 {
     child->parent = parent;
     if(parent)
+    {
+        parent->child_count += 1;
+        parent->has_children = true;
         child->parent_id = parent->id;
+    }
     else
         child->parent_id = -1;
 }
@@ -739,7 +745,10 @@ void Unit_AdvanceBuildAnimate(Unit* const unit, const bool allowed_to_unlock_par
     if(unit->health >= unit->trait.max_health)
     {
         if(allowed_to_unlock_parent)
+        {
             unit->parent->child_lock_id = -1;
+            unit->parent->child_count -= 1;
+        }
         unit->is_being_built = false;
         unit->is_floating = false;
         unit->has_parent_lock = false;

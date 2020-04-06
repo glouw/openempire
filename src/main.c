@@ -10,7 +10,6 @@
 #include "Args.h"
 #include "Util.h"
 
-#include <signal.h>
 #include <time.h>
 
 static Overview WaitInLobby(const Video video, const Sock sock)
