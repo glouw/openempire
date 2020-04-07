@@ -218,7 +218,9 @@ static Unit* FoundCreator(const Units units, Unit* const unit, const Color color
             }};
             if(Rect_ContainsPoint(rect, unit->cart))
             {
-                if(parent->child_count < child_count_min && parent->is_selected)
+                if(parent->child_count < child_count_min
+                && parent->is_selected
+                && parent->is_being_built == false)
                 {
                     out = parent;
                     child_count_min = parent->child_count;
