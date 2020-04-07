@@ -1086,7 +1086,11 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
         // BITS ARE GOTTEN FROM UNITS BECAUSE TRIGGER SPEED WILL OUTMATCH OVERVIEW SPEED.
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
-            units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
+        {
+            const int32_t count = overview.event.key_left_shift ? 3 : 1;
+            for(int32_t i = 0; i < count; i++)
+                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
+        }
         Parts_Free(parts);
     }
     return units;
