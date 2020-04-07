@@ -435,20 +435,22 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(!Unit_IsExempt(tile.reference))
         {
-            uint32_t color = 0x0;
-            if(tile.reference->is_selected
-            && tile.reference->trait.is_inanimate == false)
-                color = tile.reference->is_engaged_in_melee
-                    ? 0xFF0000 // RED
-                    : tile.reference->using_attack_move
-                        ? 0xFFFF00 // YELLOW
-                        : tile.reference->has_direct
-                            ? 0x00FF00 // GREEN
-                                : 0xFFFFFF;// WHITE (DEFAULT)
+            if(tile.reference->is_selected)
+            {
+                if(tile.reference->is_engaged_in_melee)
+                    DrawEllipse(vram, rect, 0xFF0000);
+                else
+                if(tile.reference->using_attack_move)
+                    DrawEllipse(vram, rect, 0xFFFF00);
+                else
+                if(tile.reference->has_direct)
+                    DrawEllipse(vram, rect, 0x00FF00);
+                else
+                    DrawEllipse(vram, rect, 0xFFFFFF);
+            }
             else
             if(tile.reference->has_parent_lock)
-                color = 0xFFFFFF; // WHITE
-            DrawEllipse(vram, rect, color);
+                DrawEllipse(vram, rect, 0xFFFFFF);
         }
     }
 }
