@@ -29,6 +29,11 @@ void Unit_SetCommandGroupNext(const int32_t command_group)
     command_group_next = command_group;
 }
 
+void Unit_IncrementCommandGroup(void)
+{
+    command_group_next += 1;
+}
+
 static void ConditionallySkipFirstPoint(Unit* const unit)
 {
     if(unit->path.count > 1 && unit->path_index == 0)
@@ -426,7 +431,6 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         unit->path = unit->has_direct
             ? PathStraight(unit->cart, unit->cart_goal)
             : Field_PathAStar(field, unit->cart, unit->cart_goal);
-        command_group_next += 1;
     }
 }
 
@@ -763,7 +767,11 @@ void Unit_AdvanceBuildAnimate(Unit* const unit, const Grid grid, const Field fie
         if(allowed_to_unlock_parent)
         {
             if(unit->parent->has_rally_point)
+            {
+                Unit_SetInterest(unit, unit->parent->interest);
                 Unit_FindPath(unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
+                Unit_IncrementCommandGroup();
+            }
             unit->parent->child_lock_id = -1;
             unit->parent->child_count -= 1;
         }

@@ -159,3 +159,5 @@ void Unit_AdvanceBuildAnimate(Unit* const, const Grid, const Field, const bool a
 int32_t Unit_GetCommandGroupNext(void);
 
 void Unit_SetCommandGroupNext(const int32_t command_group);
+
+void Unit_IncrementCommandGroup(void);

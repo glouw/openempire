@@ -374,6 +374,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
             units = MoveTo(units, overview, grid, graphics, map, field, render_points);
             SetSelectedAttackMove(units, overview.color, using_attack_move);
         }
+        Unit_IncrementCommandGroup();
     }
     return units;
 }
