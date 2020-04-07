@@ -154,7 +154,10 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
                 unit->has_rally_point = true;
             }
             else
+            {
+                unit->command_group = Unit_GetCommandGroupNext();
                 Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
+            }
         }
     }
 }

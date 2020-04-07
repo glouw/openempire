@@ -262,6 +262,7 @@ void Unit_Print(Unit* const unit)
 {
     if(unit)
     {
+        printf("command_group         :: %d\n", unit->command_group);
         printf("path.count            :: %d\n", unit->path.count);
         printf("has_rally_point       :: %d\n", unit->has_rally_point);
         printf("child_count           :: %d\n", unit->child_count);
@@ -271,6 +272,7 @@ void Unit_Print(Unit* const unit)
         printf("health                :: %d\n", unit->health);
         printf("max_health            :: %d\n", unit->trait.max_health);
         printf("is_being_built        :: %d\n", unit->is_being_built);
+        printf("self                  :: 0x%16p\n", (void*) unit);
         printf("interest              :: 0x%16p\n", (void*) unit->interest);
         printf("cart                  :: %d %d\n", unit->cart.x, unit->cart.y);
         printf("cart_grid_offset      :: %d %d\n", unit->cart_grid_offset.x, unit->cart_grid_offset.y);
@@ -414,11 +416,18 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
     static Point zero;
     if(!Unit_IsExempt(unit))
     {
-        if(unit->interest
-        && unit->interest->trait.is_inanimate)
+        if(unit->interest)
         {
-            unit->cart_goal = GetNextBestInanimateCoord(unit, grid, field);
-            unit->cart_grid_offset_goal = zero;
+            if(unit->interest->trait.is_inanimate)
+            {
+                unit->cart_goal = GetNextBestInanimateCoord(unit, grid, field);
+                unit->cart_grid_offset_goal = zero;
+            }
+            else
+            {
+                unit->cart_goal = unit->interest->cart;
+                unit->cart_grid_offset_goal = unit->interest->cart_grid_offset;
+            }
         }
         else
         {
@@ -426,7 +435,6 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
             unit->cart_grid_offset_goal = cart_grid_offset_goal;
         }
         Unit_FreePath(unit);
-        unit->command_group = command_group_next;
         unit->has_direct = HasDirectPath(unit, grid, field);
         unit->path = unit->has_direct
             ? PathStraight(unit->cart, unit->cart_goal)
@@ -680,11 +688,14 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
 {
-    unit->interest = interest;
-    if(interest)
-        unit->interest_id = interest->id;
-    else
-        unit->interest_id = -1;
+    if(interest != unit)
+    {
+        unit->interest = interest;
+        if(interest)
+            unit->interest_id = interest->id;
+        else
+            unit->interest_id = -1;
+    }
 }
 
 bool Unit_FlashTimerTick(Unit* const unit)
@@ -768,6 +779,7 @@ void Unit_AdvanceBuildAnimate(Unit* const unit, const Grid grid, const Field fie
         {
             if(unit->parent->has_rally_point)
             {
+                unit->command_group = Unit_GetCommandGroupNext();
                 Unit_SetInterest(unit, unit->parent->interest);
                 Unit_FindPath(unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
                 Unit_IncrementCommandGroup();
