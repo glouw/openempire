@@ -7,7 +7,9 @@
 
 static int32_t id_next = 0;
 
-int32_t Unit_GetIdNext(void) // NOT IDEAL, BUT NEEDS TO BE RESTORED WHEN OUT OF SYNC.
+static int32_t command_group_next = 0;
+
+int32_t Unit_GetIdNext(void)
 {
     return id_next;
 }
@@ -15,6 +17,16 @@ int32_t Unit_GetIdNext(void) // NOT IDEAL, BUT NEEDS TO BE RESTORED WHEN OUT OF 
 void Unit_SetIdNext(const int32_t id)
 {
     id_next = id;
+}
+
+int32_t Unit_GetCommandGroupNext(void)
+{
+    return command_group_next;
+}
+
+void Unit_SetCommandGroupNext(const int32_t command_group)
+{
+    command_group_next = command_group;
 }
 
 static void ConditionallySkipFirstPoint(Unit* const unit)
@@ -245,6 +257,8 @@ void Unit_Print(Unit* const unit)
 {
     if(unit)
     {
+        printf("path.count            :: %d\n", unit->path.count);
+        printf("has_rally_point       :: %d\n", unit->has_rally_point);
         printf("child_count           :: %d\n", unit->child_count);
         printf("has_children          :: %d\n", unit->has_children);
         printf("string                :: %s\n", Graphics_GetString(unit->file));
@@ -407,10 +421,12 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
             unit->cart_grid_offset_goal = cart_grid_offset_goal;
         }
         Unit_FreePath(unit);
+        unit->command_group = command_group_next;
         unit->has_direct = HasDirectPath(unit, grid, field);
         unit->path = unit->has_direct
             ? PathStraight(unit->cart, unit->cart_goal)
             : Field_PathAStar(field, unit->cart, unit->cart_goal);
+        command_group_next += 1;
     }
 }
 
@@ -739,13 +755,15 @@ bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other)
         || IsFloatingDifferent(unit, other);
 }
 
-void Unit_AdvanceBuildAnimate(Unit* const unit, const bool allowed_to_unlock_parent)
+void Unit_AdvanceBuildAnimate(Unit* const unit, const Grid grid, const Field field, const bool allowed_to_unlock_parent)
 {
     unit->health += 1;
     if(unit->health >= unit->trait.max_health)
     {
         if(allowed_to_unlock_parent)
         {
+            if(unit->parent->has_rally_point)
+                Unit_FindPath(unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
             unit->parent->child_lock_id = -1;
             unit->parent->child_count -= 1;
         }

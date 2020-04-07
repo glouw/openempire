@@ -70,6 +70,7 @@ typedef struct Unit
     bool is_being_built;
     bool has_direct;
     bool has_parent_lock;
+    bool has_rally_point;
 }
 Unit;
 
@@ -153,4 +154,8 @@ void Unit_LayFarm(Unit* const, const Map);
 
 bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other);
 
-void Unit_AdvanceBuildAnimate(Unit* const, const bool allowed_to_unlock_parent);
+void Unit_AdvanceBuildAnimate(Unit* const, const Grid, const Field, const bool allowed_to_unlock_parent);
+
+int32_t Unit_GetCommandGroupNext(void);
+
+void Unit_SetCommandGroupNext(const int32_t command_group);

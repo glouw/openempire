@@ -145,10 +145,16 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == overview.color && unit->is_selected && unit->trait.max_speed > 0)
+        if(unit->color == overview.color && unit->is_selected)
         {
-            unit->command_group = overview.share.command_group_next;
-            Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
+            if(unit->trait.is_inanimate) // RALLY POINTS
+            {
+                unit->cart_goal = cart_goal;
+                unit->cart_grid_offset_goal = cart_grid_offset_goal;
+                unit->has_rally_point = true;
+            }
+            else
+                Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
         }
     }
 }
@@ -241,8 +247,7 @@ static Units BulkAppend(Units units, const Map map, Unit* const temp, const Colo
                 Unit_SetParent(&unit, parent);
         }
         units = Append(units, unit);
-        Unit* const last = &units.unit[units.count - 1];
-        ProperStackAppend(units, last);
+        ProperStackAppend(units, &units.unit[units.count - 1]);
     }
     return units;
 }
@@ -351,7 +356,6 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
         units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE, false);
     }
     Tiles_Free(tiles);
-    units.share[overview.color].command_group_next += 1;
     return units;
 }
 
@@ -1074,7 +1078,7 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
 {
     const Point zero = { 0,0 };
     const Parts parts = Parts_FromButton(button, overview.share.status.age);
-    if(parts.part)
+    if(parts.count > 0 )
     {
         // BITS ARE GOTTEN FROM UNITS BECAUSE TRIGGER SPEED WILL OUTMATCH OVERVIEW SPEED.
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
@@ -1242,7 +1246,7 @@ static void CompleteInanimateConstruction(const Units units, const Map map)
     }
 }
 
-static void BuildAnimate(const Units units)
+static void BuildAnimate(const Units units, const Grid grid, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
@@ -1258,10 +1262,10 @@ static void BuildAnimate(const Units units)
                     unit->has_parent_lock = true;
                 }
                 if(parent->child_lock_id == unit->id)
-                    Unit_AdvanceBuildAnimate(unit, true);
+                    Unit_AdvanceBuildAnimate(unit, grid, field, true);
             }
             else
-                Unit_AdvanceBuildAnimate(unit, false);
+                Unit_AdvanceBuildAnimate(unit, grid, field, false);
         }
     }
 }
@@ -1270,7 +1274,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
 {
     UpdateEntropy(units);
     Tick(units);
-    BuildAnimate(units);
+    BuildAnimate(units, grid, field);
     CompleteInanimateConstruction(units, map);
     units = ManagePathFinding(units, grid, map, field);
     units = UpdateAllMotives(units);
@@ -1461,6 +1465,7 @@ static Units UnpackRestore(Units units, const Restore restore)
     units.count = restore.count;
     units.repath_index = 0;
     Unit_SetIdNext(restore.id_next);
+    Unit_SetCommandGroupNext(restore.command_group_next);
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -1493,6 +1498,7 @@ Restore Units_PackRestore(const Units units, const int32_t cycles)
     restore.count = units.count;
     restore.cycles = cycles;
     restore.id_next = Unit_GetIdNext();
+    restore.command_group_next = Unit_GetCommandGroupNext();
     for(int32_t i = 0; i < COLOR_COUNT; i++)
         restore.share[i] = units.share[i];
     return restore;
