@@ -756,7 +756,11 @@ static void EngageAllBoids(const Units units, const Grid grid)
 static void NullInterestPointers(const Units units)
 {
     for(int32_t i = 0; i < units.count; i++)
-        units.unit[i].interest = NULL;
+    {
+        Unit* const unit = &units.unit[i];
+        unit->interest = NULL;
+        unit->parent = NULL;
+    }
 }
 
 // DOES NOT NEED TO BE THREADED -
@@ -980,15 +984,44 @@ static void ResetParent(const Units units, Unit* const unit)
     }
 }
 
-static void ResetPointers(Units units)
+typedef struct
+{
+    Units units;
+    int32_t a;
+    int32_t b;
+}
+ResetNeedle;
+
+static int32_t RunResetNeedle(void* data)
+{
+    ResetNeedle* needle = (ResetNeedle*) data;
+    for(int32_t i = needle->a; i < needle->b; i++)
+    {
+        Unit* const unit = &needle->units.unit[i];
+        ResetInterest(needle->units, unit);
+        ResetParent(needle->units, unit);
+    }
+    return 0;
+}
+
+static void ResetPointers(const Units units)
 {
     UTIL_SORT(units.unit, units.count, CompareById);
-    for(int32_t i = 0; i < units.count; i++)
+    ResetNeedle* const needles = UTIL_ALLOC(ResetNeedle, units.cpu_count);
+    const int32_t width = units.count / units.cpu_count;
+    const int32_t remainder = units.count % units.cpu_count;
+    for(int32_t i = 0; i < units.cpu_count; i++)
     {
-        Unit* const unit = &units.unit[i];
-        ResetInterest(units, unit);
-        ResetParent(units, unit);
+        needles[i].units = units;
+        needles[i].a = (i + 0) * width;
+        needles[i].b = (i + 1) * width;
     }
+    needles[units.cpu_count - 1].b += remainder;
+    SDL_Thread** const threads = UTIL_ALLOC(SDL_Thread*, units.cpu_count);
+    for(int32_t i = 0; i < units.cpu_count; i++) threads[i] = SDL_CreateThread(RunResetNeedle, "N/A", &needles[i]);
+    for(int32_t i = 0; i < units.cpu_count; i++) SDL_WaitThread(threads[i], NULL);
+    free(needles);
+    free(threads);
 }
 
 static Units RemoveGarbage(Units units)
