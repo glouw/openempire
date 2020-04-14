@@ -76,6 +76,7 @@ static void Play(const Video video, const Data data, const Args args)
                 const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
             }
+            Sock_Spin(reset);
             const Restore restore = Restore_Recv(reset.server);
             units = Units_ApplyRestore(units, restore, grid, field);
             cycles = restore.cycles;

@@ -34,3 +34,14 @@ void Sock_Disconnect(const Sock sock)
     SDLNet_FreeSocketSet(sock.set);
     SDLNet_TCP_Close(sock.server);
 }
+
+static bool Ready(const Sock sock, const int32_t timeout)
+{
+    return SDLNet_CheckSockets(sock.set, timeout) && SDLNet_SocketReady(sock.server);
+}
+
+void Sock_Spin(const Sock sock)
+{
+    while(!Ready(sock, 1))
+        SDL_Delay(1);
+}

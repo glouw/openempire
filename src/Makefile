@@ -2,8 +2,6 @@ BIN = ../openempires
 
 DUMP=objdump
 
-TAGS=ctags
-
 LIBS  = -lSDL2
 LIBS += -lSDL2_ttf
 LIBS += -lSDL2_net
@@ -120,7 +118,6 @@ UNAME := $(shell uname)
 $(BIN): $(OBJS) $(DEPS)
 	$(COMPILER) $(FLAGS) $(OBJS) $(LIBS) -o $(BIN)
 	$(DUMP) -M intel --disassemble $(BIN) > $(BIN).s
-	$(TAGS) *[ch] .
 
 %.o : %.c %.d Makefile
 	$(COMPILER) $(FLAGS) -DSANITIZE_THREAD=$(SANITIZE_THREAD) -DSANITIZE_UNDEFINED=$(SANITIZE_UNDEFINED) -DSANITIZE_ADDRESS=$(SANITIZE_ADDRESS) -MMD -MP -MT $@ -MF $*.d -c $<

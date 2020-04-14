@@ -5,8 +5,6 @@
 
 #include <assert.h>
 
-#define RESTORE_COMPLETE (0xAB)
-
 #define HEADER_SIZE (sizeof(int32_t) + sizeof(Restore)) // REAL SIZE (size_real) OF WHOLE STREAM IS INCLUDED.
 
 static Restore RecvPacked(const TCPsocket socket)
@@ -33,8 +31,6 @@ static Restore RecvPacked(const TCPsocket socket)
             out.unit[i] = unit[i];
     }
     free(buffer);
-    const uint8_t ack = RESTORE_COMPLETE;
-    UTIL_TCP_SEND(socket, &ack);
     return out;
 }
 
@@ -53,9 +49,6 @@ void Restore_Send(const Restore restore, const TCPsocket socket)
     UTIL_TCP_SEND(socket, &size_real);
     UTIL_TCP_SEND(socket, &restore);
     SDLNet_TCP_Send(socket, restore.unit, size_units);
-    uint8_t ack = 0;
-    UTIL_TCP_RECV(socket, &ack);
-    assert(ack == RESTORE_COMPLETE);
 }
 
 void Restore_Free(const Restore restore)

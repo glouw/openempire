@@ -37,16 +37,17 @@ static int32_t Ping(void* const data)
     const Sock pinger = Sock_Connect(args->host, args->port_ping);
     while(true)
     {
-        const uint8_t send = 0xAF;
         uint8_t temp = 0x0;
+        const uint8_t send = 0xAF;
         const int32_t t0 = SDL_GetTicks();
         UTIL_TCP_SEND(pinger.server, &send);
+        Sock_Spin(pinger);
         UTIL_TCP_RECV(pinger.server, &temp);
         const int32_t t1 = SDL_GetTicks();
         const int32_t dt = t1 - t0;
         if(temp == send)
             Set(dt);
-        const int32_t delay = 200 - dt;
+        const int32_t delay = 250 - dt; // ARBITRARY HZ. WHAT IF DT GETS TOO LARGE?
         SDL_Delay(delay > 0 ? delay : 0);
     }
     Sock_Disconnect(pinger);

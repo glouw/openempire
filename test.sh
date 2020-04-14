@@ -8,8 +8,8 @@ GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empire
 LATENCY=25ms
 VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
-XRES=1200
-YRES=800
+XRES=800
+YRES=600
 USERS=2
 MAP_SIZE=64
 HOST=localhost
@@ -31,7 +31,7 @@ netsim()
 
 server()
 {
-    ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT
+    ./$BIN --server --users $USERS --map_size $MAP_SIZE --port $PORT
 }
 
 client()
