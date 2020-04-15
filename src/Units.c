@@ -1313,6 +1313,21 @@ static void BuildAnimate(const Units units, const Grid grid, const Field field)
     }
 }
 
+static void Pursue(const Units units)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(!Unit_IsExempt(unit)
+        && unit->interest
+        && unit->interest->trait.is_inanimate == false)
+        {
+            unit->cart_goal = unit->interest->cart;
+            unit->cart_grid_offset_goal = unit->interest->cart_grid_offset;
+        }
+    }
+}
+
 Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
 {
     UpdateEntropy(units);
@@ -1327,6 +1342,7 @@ Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, con
     units = RemoveGarbage(units);
     units = TriggerTriggers(units, grid, graphics);
     ManageStacks(units);
+    Pursue(units);
     return CountAllPopulations(units);
 }
 
