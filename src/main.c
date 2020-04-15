@@ -124,8 +124,8 @@ static void Play(const Video video, const Data data, const Args args)
                     SDL_Delay(ms);
                 if(control < 0)
                 {
+                    SDL_Delay(abs(control));
                     control++;
-                    SDL_Delay(1);
                 }
             }
         }
