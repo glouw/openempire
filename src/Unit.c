@@ -427,6 +427,8 @@ void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_gri
             {
                 unit->cart_goal = unit->interest->cart;
                 unit->cart_grid_offset_goal = unit->interest->cart_grid_offset;
+                if(unit->interest->color == unit->color)
+                    unit->command_group = unit->interest->command_group;
             }
         }
         else // GOTO GENERIC.
@@ -597,15 +599,7 @@ void Unit_Repath(Unit* const unit, const Grid grid, const Field field)
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && Unit_HasPath(unit))
-    {
-        unit->is_engaged_in_melee
-            ? Unit_MockPath(unit, unit->cart_goal, unit->cart_grid_offset_goal)
-            : Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
-        if(unit->interest
-        && unit->interest->color == unit->color
-        && unit->interest->trait.is_inanimate == false)
-            unit->command_group = unit->interest->command_group;
-    }
+        Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
 }
 
 static Point Nudge(Unit* const unit)
