@@ -94,8 +94,7 @@ static Units UnSelectAll(Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == color)
-            unit->is_selected = false;
+        Unit_ClearSelectedColor(unit, color);
     }
     units.share[color] = share;
     return units;
@@ -108,7 +107,8 @@ static Units RecountSelected(Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected && unit->color == color)
+        if(Unit_IsSelectedByColor(unit, color)
+        && unit->color == color)
             share.select_count += 1;
     }
     units.share[color] = share;
@@ -131,7 +131,7 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
             {
                 Tile_Select(tile, overview.color);
                 if(overview.event.key_left_shift)
-                    Tiles_SelectSimilar(tiles, tile);
+                    Tiles_SelectSimilar(tiles, tile, overview.color);
             }
         }
         Tiles_Free(tiles);
@@ -145,7 +145,8 @@ static void FindPathForSelected(const Units units, const Overview overview, cons
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->color == overview.color && unit->is_selected)
+        if(unit->color == overview.color
+        && Unit_IsSelectedByColor(unit, overview.color))
         {
             if(unit->trait.is_inanimate) // RALLY POINTS
             {
@@ -222,7 +223,7 @@ static Unit* FoundCreator(const Units units, Unit* const unit, const Color color
             if(Rect_ContainsPoint(rect, unit->cart))
             {
                 if(parent->child_count < child_count_min
-                && parent->is_selected
+                && Unit_IsSelectedByColor(parent, color)
                 && parent->is_being_built == false)
                 {
                     out = parent;
@@ -291,7 +292,7 @@ static void SetSelectedInterest(const Units units, const Color color, Unit* cons
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, color)
         && unit->color == color)
             Unit_SetInterest(unit, interest);
     }
@@ -302,7 +303,7 @@ static void SetSelectedAttackMove(const Units units, const Color color, const bo
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, color)
         && unit->color == color)
             unit->using_attack_move = using_attack_move;
     }
@@ -313,7 +314,7 @@ static void DisengageSelected(const Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, color)
         && unit->color == color)
             unit->is_engaged_in_melee = false;
     }
@@ -907,7 +908,7 @@ static void Decay(const Units units)
         if(unit->state == STATE_FALL && unit->state_timer == last_tick)
         {
             Unit_SetState(unit, STATE_DECAY, true);
-            unit->is_selected = false;
+            Unit_ClearSelectedAllColors(unit);
         }
     }
 }
@@ -1047,7 +1048,7 @@ static Action GetAction(const Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, color)
         && unit->color == color
         && !unit->is_being_built)
         {
@@ -1066,7 +1067,7 @@ static Type GetType(const Units units, const Color color)
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, color)
         && unit->color == color)
         {
             const int32_t index = (int32_t) unit->trait.type + 1;

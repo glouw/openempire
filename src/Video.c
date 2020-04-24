@@ -106,13 +106,13 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Lines_Sort(blend_lines);
     Vram_Clear(vram, 0x0);
     Vram_DrawUnits(vram, graphics_tiles);
-    Vram_DrawUnitHealthBars(vram, graphics_tiles);
+    Vram_DrawUnitHealthBars(vram, graphics_tiles, overview.color);
 #if SANITIZE == 0
     Vram_DrawMap(vram, data.terrain, map, overview, grid, data.blendomatic, blend_lines, terrain_tiles);
 #endif
     Vram_DrawUnits(vram, graphics_tiles_floats);
     Vram_DrawMouseTileSelect(vram, data.terrain, overview, grid);
-    Vram_DrawUnitSelections(vram, graphics_tiles);
+    Vram_DrawUnitSelections(vram, graphics_tiles, overview.color);
     Vram_FlashDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);
     Vram_FlashUnits(vram, graphics_tiles);
     Vram_DrawSelectedDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);

@@ -44,11 +44,11 @@ void Vram_DrawUnits(const Vram, const Tiles);
 
 void Vram_DrawMouseTileSelect(const Vram, const Registrar, const Overview, const Grid);
 
-void Vram_DrawUnitSelections(const Vram, const Tiles);
+void Vram_DrawUnitSelections(const Vram, const Tiles, const Color);
 
 void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, const bool enabled);
 
-void Vram_DrawUnitHealthBars(const Vram, const Tiles);
+void Vram_DrawUnitHealthBars(const Vram, const Tiles, const Color);
 
 void Vram_DrawMotiveRow(const Vram, const Registrar, const Share, const Color);
 

@@ -19,7 +19,7 @@ void Tiles_Free(const Tiles);
 
 Tile Tiles_Get(const Tiles, const Point);
 
-int32_t Tiles_SelectSimilar(const Tiles, const Tile);
+int32_t Tiles_SelectSimilar(const Tiles, const Tile, const Color);
 
 int32_t Tiles_SelectWithBox(const Tiles, const Rect, const Color);
 

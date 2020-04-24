@@ -426,7 +426,7 @@ void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint3
     }
 }
 
-void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
+void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles, const Color color)
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
@@ -435,7 +435,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles)
         const Rect rect = Rect_GetEllipse(center, tile.reference->trait.width / CONFIG_GRID_CELL_SIZE);
         if(!Unit_IsExempt(tile.reference))
         {
-            if(tile.reference->is_selected)
+            if(Unit_IsSelectedByColor(tile.reference, color))
             {
                 if(tile.reference->is_engaged_in_melee)
                     DrawEllipse(vram, rect, 0xFF0000);
@@ -492,7 +492,7 @@ static inline void DrawHealthBar(const Vram vram, const Point top, Unit* const u
         }
 }
 
-void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
+void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles, const Color color)
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
@@ -503,7 +503,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles)
             center.y - CONFIG_VRAM_UNIT_HEALTH_HEIGHT,
         };
         Unit* const unit = tile.reference;
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, color)
         || unit->is_being_built)
             DrawHealthBar(vram, top, unit);
     }
@@ -564,7 +564,7 @@ void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, c
     for(int32_t i = 0; i < tiles.count; i++)
     {
         Unit* const unit = tiles.tile[i].reference;
-        if(unit->is_selected
+        if(Unit_IsSelectedByColor(unit, overview.color)
         && unit->trait.is_inanimate)
             DrawDimensionGrid(vram, terrain, overview, grid, unit);
     }

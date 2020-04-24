@@ -53,8 +53,8 @@ typedef struct Unit
     int32_t decay_frames_per_dir;
     int32_t expire_frames;
     int32_t child_count;
+    uint16_t is_selected_by;
     bool is_engaged_in_melee;
-    bool is_selected;
     bool must_garbage_collect;
     bool is_state_locked;
     bool is_already_tiled;
@@ -161,3 +161,11 @@ int32_t Unit_GetCommandGroupNext(void);
 void Unit_SetCommandGroupNext(const int32_t command_group);
 
 void Unit_IncrementCommandGroup(void);
+
+bool Unit_IsSelectedByColor(Unit* const, const Color);
+
+void Unit_ClearSelectedColor(Unit* const, const Color);
+
+void Unit_ClearSelectedAllColors(Unit* const);
+
+void Unit_SetSelectedColor(Unit* const, const Color);

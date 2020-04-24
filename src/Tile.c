@@ -172,9 +172,9 @@ Point Tile_GetTopLeftOffsetCoords(const Tile tile, const int32_t x, const int32_
 void Tile_Select(const Tile tile, const Color color)
 {
     Unit* const unit = tile.reference;
-    if(!Unit_IsExempt(unit) && !unit->is_floating && tile.reference->color == color)
-        unit->is_selected = true;
-#if 1
+    if(!Unit_IsExempt(unit) && !unit->is_floating)
+        Unit_SetSelectedColor(unit, color);
+#if 0
     Unit_Print(unit);
 #endif
 }

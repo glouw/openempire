@@ -206,7 +206,6 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
         unit.entropy = Point_Rand();
         unit.entropy_static = Util_Rand();
     }
-    // FLOATING IS OVERWRITTEN FOR ANIMATES THAT ARE BEING BUILT
     if(is_being_built && !unit.trait.is_inanimate)
         unit.is_floating = true;
     unit.child_lock_id = -1;
@@ -214,15 +213,13 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.interest_id = -1;
     unit.color = color;
     unit.state = STATE_IDLE;
-    // ONE HEALTH IS ENOUGH SO THAT UNIT IS NOT DEAD. THE BUILD SEQUENCE WILL INCREASE HEALTH UNTIL 100%
 #if 0
     unit.health = is_being_built ? 1 : unit.trait.max_health;
 #else
     if(unit.trait.max_health > 0)
-        unit.health = (2 * unit.trait.max_health) / 3;
+        unit.health = (9 * unit.trait.max_health) / 10;
 #endif
     unit.trigger = trigger;
-    // BUILDINGS CAN BE PLACED BY THEIR MIDDLE SQUARE, AND NOT TOP LEFT SQUARE, WITH AT_CENTER ENABLED
     Point temp = cart;
     if(at_center)
     {
@@ -230,7 +227,6 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
         temp = Point_Sub(temp, center);
     }
     unit.cell = Grid_CartToCell(grid, temp);
-    // EVEN SIZED DIMENSIONS DO NOT PLAY NICELY AND NEED TO BE SHIFTED HALF A BLOCK BEFORE BEING PLACED
     if(Point_IsEven(unit.trait.dimensions))
     {
         const Point shift = {
@@ -240,16 +236,13 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
         unit.cell = Point_Sub(unit.cell, shift);
     }
     unit.cell = Point_Add(unit.cell, Grid_OffsetToCell(offset));
-    // CART AND OFFSET VALUES ARE RECALCULATED FROM CELL, AS CELL IS THE SMALLEST GRANULAR MEASUREMENT SIZE
     UpdateCart(&unit, grid);
-    // THESE FRAME COUNTS ARE HIGHLY USED DURING COMBAT AND ARE CACHED WITHIN THE UNIT FOR QUICK ACCESS
     if(unit.trait.is_multi_state)
     {
         unit.attack_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_ATTACK);
         unit.fall_frames_per_dir   = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir  = GetFramesFromState(&unit, graphics, STATE_DECAY);
     }
-    // FIRE AND RUBBLE WILL EVENTUALLY CLEAN UP OVER TIME, WHILE OTHERS MARKED CAN_EXPIRE WILL BE CLEANED UP AFTER ONE ANIMATION CYCLE
     if(unit.trait.can_expire)
         unit.expire_frames = GetExpireFrames(&unit, graphics);
     if(unit.trait.type == TYPE_FIRE
@@ -459,7 +452,7 @@ void Unit_Flag(Unit* const unit)
 {
     unit->health = 0;
     unit->is_being_built = false;
-    unit->is_selected = false;
+    Unit_ClearSelectedAllColors(unit);
     if(unit->trait.is_inanimate)
         unit->must_garbage_collect = true;
     else
@@ -792,4 +785,24 @@ void Unit_AdvanceBuildAnimate(Unit* const unit, const Grid grid, const Field fie
         unit->has_parent_lock = false;
         Unit_SetParent(unit, NULL);
     }
+}
+
+bool Unit_IsSelectedByColor(Unit* const unit, const Color color)
+{
+    return (unit->is_selected_by >> color) & 0x1;
+}
+
+void Unit_ClearSelectedColor(Unit* const unit, const Color color)
+{
+    unit->is_selected_by &= ~(0x1 << color);
+}
+
+void Unit_ClearSelectedAllColors(Unit* const unit)
+{
+    unit->is_selected_by = 0x0;
+}
+
+void Unit_SetSelectedColor(Unit* const unit, const Color color)
+{
+    unit->is_selected_by |= 0x1 << color;
 }

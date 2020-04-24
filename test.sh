@@ -10,7 +10,7 @@ VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
 XRES=800
 YRES=600
-USERS=2
+USERS=3
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -51,7 +51,7 @@ batch()
         client $X $Y &
     done
     # SPECTATOR MUST CONNECT LAST, SO ENSURE WITH A SLEEP THEY COME LAST.
-    sleep 2
+    sleep 5
     client 400 300
 }
 
