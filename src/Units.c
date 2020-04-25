@@ -298,14 +298,14 @@ static void SetSelectedInterest(const Units units, const Color color, Unit* cons
     }
 }
 
-static void SetSelectedAttackMove(const Units units, const Color color, const bool using_attack_move)
+static void SetSelectedAggroMove(const Units units, const Color color, const bool using_aggro_move)
 {
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
         if(Unit_IsSelectedByColor(unit, color)
         && unit->color == color)
-            unit->using_attack_move = using_attack_move;
+            unit->using_aggro_move = using_aggro_move;
     }
 }
 
@@ -368,17 +368,17 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
 {
     const Button button = Button_FromOverview(overview);
-    const bool using_attack_move = Button_UseAttackMove(button);
+    const bool using_aggro_move = Button_UseAggroMove(button);
     const bool using_building_icon = button.icon_type == ICONTYPE_BUILD;
     if(overview.share.select_count > 0)
     {
         if(overview.event.mouse_lu && using_building_icon)
             MoveToNewConstruction(units, overview, grid, field);
         else
-        if(overview.event.mouse_ru || using_attack_move)
+        if(overview.event.mouse_ru || using_aggro_move)
         {
             units = MoveTo(units, overview, grid, graphics, map, field, render_points);
-            SetSelectedAttackMove(units, overview.color, using_attack_move);
+            SetSelectedAggroMove(units, overview.color, using_aggro_move);
         }
         Unit_IncrementCommandGroup();
     }
@@ -728,7 +728,7 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
 {
     if(!Unit_IsExempt(unit) && !unit->is_state_locked)
     {
-        if(unit->using_attack_move)
+        if(unit->using_aggro_move)
         {
             Unit* const closest = GetClosestBoid(units, unit, grid);
             if(closest

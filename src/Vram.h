@@ -50,7 +50,7 @@ void Vram_DrawSelectionBox(const Vram, const Overview, const uint32_t color, con
 
 void Vram_DrawUnitHealthBars(const Vram, const Tiles, const Color);
 
-void Vram_DrawMotiveRow(const Vram, const Registrar, const Share, const Color);
+void Vram_DrawMotiveRow(const Vram, const Registrar, const Overview);
 
 void Vram_DrawHud(const Vram, const Registrar);
 

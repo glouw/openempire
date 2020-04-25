@@ -118,7 +118,7 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawSelectedDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);
     const bool should_draw = overview.event.mouse_l && !overview.event.key_left_alt;
     Vram_DrawSelectionBox(vram, overview, 0x00FFFFFF, should_draw);
-    Vram_DrawMotiveRow(vram, data.interfac, units.share[units.color], units.color);
+    Vram_DrawMotiveRow(vram, data.interfac, overview);
     Vram_DrawHud(vram, data.interfac);
     Vram_DrawCross(vram, video.middle, 5, 0x00FF0000);
     Vram_Unlock(video.canvas);

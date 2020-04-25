@@ -65,7 +65,7 @@ typedef struct Unit
     bool is_triggered;
     bool must_skip_debris;
     bool must_repath_with_recover;
-    bool using_attack_move;
+    bool using_aggro_move;
     bool is_flash_on;
     bool is_being_built;
     bool has_direct;

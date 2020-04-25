@@ -14,3 +14,5 @@ Bits Bits_Clear(Bits, const Trigger);
 bool Bits_Get(Bits, const Trigger);
 
 void Bits_Print(const Bits);
+
+bool Bits_MustRedOut(const Bits, const Bits, const Trigger);

@@ -671,7 +671,7 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     COPY(to, from, path);
     COPY(to, from, dir);
     COPY(to, from, health);
-    COPY(to, from, using_attack_move);
+    COPY(to, from, using_aggro_move);
     COPY(to, from, cart_goal);
     COPY(to, from, cart_grid_offset_goal);
     COPY(to, from, is_being_built);

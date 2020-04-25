@@ -29,4 +29,4 @@ int32_t Button_GetHotkeysLen(void);
 
 Button Button_Upgrade(Button, const Bits);
 
-bool Button_UseAttackMove(const Button);
+bool Button_UseAggroMove(const Button);

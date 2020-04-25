@@ -134,7 +134,7 @@ static int32_t GetTownCenterLen(const Age age)
 }
 
 #define COMMAND_AGE_1 \
-    { ICONTYPE_COMMAND, { ICONCOMMAND_ATTACK_MOVE }, TRIGGER_NONE }
+    { ICONTYPE_COMMAND, { ICONCOMMAND_AGGRO_MOVE }, TRIGGER_NONE }
 
 static const Button command_age1[] = { COMMAND_AGE_1 };
 static const Button command_age2[] = { COMMAND_AGE_1 };

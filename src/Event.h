@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct
 {
@@ -34,3 +34,5 @@ typedef struct
         tab            : 1;
 }
 Event;
+
+int32_t Event_GetIndex(const Event);

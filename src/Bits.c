@@ -29,3 +29,8 @@ void Bits_Print(const Bits bits)
         printf("%d", (int32_t) ((bits >> i) & 0x1));
     putchar('\n');
 }
+
+bool Bits_MustRedOut(const Bits bits, const Bits busy, const Trigger trigger)
+{
+    return Bits_Get(bits, trigger) || Bits_Get(busy, trigger);
+}

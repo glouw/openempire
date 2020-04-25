@@ -16,6 +16,7 @@ SRCS += Color.c
 SRCS += Data.c
 SRCS += Direction.c
 SRCS += Drs.c
+SRCS += Event.c
 SRCS += Field.c
 SRCS += File.c
 SRCS += Frame.c

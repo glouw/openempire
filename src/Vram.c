@@ -414,15 +414,20 @@ static inline void DrawEllipse(const Vram vram, Rect rect, const uint32_t color)
     }
 }
 
+static void DrawRect(const Vram vram, const Rect rect, const uint32_t color)
+{
+    for(int32_t x = rect.a.x; x < rect.b.x; x++) Put(vram, x, rect.a.y, color);
+    for(int32_t x = rect.a.x; x < rect.b.x; x++) Put(vram, x, rect.b.y, color);
+    for(int32_t y = rect.a.y; y < rect.b.y; y++) Put(vram, rect.a.x, y, color);
+    for(int32_t y = rect.a.y; y < rect.b.y; y++) Put(vram, rect.b.x, y, color);
+}
+
 void Vram_DrawSelectionBox(const Vram vram, const Overview overview, const uint32_t color, const bool enabled)
 {
     if(enabled && Overview_IsSelectionBoxBigEnough(overview))
     {
-        const Rect box = Rect_CorrectOrientation(overview.selection_box);
-        for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.a.y, color);
-        for(int32_t x = box.a.x; x < box.b.x; x++) Put(vram, x, box.b.y, color);
-        for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.a.x, y, color);
-        for(int32_t y = box.a.y; y < box.b.y; y++) Put(vram, box.b.x, y, color);
+        const Rect rect = Rect_CorrectOrientation(overview.selection_box);
+        DrawRect(vram, rect, color);
     }
 }
 
@@ -440,7 +445,7 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles, const Color col
                 if(tile.reference->is_engaged_in_melee)
                     DrawEllipse(vram, rect, 0xFF0000);
                 else
-                if(tile.reference->using_attack_move)
+                if(tile.reference->using_aggro_move)
                     DrawEllipse(vram, rect, 0xFFFF00);
                 else
                 if(tile.reference->has_direct)
@@ -613,27 +618,36 @@ static inline Pack GetPackFromMotive(const Registrar interfac, const Motive moti
     return pack;
 }
 
-static inline void DrawPack(const Vram vram, const Pack pack, const Share share)
+static inline void DrawPack(const Vram vram, const Pack pack, const Overview overview)
 {
+    static Rect zero;
+    Rect outline = zero;
+    const int32_t selected_index = Event_GetIndex(overview.event);
     for(int32_t index = 0; index < pack.buttons.count; index++)
     {
-        const Button button = Button_Upgrade(pack.buttons.button[index], share.bits);
+        const Button button = Button_Upgrade(pack.buttons.button[index], overview.share.bits);
         SDL_Surface* const surface = pack.animation[button.icon_type].surface[button.index];
         const Point offset = Point_Layout(index, vram.xres, vram.yres);
         const Rect rect = {
             { 0, 0 },
             { surface->w, surface->h }
         };
-        const bool red_out = Bits_Get(share.bits, button.trigger)
-                          || Bits_Get(share.busy, button.trigger);
+        const bool red_out = Bits_MustRedOut(overview.share.bits, overview.share.busy, button.trigger);
         DrawWithBounds(vram, surface, offset, rect, red_out);
+        if(index == selected_index)
+        {
+            outline.a = Point_Add(rect.a, offset);
+            outline.b = Point_Add(rect.b, offset);
+        }
     }
+    if(selected_index != -1)
+        DrawRect(vram, outline, 0xFFFFFF);
 }
 
-void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Share share, const Color color)
+void Vram_DrawMotiveRow(const Vram vram, const Registrar interfac, const Overview overview)
 {
-    const Pack pack = GetPackFromMotive(interfac, share.motive, color, share.status.age);
-    DrawPack(vram, pack, share);
+    const Pack pack = GetPackFromMotive(interfac, overview.share.motive, overview.color, overview.share.status.age);
+    DrawPack(vram, pack, overview);
 }
 
 void Vram_DrawHud(const Vram vram, const Registrar interfac)

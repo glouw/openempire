@@ -45,7 +45,7 @@ IconUnit;
 
 typedef enum
 {
-    ICONCOMMAND_ATTACK_MOVE = 6,
+    ICONCOMMAND_AGGRO_MOVE = 6,
 }
 IconCommand;
 
