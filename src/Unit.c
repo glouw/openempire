@@ -211,6 +211,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.child_lock_id = -1;
     unit.parent_id = -1;
     unit.interest_id = -1;
+    unit.rally_id = -1;
     unit.color = color;
     unit.state = STATE_IDLE;
 #if 0
@@ -262,6 +263,7 @@ void Unit_Print(Unit* const unit)
         printf("has_children          :: %d\n", unit->has_children);
         printf("string                :: %s\n", Graphics_GetString(unit->file));
         printf("has_direct            :: %d\n", unit->has_direct);
+        printf("must_garbage_collect  :: %d\n", unit->must_garbage_collect);
         printf("health                :: %d\n", unit->health);
         printf("max_health            :: %d\n", unit->trait.max_health);
         printf("is_being_built        :: %d\n", unit->is_being_built);
@@ -485,10 +487,10 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
 static bool CanEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(
-            unit->interest->trait.is_inanimate
-                ? unit->cell_interest_inanimate
-                : unit->interest->cell,
-            unit->cell);
+        unit->interest->trait.is_inanimate
+            ? unit->cell_interest_inanimate
+            : unit->interest->cell,
+        unit->cell);
     const int32_t width = UTIL_MAX(unit->trait.width, unit->interest->trait.width);
     if(unit->interest->trait.is_inanimate)
     {
@@ -662,10 +664,13 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     COPY(to, from, cell);
     COPY(to, from, cart);
     COPY(to, from, cart_grid_offset);
+    COPY(to, from, has_rally_point);
     COPY(to, from, id);
+    COPY(to, from, rally_id);
     COPY(to, from, parent_id);
     COPY(to, from, interest_id);
     COPY(to, from, child_lock_id);
+    // NOT NECESSARY TO COPY POINTERS OVER SINCE IDS WILL REMAP POINTERS.
     COPY(to, from, has_parent_lock);
     COPY(to, from, has_children);
     COPY(to, from, path);
@@ -688,6 +693,18 @@ void Unit_SetInterest(Unit* const unit, Unit* const interest)
             unit->interest_id = interest->id;
         else
             unit->interest_id = -1;
+    }
+}
+
+void Unit_SetRally(Unit* const unit, Unit* const rally)
+{
+    if(rally != unit)
+    {
+        unit->rally = rally;
+        if(rally)
+            unit->rally_id = rally->id;
+        else
+            unit->rally_id = -1;
     }
 }
 

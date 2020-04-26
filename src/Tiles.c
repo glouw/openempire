@@ -82,13 +82,18 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
                     && ref->parent
                     && ref->parent->is_being_built)
                         continue;
+                // SKIP THE RALLY POINT RENDER FOR WAY POINT FLAGS THAT ARE NOT SELECTED.
+                if(ref->parent
+                && ref->parent->has_rally_point
+                && Unit_IsSelectedByColor(ref->parent, overview.color) == false
+                && ref->file == FILE_GRAPHICS_WAYPOINT_FLAG)
+                    continue;
                 const Graphics file = Unit_IsConstruction(ref)
                     ? Unit_GetConstructionFile(ref)
                     : ref->file;
                 const Animation animation = graphics.animation[ref->color][file];
                 const Point overrider = ref->trait.is_inanimate ? ref->cart : point;
-                tile[unit_count] = Tile_GetGraphics(overview, grid, overrider, ref->cart_grid_offset, animation, ref);
-                unit_count++;
+                tile[unit_count++] = Tile_GetGraphics(overview, grid, overrider, ref->cart_grid_offset, animation, ref);
             }
         }
     }

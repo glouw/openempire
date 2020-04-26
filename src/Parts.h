@@ -19,6 +19,8 @@ void Parts_Free(const Parts);
 
 // SOME PARTS HAVE TO BE EXPORTED AS THEY ARE NOT CREATED THROUGH A BUTTON.
 
+Parts Parts_GetWayPointFlag(void);
+
 Parts Parts_GetRedArrows(void);
 
 Parts Parts_GetSmoke(void);

@@ -140,27 +140,9 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
     return units;
 }
 
-static void FindPathForSelected(const Units units, const Overview overview, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
+static Unit* Last(const Units units)
 {
-    for(int32_t i = 0; i < units.count; i++)
-    {
-        Unit* const unit = &units.unit[i];
-        if(unit->color == overview.color
-        && Unit_IsSelectedByColor(unit, overview.color))
-        {
-            if(unit->trait.is_inanimate) // RALLY POINTS
-            {
-                unit->cart_goal = cart_goal;
-                unit->cart_grid_offset_goal = cart_grid_offset_goal;
-                unit->has_rally_point = true;
-            }
-            else
-            {
-                unit->command_group = Unit_GetCommandGroupNext();
-                Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
-            }
-        }
-    }
+    return &units.unit[units.count - 1];
 }
 
 static Units Append(Units units, const Unit unit)
@@ -253,7 +235,7 @@ static Units BulkAppend(Units units, const Map map, Unit* const temp, const Colo
                 Unit_SetParent(&unit, parent);
         }
         units = Append(units, unit);
-        ProperStackAppend(units, &units.unit[units.count - 1]);
+        ProperStackAppend(units, Last(units));
     }
     return units;
 }
@@ -284,6 +266,41 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
     SetChildren(temp, parts.count);
     units = BulkAppend(units, map, temp, color, parts.count, ignore_collisions, is_being_built);
     free(temp);
+    return units;
+}
+
+static Units PlantRallyPoint(Units units, Unit* const unit, const Overview overview, const Registrar graphics, const Map map, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid)
+{
+    if(unit->has_rally_point)
+        Unit_Flag(unit->rally);
+    unit->cart_goal = cart_goal;
+    unit->cart_grid_offset_goal = cart_grid_offset_goal;
+    unit->has_rally_point = true;
+    const Parts parts = Parts_GetWayPointFlag();
+    units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, overview.color, graphics, map, false, parts, true, TRIGGER_NONE, false);
+    Unit* const rally = Last(units);
+    Unit_SetRally(unit, rally);
+    Unit_SetParent(rally, unit);
+    return units;
+}
+
+static Units FindPathForSelected(Units units, const Overview overview, const Registrar graphics, const Map map, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
+{
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(unit->color == overview.color
+        && Unit_IsSelectedByColor(unit, overview.color))
+        {
+            if(unit->trait.is_inanimate)
+                units = PlantRallyPoint(units, unit, overview, graphics, map, cart_goal, cart_grid_offset_goal, grid);
+            else
+            {
+                unit->command_group = Unit_GetCommandGroupNext();
+                Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
+            }
+        }
+    }
     return units;
 }
 
@@ -320,15 +337,15 @@ static void DisengageSelected(const Units units, const Color color)
     }
 }
 
-static void PathSelectedToUnit(const Units units, Unit* const unit, const Grid grid, const Overview overview, const Field field)
+static Units PathSelectedToUnit(const Units units, Unit* const unit, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field)
 {
     unit->grid_flash_timer = 0;
     DisengageSelected(units, overview.color);
     SetSelectedInterest(units, overview.color, unit);
-    FindPathForSelected(units, overview, unit->cart, unit->cart_grid_offset, grid, field);
+    return FindPathForSelected(units, overview, graphics, map, unit->cart, unit->cart_grid_offset, grid, field);
 }
 
-static void MoveToNewConstruction(const Units units, const Overview overview, const Grid grid, const Field field)
+static Units MoveToNewConstruction(const Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field)
 {
     const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
     const Stack stack = Units_GetStackCart(units, cart_goal);
@@ -336,11 +353,9 @@ static void MoveToNewConstruction(const Units units, const Overview overview, co
     {
         Unit* const reference = stack.reference[i];
         if(!Unit_IsExempt(reference))
-        {
-            PathSelectedToUnit(units, reference, grid, overview, field);
-            break;
-        }
+            return PathSelectedToUnit(units, reference, overview, grid, graphics, map, field);
     }
+    return units;
 }
 
 static Units MoveTo(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
@@ -349,7 +364,7 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
     Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
     const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
     if(tile.reference && !Unit_IsExempt(tile.reference))
-        PathSelectedToUnit(units, tile.reference, grid, overview, field);
+        return PathSelectedToUnit(units, tile.reference, overview, grid, graphics, map, field);
     else
     {
         DisengageSelected(units, overview.color);
@@ -357,8 +372,8 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
         const Point cart_goal = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
         const Point cart_grid = Overview_IsoToCart(overview, grid, overview.mouse_cursor, true);
         const Point cart_grid_offset_goal = Grid_GetOffsetFromGridPoint(grid, cart_grid);
+        units = FindPathForSelected(units, overview, graphics, map, cart_goal, cart_grid_offset_goal, grid, field);
         const Parts parts = Parts_GetRedArrows();
-        FindPathForSelected(units, overview, cart_goal, cart_grid_offset_goal, grid, field);
         units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, COLOR_GAIA, graphics, map, false, parts, false, TRIGGER_NONE, false);
     }
     Tiles_Free(tiles);
@@ -373,7 +388,7 @@ static Units Command(Units units, const Overview overview, const Grid grid, cons
     if(overview.share.select_count > 0)
     {
         if(overview.event.mouse_lu && using_building_icon)
-            MoveToNewConstruction(units, overview, grid, field);
+            units = MoveToNewConstruction(units, overview, grid, graphics, map, field);
         else
         if(overview.event.mouse_ru || using_aggro_move)
         {
@@ -761,6 +776,7 @@ static void NullInterestPointers(const Units units)
         Unit* const unit = &units.unit[i];
         unit->interest = NULL;
         unit->parent = NULL;
+        unit->rally = NULL;
     }
 }
 
@@ -985,6 +1001,18 @@ static void ResetParent(const Units units, Unit* const unit)
     }
 }
 
+static void ResetRally(const Units units, Unit* const unit)
+{
+    if(unit->rally_id != -1)
+    {
+        Unit key;
+        key.id = unit->rally_id;
+        Unit* const found = UTIL_SEARCH(units.unit, Unit, units.count, &key, CompareById);
+        if(found)
+            unit->rally = found;
+    }
+}
+
 typedef struct
 {
     Units units;
@@ -1001,6 +1029,7 @@ static int32_t RunResetNeedle(void* data)
         Unit* const unit = &needle->units.unit[i];
         ResetInterest(needle->units, unit);
         ResetParent(needle->units, unit);
+        ResetRally(needle->units, unit);
     }
     return 0;
 }

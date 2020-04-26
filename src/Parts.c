@@ -7,6 +7,9 @@
 static Part flag[] = {
     { {0,0}, FILE_GRAPHICS_FLAG_TALL }
 },
+waypoint_flag[] = {
+    { {0,0}, FILE_GRAPHICS_WAYPOINT_FLAG }
+},
 villager_male[] = {
     { {0,0}, FILE_GRAPHICS_MALE_VILLAGER_IDLE }
 },
@@ -141,6 +144,14 @@ Parts Parts_GetRedArrows(void)
 {
     const Parts parts = {
         red_arrows, UTIL_LEN(red_arrows)
+    };
+    return parts;
+}
+
+Parts Parts_GetWayPointFlag(void)
+{
+    const Parts parts = {
+        waypoint_flag, UTIL_LEN(waypoint_flag)
     };
     return parts;
 }

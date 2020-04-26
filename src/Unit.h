@@ -17,6 +17,7 @@ typedef struct Unit
 {
     struct Unit* interest;
     struct Unit* parent;
+    struct Unit* rally;
     Trait trait;
     Point cart;
     Point cart_grid_offset;
@@ -37,6 +38,7 @@ typedef struct Unit
     Trigger trigger;
     int32_t interest_id;
     int32_t parent_id;
+    int32_t rally_id;
     int32_t child_lock_id;
     int32_t entropy_static;
     int32_t id;
@@ -169,3 +171,5 @@ void Unit_ClearSelectedColor(Unit* const, const Color);
 void Unit_ClearSelectedAllColors(Unit* const);
 
 void Unit_SetSelectedColor(Unit* const, const Color);
+
+void Unit_SetRally(Unit* const, Unit* const);
