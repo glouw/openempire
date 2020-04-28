@@ -173,7 +173,7 @@ void Tile_Select(const Tile tile, const Color color)
 {
     if(!Unit_IsExempt(tile.reference) && !tile.reference->is_floating)
         Unit_SetSelectedColor(tile.reference, color);
-#if 1
+#if 0
     Unit_Print(tile.reference);
 #endif
 }

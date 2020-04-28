@@ -1153,7 +1153,11 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
         {
-            const int32_t count = overview.event.key_left_shift ? 3 : 1;
+            const bool using_flag = parts.part[0].file == FILE_GRAPHICS_FLAG_TALL;
+            const int32_t count =
+                (!using_flag && overview.event.key_left_shift)
+                    ? 3
+                    : 1;
             for(int32_t i = 0; i < count; i++)
                 units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
         }
@@ -1181,11 +1185,6 @@ static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar 
     Unit_Preserve(unit, &temp);
 }
 
-static Age GetNextAge(const Status status)
-{
-    return (Age) ((int32_t) status.age + 1);
-}
-
 static Units AppendMissing(const Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Graphics file)
 {
     static Point zero;
@@ -1194,9 +1193,10 @@ static Units AppendMissing(const Units units, Unit* const unit, const Grid grid,
     return Append(units, missing);
 }
 
-static Units UpgradeInanimate(Units units, Unit* const flag, const Grid grid, const Registrar graphics)
+static Units UpgradeInanimate(Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Age age)
 {
-    units.share[flag->color].status.age = GetNextAge(units.share[flag->color].status);
+    printf("%d\n", age);
+    units.share[flag->color].status.age = age;
     for(int32_t i = 0; i < units.count; i++)
     {
         Unit* const unit = &units.unit[i];
@@ -1249,9 +1249,8 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
                 // ONLY ONE TRIGGER CAN RUN AT A TIME.
                 switch(trigger)
                 {
-                case TRIGGER_AGE_UP_2:
-                case TRIGGER_AGE_UP_3:
-                    return UpgradeInanimate(units, flag, grid, graphics);
+                case TRIGGER_AGE_UP_2: return UpgradeInanimate(units, flag, grid, graphics, AGE_2);
+                case TRIGGER_AGE_UP_3: return UpgradeInanimate(units, flag, grid, graphics, AGE_3);
                 case TRIGGER_UPGRADE_MILITIA:
                 case TRIGGER_UPGRADE_MAN_AT_ARMS:
                 case TRIGGER_UPGRADE_SPEARMAN:

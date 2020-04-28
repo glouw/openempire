@@ -76,18 +76,20 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
             if(!ref->is_already_tiled)
             {
                 ref->is_already_tiled = true;
-                // SKIP THE RENDER FOR CHILDREN OF BUILDINGS BEING BUILT.
                 if(!ref->is_floating)
+                {
+                    // SKIP THE RENDER FOR CHILDREN OF BUILDINGS BEING BUILT.
                     if(ref->trait.is_inanimate
                     && ref->parent
                     && ref->parent->is_being_built)
                         continue;
-                // SKIP THE RALLY POINT RENDER FOR WAY POINT FLAGS THAT ARE NOT SELECTED.
-                if(ref->parent
-                && ref->parent->has_rally_point
-                && Unit_IsSelectedByColor(ref->parent, overview.color) == false
-                && ref->file == FILE_GRAPHICS_WAYPOINT_FLAG)
-                    continue;
+                    // SKIP THE RALLY POINT RENDER FOR WAY POINT FLAGS THAT ARE NOT SELECTED.
+                    if(ref->parent
+                    && ref->parent->has_rally_point
+                    && Unit_IsSelectedByColor(ref->parent, overview.color) == false
+                    && ref->file == FILE_GRAPHICS_WAYPOINT_FLAG)
+                        continue;
+                }
                 const Graphics file = Unit_IsConstruction(ref)
                     ? Unit_GetConstructionFile(ref)
                     : ref->file;
