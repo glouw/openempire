@@ -13,10 +13,13 @@ Points Points_Make(const int32_t max)
 
 Points Points_Free(Points points)
 {
-    free(points.point);
-    points.point = NULL;
-    points.count = 0;
-    points.max = 0;
+    if(points.point)
+    {
+        free(points.point);
+        points.point = NULL;
+        points.count = 0;
+        points.max = 0;
+    }
     return points;
 }
 

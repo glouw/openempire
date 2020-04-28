@@ -102,7 +102,7 @@ static void MoveAlongPath(Unit* const unit, const Grid grid)
 
 static void Stop(Unit* const unit)
 {
-    if(Point_Mag(unit->velocity) > 0) 
+    if(Point_Mag(unit->velocity) > 0)
     {
         static Point zero;
         unit->velocity = zero;
@@ -197,6 +197,8 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     unit.trait = Trait_Build(file);
     unit.file = file;
     unit.id = id_next;
+    Unit_IncrementCommandGroup();
+    unit.command_group = Unit_GetCommandGroupNext();
     if(!is_floating)
         id_next++;
     unit.is_being_built = is_being_built;
@@ -484,7 +486,7 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
-static bool CanEngage(Unit* const unit, const Grid grid)
+static bool WithinRange(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(
         unit->interest->trait.is_inanimate
@@ -556,15 +558,23 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     Unit* const other = unit->interest;
     if(other != NULL
     && !Unit_IsExempt(unit)
+    && !unit->is_floating
     && !Unit_IsExempt(other)
-    && Unit_IsDifferent(unit, other) // DO NOT MELEE SELF.
+    && !other->is_floating
+    && Unit_IsDifferent(unit, other)   // DO NOT MELEE SELF.
     && other->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
     {
-        if(CanEngage(unit, grid))
+        if(WithinRange(unit, grid))
         {
-            unit->is_engaged_in_melee = true;
-            Unit_SetState(unit, STATE_ATTACK, true);
-            Unit_Lock(unit);
+            if((SameColor(unit, other) && other->is_being_built && unit->trait.type == TYPE_VILLAGER)
+            || !SameColor(unit, other))
+            {
+                unit->is_engaged_in_melee = true;
+                Unit_SetState(unit, STATE_ATTACK, true);
+                Unit_Lock(unit);
+            }
+            else
+                Unit_FreePath(unit);
         }
         if(MustDisengage(unit))
         {

@@ -363,7 +363,7 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
     Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
     const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
-    if(tile.reference && !Unit_IsExempt(tile.reference))
+    if(tile.reference && !Unit_IsExempt(tile.reference) && !tile.reference->is_floating)
         return PathSelectedToUnit(units, tile.reference, overview, grid, graphics, map, field);
     else
     {
