@@ -22,14 +22,16 @@ static Restore RecvPacked(const TCPsocket socket)
         if(bytes >= *size_real) // EARLY EXIT WHEN ALL STREAM BYTES ARE RELIABLY RECVD OVER TCP.
             break;
     }
-    assert(bytes == *size_real);
     Restore out = *restore;
-    if(out.count > 0)
-    {
-        out.unit = UTIL_ALLOC(Unit, out.count);
-        for(int32_t i = 0; i < out.count; i++)
-            out.unit[i] = unit[i];
-    }
+    out.unit = NULL;
+    out.is_success = bytes == *size_real;
+    if(out.is_success)
+        if(out.count > 0)
+        {
+            out.unit = UTIL_ALLOC(Unit, out.count);
+            for(int32_t i = 0; i < out.count; i++)
+                out.unit[i] = unit[i];
+        }
     free(buffer);
     return out;
 }

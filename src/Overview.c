@@ -15,6 +15,17 @@ Overview Overview_Make(const int32_t xres, const int32_t yres)
     return overview;
 }
 
+static Overview RandomizeMouseEvents(Overview overview)
+{
+    if(rand() % 2 == 0) // NOT FLIP COIN - TRULY RANDOM INPUTS.
+    {
+        overview.mouse_cursor.x = rand() % overview.xres;
+        overview.mouse_cursor.y = rand() % overview.yres;
+        overview.event.mouse_ru = rand() % 2;
+    }
+    return overview;
+}
+
 static Overview UpdateMouse(Overview overview, const Input input)
 {
     overview.mouse_cursor = input.cursor;
@@ -73,7 +84,7 @@ static Overview UpdatePan(Overview overview)
     return overview;
 }
 
-Overview Overview_Update(Overview overview, const Input input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Share share, const int32_t ping)
+Overview Overview_Update(Overview overview, const Input input, const uint64_t parity, const int32_t cycles, const int32_t queue_size, const Share share, const int32_t ping, const bool must_randomize_mouse)
 {
     overview = UpdateMouse(overview, input);
     overview = UpdateKeys(overview, input);
@@ -84,7 +95,9 @@ Overview Overview_Update(Overview overview, const Input input, const uint64_t pa
     overview.queue_size = queue_size;
     overview.share = share;
     overview.ping = ping == -1 ? overview.ping : ping;
-    return overview;
+    return must_randomize_mouse
+        ? RandomizeMouseEvents(overview)
+        : overview;
 }
 
 bool Overview_IsSelectionBoxBigEnough(const Overview overview)

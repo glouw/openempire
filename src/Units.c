@@ -100,6 +100,30 @@ static Units UnSelectAll(Units units, const Color color)
     return units;
 }
 
+static Units SelectAll(Units units, const Color color)
+{
+    Share share = units.share[color];
+    share.select_count = 0;
+    for(int32_t i = 0; i < units.count; i++)
+    {
+        Unit* const unit = &units.unit[i];
+        if(!Unit_IsExempt(unit) && unit->color == color)
+        {
+            Unit_SetSelectedColor(unit, color);
+            share.select_count += 1;
+        }
+    }
+    units.share[color] = share;
+    return units;
+}
+
+static Units SelectAllForAllColors(Units units)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        units = SelectAll(units, (Color) i);
+    return units;
+}
+
 static Units RecountSelected(Units units, const Color color)
 {
     Share share = units.share[color];
@@ -1357,8 +1381,10 @@ static void Pursue(const Units units)
     }
 }
 
-Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field)
+Units Units_Caretake(Units units, const Registrar graphics, const Grid grid, const Map map, const Field field, const bool must_randomize_mouse)
 {
+    if(must_randomize_mouse)
+        units = SelectAllForAllColors(units);
     UpdateEntropy(units);
     Tick(units);
     BuildAnimate(units, grid, field);
@@ -1548,20 +1574,23 @@ static void RestorePaths(const Units units, const Grid grid, const Field field)
 
 static Units UnpackRestore(Units units, const Restore restore)
 {
-    // XXX. GIVEN AN OLD STATE IS RESTORED, THE COMMAND GROUP MAY STAY THE SAME,
-    // BUT INCREMENT FOR SAFETY AND GOOD MEASURE.
-    units.count = restore.count;
-    units.repath_index = 0;
-    Unit_SetIdNext(restore.id_next);
-    Unit_SetCommandGroupNext(restore.command_group_next);
-    for(int32_t i = 0; i < units.count; i++)
+    if(restore.is_success)
     {
-        Unit* const unit = &units.unit[i];
-        *unit = restore.unit[i];
-        unit->trait.file_name = Graphics_GetString(unit->file);
+        units.count = restore.count;
+        units.repath_index = 0;
+        Unit_SetIdNext(restore.id_next);
+        Unit_SetCommandGroupNext(restore.command_group_next);
+        for(int32_t i = 0; i < units.count; i++)
+        {
+            Unit* const unit = &units.unit[i];
+            *unit = restore.unit[i];
+            unit->trait.file_name = Graphics_GetString(unit->file);
+        }
+        for(int32_t i = 0; i < COLOR_COUNT; i++)
+            units.share[i] = restore.share[i];
     }
-    for(int32_t i = 0; i < COLOR_COUNT; i++)
-        units.share[i] = restore.share[i];
+    else
+        puts("RESTORE FAILURE, DID NOT GET ALL BYTES");
     return units;
 }
 

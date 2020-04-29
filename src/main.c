@@ -56,6 +56,7 @@ static void Play(const Video video, const Data data, const Args args)
     Packets packets = Packets_Make();
     int32_t cycles = 0;
     int32_t control = 0;
+    const bool must_randomize_mouse = true;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
@@ -63,7 +64,7 @@ static void Play(const Video video, const Data data, const Args args)
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping);
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping, must_randomize_mouse);
         UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
@@ -94,7 +95,7 @@ static void Play(const Video video, const Data data, const Args args)
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
-            units = Units_Caretake(units, data.graphics, grid, map, field);
+            units = Units_Caretake(units, data.graphics, grid, map, field, must_randomize_mouse);
             cycles++;
             if(args.must_measure && cycles == 60)
                 break;

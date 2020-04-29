@@ -8,9 +8,9 @@ GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empire
 LATENCY=25ms
 VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
-XRES=800
-YRES=600
-USERS=3
+XRES=640
+YRES=480
+USERS=2
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -25,6 +25,7 @@ build()
 netsim()
 {
     DEV=lo
+    ulimit -c 0
     sudo tc qdisc del dev $DEV root netem
     sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY
 }

@@ -5,6 +5,7 @@
 #include "Color.h"
 
 #include <SDL2/SDL_net.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -14,6 +15,7 @@ typedef struct
     int32_t id_next;
     int32_t command_group_next;
     Share share[COLOR_COUNT];
+    bool is_success;
 }
 Restore;
 
