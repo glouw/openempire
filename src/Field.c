@@ -71,8 +71,9 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
         if(tries > CONFIG_FIELD_MAX_PATHING_TRIES)
         {
             Meap_Free(&frontier);
-            free(cost_so_far);
             Points_Free(came_from);
+            free(cost_so_far);
+            puts("WARNING: MAX PATHING TRIES EXCEEDED");
             return zero;
         }
         const Point deltas[] = {

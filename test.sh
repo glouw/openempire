@@ -37,7 +37,7 @@ server()
 
 client()
 {
-    ./$BIN --randomize --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
+    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
 }
 
 batch()
