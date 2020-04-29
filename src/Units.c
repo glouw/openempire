@@ -290,11 +290,10 @@ static Units SpawnParts(Units units, const Point cart, const Point offset, const
 
 static Units PlantRallyPoint(Units units, Unit* const unit, const Overview overview, const Registrar graphics, const Map map, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid)
 {
-    if(unit->has_rally_point)
+    if(unit->rally)
         Unit_Flag(unit->rally);
     unit->cart_goal = cart_goal;
     unit->cart_grid_offset_goal = cart_grid_offset_goal;
-    unit->has_rally_point = true;
     const Parts parts = Parts_GetWayPointFlag();
     units = SpawnParts(units, cart_goal, cart_grid_offset_goal, grid, overview.color, graphics, map, false, parts, true, TRIGGER_NONE, false);
     Unit* const rally = Last(units);
@@ -1214,7 +1213,6 @@ static Units AppendMissing(const Units units, Unit* const unit, const Grid grid,
 
 static Units UpgradeInanimate(Units units, Unit* const flag, const Grid grid, const Registrar graphics, const Age age)
 {
-    printf("%d\n", age);
     units.share[flag->color].status.age = age;
     for(int32_t i = 0; i < units.count; i++)
     {

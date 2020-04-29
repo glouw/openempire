@@ -275,10 +275,9 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
                 for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
                 for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
                 cache->is_out_of_sync = false;
-                Restore_Print(restore);
                 Restore_Free(restore);
                 Cache_ClearHistory(cache);
-                puts("GAME SUCCESSFULLY RESTORED");
+                printf("RESTORE TRANSMITTED TO CYCLE NUMBER %d\n", restore.cycles);
                 return;
             }
         }

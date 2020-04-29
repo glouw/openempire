@@ -260,7 +260,6 @@ void Unit_Print(Unit* const unit)
     {
         printf("command_group         :: %d\n", unit->command_group);
         printf("path.count            :: %d\n", unit->path.count);
-        printf("has_rally_point       :: %d\n", unit->has_rally_point);
         printf("child_count           :: %d\n", unit->child_count);
         printf("has_children          :: %d\n", unit->has_children);
         printf("string                :: %s\n", Graphics_GetString(unit->file));
@@ -674,7 +673,6 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
     COPY(to, from, cell);
     COPY(to, from, cart);
     COPY(to, from, cart_grid_offset);
-    COPY(to, from, has_rally_point);
     COPY(to, from, id);
     COPY(to, from, rally_id);
     COPY(to, from, parent_id);
@@ -797,12 +795,11 @@ void Unit_AdvanceBuildAnimate(Unit* const unit, const Grid grid, const Field fie
     {
         if(allowed_to_unlock_parent)
         {
-            if(unit->parent->has_rally_point)
+            if(unit->parent->rally)
             {
                 unit->command_group = Unit_GetCommandGroupNext();
                 Unit_SetInterest(unit, unit->parent->interest);
                 Unit_FindPath(unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
-                Unit_IncrementCommandGroup();
             }
             unit->parent->child_lock_id = -1;
             unit->parent->child_count -= 1;

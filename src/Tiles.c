@@ -85,7 +85,7 @@ Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, cons
                         continue;
                     // SKIP THE RALLY POINT RENDER FOR WAY POINT FLAGS THAT ARE NOT SELECTED.
                     if(ref->parent
-                    && ref->parent->has_rally_point
+                    && ref->parent->rally
                     && Unit_IsSelectedByColor(ref->parent, overview.color) == false
                     && ref->file == FILE_GRAPHICS_WAYPOINT_FLAG)
                         continue;

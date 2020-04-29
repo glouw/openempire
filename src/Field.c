@@ -73,7 +73,6 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
             Meap_Free(&frontier);
             Points_Free(came_from);
             free(cost_so_far);
-            puts("WARNING: MAX PATHING TRIES EXCEEDED");
             return zero;
         }
         const Point deltas[] = {

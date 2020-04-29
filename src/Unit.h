@@ -72,7 +72,6 @@ typedef struct Unit
     bool is_being_built;
     bool has_direct;
     bool has_parent_lock;
-    bool has_rally_point;
 }
 Unit;
 
