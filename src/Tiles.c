@@ -140,17 +140,23 @@ Tiles Tiles_PrepTerrain(const Registrar terrain, const Map map, const Overview o
     return tiles;
 }
 
-Tile Tiles_Get(const Tiles tiles, const Point click)
+Tile Tiles_Get(const Tiles tiles, const Overview overview, const Grid grid)
 {
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
-        if(Tile_ContainsPoint(tile, click)) // XXX: MAKE THIS SELECTION POINT A BIT BIGGER (MAYBE 5X5).
+        if(Tile_ContainsPoint(tile, overview.mouse_cursor)) // XXX: MAKE THIS SELECTION POINT A BIT BIGGER (MAYBE 5X5).
         {
             const Rect rect = Tile_GetFrameOutline(tile);
-            const Point origin_click = Point_Sub(click, rect.a);
+            const Point origin_click = Point_Sub(overview.mouse_cursor, rect.a);
             const uint32_t pixel = Surface_GetPixel(tile.surface, origin_click.x, origin_click.y);
             if(pixel != SURFACE_COLOR_KEY)
+                return tile;
+        }
+        if(tile.reference->trait.is_inanimate && !Unit_IsExempt(tile.reference)) // BACKUP CHECK, PROBE FULL TILE BELOW BUILDING (REALLY HELPS WHEN BUILDINGS ARE BEING BUILT).
+        {
+            const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
+            if(Unit_IsPointWithinDimensions(tile.reference, cart))
                 return tile;
         }
     }

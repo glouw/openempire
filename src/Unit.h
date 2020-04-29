@@ -172,3 +172,5 @@ void Unit_ClearSelectedAllColors(Unit* const);
 void Unit_SetSelectedColor(Unit* const, const Color);
 
 void Unit_SetRally(Unit* const, Unit* const);
+
+bool Unit_IsPointWithinDimensions(Unit* const, const Point);

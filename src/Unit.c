@@ -830,3 +830,16 @@ void Unit_SetSelectedColor(Unit* const unit, const Color color)
 {
     unit->is_selected_by |= 0x1 << color;
 }
+
+bool Unit_IsPointWithinDimensions(Unit* const unit, const Point cart)
+{
+    const Rect rect = {
+        unit->cart,
+        Point_Add(unit->cart, unit->trait.dimensions)
+    };
+    puts(Graphics_GetString(unit->file));
+    Point_Print(rect.a);
+    Point_Print(rect.b);
+    Point_Print(unit->cart);
+    return Rect_ContainsPoint(rect, cart);
+}
