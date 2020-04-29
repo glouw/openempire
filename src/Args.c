@@ -29,6 +29,7 @@ Args Args_Parse(const int32_t argc, const char* argv[])
         if(Util_StringEqual(arg, "--quiet"    )) args.is_quiet = true;
         if(Util_StringEqual(arg, "--server"   )) args.is_server = true;
         if(Util_StringEqual(arg, "--demo"     )) args.is_demo = true;
+        if(Util_StringEqual(arg, "--randomize")) args.must_randomize_mouse = true;
     }
     args.port_ping  = args.port + 1;
     args.port_reset = args.port + 2;

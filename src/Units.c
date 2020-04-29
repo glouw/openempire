@@ -37,12 +37,8 @@ static bool CanBuild(const Units units, const Map map, Unit* const unit)
     return true;
 }
 
-Field Units_Field(const Units units, const Map map)
+void Units_Field(const Units units, const Map map, const Field field)
 {
-    static Field zero;
-    Field field = zero;
-    field.size = map.size;
-    field.object = UTIL_ALLOC(char, field.size * field.size);
     for(int32_t row = 0; row < field.size; row++)
     for(int32_t col = 0; col < field.size; col++)
     {
@@ -51,7 +47,6 @@ Field Units_Field(const Units units, const Map map)
             ? Field_Set(field, point, FIELD_WALKABLE_SPACE)
             : Field_Set(field, point, FIELD_OBSTRUCT_SPACE);
     }
-    return field;
 }
 
 static Units Alloc(Units units)
@@ -388,7 +383,7 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
     Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
     const Tile tile = Tiles_Get(tiles, overview.mouse_cursor);
     if(tile.reference && !Unit_IsExempt(tile.reference) && !tile.reference->is_floating)
-        return PathSelectedToUnit(units, tile.reference, overview, grid, graphics, map, field);
+        units = PathSelectedToUnit(units, tile.reference, overview, grid, graphics, map, field);
     else
     {
         DisengageSelected(units, overview.color);

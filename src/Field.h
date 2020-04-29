@@ -12,15 +12,20 @@ typedef struct
 {
     char* object;
     int32_t size;
+    int32_t area;
 }
 Field;
 
 Points Field_PathAStar(const Field, const Point start, const Point goal);
-
-void Field_Free(const Field);
 
 char Field_Get(const Field, const Point);
 
 void Field_Set(const Field, const Point, const char ch);
 
 bool Field_IsWalkable(const Field, const Point);
+
+Field Field_Make(const int32_t size);
+
+void Field_Clear(const Field);
+
+void Field_Free(const Field);

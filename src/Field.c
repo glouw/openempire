@@ -48,10 +48,13 @@ Points Construct(const Field field, const Point start, const Point goal, const P
 
 Points Field_PathAStar(const Field field, const Point start, const Point goal)
 {
+    static Points zero;
+    if(!IsInBounds(field, goal))
+        return zero;
     Meap frontier = Meap_Make();
     Meap_Insert(&frontier, 0, start);
     const Point none = { -1, -1 };
-    const int32_t area = field.size * field.size;
+    const int32_t area = field.area;
     int32_t* const cost_so_far = UTIL_ALLOC(int32_t, area);
     const Points came_from = Points_Make(area);
     for(int32_t i = 0; i < area; i++)
@@ -67,7 +70,9 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
             break;
         if(tries > CONFIG_FIELD_MAX_PATHING_TRIES)
         {
-            static Points zero;
+            Meap_Free(&frontier);
+            free(cost_so_far);
+            Points_Free(came_from);
             return zero;
         }
         const Point deltas[] = {
@@ -104,6 +109,22 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
     Points_Free(forwards);
     free(cost_so_far);
     return backward;
+}
+
+Field Field_Make(const int32_t size)
+{
+    static Field zero;
+    Field field = zero;
+    field.size = size;
+    field.area = field.size * field.size;
+    field.object = UTIL_ALLOC(char, field.area);
+    return field;
+}
+
+void Field_Clear(const Field field)
+{
+    for(int32_t i = 0; i < field.area; i++)
+        field.object[i] = '\0';
 }
 
 void Field_Free(const Field field)

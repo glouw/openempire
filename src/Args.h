@@ -21,6 +21,7 @@ typedef struct
     bool is_quiet;
     bool is_demo;
     bool must_measure;
+    bool must_randomize_mouse;
 }
 Args;
 

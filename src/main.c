@@ -54,17 +54,18 @@ static void Play(const Video video, const Data data, const Args args)
     units = Units_Generate(units, map, grid, data.graphics, overview.users, overview.spectator);
     overview.pan = Units_GetFirstTownCenterPan(units, grid);
     Packets packets = Packets_Make();
+    Field field = Field_Make(map.size);
     int32_t cycles = 0;
     int32_t control = 0;
-    const bool must_randomize_mouse = true;
     for(Input input = Input_Ready(); !input.done; input = Input_Pump(input))
     {
         const int32_t t0 = SDL_GetTicks();
-        const Field field = Units_Field(units, map);
+        Field_Clear(field);
+        Units_Field(units, map, field);
         const int32_t size = Packets_Size(packets);
         const uint64_t parity = Units_Xor(units);
         const int32_t ping = Ping_Get();
-        overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping, must_randomize_mouse);
+        overview = Overview_Update(overview, input, parity, cycles, size, units.share[units.color], ping, args.must_randomize_mouse);
         UTIL_TCP_SEND(sock.server, &overview);
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
@@ -95,9 +96,9 @@ static void Play(const Video video, const Data data, const Args args)
                 packets = Packets_Dequeue(packets, &dequeued);
                 units = Units_PacketService(units, data.graphics, dequeued, grid, map, field);
             }
-            units = Units_Caretake(units, data.graphics, grid, map, field, must_randomize_mouse);
+            units = Units_Caretake(units, data.graphics, grid, map, field, args.must_randomize_mouse);
             cycles++;
-            if(args.must_measure && cycles == 60)
+            if(args.must_measure && cycles == 1024)
                 break;
             if(packet.control != 0)
                 control = packet.control;
@@ -130,8 +131,8 @@ static void Play(const Video video, const Data data, const Args args)
                 }
             }
         }
-        Field_Free(field);
     }
+    Field_Free(field);
     Units_Free(floats);
     Units_Free(units);
     Packets_Free(packets);

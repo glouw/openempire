@@ -4,10 +4,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef __unix__
-#include <execinfo.h>
-#endif
-
 void Util_Bomb(const char* const message, ...)
 {
     va_list args;

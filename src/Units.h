@@ -37,7 +37,7 @@ void Units_Free(const Units);
 
 Stack Units_GetStackCart(const Units, const Point);
 
-Field Units_Field(const Units, const Map);
+void Units_Field(const Units, const Map, const Field);
 
 void Units_ResetTiled(const Units);
 
