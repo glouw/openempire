@@ -47,7 +47,7 @@ static int32_t Ping(void* const data)
         const int32_t dt = t1 - t0;
         if(temp == send)
             Set(dt);
-        const int32_t delay = 250 - dt; // ARBITRARY HZ. WHAT IF DT GETS TOO LARGE?
+        const int32_t delay = 50 - dt; // ARBITRARY HZ. WHAT IF DT GETS TOO LARGE?
         SDL_Delay(delay > 0 ? delay : 0);
     }
     Sock_Disconnect(pinger);

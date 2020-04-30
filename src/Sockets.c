@@ -142,7 +142,7 @@ static int32_t RunSendNeedle(void* const data)
 static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
-    const int32_t buffer = 5; // XXX. THIS BUFFER NEEDS TO BE LARGER IF ONE OF THE CLIENT IS DRIVING HARDER WITH ITS CONTROL VALUE.
+    const int32_t buffer = 3; // XXX. THIS BUFFER NEEDS TO BE LARGER IF ONE OF THE CLIENT IS DRIVING HARDER WITH ITS CONTROL VALUE.
     const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
     Packet base = cache->packet;
     base.turn = cache->turn;
@@ -154,7 +154,7 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
     base.users = cache->users;
     base.seed = cache->seed;
     base.map_size = cache->map_size;
-    if(!cache->is_stable)
+    if(!cache->is_stable || cache->is_out_of_sync)
         base = Packet_ZeroOverviews(base);
     SendNeedle  needles[COLOR_COUNT]; // THREADS ENSURE ALL CLIENTS GET THEIR PACKETS ROUGHLY AT THE SAME TIME.
     SDL_Thread* threads[COLOR_COUNT]; // FOR EXAMPLE, A SLIGHT HANG ON CLIENT 2 WILL NOT DELAY CLIENT 7 AND MISS ITS EXEC CYCLE DEADLINE.
@@ -275,7 +275,6 @@ void Sockets_Reset(const Sockets resets, Cache* const cache)
                     }
                     for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
                     for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
-                    cache->is_out_of_sync = false;
                     Restore_Free(restore);
                     Cache_ClearHistory(cache);
                     printf("RESTORE TRANSMITTED TO CYCLE NUMBER %d\n", restore.cycles);

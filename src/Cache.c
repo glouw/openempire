@@ -38,6 +38,7 @@ static bool MisMatch(Cache* const cache, const int32_t cycles_check, const int32
 void Cache_CheckParity(Cache* const cache)
 {
     if(cache->is_stable)
+    {
         for(int32_t i = 0; i < COLOR_COUNT; i++)
         {
             const History history = cache->history[i];
@@ -48,10 +49,13 @@ void Cache_CheckParity(Cache* const cache)
                 if(MisMatch(cache, cycles_check, parity_check))
                 {
                     cache->is_out_of_sync = true;
+                    puts("OUT OF SYNC DETECTED");
                     return;
                 }
             }
         }
+        cache->is_out_of_sync = false;
+    }
 }
 
 void Cache_ClearPacket(Cache* const cache)
