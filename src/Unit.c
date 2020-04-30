@@ -2,6 +2,7 @@
 
 #include "Rect.h"
 #include "Util.h"
+#include "Points.h"
 #include "Resource.h"
 #include "Config.h"
 
@@ -315,75 +316,7 @@ void Unit_SetDir(Unit* const unit, const Point dir)
     }
 }
 
-typedef struct
-{
-    Point point;
-    int32_t mag;
-}
-Mag;
-
-static int32_t CompareByMag(const void* a, const void* b)
-{
-    Mag* const aa = (Mag*) a;
-    Mag* const bb = (Mag*) b;
-    const int32_t ma = aa->mag;
-    const int32_t mb = bb->mag;
-    return ma > mb;
-}
-
-static Point GetNextBestInanimateCoord(Unit* const unit, const Grid grid, const Field field) // XXX. DEPENDING ON NUMBER OF UNITS SELECTED, RANDOMLY SPREAD OUT.
-{
-#define WIDTH   (4)
-#define SIDES   (4)
-#define CORNERS (4)
-#define MAX (SIDES * WIDTH + CORNERS)
-    Mag mags[MAX];
-    for(int32_t i = 0; i < MAX; i++)
-    {
-        static Mag zero;
-        mags[i] = zero;
-    }
-    const Unit* const interest = unit->interest;
-    int32_t count = 0;
-    const int32_t width = 1;
-    for(int32_t x = -width; x < interest->trait.dimensions.x + width; x++)
-    for(int32_t y = -width; y < interest->trait.dimensions.y + width; y++)
-        if(x == -width
-        || y == -width
-        || x == interest->trait.dimensions.x
-        || y == interest->trait.dimensions.y)
-        {
-            const Point shift = { x, y };
-            const Point cart = Point_Add(interest->cart, shift);
-            if(Field_IsWalkable(field, cart))
-            {
-                const Point cell = Grid_CartToCell(grid, cart);
-                const Point diff = Point_Sub(unit->cell, cell);
-                const Mag mag = { cart, Point_Mag(diff) };
-                mags[count++] = mag;
-            }
-        }
-    UTIL_SORT(mags, count, CompareByMag);
-#if 0
-    for(int32_t i = 0; i < MAX; i++)
-        Point_Print(mags[i].point);
-#endif
-    return mags[0].point;
-#undef MAX
-#undef SIDES
-#undef CORNERS
-#undef MAX
-}
-
-static Points PathStraight(const Point a, const Point b)
-{
-    Points path = Points_Make(2);
-    path = Points_Append(path, a);
-    path = Points_Append(path, b);
-    return path;
-}
-
-static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
+bool Unit_HasDirectPath(Unit* const unit, const Grid grid, const Field field)
 {
     if(Point_Equal(unit->cart, unit->cart_goal))
         return true;
@@ -407,39 +340,6 @@ static bool HasDirectPath(Unit* const unit, const Grid grid, const Field field)
     return false;
 }
 
-void Unit_FindPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
-{
-    static Point zero;
-    if(!Unit_IsExempt(unit))
-    {
-        if(unit->interest)
-        {
-            if(unit->interest->trait.is_inanimate) // PURSUE BUILDING NEXT BEST.
-            {
-                unit->cart_goal = GetNextBestInanimateCoord(unit, grid, field);
-                unit->cart_grid_offset_goal = zero;
-            }
-            else // PURSUE ANIMATE.
-            {
-                unit->cart_goal = unit->interest->cart;
-                unit->cart_grid_offset_goal = unit->interest->cart_grid_offset;
-                if(unit->interest->color == unit->color)
-                    unit->command_group = unit->interest->command_group;
-            }
-        }
-        else // GOTO GENERIC.
-        {
-            unit->cart_goal = cart_goal;
-            unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        }
-        Unit_FreePath(unit);
-        unit->has_direct = HasDirectPath(unit, grid, field);
-        unit->path = unit->has_direct
-            ? PathStraight(unit->cart, unit->cart_goal)
-            : Field_PathAStar(field, unit->cart, unit->cart_goal);
-    }
-}
-
 void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal)
 {
     if(!Unit_IsExempt(unit))
@@ -447,7 +347,7 @@ void Unit_MockPath(Unit* const unit, const Point cart_goal, const Point cart_gri
         Unit_FreePath(unit);
         unit->cart_goal = cart_goal;
         unit->cart_grid_offset_goal = cart_grid_offset_goal;
-        unit->path = PathStraight(unit->cart, cart_goal);
+        unit->path = Points_PathStraight(unit->cart, cart_goal);
     }
 }
 
@@ -596,14 +496,6 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         Unit_Unlock(unit);
     const Resource none = { TYPE_NONE, 0 };
     return none;
-}
-
-void Unit_Repath(Unit* const unit, const Grid grid, const Field field)
-{
-    if(!Unit_IsExempt(unit)
-    && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
-    && Unit_HasPath(unit))
-        Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
 }
 
 static Point Nudge(Unit* const unit)
@@ -786,29 +678,6 @@ bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other)
 {
     return IsFloatingDifferent(other, unit)
         || IsFloatingDifferent(unit, other);
-}
-
-void Unit_AdvanceBuildAnimate(Unit* const unit, const Grid grid, const Field field, const bool allowed_to_unlock_parent)
-{
-    unit->health += 1;
-    if(unit->health >= unit->trait.max_health)
-    {
-        if(allowed_to_unlock_parent)
-        {
-            if(unit->parent->rally)
-            {
-                unit->command_group = Unit_GetCommandGroupNext();
-                Unit_SetInterest(unit, unit->parent->interest);
-                Unit_FindPath(unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
-            }
-            unit->parent->child_lock_id = -1;
-            unit->parent->child_count -= 1;
-        }
-        unit->is_being_built = false;
-        unit->is_floating = false;
-        unit->has_parent_lock = false;
-        Unit_SetParent(unit, NULL);
-    }
 }
 
 bool Unit_IsSelectedByColor(Unit* const unit, const Color color)

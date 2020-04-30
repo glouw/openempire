@@ -101,8 +101,6 @@ void Unit_SetDir(Unit* const, const Point);
 
 void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal);
 
-void Unit_FindPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal, const Grid, const Field);
-
 void Unit_Flag(Unit* const);
 
 int32_t Unit_GetLastExpireTick(Unit* const);
@@ -155,8 +153,6 @@ void Unit_LayFarm(Unit* const, const Map);
 
 bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other);
 
-void Unit_AdvanceBuildAnimate(Unit* const, const Grid, const Field, const bool allowed_to_unlock_parent);
-
 int32_t Unit_GetCommandGroupNext(void);
 
 void Unit_SetCommandGroupNext(const int32_t command_group);
@@ -174,3 +170,5 @@ void Unit_SetSelectedColor(Unit* const, const Color);
 void Unit_SetRally(Unit* const, Unit* const);
 
 bool Unit_IsPointWithinDimensions(Unit* const, const Point);
+
+bool Unit_HasDirectPath(Unit* const, const Grid, const Field);

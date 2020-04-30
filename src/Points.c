@@ -74,3 +74,11 @@ Points Points_Reverse(Points points)
     }
     return out;
 }
+
+Points Points_PathStraight(const Point a, const Point b)
+{
+    Points path = Points_Make(2);
+    path = Points_Append(path, a);
+    path = Points_Append(path, b);
+    return path;
+}

@@ -191,6 +191,19 @@ static void SafeStackAppend(const Units units, Unit* const unit, const Point car
         Stack_Append(GetStack(units, cart), unit);
 }
 
+Stack Units_GetStackCart(const Units units, const Point p)
+{
+    static Stack zero;
+    return OutOfBounds(units, p)
+        ? zero
+        : *GetStack(units, p);
+}
+
+static int32_t GetStackCount(const Units units, const Point p)
+{
+    return Units_GetStackCart(units, p).count;
+}
+
 static void ProperStackAppend(const Units units, Unit* const unit)
 {
     if(unit->trait.is_inanimate)
@@ -302,6 +315,144 @@ static Units PlantRallyPoint(Units units, Unit* const unit, const Overview overv
     return units;
 }
 
+typedef struct
+{
+    Point point;
+    int32_t mag;
+}
+Mag;
+
+static int32_t CompareByMag(const void* a, const void* b)
+{
+    Mag* const aa = (Mag*) a;
+    Mag* const bb = (Mag*) b;
+    const int32_t ma = aa->mag;
+    const int32_t mb = bb->mag;
+    return ma > mb;
+}
+
+static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, const Grid grid, const Field field) // XXX. DEPENDING ON NUMBER OF UNITS SELECTED, RANDOMLY SPREAD OUT.
+{
+#define WIDTH   (4)
+#define SIDES   (4)
+#define CORNERS (4)
+#define MAX (SIDES * WIDTH + CORNERS)
+    Mag mags[MAX];
+    for(int32_t i = 0; i < MAX; i++)
+    {
+        static Mag zero;
+        mags[i] = zero;
+    }
+    const Unit* const interest = unit->interest;
+    int32_t count = 0;
+    const int32_t width = 1;
+    for(int32_t x = -width; x < interest->trait.dimensions.x + width; x++)
+    for(int32_t y = -width; y < interest->trait.dimensions.y + width; y++)
+        if(x == -width
+        || y == -width
+        || x == interest->trait.dimensions.x
+        || y == interest->trait.dimensions.y)
+        {
+            const Point shift = { x, y };
+            const Point cart = Point_Add(interest->cart, shift);
+            if(Field_IsWalkable(field, cart))
+            {
+                const Point cell = Grid_CartToCell(grid, cart);
+                const Point diff = Point_Sub(unit->cell, cell);
+                const Mag mag = { cart, Point_Mag(diff) };
+                mags[count++] = mag;
+            }
+        }
+    // OF THE CLOSEST FOUR SIDES, PICK THE TILE WITH LEAST AMOUNT OF VILLAGERS.
+#define MIN (4)
+    UTIL_SORT(mags, count, CompareByMag);
+    Point out = { -1,-1 };
+    int32_t min = INT_MAX;
+    for(int32_t i = 0; i < SIDES; i++)
+    {
+        const Point cart = mags[i].point;
+        const int32_t stacked = GetStackCount(units, cart);
+        if(stacked < min)
+        {
+            min = stacked;
+            out = cart;
+        }
+    }
+    return out;
+#undef WIDTH
+#undef SIDES
+#undef CORNERS
+#undef MAX
+#undef MIN
+}
+
+static void SetupGoal(const Units units, Unit* const unit, const Grid grid, const Field field)
+{
+    if(unit->interest->trait.is_inanimate) // PURSUE BUILDING NEXT BEST.
+    {
+        static Point zero;
+        unit->cart_goal = GetNextBestInanimateCoord(units, unit, grid, field);
+        unit->cart_grid_offset_goal = zero;
+    }
+    else // PURSUE ANIMATE.
+    {
+        unit->cart_goal = unit->interest->cart;
+        unit->cart_grid_offset_goal = unit->interest->cart_grid_offset;
+        if(unit->interest->color == unit->color)
+            unit->command_group = unit->interest->command_group;
+    }
+}
+
+static void FindPath(const Units units, Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
+{
+    if(!Unit_IsExempt(unit))
+    {
+        if(unit->interest)
+            SetupGoal(units, unit, grid, field);
+        else
+        {
+            unit->cart_goal = cart_goal;
+            unit->cart_grid_offset_goal = cart_grid_offset_goal;
+        }
+        Unit_FreePath(unit);
+        unit->has_direct = Unit_HasDirectPath(unit, grid, field);
+        unit->path = unit->has_direct
+            ? Points_PathStraight(unit->cart, unit->cart_goal)
+            : Field_PathAStar(field, unit->cart, unit->cart_goal);
+    }
+}
+
+static void Repath(const Units units, Unit* const unit, const Grid grid, const Field field)
+{
+    if(!Unit_IsExempt(unit)
+    && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
+    && Unit_HasPath(unit))
+        FindPath(units, unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
+}
+
+static void AdvanceBuildAnimate(const Units units, Unit* const unit, const Grid grid, const Field field, const bool allowed_to_unlock_parent)
+{
+    unit->health += 1;
+    if(unit->health >= unit->trait.max_health)
+    {
+        if(allowed_to_unlock_parent)
+        {
+            if(unit->parent->rally)
+            {
+                unit->command_group = Unit_GetCommandGroupNext();
+                Unit_SetInterest(unit, unit->parent->interest);
+                FindPath(units, unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
+            }
+            unit->parent->child_lock_id = -1;
+            unit->parent->child_count -= 1;
+        }
+        unit->is_being_built = false;
+        unit->is_floating = false;
+        unit->has_parent_lock = false;
+        Unit_SetParent(unit, NULL);
+    }
+}
+
 static Units FindPathForSelected(Units units, const Overview overview, const Registrar graphics, const Map map, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -315,7 +466,7 @@ static Units FindPathForSelected(Units units, const Overview overview, const Reg
             else
             {
                 unit->command_group = Unit_GetCommandGroupNext();
-                Unit_FindPath(unit, cart_goal, cart_grid_offset_goal, grid, field);
+                FindPath(units, unit, cart_goal, cart_grid_offset_goal, grid, field);
             }
         }
     }
@@ -809,7 +960,7 @@ static Units RepathSomeBoids(Units units, const Grid grid, const Field field)
     if(end > units.count)
         end = units.count;
     for(int32_t i = units.repath_index; i < end; i++)
-        Unit_Repath(&units.unit[i], grid, field);
+        Repath(units, &units.unit[i], grid, field);
     units.repath_index += slice;
     if(units.repath_index >= units.count)
         units.repath_index = 0;
@@ -1285,12 +1436,6 @@ static Units TriggerTriggers(Units units, const Grid grid, const Registrar graph
     return units;
 }
 
-Stack Units_GetStackCart(const Units units, const Point p)
-{
-    static Stack zero;
-    return OutOfBounds(units, p) ? zero : *GetStack(units, p);
-}
-
 static void ResetStacks(const Units units)
 {
     for(int32_t y = 0; y < units.size; y++)
@@ -1351,10 +1496,10 @@ static void BuildAnimate(const Units units, const Grid grid, const Field field)
                     unit->has_parent_lock = true;
                 }
                 if(parent->child_lock_id == unit->id)
-                    Unit_AdvanceBuildAnimate(unit, grid, field, true);
+                    AdvanceBuildAnimate(units, unit, grid, field, true);
             }
             else
-                Unit_AdvanceBuildAnimate(unit, grid, field, false);
+                AdvanceBuildAnimate(units, unit, grid, field, false);
         }
     }
 }
@@ -1559,7 +1704,7 @@ static void RestorePaths(const Units units, const Grid grid, const Field field)
         Unit* const unit = &units.unit[i];
         if(unit->must_repath_with_recover)
         {
-            Unit_FindPath(unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
+            FindPath(units, unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
             unit->must_repath_with_recover = false;
         }
     }
