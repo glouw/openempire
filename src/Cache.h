@@ -10,6 +10,7 @@
 typedef struct
 {
     Packet packet;
+    History history[COLOR_COUNT];
     uint64_t parity[COLOR_COUNT]; // XXX. REQUIRES 2D ARRAY WITH BUFFER TO LOOK AT ALL PARITIES.
     int32_t cycles[COLOR_COUNT];
     int32_t queue_size[COLOR_COUNT];
@@ -19,11 +20,11 @@ typedef struct
     int32_t users;
     int32_t seed;
     int32_t map_size;
+    int32_t control[COLOR_COUNT];
+    int32_t integral[COLOR_COUNT];
+    int32_t restore_count;
     bool is_stable;
     bool is_out_of_sync;
-    int32_t control[COLOR_COUNT];
-    History history[COLOR_COUNT];
-    int32_t integral[COLOR_COUNT];
 }
 Cache;
 

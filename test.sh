@@ -10,7 +10,7 @@ VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
 XRES=640
 YRES=480
-USERS=3
+USERS=5
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -27,7 +27,7 @@ netsim()
     DEV=lo
     ulimit -c 0
     sudo tc qdisc del dev $DEV root netem
-    sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY
+    sudo tc qdisc add dev $DEV root netem delay $LATENCY $VARIANCE 25% loss $ENTROPY 25% duplicate $ENTROPY corrupt $ENTROPY
 }
 
 server()
@@ -37,7 +37,7 @@ server()
 
 client()
 {
-    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
+    ./$BIN --randomize --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
 }
 
 batch()
@@ -46,14 +46,14 @@ batch()
     server &
     for (( i = 0; i < $(($USERS - 1)); i++ ))
     do
-        D=20
+        sleep 1
+        D=30
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))
         client $X $Y &
-        sleep 0.2
     done
-    # SPECTATOR MUST CONNECT LAST, SO ENSURE WITH A SLEEP THEY COME LAST.
     sleep 5
+    # SPECTATOR MUST CONNECT LAST, SO ENSURE WITH A SLEEP THEY COME LAST.
     client 400 300
 }
 

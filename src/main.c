@@ -70,8 +70,6 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            packets = Packets_Clear(packets);
-            Packet_Flush(sock);
             if(Overview_IsSpectator(overview))
             {
                 Units_FreeAllPathsForRecovery(units);
@@ -84,6 +82,8 @@ static void Play(const Video video, const Data data, const Args args)
             cycles = restore.cycles;
             Util_Srand(overview.seed);
             Restore_Free(restore);
+            packets = Packets_Clear(packets);
+            Packet_Flush(sock);
         }
         else
         {
@@ -126,7 +126,7 @@ static void Play(const Video video, const Data data, const Args args)
                     SDL_Delay(ms);
                 if(control < 0)
                 {
-                    SDL_Delay(abs(control));
+                    SDL_Delay(1);
                     control++;
                 }
             }

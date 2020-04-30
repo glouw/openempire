@@ -86,7 +86,7 @@ Sockets Sockets_Recv(Sockets sockets, Cache* const cache)
 
 static void Print(const Sockets sockets, Cache* const cache, const int32_t setpoint, const int32_t max_ping, const bool game_running)
 {
-    printf("TURN %d :: SETPOINT %d :: MAX_PING %d\n", cache->turn, setpoint, max_ping);
+    printf("TURN %d :: SETPOINT %d :: MAX_PING %d :: RESTORE_COUNT %d\n", cache->turn, setpoint, max_ping, cache->restore_count);
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const uint64_t parity    = cache->parity[i];
@@ -142,7 +142,7 @@ static int32_t RunSendNeedle(void* const data)
 static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cycle, const int32_t max_ping, const bool game_running)
 {
     const int32_t dt_cycles = max_ping / CONFIG_MAIN_LOOP_SPEED_MS;
-    const int32_t buffer = 3; // XXX. THIS BUFFER NEEDS TO BE LARGER IF ONE OF THE CLIENT IS DRIVING HARDER WITH ITS CONTROL VALUE.
+    const int32_t buffer = 5; // XXX. THIS BUFFER NEEDS TO BE LARGER IF ONE OF THE CLIENT IS DRIVING HARDER WITH ITS CONTROL VALUE.
     const int32_t exec_cycle = max_cycle + dt_cycles + buffer;
     Packet base = cache->packet;
     base.turn = cache->turn;
@@ -258,28 +258,30 @@ static int32_t RunRestoreNeedle(void* const data)
 void Sockets_Reset(const Sockets resets, Cache* const cache)
 {
     if(SDLNet_CheckSockets(resets.set, 0))
-    {
         for(int32_t j = 0; j < COLOR_COUNT; j++)
         {
             const TCPsocket socket = resets.socket[j];
             if(SDLNet_SocketReady(socket))
             {
                 const Restore restore = Restore_Recv(socket);
-                RestoreNeedle needles[COLOR_COUNT];
-                SDL_Thread*   threads[COLOR_COUNT];
-                for(int32_t i = 0; i < COLOR_COUNT; i++)
+                if(restore.is_success)
                 {
-                    needles[i].socket = resets.socket[i];
-                    needles[i].restore = restore;
+                    RestoreNeedle needles[COLOR_COUNT];
+                    SDL_Thread*   threads[COLOR_COUNT];
+                    for(int32_t i = 0; i < COLOR_COUNT; i++)
+                    {
+                        needles[i].socket = resets.socket[i];
+                        needles[i].restore = restore;
+                    }
+                    for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
+                    for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
+                    cache->is_out_of_sync = false;
+                    Restore_Free(restore);
+                    Cache_ClearHistory(cache);
+                    printf("RESTORE TRANSMITTED TO CYCLE NUMBER %d\n", restore.cycles);
+                    cache->restore_count += 1;
+                    return;
                 }
-                for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunRestoreNeedle, "N/A", &needles[i]);
-                for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
-                cache->is_out_of_sync = false;
-                Restore_Free(restore);
-                Cache_ClearHistory(cache);
-                printf("RESTORE TRANSMITTED TO CYCLE NUMBER %d\n", restore.cycles);
-                return;
             }
         }
-    }
 }

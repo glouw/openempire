@@ -17,7 +17,7 @@ Overview Overview_Make(const int32_t xres, const int32_t yres)
 
 static Overview RandomizeMouseEvents(Overview overview)
 {
-    if(rand() % 2 == 0) // NOT FLIP COIN - TRULY RANDOM INPUTS.
+    if(rand() % 6 == 0)
     {
         overview.mouse_cursor.x = rand() % overview.xres;
         overview.mouse_cursor.y = rand() % overview.yres;
