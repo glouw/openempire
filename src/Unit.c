@@ -564,6 +564,7 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
 #define COPY(a, b, what) to->what = from->what
     COPY(to, from, cell);
     COPY(to, from, cart);
+    COPY(to, from, is_selected_by);
     COPY(to, from, cart_grid_offset);
     COPY(to, from, id);
     COPY(to, from, rally_id);

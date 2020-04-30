@@ -75,19 +75,25 @@ typedef struct Unit
 }
 Unit;
 
-Unit Unit_Make(const Point cart, const Point offset, const Grid, const Graphics file, const Color, const Registrar graphics, const bool at_center, const bool is_floating, const Trigger, const bool is_being_built);
+int32_t Unit_GetIdNext(void);
+
+void Unit_SetIdNext(const int32_t id);
+
+int32_t Unit_GetCommandGroupNext(void);
+
+void Unit_SetCommandGroupNext(const int32_t command_group);
+
+void Unit_IncrementCommandGroup(void);
 
 void Unit_UpdatePathIndex(Unit* const, const int32_t index, const bool reset_path_index_timer);
+
+void Unit_FreePath(Unit* const);
+
+void UpdateCart(Unit* const, const Grid);
 
 void Unit_UndoMove(Unit* const, const Grid);
 
 void Unit_Move(Unit* const, const Grid);
-
-void Unit_Print(Unit* const);
-
-void Unit_Flow(Unit* const, const Grid);
-
-bool Unit_InPlatoon(Unit* const, Unit* const other);
 
 void Unit_Lock(Unit* const);
 
@@ -95,9 +101,19 @@ void Unit_Unlock(Unit* const);
 
 void Unit_SetState(Unit* const, const State, const bool reset_state_timer);
 
-void Unit_FreePath(Unit* const);
+Unit Unit_Make(const Point, const Point, const Grid, const Graphics, const Color, const Registrar, const bool at_center, const bool is_floating, const Trigger, const bool is_being_built);
+
+void Unit_Print(Unit* const);
+
+void ApplyStressors(Unit* const);
+
+void Unit_Flow(Unit* const, const Grid);
+
+bool Unit_InPlatoon(Unit* const, Unit* const);
 
 void Unit_SetDir(Unit* const, const Point);
+
+bool Unit_HasDirectPath(Unit* const, const Grid, const Field);
 
 void Unit_MockPath(Unit* const, const Point cart_goal, const Point cart_grid_offset_goal);
 
@@ -112,8 +128,6 @@ int32_t Unit_GetLastDecayTick(Unit* const);
 int32_t Unit_GetLastFallTick(Unit* const);
 
 Resource Unit_Melee(Unit* const, const Grid);
-
-void Unit_Repath(Unit* const, const Grid, const Field);
 
 Point Unit_Separate(Unit* const, Unit* const);
 
@@ -131,33 +145,25 @@ bool Unit_HasPath(Unit* const);
 
 bool Unit_IsType(Unit* const, const Color, const Type);
 
-void Unit_Preserve(Unit* const to, const Unit* const from);
+void Unit_Preserve(Unit* const, const Unit* const);
 
-int32_t Unit_GetIdNext(void);
+void Unit_SetInterest(Unit* const, Unit* const);
 
-void Unit_SetIdNext(const int32_t id);
-
-void Unit_SetInterest(Unit* const unit, Unit* const interest);
+void Unit_SetRally(Unit* const, Unit* const);
 
 bool Unit_FlashTimerTick(Unit* const);
 
 Graphics Unit_GetConstructionFile(Unit* const);
 
-void Unit_SetParent(Unit* const, Unit* const parent);
+void Unit_SetParent(Unit* const, Unit* const);
 
 bool Unit_IsConstruction(Unit* const);
 
-bool Unit_AreEnemies(Unit* const unit, Unit* const other);
+bool Unit_AreEnemies(Unit* const, Unit* const);
 
 void Unit_LayFarm(Unit* const, const Map);
 
 bool Unit_CanAnimateClipAnimate(Unit* const unit, Unit* const other);
-
-int32_t Unit_GetCommandGroupNext(void);
-
-void Unit_SetCommandGroupNext(const int32_t command_group);
-
-void Unit_IncrementCommandGroup(void);
 
 bool Unit_IsSelectedByColor(Unit* const, const Color);
 
@@ -167,16 +173,12 @@ void Unit_ClearSelectedAllColors(Unit* const);
 
 void Unit_SetSelectedColor(Unit* const, const Color);
 
-void Unit_SetRally(Unit* const, Unit* const);
-
 bool Unit_IsPointWithinDimensions(Unit* const, const Point);
-
-bool Unit_HasDirectPath(Unit* const, const Grid, const Field);
 
 void Unit_MakeRubble(Unit*, const Grid, const Registrar);
 
 void Unit_UpdateCellInterestInanimate(Unit* const, const Grid);
 
-void Unit_EngageWithMock(Unit* const unit, Unit* const closest, const Grid);
+void Unit_EngageWithMock(Unit* const, Unit* const, const Grid);
 
 void Unit_PreservedUpgrade(Unit* const, const Grid, const Registrar, const Graphics);
