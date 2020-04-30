@@ -736,26 +736,6 @@ static Units SpamSmoke(Units units, Unit* const unit, const Grid grid, const Reg
     return units;
 }
 
-void MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
-{
-    static Point none;
-    const Graphics rubbles[] = {
-        FILE_GRAPHICS_RUBBLE_1X1,
-        FILE_GRAPHICS_RUBBLE_2X2,
-        FILE_GRAPHICS_RUBBLE_3X3,
-        FILE_GRAPHICS_RUBBLE_4X4,
-    };
-    Graphics file = FILE_GRAPHICS_NONE;
-    for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
-    {
-        const Graphics rubble = rubbles[i];
-        if(Graphics_EqualDimension(rubble, unit->trait.dimensions))
-            file = rubble;
-    }
-    if(file != FILE_GRAPHICS_NONE)
-        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE, false);
-}
-
 static void DisengageFrom(const Units units, Unit* const other)
 {
     for(int32_t i = 0; i < units.count; i++)
@@ -799,7 +779,7 @@ static Units FlagTheDead(Units units, const Grid grid, const Registrar graphics,
                 continue;
             if(unit->trait.is_inanimate)
             {
-                MakeRubble(unit, grid, graphics);
+                Unit_MakeRubble(unit, grid, graphics);
                 units = SpamFire(units, unit, grid, graphics, map);
                 units = SpamSmoke(units, unit, grid, graphics, map);
             }
@@ -870,44 +850,6 @@ static bool InterestInRange(const Units units, Unit* const unit)
     return false;
 }
 
-static void UpdateCellInterestInanimate(Unit* const unit, const Grid grid)
-{
-    Unit* const interest = unit->interest;
-    if(interest->trait.is_inanimate)
-    {
-        int32_t min = INT32_MAX;
-        for(int32_t x = 0; x < interest->trait.dimensions.x; x++)
-        for(int32_t y = 0; y < interest->trait.dimensions.y; y++)
-        {
-            const Point shift = { x, y };
-            const Point cart = Point_Add(interest->cart, shift);
-            const Point cell = Grid_CartToCell(grid, cart);
-            const Point diff = Point_Sub(unit->cell, cell);
-            const int32_t mag = Point_Mag(diff);
-            if(mag < min)
-            {
-                min = mag;
-                unit->cell_interest_inanimate = cell;
-            }
-        }
-    }
-}
-
-static void EngageWithMock(Unit* const unit, Unit* const closest, const Grid grid)
-{
-    static Point zero;
-    Point cart = zero;
-    Point offset = zero;
-    if(closest->trait.is_inanimate)
-        cart = Grid_CellToCart(grid, unit->cell_interest_inanimate);
-    else
-    {
-        cart = closest->cart;
-        offset = closest->cart_grid_offset;
-    }
-    Unit_MockPath(unit, cart, offset);
-}
-
 static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
 {
     if(!Unit_IsExempt(unit) && !unit->is_state_locked)
@@ -919,15 +861,15 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
             && closest->trait.type != TYPE_FLAG)
             {
                 Unit_SetInterest(unit, closest);
-                UpdateCellInterestInanimate(unit, grid);
-                EngageWithMock(unit, closest, grid);
+                Unit_UpdateCellInterestInanimate(unit, grid);
+                Unit_EngageWithMock(unit, closest, grid);
             }
         }
         else
         if(InterestInRange(units, unit))
         {
-            UpdateCellInterestInanimate(unit, grid);
-            EngageWithMock(unit, unit->interest, grid);
+            Unit_UpdateCellInterestInanimate(unit, grid);
+            Unit_EngageWithMock(unit, unit->interest, grid);
         }
     }
 }
@@ -1343,17 +1285,6 @@ static Units UseIcon(Units units, const Overview overview, const Grid grid, cons
     return SpawnWithButton(units, overview, grid, graphics, map, upgrade, cart, is_floating, is_being_built);
 }
 
-static void PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar graphics, const Graphics upgrade)
-{
-    static Point zero;
-    static Unit none;
-    Unit temp = none;
-    Unit_Preserve(&temp, unit);
-    // POSITION IS MAINTAINED.
-    *unit = Unit_Make(zero, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE, false);
-    Unit_Preserve(unit, &temp);
-}
-
 static Units AppendMissing(const Units units, Unit* const unit, const Grid grid, const Registrar graphics, const Graphics file)
 {
     static Point zero;
@@ -1375,7 +1306,7 @@ static Units UpgradeInanimate(Units units, Unit* const flag, const Grid grid, co
             {
                 if(unit->file == FILE_GRAPHICS_AGE_1_MILL)
                     units = AppendMissing(units, unit, grid, graphics, FILE_GRAPHICS_AGE_2_WEST_EUROPE_MILL_SHADOW);
-                PreservedUpgrade(unit, grid, graphics, upgrade);
+                Unit_PreservedUpgrade(unit, grid, graphics, upgrade);
             }
         }
     }
@@ -1391,7 +1322,7 @@ static Units UpgradeType(const Units units, Unit* const flag, const Grid grid, c
         {
             const Graphics upgrade = unit->trait.upgrade;
             if(upgrade != FILE_GRAPHICS_NONE)
-                PreservedUpgrade(unit, grid, graphics, upgrade);
+                Unit_PreservedUpgrade(unit, grid, graphics, upgrade);
         }
 
     }

@@ -706,9 +706,74 @@ bool Unit_IsPointWithinDimensions(Unit* const unit, const Point cart)
         unit->cart,
         Point_Add(unit->cart, unit->trait.dimensions)
     };
-    puts(Graphics_GetString(unit->file));
-    Point_Print(rect.a);
-    Point_Print(rect.b);
-    Point_Print(unit->cart);
     return Rect_ContainsPoint(rect, cart);
+}
+
+void Unit_MakeRubble(Unit* unit, const Grid grid, const Registrar graphics)
+{
+    static Point none;
+    const Graphics rubbles[] = {
+        FILE_GRAPHICS_RUBBLE_1X1,
+        FILE_GRAPHICS_RUBBLE_2X2,
+        FILE_GRAPHICS_RUBBLE_3X3,
+        FILE_GRAPHICS_RUBBLE_4X4,
+    };
+    Graphics file = FILE_GRAPHICS_NONE;
+    for(int32_t i = 0; i < UTIL_LEN(rubbles); i++)
+    {
+        const Graphics rubble = rubbles[i];
+        if(Graphics_EqualDimension(rubble, unit->trait.dimensions))
+            file = rubble;
+    }
+    if(file != FILE_GRAPHICS_NONE)
+        *unit = Unit_Make(unit->cart, none, grid, file, unit->color, graphics, false, false, TRIGGER_NONE, false);
+}
+
+void Unit_UpdateCellInterestInanimate(Unit* const unit, const Grid grid)
+{
+    Unit* const interest = unit->interest;
+    if(interest->trait.is_inanimate)
+    {
+        int32_t min = INT32_MAX;
+        for(int32_t x = 0; x < interest->trait.dimensions.x; x++)
+        for(int32_t y = 0; y < interest->trait.dimensions.y; y++)
+        {
+            const Point shift = { x, y };
+            const Point cart = Point_Add(interest->cart, shift);
+            const Point cell = Grid_CartToCell(grid, cart);
+            const Point diff = Point_Sub(unit->cell, cell);
+            const int32_t mag = Point_Mag(diff);
+            if(mag < min)
+            {
+                min = mag;
+                unit->cell_interest_inanimate = cell;
+            }
+        }
+    }
+}
+
+void Unit_EngageWithMock(Unit* const unit, Unit* const closest, const Grid grid)
+{
+    static Point zero;
+    Point cart = zero;
+    Point offset = zero;
+    if(closest->trait.is_inanimate)
+        cart = Grid_CellToCart(grid, unit->cell_interest_inanimate);
+    else
+    {
+        cart = closest->cart;
+        offset = closest->cart_grid_offset;
+    }
+    Unit_MockPath(unit, cart, offset);
+}
+
+void Unit_PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar graphics, const Graphics upgrade)
+{
+    static Point zero;
+    static Unit none;
+    Unit temp = none;
+    Unit_Preserve(&temp, unit);
+    // POSITION IS MAINTAINED.
+    *unit = Unit_Make(zero, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE, false);
+    Unit_Preserve(unit, &temp);
 }

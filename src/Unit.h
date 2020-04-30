@@ -172,3 +172,11 @@ void Unit_SetRally(Unit* const, Unit* const);
 bool Unit_IsPointWithinDimensions(Unit* const, const Point);
 
 bool Unit_HasDirectPath(Unit* const, const Grid, const Field);
+
+void Unit_MakeRubble(Unit*, const Grid, const Registrar);
+
+void Unit_UpdateCellInterestInanimate(Unit* const, const Grid);
+
+void Unit_EngageWithMock(Unit* const unit, Unit* const closest, const Grid);
+
+void Unit_PreservedUpgrade(Unit* const, const Grid, const Registrar, const Graphics);
