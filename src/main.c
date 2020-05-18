@@ -77,7 +77,10 @@ static void Play(const Video video, const Data data, const Args args)
                 Restore_Send(restore, reset.server);
             }
             Sock_Spin(reset);
+            if(args.must_simulate_slow_download)
+                SDL_Delay(1000 + rand() % 1000);
             const Restore restore = Restore_Recv(reset.server);
+            Sock_GetServerRestoredAck(reset);
             units = Units_ApplyRestore(units, restore, grid, field);
             cycles = restore.cycles;
             Util_Srand(overview.seed);
@@ -186,8 +189,9 @@ static void RunServer(const Args args)
         sockets = Sockets_Accept(sockets);
         resets = Sockets_Accept(resets);
         sockets = Sockets_Recv(sockets, &cache);
-        Sockets_Send(sockets, &cache, cycles, args.is_quiet);
-        Sockets_Reset(resets, &cache);
+        const int32_t max_ping = Cache_GetPingMax(&cache);
+        Sockets_Send(sockets, &cache, cycles, args.is_quiet, max_ping);
+        Sockets_Reset(resets, &cache, max_ping);
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = 10 - (t1 - t0);
         if(ms > 0)

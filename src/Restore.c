@@ -25,14 +25,15 @@ static Restore RecvPacked(const TCPsocket socket)
     Restore out = *restore;
     out.unit = NULL;
     out.is_success = bytes == *size_real;
-    if(out.is_success)
-        if(out.count > 0)
-        {
-            out.unit = UTIL_ALLOC(Unit, out.count);
-            for(int32_t i = 0; i < out.count; i++)
-                out.unit[i] = unit[i];
-        }
+    if(out.is_success && out.count > 0)
+    {
+        out.unit = UTIL_ALLOC(Unit, out.count);
+        for(int32_t i = 0; i < out.count; i++)
+            out.unit[i] = unit[i];
+    }
     free(buffer);
+    const uint8_t ack = RESTORE_CLIENT_ACK;
+    UTIL_TCP_SEND(socket, &ack);
     return out;
 }
 
@@ -51,6 +52,9 @@ void Restore_Send(const Restore restore, const TCPsocket socket)
     UTIL_TCP_SEND(socket, &size_real);
     UTIL_TCP_SEND(socket, &restore);
     SDLNet_TCP_Send(socket, restore.unit, size_units);
+    uint8_t ack = 0x0;
+    UTIL_TCP_RECV(socket, &ack);
+    assert(ack == RESTORE_CLIENT_ACK);
 }
 
 void Restore_Free(const Restore restore)

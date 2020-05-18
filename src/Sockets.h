@@ -20,12 +20,12 @@ void Sockets_Free(const Sockets);
 
 Sockets Sockets_Recv(const Sockets, Cache* const);
 
-void Sockets_Send(const Sockets, Cache* const, const int32_t cycles, const bool quiet);
+void Sockets_Send(const Sockets, Cache* const, const int32_t cycles, const bool quiet, const int32_t max_ping);
 
 Sockets Sockets_Accept(const Sockets);
 
 void Sockets_Ping(const Sockets);
 
-void Sockets_Reset(const Sockets, Cache* const);
+void Sockets_Reset(const Sockets, Cache* const, const int32_t max_ping);
 
 void Sockets_Init(void);

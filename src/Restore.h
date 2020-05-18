@@ -7,6 +7,9 @@
 #include <SDL2/SDL_net.h>
 #include <stdbool.h>
 
+#define RESTORE_CLIENT_ACK (0xAA)
+#define RESTORE_SERVER_ACK (0xAB)
+
 typedef struct
 {
     Unit* unit;

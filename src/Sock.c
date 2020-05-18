@@ -1,6 +1,7 @@
 #include "Sock.h"
 
 #include "Util.h"
+#include "Restore.h"
 
 #include <SDL2/SDL_mutex.h>
 
@@ -44,4 +45,11 @@ void Sock_Spin(const Sock sock)
 {
     while(!Ready(sock, 1))
         SDL_Delay(1);
+}
+
+void Sock_GetServerRestoredAck(const Sock sock)
+{
+    uint8_t ack;
+    UTIL_TCP_RECV(sock.server, &ack);
+    assert(ack == RESTORE_SERVER_ACK);
 }

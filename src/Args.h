@@ -22,6 +22,7 @@ typedef struct
     bool is_demo;
     bool must_measure;
     bool must_randomize_mouse;
+    bool must_simulate_slow_download;
 }
 Args;
 
