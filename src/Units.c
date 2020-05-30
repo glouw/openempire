@@ -589,6 +589,11 @@ static Point SeparateBoids(const Units units, Unit* const unit)
                 // LIKEWISE, NON FLOATING ANIMATES CAN CLIP NON FLOATING ANIMATES ONLY.
                 if(Unit_CanAnimateClipAnimate(unit, other))
                     continue;
+                // IF THIS UNIT IS BEING FOLLOWED, THE OTHER UNIT WILL HAVE A MATCHING
+                // INTEREST POINTER. DISCARD, OTHERWISE UNIT WILL BE PUSHED FOREVER
+                // IF ENOUGH OTHER UNITS ARE FOLLOWING THIS UNIT.
+                if(other->interest == unit && other->color == unit->color)
+                    continue;
                 if(!other->trait.is_inanimate)
                 {
                     const Point force = Unit_Separate(unit, other);
