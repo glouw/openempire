@@ -51,6 +51,11 @@ Points Field_PathAStar(const Field field, const Point start, const Point goal)
     static Points zero;
     if(!IsInBounds(field, goal))
         return zero;
+    // FOR WHATEVER REASON, IF UNIT IS STUCK IN A BUILDING,
+    // DO NOT PATH, ELSE ALL THE RAM WILL BE EATEN.
+    // OF COURSE, THIS STATE IN A PERFECT WORLD SHOULD BE UNREACHABLE.
+    if(!IsInBounds(field, start))
+        return zero;
     Meap frontier = Meap_Make();
     Meap_Insert(&frontier, 0, start);
     const Point none = { -1, -1 };
