@@ -8,7 +8,8 @@ typedef enum
     TYPE_MAN_AT_ARMS,
     TYPE_SPEARMAN,
     // --- END.
-    TYPE_VILLAGER,
+    TYPE_VILLAGER_MALE,
+    TYPE_VILLAGER_FEMALE,
     TYPE_FIRE,
     TYPE_SHADOW,
     TYPE_SMOKE,

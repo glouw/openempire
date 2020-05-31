@@ -145,16 +145,10 @@ void Unit_Move(Unit* const unit, const Grid grid)
     unit->cell_last = unit->cell;
     unit->cell = Point_Add(unit->cell, unit->velocity);
     UpdateCart(unit, grid);
-    Unit_SetState(unit, STATE_MOVE, false);
+    if(unit->state != STATE_MOVE)
+        Unit_SetState(unit, STATE_MOVE, false); // AN EXPENSIVE SWITCH CASE JUMP TO BE DOING EVERY FRAME.
     if(Point_Mag(unit->velocity) < CONFIG_UNIT_VELOCITY_DEADZONE)
         Unit_SetState(unit, STATE_IDLE, false);
-}
-
-static Graphics GetFileFromState(Unit* const unit, const State state)
-{
-    const int32_t base = (int32_t) unit->file - (int32_t) unit->state;
-    const int32_t next = base + (int32_t) state;
-    return (Graphics) next;
 }
 
 void Unit_Lock(Unit* const unit)
@@ -171,7 +165,7 @@ void Unit_SetState(Unit* const unit, const State state, const bool reset_state_t
 {
     if(!unit->was_wall_pushed && !unit->is_state_locked && unit->trait.is_multi_state)
     {
-        const Graphics file = GetFileFromState(unit, state);
+        const Graphics file = Graphics_GetGraphicsState(unit->file, state);
         unit->state = state;
         unit->file = file;
         if(reset_state_timer)
@@ -181,7 +175,7 @@ void Unit_SetState(Unit* const unit, const State state, const bool reset_state_t
 
 static int32_t GetFramesFromState(Unit* const unit, const Registrar graphics, const State state)
 {
-    const Graphics file = GetFileFromState(unit, state);
+    const Graphics file = Graphics_GetGraphicsState(unit->file, state);
     const Animation animation = graphics.animation[unit->color][file];
     return Animation_GetFramesPerDirection(animation);
 }
@@ -243,6 +237,7 @@ Unit Unit_Make(const Point cart, const Point offset, const Grid grid, const Grap
     UpdateCart(&unit, grid);
     if(unit.trait.is_multi_state)
     {
+        // BIG PERFORMANCE GAIN FROM CACHING SINCE GRAPHICS_GETGRAPHICSSTATE IS NOT BEING CALLED.
         unit.attack_frames_per_dir = GetFramesFromState(&unit, graphics, STATE_ATTACK);
         unit.fall_frames_per_dir   = GetFramesFromState(&unit, graphics, STATE_FALL);
         unit.decay_frames_per_dir  = GetFramesFromState(&unit, graphics, STATE_DECAY);
@@ -465,7 +460,7 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     {
         if(WithinRange(unit, grid))
         {
-            if((SameColor(unit, other) && other->is_being_built && unit->trait.type == TYPE_VILLAGER)
+            if((SameColor(unit, other) && other->is_being_built && Unit_IsVillager(unit))
             || !SameColor(unit, other))
             {
                 unit->is_engaged_in_melee = true;
@@ -480,7 +475,7 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
             Unit_Unlock(unit);
             if(other)
             {
-                if(unit->trait.type == TYPE_VILLAGER)
+                if(Unit_IsVillager(unit))
                 {
                     if(SameColor(unit, other))
                         Build(unit, other);
@@ -585,13 +580,30 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
 #undef COPY
 }
 
+static void MorphState(Unit* const unit, const Graphics file, const State state)
+{
+    unit->file = file;
+    unit->state = state;
+    unit->state_timer = 0;
+    unit->is_state_locked = false;
+}
+
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
 {
     if(interest != unit)
     {
         unit->interest = interest;
         if(interest)
+        {
             unit->interest_id = interest->id;
+            if(unit->interest->is_being_built)
+            {
+                if(unit->trait.type == TYPE_VILLAGER_MALE)
+                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_BUILDER_IDLE, STATE_IDLE);
+                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
+                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_BUILDER_IDLE, STATE_IDLE);
+            }
+        }
         else
             unit->interest_id = -1;
     }
@@ -777,4 +789,10 @@ void Unit_PreservedUpgrade(Unit* const unit, const Grid grid, const Registrar gr
     // POSITION IS MAINTAINED.
     *unit = Unit_Make(zero, zero, grid, upgrade, unit->color, graphics, false, false, TRIGGER_NONE, false);
     Unit_Preserve(unit, &temp);
+}
+
+bool Unit_IsVillager(Unit* const unit)
+{
+    return unit->trait.type == TYPE_VILLAGER_FEMALE
+        || unit->trait.type == TYPE_VILLAGER_MALE;
 }

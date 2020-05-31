@@ -182,3 +182,5 @@ void Unit_UpdateCellInterestInanimate(Unit* const, const Grid);
 void Unit_EngageWithMock(Unit* const, Unit* const, const Grid);
 
 void Unit_PreservedUpgrade(Unit* const, const Grid, const Registrar, const Graphics);
+
+bool Unit_IsVillager(Unit* const);

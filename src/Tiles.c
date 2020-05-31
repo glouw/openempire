@@ -182,8 +182,8 @@ int32_t Tiles_SelectSimilar(const Tiles tiles, const Tile similar, const Color c
         const Type t_b  = tile.reference->trait.type;
         const Color c_a = similar.reference->color;
         const Color c_b = tile.reference->color;
-        if(t_a == t_b
-        && c_a == c_b)
+        const bool both_villagers = Unit_IsVillager(tile.reference) && Unit_IsVillager(similar.reference);
+        if((t_a == t_b || both_villagers) && c_a == c_b)
         {
             Tile_Select(tile, color);
             count++;

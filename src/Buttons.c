@@ -185,7 +185,8 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
         // EXEMPT - PREFERABLE TO BE EXPLICIT. DEFAULT
         // WILL SILENTLY HIDE NEWLY ADDED TYPES.
         case TYPE_NONE:
-        case TYPE_VILLAGER:
+        case TYPE_VILLAGER_MALE:
+        case TYPE_VILLAGER_FEMALE:
         case TYPE_FIRE:
         case TYPE_SHADOW:
         case TYPE_SMOKE:
@@ -232,7 +233,8 @@ Buttons Buttons_FromMotive(const Motive motive, const Age age)
         case TYPE_MILITIA:
         case TYPE_MAN_AT_ARMS:
         case TYPE_SPEARMAN:
-        case TYPE_VILLAGER:
+        case TYPE_VILLAGER_MALE:
+        case TYPE_VILLAGER_FEMALE:
         case TYPE_FIRE:
         case TYPE_SHADOW:
         case TYPE_SMOKE:
