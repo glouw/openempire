@@ -603,6 +603,14 @@ void Unit_SetInterest(Unit* const unit, Unit* const interest)
                 if(unit->trait.type == TYPE_VILLAGER_FEMALE)
                     MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_BUILDER_IDLE, STATE_IDLE);
             }
+            else
+            if(unit->interest->trait.type == TYPE_TREE)
+            {
+                if(unit->trait.type == TYPE_VILLAGER_MALE)
+                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE, STATE_IDLE);
+                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
+                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_IDLE, STATE_IDLE);
+            }
         }
         else
             unit->interest_id = -1;
