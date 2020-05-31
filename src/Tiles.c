@@ -3,6 +3,7 @@
 #include "Util.h"
 #include "Rect.h"
 #include "Surface.h"
+#include "Config.h"
 
 static int32_t CompareByY(const void* a, const void* b)
 {
@@ -145,19 +146,26 @@ Tile Tiles_Get(const Tiles tiles, const Overview overview, const Grid grid)
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
-        if(Tile_ContainsPoint(tile, overview.mouse_cursor)) // XXX: MAKE THIS SELECTION POINT A BIT BIGGER (MAYBE 5X5).
+        const int32_t width = CONFIG_TILES_CURSOR_SELECT_WIDTH;
+        for(int32_t y = -width; y < width; y++)
+        for(int32_t x = -width; x < width; x++)
         {
-            const Rect rect = Tile_GetFrameOutline(tile);
-            const Point origin_click = Point_Sub(overview.mouse_cursor, rect.a);
-            const uint32_t pixel = Surface_GetPixel(tile.surface, origin_click.x, origin_click.y);
-            if(pixel != SURFACE_COLOR_KEY)
-                return tile;
-        }
-        if(tile.reference->trait.is_inanimate && !Unit_IsExempt(tile.reference)) // BACKUP CHECK, PROBE FULL TILE BELOW BUILDING (REALLY HELPS WHEN BUILDINGS ARE BEING BUILT).
-        {
-            const Point cart = Overview_IsoToCart(overview, grid, overview.mouse_cursor, false);
-            if(Unit_IsPointWithinDimensions(tile.reference, cart))
-                return tile;
+            const Point shift = { x, y };
+            const Point cursor = Point_Add(overview.mouse_cursor, shift);
+            if(Tile_ContainsPoint(tile, cursor))
+            {
+                const Rect rect = Tile_GetFrameOutline(tile);
+                const Point origin_click = Point_Sub(cursor, rect.a);
+                const uint32_t pixel = Surface_GetPixel(tile.surface, origin_click.x, origin_click.y);
+                if(pixel != SURFACE_COLOR_KEY)
+                    return tile;
+            }
+            if(tile.reference->trait.is_inanimate && !Unit_IsExempt(tile.reference)) // BACKUP CHECK, PROBE FULL TILE BELOW BUILDING (REALLY HELPS WHEN BUILDINGS ARE BEING BUILT).
+            {
+                const Point cart = Overview_IsoToCart(overview, grid, cursor, false);
+                if(Unit_IsPointWithinDimensions(tile.reference, cart))
+                    return tile;
+            }
         }
     }
     static Tile zero;
