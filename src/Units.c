@@ -621,6 +621,9 @@ static Point AlignBoids(const Units units, Unit* const unit)
             for(int32_t i = 0; i < stack.count; i++)
             {
                 Unit* const other = stack.reference[i];
+                // SEE NOTE ABOVE ABOUT MATCHING INTEREST POINTERS.
+                if(other->interest == unit && other->color == unit->color)
+                    continue;
                 if(!Unit_IsExempt(other) && Unit_IsDifferent(unit, other) && Unit_InPlatoon(unit, other))
                     out = Point_Add(out, other->velocity);
             }
