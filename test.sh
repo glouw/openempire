@@ -5,12 +5,12 @@
 # 3. STARTS A SERVER, AND STARTS SEVERAL CLIENTS.
 
 GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data/";
-LATENCY=25ms
+LATENCY=15ms
 VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
-XRES=640
-YRES=480
-USERS=5
+XRES=1280
+YRES=720
+USERS=3
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -37,7 +37,7 @@ server()
 
 client()
 {
-    ./$BIN --randomize --slow_download --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
+    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
 }
 
 batch()
@@ -47,7 +47,7 @@ batch()
     for (( i = 0; i < $(($USERS - 1)); i++ ))
     do
         sleep 1
-        D=30
+        D=0
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))
         client $X $Y &

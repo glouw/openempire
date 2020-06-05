@@ -106,6 +106,14 @@ File File_Load(FILE* const);
     FILE_GRAPHICS_MALE_VILLAGER_MINER_MOVING,     \
 }
 
+#define FILE_GRAPHICS_STATE_MALE_VILLAGER_FORAGER { \
+    FILE_GRAPHICS_MALE_VILLAGER_FORAGER_FORAGING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_FORAGER_FALLING,    \
+    FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE,       \
+    FILE_GRAPHICS_MALE_VILLAGER_FORAGER_DECAYING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_FORAGER_MOVING,     \
+}
+
 #define FILE_GRAPHICS_STATE_SCOUT { \
     FILE_GRAPHICS_SCOUT_FIGHTING,   \
     FILE_GRAPHICS_SCOUT_FALLING,    \
@@ -152,6 +160,14 @@ File File_Load(FILE* const);
     FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE,       \
     FILE_GRAPHICS_FEMALE_VILLAGER_MINER_DECAYING,   \
     FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MOVING,     \
+}
+
+#define FILE_GRAPHICS_STATE_FEMALE_VILLAGER_FORAGER { \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_FORAGING,   \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_FALLING,    \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE,       \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_DECAYING,   \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_MOVING,     \
 }
 
 // FOR MORE DETAILS ABOUT X-MACROS: HTTPS://EN.WIKIPEDIA.ORG/WIKI/X_MACRO
@@ -280,6 +296,11 @@ File File_Load(FILE* const);
     FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_DECAYING,                      (209), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MOVING,                        (210), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MINING,                        (273), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_FALLING,                     (332), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_FORAGER,    FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE,                        (333), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_FORAGER,    FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_DECAYING,                    (334), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_FORAGER,    FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_FORAGING,                    (335), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_FORAGER,    FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_MOVING,                      (336), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_FORAGER,    FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FIGHTING,                              (212), FILE_GRAPHICS_STATE_MALE_VILLAGER,              FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FALLING,                               (213), FILE_GRAPHICS_STATE_MALE_VILLAGER,              FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_IDLE,                                  (214), FILE_GRAPHICS_STATE_MALE_VILLAGER,              FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,        (100),   (1000),    (1), (2500),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
@@ -310,6 +331,11 @@ File File_Load(FILE* const);
     FILE_X(FILE_GRAPHICS_AGE_3_WEST_EUROPE_HOUSE,                             (299), FILE_STATE_NONE,                                FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_BUILDING, (0), TYPE_HOUSE,                  (0),   (1000),    (0),    (0),     (1),  (0),  (0),  (1),  (0),  FILE_DIMENSIONS_2X2, ACTION_UNIT_TECH,   (0)) \
     FILE_X(FILE_GRAPHICS_FOREST_TREE_SHADOW,                                  (302), FILE_STATE_NONE,                                FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_SHADOW,   (1), TYPE_SHADOW,                 (0),      (0),    (0),    (0),     (1),  (0),  (0),  (1),  (0),  FILE_DIMENSIONS_1X1, ACTION_NONE,        (1)) \
     FILE_X(FILE_GRAPHICS_BERRY_BUSH,                                          (330), FILE_STATE_NONE,                                FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (0), TYPE_BERRY_BUSH,             (0), (999999),    (0),    (0),     (1),  (0),  (0),  (1),  (1),  FILE_DIMENSIONS_1X1, ACTION_NONE,        (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FORAGER_FALLING,                       (337), FILE_GRAPHICS_STATE_MALE_VILLAGER_FORAGER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE,                          (338), FILE_GRAPHICS_STATE_MALE_VILLAGER_FORAGER,      FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FORAGER_DECAYING,                      (339), FILE_GRAPHICS_STATE_MALE_VILLAGER_FORAGER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FORAGER_FORAGING,                      (340), FILE_GRAPHICS_STATE_MALE_VILLAGER_FORAGER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FORAGER_MOVING,                        (341), FILE_GRAPHICS_STATE_MALE_VILLAGER_FORAGER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_AGE_1_BARRACKS,                                      (346), FILE_STATE_NONE,                                FILE_GRAPHICS_AGE_2_WEST_EUROPE_BARRACKS,                         TYPE_NONE,           FILE_PRIO_BUILDING, (0), TYPE_BARRACKS,               (0),    (200),    (0),    (0),     (1),  (0),  (0),  (1),  (0),  FILE_DIMENSIONS_3X3, ACTION_UNIT_TECH,   (0)) \
     FILE_X(FILE_GRAPHICS_PIKEMAN_FIGHTING,                                    (348), FILE_GRAPHICS_STATE_PIKEMAN,                    FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_PIKEMAN,                (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_COMMAND,     (0)) \
     FILE_X(FILE_GRAPHICS_PIKEMAN_FALLING,                                     (349), FILE_GRAPHICS_STATE_PIKEMAN,                    FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_PIKEMAN,                (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_COMMAND,     (0)) \
