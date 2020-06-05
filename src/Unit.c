@@ -415,8 +415,7 @@ static Resource Collect(Resource resource, Unit* const unit)
     case TYPE_GOLD_MINE  : resource.type = TYPE_GOLD;  break;
     case TYPE_BERRY_BUSH : resource.type = TYPE_FOOD;  break;
     default:
-        // DEFAULT IS FINE.
-        // BY LAW THERE ARE ONLY 4 RESOURCES TYPES IN AGE II.
+        // DEFAULT IS FINE. BY LAW THERE ARE ONLY 4 RESOURCES TYPES IN AGE II.
         break;
     }
     return resource;
@@ -610,6 +609,22 @@ void Unit_SetInterest(Unit* const unit, Unit* const interest)
                     MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE, STATE_IDLE);
                 if(unit->trait.type == TYPE_VILLAGER_FEMALE)
                     MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_IDLE, STATE_IDLE);
+            }
+            else
+            if(unit->interest->trait.type == TYPE_STONE_MINE
+            || unit->interest->trait.type == TYPE_GOLD_MINE)
+            {
+                if(unit->trait.type == TYPE_VILLAGER_MALE)
+                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_MINER_IDLE, STATE_IDLE);
+                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
+                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE, STATE_IDLE);
+            }
+            else
+            {
+                if(unit->trait.type == TYPE_VILLAGER_MALE)
+                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_IDLE, STATE_IDLE);
+                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
+                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE, STATE_IDLE);
             }
         }
         else

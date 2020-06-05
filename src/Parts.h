@@ -17,7 +17,7 @@ Parts Parts_FromButton(const Button, const Age);
 
 void Parts_Free(const Parts);
 
-// SOME PARTS HAVE TO BE EXPORTED AS THEY ARE NOT CREATED THROUGH A BUTTON.
+// THESE PARTS HAVE TO BE EXPORTED AS THEY ARE NOT CREATED THROUGH A BUTTON.
 
 Parts Parts_GetWayPointFlag(void);
 
@@ -28,3 +28,9 @@ Parts Parts_GetSmoke(void);
 Parts Parts_GetFire(void);
 
 Parts Parts_GetForestTree(void);
+
+Parts Parts_GetStoneMine(void);
+
+Parts Parts_GetGoldMine(void);
+
+Parts Parts_GetBerryBush(void);

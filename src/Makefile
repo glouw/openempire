@@ -132,3 +132,6 @@ clean:
 	rm -f $(BIN)
 	rm -f $(OBJS)
 	rm -f $(DEPS)
+
+love:
+	@echo "not war"

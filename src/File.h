@@ -74,20 +74,36 @@ File File_Load(FILE* const);
     FILE_GRAPHICS_LONG_SWORDSMAN_MOVING,     \
 }
 
-#define FILE_GRAPHICS_STATE_FEMALE_VILLAGER { \
-    FILE_GRAPHICS_FEMALE_VILLAGER_FIGHTING,   \
-    FILE_GRAPHICS_FEMALE_VILLAGER_FALLING,    \
-    FILE_GRAPHICS_FEMALE_VILLAGER_IDLE,       \
-    FILE_GRAPHICS_FEMALE_VILLAGER_DECAYING,   \
-    FILE_GRAPHICS_FEMALE_VILLAGER_MOVING,     \
-}
-
 #define FILE_GRAPHICS_STATE_MALE_VILLAGER { \
     FILE_GRAPHICS_MALE_VILLAGER_FIGHTING,   \
     FILE_GRAPHICS_MALE_VILLAGER_FALLING,    \
     FILE_GRAPHICS_MALE_VILLAGER_IDLE,       \
     FILE_GRAPHICS_MALE_VILLAGER_DECAYING,   \
     FILE_GRAPHICS_MALE_VILLAGER_MOVING,     \
+}
+
+#define FILE_GRAPHICS_STATE_MALE_VILLAGER_BUILDER { \
+    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_BUILDING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_FALLING,    \
+    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_IDLE,       \
+    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_DECAYING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_MOVING,     \
+}
+
+#define FILE_GRAPHICS_STATE_MALE_VILLAGER_WOODCUTTER { \
+    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_CHOPPING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_FALLING,    \
+    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE,       \
+    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_DECAYING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_MOVING,     \
+}
+
+#define FILE_GRAPHICS_STATE_MALE_VILLAGER_MINER { \
+    FILE_GRAPHICS_MALE_VILLAGER_MINER_MINING,     \
+    FILE_GRAPHICS_MALE_VILLAGER_MINER_FALLING,    \
+    FILE_GRAPHICS_MALE_VILLAGER_MINER_IDLE,       \
+    FILE_GRAPHICS_MALE_VILLAGER_MINER_DECAYING,   \
+    FILE_GRAPHICS_MALE_VILLAGER_MINER_MOVING,     \
 }
 
 #define FILE_GRAPHICS_STATE_SCOUT { \
@@ -106,12 +122,12 @@ File File_Load(FILE* const);
     FILE_GRAPHICS_PIKEMAN_MOVING,     \
 }
 
-#define FILE_GRAPHICS_STATE_MALE_VILLAGER_BUILDER { \
-    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_BUILDING,   \
-    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_FALLING,    \
-    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_IDLE,       \
-    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_DECAYING,   \
-    FILE_GRAPHICS_MALE_VILLAGER_BUILDER_MOVING,     \
+#define FILE_GRAPHICS_STATE_FEMALE_VILLAGER { \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FIGHTING,   \
+    FILE_GRAPHICS_FEMALE_VILLAGER_FALLING,    \
+    FILE_GRAPHICS_FEMALE_VILLAGER_IDLE,       \
+    FILE_GRAPHICS_FEMALE_VILLAGER_DECAYING,   \
+    FILE_GRAPHICS_FEMALE_VILLAGER_MOVING,     \
 }
 
 #define FILE_GRAPHICS_STATE_FEMALE_VILLAGER_BUILDER { \
@@ -130,12 +146,12 @@ File File_Load(FILE* const);
     FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_MOVING,     \
 }
 
-#define FILE_GRAPHICS_STATE_MALE_VILLAGER_WOODCUTTER { \
-    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_CHOPPING,   \
-    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_FALLING,    \
-    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE,       \
-    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_DECAYING,   \
-    FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_MOVING,     \
+#define FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER { \
+    FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MINING,     \
+    FILE_GRAPHICS_FEMALE_VILLAGER_MINER_FALLING,    \
+    FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE,       \
+    FILE_GRAPHICS_FEMALE_VILLAGER_MINER_DECAYING,   \
+    FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MOVING,     \
 }
 
 // FOR MORE DETAILS ABOUT X-MACROS: HTTPS://EN.WIKIPEDIA.ORG/WIKI/X_MACRO
@@ -259,6 +275,11 @@ File File_Load(FILE* const);
     FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_IDLE,                     (204), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_WOODCUTTER, FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_DECAYING,                 (205), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_WOODCUTTER, FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_MOVING,                   (206), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_WOODCUTTER, FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_FALLING,                       (207), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE,                          (208), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_DECAYING,                      (209), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MOVING,                        (210), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_FEMALE_VILLAGER_MINER_MINING,                        (273), FILE_GRAPHICS_STATE_FEMALE_VILLAGER_MINER,      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_FEMALE,        (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FIGHTING,                              (212), FILE_GRAPHICS_STATE_MALE_VILLAGER,              FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_FALLING,                               (213), FILE_GRAPHICS_STATE_MALE_VILLAGER,              FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_IDLE,                                  (214), FILE_GRAPHICS_STATE_MALE_VILLAGER,              FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,        (100),   (1000),    (1), (2500),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
@@ -274,6 +295,11 @@ File File_Load(FILE* const);
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE,                       (237), FILE_GRAPHICS_STATE_MALE_VILLAGER_WOODCUTTER,   FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_DECAYING,                   (238), FILE_GRAPHICS_STATE_MALE_VILLAGER_WOODCUTTER,   FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_MOVING,                     (240), FILE_GRAPHICS_STATE_MALE_VILLAGER_WOODCUTTER,   FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_MINER_FALLING,                         (242), FILE_GRAPHICS_STATE_MALE_VILLAGER_MINER,        FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_MINER_IDLE,                            (243), FILE_GRAPHICS_STATE_MALE_VILLAGER_MINER,        FILE_GRAPHICS_NONE,                                               TYPE_TOWN_CENTER,    FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_MINER_DECAYING,                        (244), FILE_GRAPHICS_STATE_MALE_VILLAGER_MINER,        FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_DECAY,    (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_MINER_MINING,                          (245), FILE_GRAPHICS_STATE_MALE_VILLAGER_MINER,        FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
+    FILE_X(FILE_GRAPHICS_MALE_VILLAGER_MINER_MOVING,                          (246), FILE_GRAPHICS_STATE_MALE_VILLAGER_MINER,        FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_VILLAGER_MALE,          (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_BUILD,       (0)) \
     FILE_X(FILE_GRAPHICS_SCOUT_FIGHTING,                                      (286), FILE_GRAPHICS_STATE_SCOUT,                      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_SCOUT,                  (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_COMMAND,     (0)) \
     FILE_X(FILE_GRAPHICS_SCOUT_FALLING,                                       (287), FILE_GRAPHICS_STATE_SCOUT,                      FILE_GRAPHICS_NONE,                                               TYPE_NONE,           FILE_PRIO_UNIT,     (1), TYPE_SCOUT,                  (0),      (0),    (0),    (0),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_COMMAND,     (0)) \
     FILE_X(FILE_GRAPHICS_SCOUT_IDLE,                                          (288), FILE_GRAPHICS_STATE_SCOUT,                      FILE_GRAPHICS_NONE,                                               TYPE_STABLE,         FILE_PRIO_UNIT,     (1), TYPE_SCOUT,                (120),   (1000),    (3), (3500),     (0),  (1),  (0),  (0),  (0),  FILE_DIMENSIONS_1X1, ACTION_COMMAND,     (0)) \

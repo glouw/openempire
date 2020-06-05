@@ -114,7 +114,40 @@ pikeman[] = {
 forest_tree[] = {
     { {0,0}, FILE_GRAPHICS_FOREST_TREE },
     { {0,0}, FILE_GRAPHICS_FOREST_TREE_SHADOW },
+},
+stone_mine[] = {
+    { {0,0}, FILE_GRAPHICS_STONE_MINE },
+},
+gold_mine[] = {
+    { {0,0}, FILE_GRAPHICS_GOLD_MINE },
+},
+berry_bush[] = {
+    { {0,0}, FILE_GRAPHICS_BERRY_BUSH },
 };
+
+Parts Parts_GetStoneMine(void)
+{
+    const Parts parts = {
+        stone_mine, UTIL_LEN(stone_mine)
+    };
+    return parts;
+}
+
+Parts Parts_GetGoldMine(void)
+{
+    const Parts parts = {
+        gold_mine, UTIL_LEN(gold_mine)
+    };
+    return parts;
+}
+
+Parts Parts_GetBerryBush(void)
+{
+    const Parts parts = {
+        berry_bush, UTIL_LEN(berry_bush)
+    };
+    return parts;
+}
 
 static Parts GetFlag(void)
 {
