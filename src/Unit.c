@@ -469,24 +469,27 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         if(MustDisengage(unit))
         {
             Unit_Unlock(unit);
-            if(Unit_IsVillager(unit))
+            if(CanEngage(unit, grid)) // RANGE CHECK IS DONE AGAIN, ELSE UNIT CAN ATTACK INFINITELY FAR AWAY WITH QUICK CHANGE OF INTEREST.
             {
-                if(SameColor(unit, other))
+                if(Unit_IsVillager(unit))
                 {
-                    if(Unit_IsConstruction(other))
-                        other->health += unit->trait.attack;
-                    else
-                    if(other->trait.type == TYPE_MILL)
+                    if(SameColor(unit, other))
                     {
-                        const Resource farmed = { TYPE_FOOD, unit->trait.attack };
-                        return farmed;
+                        if(Unit_IsConstruction(other))
+                            other->health += unit->trait.attack;
+                        else
+                        if(other->trait.type == TYPE_MILL)
+                        {
+                            const Resource farmed = { TYPE_FOOD, unit->trait.attack };
+                            return farmed;
+                        }
                     }
+                    else
+                        return Extract(unit, other);
                 }
                 else
-                    return Extract(unit, other);
+                    other->health -= unit->trait.attack;
             }
-            else
-                other->health -= unit->trait.attack;
         }
     }
     else
