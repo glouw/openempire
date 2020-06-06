@@ -140,6 +140,7 @@ static Units Select(Units units, const Overview overview, const Grid grid, const
     {
         const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
         Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
+        Tiles_SortByDetailReversed(tiles); // FOR SELECTING THE CORE OF THE MILL, AND NOT THE MILL DETAIL.
         units = UnSelectAll(units, overview.color);
         if(Overview_IsSelectionBoxBigEnough(overview))
             Tiles_SelectWithBox(tiles, overview.selection_box, overview.color);
@@ -531,6 +532,7 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
 {
     const Tiles tiles = Tiles_PrepGraphics(graphics, overview, grid, units, render_points);
     Tiles_SortByHeight(tiles); // FOR SELECTING TRANSPARENT UNITS BEHIND INANIMATES OR TREES.
+    Tiles_SortByDetailReversed(tiles); // FOR SELECTING THE CORE OF THE MILL, AND NOT THE MILL DETAIL.
     const Tile tile = Tiles_Get(tiles, overview, grid);
     if(tile.reference && !Unit_IsExempt(tile.reference) && !tile.reference->is_floating)
         units = PathSelectedToUnit(units, tile.reference, overview, grid, graphics, map, field);
@@ -753,6 +755,7 @@ static void DisengageFrom(const Units units, Unit* const other)
         {
             unit->is_engaged_in_melee = false;
             Unit_SetInterest(unit, NULL);
+            Unit_FreePath(unit);
         }
     }
 }

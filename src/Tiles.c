@@ -41,6 +41,15 @@ static int32_t CompareByDetail(const void* a, const void* b)
     return da < db;
 }
 
+static int32_t CompareByDetailReversed(const void* a, const void* b)
+{
+    Tile* const aa = (Tile*) a;
+    Tile* const bb = (Tile*) b;
+    const bool da = aa->reference->trait.is_detail;
+    const bool db = bb->reference->trait.is_detail;
+    return da > db;
+}
+
 static int32_t CompareByFlag(const void* a, const void* b)
 {
     Tile* const aa = (Tile*) a;
@@ -61,6 +70,11 @@ static void Sort(const Tiles tiles)
 void Tiles_SortByHeight(const Tiles tiles)
 {
     UTIL_SORT(tiles.tile, tiles.count, CompareByHeight);
+}
+
+void Tiles_SortByDetailReversed(const Tiles tiles)
+{
+    UTIL_SORT(tiles.tile, tiles.count, CompareByDetailReversed);
 }
 
 Tiles Tiles_PrepGraphics(const Registrar graphics, const Overview overview, const Grid grid, const Units units, const Points points)

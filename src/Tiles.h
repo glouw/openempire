@@ -26,3 +26,5 @@ int32_t Tiles_SelectWithBox(const Tiles, const Rect, const Color);
 void Tiles_SortByHeight(const Tiles);
 
 Tiles Tiles_Copy(const Tiles);
+
+void Tiles_SortByDetailReversed(const Tiles);

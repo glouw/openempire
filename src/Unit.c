@@ -390,7 +390,8 @@ static bool CanEngage(Unit* const unit, const Grid grid)
     const int32_t width = UTIL_MAX(unit->trait.width, unit->interest->trait.width);
     if(unit->interest->trait.is_inanimate)
     {
-        const int32_t reach = CONFIG_UNIT_SWORD_LENGTH + (width / 2);
+        const bool is_mill_built = unit->interest->trait.type == TYPE_MILL && !unit->interest->is_being_built;
+        const int32_t reach = (width / 2) + (is_mill_built ? CONFIG_UNIT_FARM_HARVEST_LENGTH : CONFIG_UNIT_SWORD_LENGTH);
         const Point feeler = Point_Normalize(diff, reach);
         const Point cell = Point_Add(unit->cell, feeler);
         const Point cart = Grid_CellToCart(grid, cell);
