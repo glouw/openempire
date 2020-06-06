@@ -590,46 +590,33 @@ static void MorphState(Unit* const unit, const Graphics file)
 
 static void Morph(Unit* const unit)
 {
+#define BRANCH(GENDER)                                                       \
+    if(unit->interest->is_being_built)                                       \
+        MorphState(unit, FILE_GRAPHICS_##GENDER##_VILLAGER_BUILDER_IDLE);    \
+    else                                                                     \
+    if(unit->interest->trait.type == TYPE_TREE)                              \
+        MorphState(unit, FILE_GRAPHICS_##GENDER##_VILLAGER_WOODCUTTER_IDLE); \
+    else                                                                     \
+    if(unit->interest->trait.type == TYPE_BERRY_BUSH)                        \
+        MorphState(unit, FILE_GRAPHICS_##GENDER##_VILLAGER_FORAGER_IDLE);    \
+    else                                                                     \
+    if(unit->interest->trait.type == TYPE_MILL)                              \
+        MorphState(unit, FILE_GRAPHICS_##GENDER##_VILLAGER_FORAGER_IDLE);    \
+    else                                                                     \
+    if(unit->interest->trait.type == TYPE_STONE_MINE                         \
+    || unit->interest->trait.type == TYPE_GOLD_MINE)                         \
+        MorphState(unit, FILE_GRAPHICS_##GENDER##_VILLAGER_MINER_IDLE);      \
+    else                                                                     \
+        MorphState(unit, FILE_GRAPHICS_##GENDER##_VILLAGER_IDLE);
     if(unit->trait.type == TYPE_VILLAGER_MALE)
     {
-        if(unit->interest->is_being_built)
-            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_BUILDER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_TREE)
-            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_BERRY_BUSH)
-            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_MILL)
-            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_STONE_MINE
-        || unit->interest->trait.type == TYPE_GOLD_MINE)
-            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_MINER_IDLE);
-        else
-            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_IDLE);
+        BRANCH(MALE)
     }
     if(unit->trait.type == TYPE_VILLAGER_FEMALE)
     {
-        if(unit->interest->is_being_built)
-            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_BUILDER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_TREE)
-            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_BERRY_BUSH)
-            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_MILL)
-            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE);
-        else
-        if(unit->interest->trait.type == TYPE_STONE_MINE
-        || unit->interest->trait.type == TYPE_GOLD_MINE)
-            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE);
-        else
-            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE);
+        BRANCH(FEMALE)
     }
+#undef BRANCH
 }
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
