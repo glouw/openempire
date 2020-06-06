@@ -380,7 +380,7 @@ int32_t Unit_GetLastFallTick(Unit* const unit)
     return unit->fall_frames_per_dir * CONFIG_ANIMATION_DIVISOR - 1;
 }
 
-static bool WithinRange(Unit* const unit, const Grid grid)
+static bool CanEngage(Unit* const unit, const Grid grid)
 {
     const Point diff = Point_Sub(
         unit->interest->trait.is_inanimate
@@ -428,12 +428,6 @@ static bool MustDisengage(Unit* const unit)
         && !Unit_IsDead(unit->interest);
 }
 
-static void Build(Unit* const unit, Unit* const other)
-{
-    if(Unit_IsConstruction(other))
-        other->health += unit->trait.attack;
-}
-
 static Resource Extract(Unit* const unit, Unit* const other)
 {
     Resource resource = {
@@ -449,6 +443,7 @@ static Resource Extract(Unit* const unit, Unit* const other)
 Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
     Unit* const other = unit->interest;
+    const Resource none = { TYPE_NONE, 0 };
     if(other != NULL
     && !Unit_IsExempt(unit)
     && !unit->is_floating
@@ -457,9 +452,10 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     && Unit_IsDifferent(unit, other)   // DO NOT MELEE SELF.
     && other->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
     {
-        if(WithinRange(unit, grid))
+        if(CanEngage(unit, grid))
         {
             if((SameColor(unit, other) && other->is_being_built && Unit_IsVillager(unit))
+            || (SameColor(unit, other) && other->trait.type == TYPE_MILL)
             || !SameColor(unit, other))
             {
                 unit->is_engaged_in_melee = true;
@@ -472,23 +468,28 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
         if(MustDisengage(unit))
         {
             Unit_Unlock(unit);
-            if(other)
+            if(Unit_IsVillager(unit))
             {
-                if(Unit_IsVillager(unit))
+                if(SameColor(unit, other))
                 {
-                    if(SameColor(unit, other))
-                        Build(unit, other);
+                    if(Unit_IsConstruction(other))
+                        other->health += unit->trait.attack;
                     else
-                        return Extract(unit, other);
+                    if(other->trait.type == TYPE_MILL)
+                    {
+                        const Resource farmed = { TYPE_FOOD, unit->trait.attack };
+                        return farmed;
+                    }
                 }
                 else
-                    other->health -= unit->trait.attack;
+                    return Extract(unit, other);
             }
+            else
+                other->health -= unit->trait.attack;
         }
     }
     else
         Unit_Unlock(unit);
-    const Resource none = { TYPE_NONE, 0 };
     return none;
 }
 
@@ -579,12 +580,56 @@ void Unit_Preserve(Unit* const to, const Unit* const from)
 #undef COPY
 }
 
-static void MorphState(Unit* const unit, const Graphics file, const State state)
+static void MorphState(Unit* const unit, const Graphics file)
 {
     unit->file = file;
-    unit->state = state;
+    unit->state = STATE_IDLE;
     unit->state_timer = 0;
     unit->is_state_locked = false;
+}
+
+static void Morph(Unit* const unit)
+{
+    if(unit->trait.type == TYPE_VILLAGER_MALE)
+    {
+        if(unit->interest->is_being_built)
+            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_BUILDER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_TREE)
+            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_BERRY_BUSH)
+            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_MILL)
+            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_STONE_MINE
+        || unit->interest->trait.type == TYPE_GOLD_MINE)
+            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_MINER_IDLE);
+        else
+            MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_IDLE);
+    }
+    if(unit->trait.type == TYPE_VILLAGER_FEMALE)
+    {
+        if(unit->interest->is_being_built)
+            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_BUILDER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_TREE)
+            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_BERRY_BUSH)
+            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_MILL)
+            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE);
+        else
+        if(unit->interest->trait.type == TYPE_STONE_MINE
+        || unit->interest->trait.type == TYPE_GOLD_MINE)
+            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE);
+        else
+            MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE);
+    }
 }
 
 void Unit_SetInterest(Unit* const unit, Unit* const interest)
@@ -595,45 +640,7 @@ void Unit_SetInterest(Unit* const unit, Unit* const interest)
         if(interest)
         {
             unit->interest_id = interest->id;
-            if(unit->interest->is_being_built)
-            {
-                if(unit->trait.type == TYPE_VILLAGER_MALE)
-                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_BUILDER_IDLE, STATE_IDLE);
-                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
-                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_BUILDER_IDLE, STATE_IDLE);
-            }
-            else
-            if(unit->interest->trait.type == TYPE_TREE)
-            {
-                if(unit->trait.type == TYPE_VILLAGER_MALE)
-                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_WOODCUTTER_IDLE, STATE_IDLE);
-                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
-                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_WOODCUTTER_IDLE, STATE_IDLE);
-            }
-            else
-            if(unit->interest->trait.type == TYPE_BERRY_BUSH)
-            {
-                if(unit->trait.type == TYPE_VILLAGER_MALE)
-                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_FORAGER_IDLE, STATE_IDLE);
-                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
-                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_FORAGER_IDLE, STATE_IDLE);
-            }
-            else
-            if(unit->interest->trait.type == TYPE_STONE_MINE
-            || unit->interest->trait.type == TYPE_GOLD_MINE)
-            {
-                if(unit->trait.type == TYPE_VILLAGER_MALE)
-                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_MINER_IDLE, STATE_IDLE);
-                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
-                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_MINER_IDLE, STATE_IDLE);
-            }
-            else
-            {
-                if(unit->trait.type == TYPE_VILLAGER_MALE)
-                    MorphState(unit, FILE_GRAPHICS_MALE_VILLAGER_IDLE, STATE_IDLE);
-                if(unit->trait.type == TYPE_VILLAGER_FEMALE)
-                    MorphState(unit, FILE_GRAPHICS_FEMALE_VILLAGER_IDLE, STATE_IDLE);
-            }
+            Morph(unit);
         }
         else
             unit->interest_id = -1;
