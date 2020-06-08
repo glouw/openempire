@@ -407,9 +407,11 @@ static bool CanEngage(Unit* const unit, const Grid grid)
     }
 }
 
-static Resource Collect(Resource resource, Unit* const unit)
+static Resource Collect(Unit* const unit, const int amount)
 {
-    switch(unit->interest->trait.type)
+    Resource resource;
+    resource.amount = amount;
+    switch(unit->trait.type)
     {
     case TYPE_TREE       : resource.type = TYPE_WOOD;  break;
     case TYPE_STONE_MINE : resource.type = TYPE_STONE; break;
@@ -419,6 +421,7 @@ static Resource Collect(Resource resource, Unit* const unit)
         // DEFAULT IS FINE. BY LAW THERE ARE ONLY 4 RESOURCES TYPES IN AGE II.
         break;
     }
+    unit->health -= amount;
     return resource;
 }
 
@@ -429,35 +432,45 @@ static bool MustDisengage(Unit* const unit)
         && !Unit_IsDead(unit->interest);
 }
 
-static Resource Extract(Unit* const unit, Unit* const other)
+static Resource DoVillagerAction(Unit* const unit)
 {
-    Resource resource = {
-        TYPE_NONE,
-        unit->trait.attack
-    };
-    if(other->trait.is_resource)
-        resource = Collect(resource, unit);
-    other->health -= unit->trait.attack;
-    return resource;
+    if(SameColor(unit, unit->interest))
+    {
+        if(Unit_IsConstruction(unit->interest))
+            unit->interest->health += unit->trait.attack;
+        else
+        if(unit->interest->trait.type == TYPE_MILL)
+        {
+            const Resource resource = { TYPE_FOOD, unit->trait.attack };
+            return resource;
+        }
+    }
+    else
+    if(unit->interest->trait.is_resource)
+    {
+        const Resource resource = Collect(unit->interest, unit->trait.attack);
+        return resource;
+    }
+    else
+        unit->interest->health -= unit->trait.attack;
+    return Resource_None();
 }
 
 Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
-    Unit* const other = unit->interest;
-    const Resource none = { TYPE_NONE, 0 };
-    if(other != NULL
+    if(unit->interest != NULL
     && !Unit_IsExempt(unit)
     && !unit->is_floating
-    && !Unit_IsExempt(other)
-    && !other->is_floating
-    && Unit_IsDifferent(unit, other)   // DO NOT MELEE SELF.
-    && other->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
+    && !Unit_IsExempt(unit->interest)
+    && !unit->interest->is_floating
+    && Unit_IsDifferent(unit, unit->interest)   // DO NOT MELEE SELF.
+    && unit->interest->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
     {
         if(CanEngage(unit, grid))
         {
-            if((SameColor(unit, other) && other->is_being_built && Unit_IsVillager(unit))
-            || (SameColor(unit, other) && other->trait.type == TYPE_MILL)
-            || !SameColor(unit, other))
+            if((SameColor(unit, unit->interest) && unit->interest->is_being_built && Unit_IsVillager(unit))
+            || (SameColor(unit, unit->interest) && unit->interest->trait.type == TYPE_MILL)
+            || !SameColor(unit, unit->interest))
             {
                 unit->is_engaged_in_melee = true;
                 Unit_SetState(unit, STATE_ATTACK, true);
@@ -472,29 +485,15 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
             if(CanEngage(unit, grid)) // RANGE CHECK IS DONE AGAIN, ELSE UNIT CAN ATTACK INFINITELY FAR AWAY WITH QUICK CHANGE OF INTEREST.
             {
                 if(Unit_IsVillager(unit))
-                {
-                    if(SameColor(unit, other))
-                    {
-                        if(Unit_IsConstruction(other))
-                            other->health += unit->trait.attack;
-                        else
-                        if(other->trait.type == TYPE_MILL)
-                        {
-                            const Resource farmed = { TYPE_FOOD, unit->trait.attack };
-                            return farmed;
-                        }
-                    }
-                    else
-                        return Extract(unit, other);
-                }
+                    return DoVillagerAction(unit);
                 else
-                    other->health -= unit->trait.attack;
+                    unit->interest->health -= unit->trait.attack;
             }
         }
     }
     else
         Unit_Unlock(unit);
-    return none;
+    return Resource_None();
 }
 
 static Point Nudge(Unit* const unit)

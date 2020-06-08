@@ -364,9 +364,12 @@ static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, cons
                 mags[count++] = mag;
             }
         }
+    UTIL_SORT(mags, count, CompareByMag);
+#if 0
+    return mags[0].point;
+#else
     // OF THE CLOSEST FOUR SIDES, PICK THE TILE WITH LEAST AMOUNT OF VILLAGERS.
 #define MIN (4)
-    UTIL_SORT(mags, count, CompareByMag);
     Point out = { -1,-1 };
     int32_t min = INT_MAX;
     for(int32_t i = 0; i < SIDES; i++)
@@ -379,12 +382,13 @@ static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, cons
             out = cart;
         }
     }
+#undef MIN
     return out;
+#endif
 #undef WIDTH
 #undef SIDES
 #undef CORNERS
 #undef MAX
-#undef MIN
 }
 
 static void SetupGoal(const Units units, Unit* const unit, const Grid grid, const Field field)

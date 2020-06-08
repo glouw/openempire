@@ -52,8 +52,8 @@ Video Video_Make(const int32_t xres, const int32_t yres, const char* const title
     video.renderer = SDL_CreateRenderer(video.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     video.canvas = SDL_CreateTexture(video.renderer, SURFACE_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, xres, yres);
     video.title = title;
-    video.text = Text_Build(terminus, 28, 0x00FF0000);
-    video.text_small = Text_Build(terminus, 14, 0x00FFFF00);
+    video.text = Text_Build(terminus, 24, 0x00FF0000);
+    video.text_small = Text_Build(terminus, 12, 0x00FFFF00);
     video.xres = xres;
     video.yres = yres;
     video.cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -146,8 +146,8 @@ static void PrintPerformanceMonitor(const Video video, const Units units, const 
 static void PrintResources(const Video video, const Units units)
 {
     const int32_t space = 77;
-    const int32_t x0 = 27;
-    const int32_t y0 = 5;
+    const int32_t x0 = 38;
+    const int32_t y0 = 7;
     const Share share= units.share[units.color];
     typedef struct
     {

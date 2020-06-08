@@ -46,6 +46,7 @@ SRCS += Quad.c
 SRCS += Rect.c
 SRCS += Rects.c
 SRCS += Registrar.c
+SRCS += Resource.c
 SRCS += Restore.c
 SRCS += Scanline.c
 SRCS += Sock.c
