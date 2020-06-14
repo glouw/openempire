@@ -48,21 +48,6 @@ static void LayDirt(const Map map)
     }
 }
 
-static void SprinkleGrass(const Map map)
-{
-    for(int32_t x = 0; x < map.size; x++)
-    for(int32_t y = 0; y < map.size; y++)
-    {
-        if(Util_FlipCoin()
-        && Util_FlipCoin()
-        && Util_FlipCoin())
-        {
-            const Point point = { x, y };
-            Map_SetTerrainFile(map, point, FILE_TERRAIN_GRASS_A);
-        }
-    }
-}
-
 Map Map_Make(const int32_t size, const Registrar terrain)
 {
     const Frame frame = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT].frame[0];
@@ -79,7 +64,6 @@ Map Map_Make(const int32_t size, const Registrar terrain)
     };
     map.middle = middle;
     LayDirt(map);
-    SprinkleGrass(map);
     return PopulateMiniMapColors(map, terrain);
 }
 

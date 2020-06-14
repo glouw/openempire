@@ -1253,6 +1253,7 @@ static int32_t CountPopulation(Units units, const Color color)
         Unit* const unit = &units.unit[i];
         if(!Unit_IsExempt(unit)
         && !unit->trait.is_inanimate
+        && !unit->is_floating
         && unit->color == color)
             count++;
     }
@@ -1278,15 +1279,7 @@ static Units SpawnWithButton(Units units, const Overview overview, const Grid gr
         // BITS ARE GOTTEN FROM UNITS BECAUSE TRIGGER SPEED WILL OUTMATCH OVERVIEW SPEED.
         if(!Bits_Get(units.share[overview.color].bits, button.trigger)
         && !Bits_Get(units.share[overview.color].busy, button.trigger))
-        {
-            const bool using_flag = parts.part[0].file == FILE_GRAPHICS_FLAG_TALL;
-            const int32_t count =
-                (!using_flag && overview.event.key_left_shift)
-                    ? 3
-                    : 1;
-            for(int32_t i = 0; i < count; i++)
-                units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
-        }
+            units = SpawnParts(units, cart, zero, grid, overview.color, graphics, map, is_floating, parts, false, button.trigger, is_being_built);
         Parts_Free(parts);
     }
     return units;

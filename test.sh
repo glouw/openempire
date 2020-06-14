@@ -47,7 +47,7 @@ batch()
     for (( i = 0; i < $(($USERS - 1)); i++ ))
     do
         sleep 1
-        D=0
+        D=20
         X=$(($XRES - $D * i))
         Y=$(($YRES - $D * i))
         client $X $Y &
