@@ -27,9 +27,9 @@ can be found in the root directory of the game's installation:
     "$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data"
 
 To play, first start the server by specifying the port and the number of users
-who will be playing (the data folder path is above):
+who will be playing:
 
-    ./openempires --server --port 1234 --users 3 --path "/path/to/data/folder"
+    ./openempires --path "$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data" --port 1234 --users 3 --server
 
 Keep note, that three users implies two human players and one anti-cheat bot
 who spectates the game and detects and restores out of syncs.
@@ -38,20 +38,20 @@ Second, start these three clients (you, on your computer, a friend on their comp
 and the anti-cheat bot on a computer you trust). The anti cheat bot must be started last.
 For instance, to start one client:
 
-    ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
+    ./openempires --path "$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data" --port 1234 --host localhost --xres 1440 --yres 900
 
 ## Controls
 
 Some small tweaks have been added to ease some of the controls:
 
     W A S D :
-        pans the camera
+        Pans the camera
 
     Left shift + left click:
-        selects multiple of the same unit
+        Selects multiple of the same unit
 
     Left alt + Q W E R T ... Z X C V B:
-        selects a building to place, or a unit command to execute.
+        Selects a building to place, or a unit command to execute
 
 ## Legal
 
