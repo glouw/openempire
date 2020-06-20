@@ -2,7 +2,7 @@
 
 Open Empires is an educational multi-player RTS engine which interfaces with the Age of Empires II Trial assets.
 
-![Open Empires](https://share.gifyoutube.com/2xPWqP.gif)
+[![YouTube](https://img.youtube.com/vi/el8Brru8ZIU/maxresdefault.jpg)](https://www.youtube.com/watch?v=el8Brru8ZIU)
 
 ## Dependencies
 
