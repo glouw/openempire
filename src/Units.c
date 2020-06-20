@@ -23,6 +23,31 @@ static bool CanWalk(const Units units, const Map map, const Point point)
         && Stack_IsWalkable(stack);
 }
 
+static bool DimensionsBlock(const Units units, Unit* const unit)
+{
+    for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
+    for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
+    {
+        const Point offset = { x, y };
+        const Point shift = Point_Add(unit->cart, offset);
+        const Stack stack = Units_GetStackCart(units, shift);
+        for(int32_t i = 0; i < stack.count; i++)
+        {
+            Unit* const reference = stack.reference[i];
+            // UNITS BUILDING ON UNITS IS NOT A BLOCK.
+            if(!reference->trait.is_inanimate && !unit->trait.is_inanimate)
+                continue;
+            // UNITS BUILDING ON TOWN CENTER DETAILS IS NOT A BLOCK.
+            if(reference->trait.type == TYPE_TOWN_CENTER
+            && reference->trait.is_detail
+            && !unit->trait.is_inanimate)
+                continue;
+            return true;
+        }
+    }
+    return false;
+}
+
 static bool CanBuild(const Units units, const Map map, Unit* const unit)
 {
     if(!unit->trait.can_expire)
@@ -31,6 +56,8 @@ static bool CanBuild(const Units units, const Map map, Unit* const unit)
         {
             const Point offset = { x, y };
             const Point cart = Point_Add(unit->cart, offset);
+            if(DimensionsBlock(units, unit))
+                return false;
             if(!CanWalk(units, map, cart))
                 return false;
         }
@@ -655,7 +682,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         const bool can_walk_w = CanWalk(units, map, Point_Add(unit->cart, w));
         const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
         const int32_t repulsion = 100; // XXX: HOW STRONG SHOULD THIS BE?
-        const int32_t border = 10;
+        const int32_t border = (unit->trait.width / CONFIG_GRID_CELL_SIZE) / 2;
         if(!can_walk_n && offset.y < border) out = Point_Add(out, Point_Mul(s, repulsion));
         if(!can_walk_w && offset.x < border) out = Point_Add(out, Point_Mul(e, repulsion));
         if(!can_walk_s && offset.y > grid.tile_cart_height - border) out = Point_Add(out, Point_Mul(n, repulsion));

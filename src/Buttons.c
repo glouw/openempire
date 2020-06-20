@@ -10,13 +10,13 @@
     { ICONTYPE_BUILD, { ICONBUILD_MILL        }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_STONE_CAMP  }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_LUMBER_CAMP }, TRIGGER_NONE }, \
+    { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_BARRACKS    }, TRIGGER_NONE }
 
 #define BUILD_AGE_2                                              \
     { ICONTYPE_BUILD, { ICONBUILD_STABLE      }, TRIGGER_NONE }  \
 
 #define BUILD_AGE_3                                              \
-    { ICONTYPE_BUILD, { ICONBUILD_TOWN_CENTER }, TRIGGER_NONE }, \
     { ICONTYPE_BUILD, { ICONBUILD_CASTLE      }, TRIGGER_NONE }
 
 static const Button build_age1[] = { BUILD_AGE_1 };

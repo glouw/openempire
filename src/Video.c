@@ -113,6 +113,9 @@ void Video_Draw(const Video video, const Data data, const Map map, const Units u
     Vram_DrawUnits(vram, graphics_tiles_floats);
     Vram_DrawMouseTileSelect(vram, data.terrain, overview, grid);
     Vram_DrawUnitSelections(vram, graphics_tiles, overview.color);
+#if 1
+    Vram_DrawDebugDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);
+#endif
     Vram_FlashDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);
     Vram_FlashUnits(vram, graphics_tiles);
     Vram_DrawSelectedDimensionGrids(vram, data.terrain, overview, grid, graphics_tiles);

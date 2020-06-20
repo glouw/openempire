@@ -10,7 +10,7 @@ VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
 XRES=1280
 YRES=720
-USERS=3
+USERS=2
 MAP_SIZE=64
 HOST=localhost
 PORT=1111
@@ -37,7 +37,7 @@ server()
 
 client()
 {
-    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH" &
+    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH"
 }
 
 batch()

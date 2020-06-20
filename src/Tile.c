@@ -132,19 +132,93 @@ static Dynamics GetDynamics(const Animation animation, Unit* const reference)
     return dynamics;
 }
 
+// LIKEWISE FOR TOWCENTER ROOF DETAILS - SEEMS LIKE THESE WERE PLACED BY THE ARTISTS AT SOME SORT OF ANCHOR COORD.
+static Point GetTownCenterGraphicsShift(const Graphics file)
+{
+    Point shift = { 0,0 };
+    switch(file)
+    {
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_SHADOW:
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_SHADOW:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_SHADOW:
+        shift.x = -1;
+        shift.y = 1;
+        break;
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT:
+        shift.x = 0;
+        shift.y = 2;
+        break;
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE:
+        shift.x = -2;
+        shift.y = -1;
+        break;
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_B:
+        shift.x = -2;
+        shift.y = -2;
+        break;
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_RITE_SUPPORT_A:
+        shift.x = -1;
+        shift.y = -1;
+        break;
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_A:
+    case FILE_GRAPHICS_AGE_1_TOWN_CENTER_ROOF_LEFT_SUPPORT_B:
+        shift.x = 1;
+        shift.y = 2;
+        break;
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT:
+        shift.x = 0;
+        shift.y = 2;
+        break;
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE:
+        shift.x = -2;
+        shift.y = -1;
+        break;
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_A:
+        shift.x = -1;
+        shift.y = -1;
+        break;
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_RITE_SUPPORT_B:
+        shift.x = -2;
+        shift.y = -2;
+        break;
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_A:
+        shift.x = 1;
+        shift.y = 2;
+        break;
+    case FILE_GRAPHICS_AGE_2_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B:
+    case FILE_GRAPHICS_AGE_3_WEST_EUROPE_TOWN_CENTER_ROOF_LEFT_SUPPORT_B:
+        shift.x = 1;
+        shift.y = 2;
+        break;
+    default:
+        // ONLY CARE ABOUT TOWN CENTERS.
+        break;
+    }
+    return shift;
+}
+
+// MINOR GRAPHICS TWEAK FOR RUBBLE - SEEMS LIKE SPRITE RUBBLE ARTWORK WAS ALWAYS BUGGED WITH A HALF GRID OFFSET.
+static Point GetRubbleGraphicsShift(const Type type, const Grid grid)
+{
+    Point shift = { 0,0 };
+    if(type == TYPE_RUBBLE)
+        shift.y = -grid.tile_cart_mid.y / 2;
+    return shift;
+}
+
 Tile Tile_GetGraphics(const Overview overview, const Grid grid, const Point cart, const Point cart_grid_offset, const Animation animation, Unit* const reference)
 {
     const Dynamics dynamics = GetDynamics(animation, reference);
     const Point shifted = Unit_GetShift(reference, cart);
     const uint8_t height = Graphics_GetHeight(reference->file);
-    Point offset = cart_grid_offset;
-    // MINOR GRAPHICS TWEAK FOR RUBBLE - SEEMS LIKE SPRITE RUBBLE ARTWORK WAS ALWAYS BUGGED WITH A HALF GRID OFFSET.
-    if(reference->trait.type == TYPE_RUBBLE)
-    {
-        const Point shift = { 0, grid.tile_cart_mid.y / 2 };
-        offset = Point_Sub(offset, shift);
-    }
-    return Construct(overview, grid, shifted, offset, animation, dynamics, height, reference);
+    const Point new_cart_grid_offset = Point_Add(cart_grid_offset, GetRubbleGraphicsShift(reference->trait.type, grid));
+    const Point new_shifted = Point_Add(shifted, GetTownCenterGraphicsShift(reference->file));
+    return Construct(overview, grid, new_shifted, new_cart_grid_offset, animation, dynamics, height, reference);
 }
 
 Point Tile_GetHotSpotCoords(const Tile tile)
@@ -173,7 +247,7 @@ void Tile_Select(const Tile tile, const Color color)
 {
     if(!Unit_IsExempt(tile.reference) && !tile.reference->is_floating)
         Unit_SetSelectedColor(tile.reference, color);
-#if 0
+#if 1
     Unit_Print(tile.reference);
 #endif
 }

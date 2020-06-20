@@ -63,3 +63,5 @@ void Vram_FlashDimensionGrids(const Vram, const Registrar, const Overview, const
 void Vram_FlashUnits(const Vram, const Tiles);
 
 void Vram_DrawSelectedDimensionGrids(const Vram, const Registrar, const Overview, const Grid, const Tiles);
+
+void Vram_DrawDebugDimensionGrids(const Vram, const Registrar, const Overview, const Grid, const Tiles);

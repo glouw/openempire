@@ -513,7 +513,7 @@ void Vram_DrawUnitHealthBars(const Vram vram, const Tiles tiles, const Color col
     }
 }
 
-void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso, const uint32_t color)
+static void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso, const uint32_t color)
 {
     const Animation animation = terrain.animation[COLOR_GAIA][FILE_TERRAIN_DIRT];
     const Image image = animation.image[0];
@@ -538,7 +538,7 @@ void DrawTileOutline(const Vram vram, const Registrar terrain, const Point iso, 
     }
 }
 
-void DrawDimensionGrid(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, Unit* const unit)
+static void DrawDimensionGrid(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, Unit* const unit, const uint32_t color)
 {
     for(int32_t x = 0; x < unit->trait.dimensions.x; x++)
     for(int32_t y = 0; y < unit->trait.dimensions.y; y++)
@@ -546,7 +546,7 @@ void DrawDimensionGrid(const Vram vram, const Registrar terrain, const Overview 
         const Point shift = { x, y };
         const Point cart = Point_Add(shift, unit->cart);
         const Point iso = Overview_CartToIso(overview, grid, cart);
-        DrawTileOutline(vram, terrain, iso, 0xFFFFFF);
+        DrawTileOutline(vram, terrain, iso, color);
     }
 }
 
@@ -559,7 +559,7 @@ void Vram_FlashDimensionGrids(const Vram vram, const Registrar terrain, const Ov
         && unit->grid_flash_timer < CONFIG_VRAM_FLASH_TIMER_MAX
         && unit->is_flash_on
         && unit->trait.is_inanimate)
-            DrawDimensionGrid(vram, terrain, overview, grid, unit);
+            DrawDimensionGrid(vram, terrain, overview, grid, unit, 0xFFFFFF);
     }
 }
 
@@ -570,7 +570,16 @@ void Vram_DrawSelectedDimensionGrids(const Vram vram, const Registrar terrain, c
         Unit* const unit = tiles.tile[i].reference;
         if(Unit_IsSelectedByColor(unit, overview.color)
         && unit->trait.is_inanimate)
-            DrawDimensionGrid(vram, terrain, overview, grid, unit);
+            DrawDimensionGrid(vram, terrain, overview, grid, unit, 0xFFFFFF);
+    }
+}
+
+void Vram_DrawDebugDimensionGrids(const Vram vram, const Registrar terrain, const Overview overview, const Grid grid, const Tiles tiles)
+{
+    for(int32_t i = 0; i < tiles.count; i++)
+    {
+        Unit* const unit = tiles.tile[i].reference;
+        DrawDimensionGrid(vram, terrain, overview, grid, unit, 0xFF0000);
     }
 }
 

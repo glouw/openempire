@@ -272,6 +272,7 @@ void Unit_Print(Unit* const unit)
         printf("cart_grid_offset_goal :: %d %d\n", unit->cart_grid_offset_goal.x, unit->cart_grid_offset_goal.y);
         printf("cell                  :: %d %d\n", unit->cell.x, unit->cell.y);
         printf("cell_inanimate        :: %d %d\n", unit->cell_interest_inanimate.x, unit->cell_interest_inanimate.y);
+        printf("dim.x, dim.y          :: %d %d\n", unit->trait.dimensions.x, unit->trait.dimensions.y);
         printf("\n");
     }
 }
