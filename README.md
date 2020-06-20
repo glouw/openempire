@@ -1,8 +1,6 @@
 # Open Empires
 
-Open Empires is an educational multi-player RTS engine which interfaces
-with the Age of Empires II Trial assets and strives to be written in 15,000
-lines of C99 or less, using only SDL2 as an external dependency.
+Open Empires is an educational multi-player RTS engine which interfaces with the Age of Empires II Trial assets.
 
 ![](https://user-images.githubusercontent.com/7000616/76479321-9ef9c700-63c8-11ea-9353-a7dafa29ea0a.png)
 
@@ -28,38 +26,23 @@ can be found in the root directory of the game's installation:
 
     "$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empires II Trial/Data"
 
-A copy of the Trial version EULA agreement has been pasted in the LICENCE file
-for your reference. In using Open Empires alongside the Trial Assets, you consent to
-the terms within this EULA.
+To play, first start the server by specifying the port and the number of users
+who will be playing (the data folder path is above):
 
-Once installed, the quickest way to get the client server model tested
-is to edit GAME_PATH in test.sh to be your game's installation DATA folder,
-although if you are on a UNIX like machine this should already be correctly set.
-Once done, run:
+    ./openempires --server --port 1234 --users 3 --path "/path/to/data/folder"
 
-    ./test.sh
-
-This test script runs netem which purposely emulates a laggy lossy network.
-Change ENTROPY within test.sh to to set realistic or development playing conditions.
-
-Otherwise, if you are looking to piece-wise setup the server and client on localhost,
-first start the server by specifying the port and the number of users who will be playing:
-
-    ./openempires --server --port 1234 --users 3
-
-Keep note, that 3 users implies 2 human players, and 1 anti-cheat bot
+Keep note, that three users implies two human players and one anti-cheat bot
 who spectates the game and detects and restores out of syncs.
 
-Second, start these 3 clients (you, on your computer, a friend on their computer,
+Second, start these three clients (you, on your computer, a friend on their computer,
 and the anti-cheat bot on a computer you trust). The anti cheat bot must be started last.
-For instance, to start 1 client:
+For instance, to start one client:
 
     ./openempires --host localhost --port 1234 --xres 1440 --yres 900 --path "/path/to/data/folder"
 
-The data folder path is the same path previously outline above.
+## Controls
 
-From here on its the game you know and love. Some small tweaks have been added
-to ease some of the controls:
+Some small tweaks have been added to ease some of the controls:
 
     W A S D :
         pans the camera
@@ -70,19 +53,6 @@ to ease some of the controls:
     Left alt + Q W E R T ... Z X C V B:
         selects a building to place, or a unit command to execute.
 
-## Structure
-
-C source lives in src/ folder and is compilable by both C++11 and C11
-compilers. C source is separated by typedefs, implemented with .[ch]
-files. General purpose scripts may live in the top level.
-
-Structs are passed by value such that functions calls modify no more than
-one argument at a time. Link time optimization removes most of the heavy
-function argument copying.
-
-To simplify the lockstep engine, double and floating points are not used,
-and the standard math library is not linked with the final binary.
-
 ## Legal
 
 Open Empires was written from scratch with the highest regards of the
@@ -90,15 +60,14 @@ original copyright holders.
 
 Open Empires is *NOT* a binary decompilation of Age of Empires II.
 
-Data, art, and sound files from Age of Empires II, for trial and non-trial
-assets alike - ARE NOT, AND NEVER WILL BE, SUPPLIED.
+Data, art, and sound files from the Age of Empires II Trial are not supplied.
 
-Age of Empires II is copyright (©) by Microsoft Corporation and Ensemble Studios.
+Age of Empires II is copyright (©) by Microsoft Corporation, Ensemble Studios, and SkyBox Labs.
 Open Empires was created under Microsoft's Game Content Usage Rules:
 
     https://www.xbox.com/en-us/developers/rules
 
-Open Empires uses assets from Age of Empires II, and it is not endorsed by
+Open Empires uses assets from the Age of Empires II Trial, and it is not endorsed by
 or affiliated with Microsoft, Ensemble Studios, or SkyBox Labs.
 
 ## Credits
@@ -115,6 +84,4 @@ Thanks to:
 * Forgotten Empires for keeping the spirit of Age of Empires II alive
 
 Dedicated to Ondrej whom I met hiking across England as he hiked from
-Scotland to Spain.
-
-For the Josh Master. Volare, my friend, wherever you are.
+Scotland to Spain, and to TheJoshMaster22; volare, my friend, wherever you are.
