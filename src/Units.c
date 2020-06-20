@@ -383,6 +383,8 @@ static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, cons
         {
             const Point shift = { x, y };
             const Point cart = Point_Add(interest->cart, shift);
+            if(Point_Equal(unit->cart, cart))
+                return cart;
             if(Field_IsWalkable(field, cart))
             {
                 const Point cell = Grid_CartToCell(grid, cart);
