@@ -587,15 +587,17 @@ static Units MoveTo(Units units, const Overview overview, const Grid grid, const
 static Units Command(Units units, const Overview overview, const Grid grid, const Registrar graphics, const Map map, const Field field, const Points render_points)
 {
     const Button button = Button_FromOverview(overview);
-    const bool using_aggro_move = Button_UseAggroMove(button);
-    const bool using_building_icon = button.icon_type == ICONTYPE_BUILD;
     if(overview.share.select_count > 0)
     {
-        if(overview.event.mouse_lu && using_building_icon)
-            units = MoveToNewConstruction(units, overview, grid, graphics, map, field);
-        else
-        if(overview.event.mouse_ru || using_aggro_move)
+        if(overview.event.mouse_lu)
         {
+            const bool using_building_icon = (button.icon_type == ICONTYPE_BUILD);
+            if(using_building_icon)
+                units = MoveToNewConstruction(units, overview, grid, graphics, map, field);
+        }
+        if(overview.event.mouse_ru)
+        {
+            const bool using_aggro_move = (button.icon_type == ICONTYPE_COMMAND) && (button.icon_command == ICONCOMMAND_AGGRO_MOVE);
             units = MoveTo(units, overview, grid, graphics, map, field, render_points);
             SetSelectedAggroMove(units, overview.color, using_aggro_move);
         }
@@ -684,7 +686,7 @@ static Point WallPushBoids(const Units units, Unit* const unit, const Map map, c
         const bool can_walk_w = CanWalk(units, map, Point_Add(unit->cart, w));
         const Point offset = Grid_GetCornerOffset(grid, unit->cart_grid_offset);
         const int32_t repulsion = 100; // XXX: HOW STRONG SHOULD THIS BE?
-        const int32_t border = (unit->trait.width / CONFIG_GRID_CELL_SIZE) / 2;
+        const int32_t border = ((unit->trait.width / 2) / CONFIG_GRID_CELL_SIZE) / 2;
         if(!can_walk_n && offset.y < border) out = Point_Add(out, Point_Mul(s, repulsion));
         if(!can_walk_w && offset.x < border) out = Point_Add(out, Point_Mul(e, repulsion));
         if(!can_walk_s && offset.y > grid.tile_cart_height - border) out = Point_Add(out, Point_Mul(n, repulsion));
@@ -904,6 +906,8 @@ static void EngageBoids(const Units units, Unit* const unit, const Grid grid)
             if(closest
             && closest->trait.type != TYPE_FLAG)
             {
+                if(closest->trait.is_resource)
+                    return;
                 Unit_SetInterest(unit, closest);
                 Unit_UpdateCellInterestInanimate(unit, grid);
                 Unit_EngageWithMock(unit, closest, grid);

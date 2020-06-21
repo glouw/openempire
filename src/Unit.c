@@ -467,6 +467,8 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     && Unit_IsDifferent(unit, unit->interest)   // DO NOT MELEE SELF.
     && unit->interest->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
     {
+        if(unit->using_aggro_move && unit->interest->trait.is_resource)
+            goto out;
         if(CanEngage(unit, grid))
         {
             if((SameColor(unit, unit->interest) && unit->interest->is_being_built && Unit_IsVillager(unit))
@@ -494,7 +496,7 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     }
     else
         Unit_Unlock(unit);
-    return Resource_None();
+out:return Resource_None();
 }
 
 static Point Nudge(Unit* const unit)

@@ -76,9 +76,3 @@ Button Button_Upgrade(Button button, const Bits bits)
     }
     return button;
 }
-
-bool Button_UseAggroMove(const Button button)
-{
-    return button.icon_type    == ICONTYPE_COMMAND
-        && button.icon_command == ICONCOMMAND_AGGRO_MOVE;
-}
