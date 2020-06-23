@@ -18,7 +18,6 @@ typedef struct
     int16_t users_connected;
     int16_t users;
     uint16_t seed;
-    int16_t map_size;
     int16_t control;
     bool is_stable;
     bool is_out_of_sync;

@@ -28,7 +28,6 @@ typedef struct
     int32_t cycles;
     int16_t queue_size;
     int16_t ping;
-    int16_t map_size;
     uint16_t seed;
     int16_t users;
 }

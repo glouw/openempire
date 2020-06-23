@@ -36,3 +36,5 @@ Point Grid_OffsetToCell(const Point);
 Point Grid_PanToCart(const Grid, const Point);
 
 Point Grid_CartToPan(const Grid, const Point);
+
+Point Grid_GetRubbleShift(const Grid);

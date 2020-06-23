@@ -117,3 +117,9 @@ Point Grid_CartToPan(const Grid grid, const Point cart)
     const Point shift = Point_Sub(out, center);
     return Point_ToIso(shift);
 }
+
+Point Grid_GetRubbleShift(const Grid grid)
+{
+    Point shift = { 0, -grid.tile_cart_mid.y / 2 };
+    return shift;
+}

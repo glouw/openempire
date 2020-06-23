@@ -19,7 +19,6 @@ typedef struct
     int32_t users_connected;
     int32_t users;
     int32_t seed;
-    int32_t map_size;
     int32_t control[COLOR_COUNT];
     int32_t integral[COLOR_COUNT];
     int32_t restore_count;
@@ -28,7 +27,7 @@ typedef struct
 }
 Cache;
 
-Cache Cache_Make(const int32_t users, const int32_t map_size);
+Cache Cache_Make(const int32_t users);
 
 void Cache_CheckStability(Cache* const, const int32_t setpoint);
 

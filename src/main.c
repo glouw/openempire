@@ -29,7 +29,6 @@ static Overview WaitInLobby(const Video video, const Sock sock)
             if(packet.game_running)
             {
                 overview.users = packet.users;
-                overview.map_size = packet.map_size;
                 overview.seed = packet.seed;
                 overview.spectator = (Color) (overview.users - 1);
                 break;
@@ -47,7 +46,7 @@ static void Play(const Video video, const Data data, const Args args)
     const Sock reset = Sock_Connect(args.host, args.port_reset);
     Overview overview = WaitInLobby(video, sock);
     Util_Srand(overview.seed);
-    const Map map = Map_Make(overview.map_size, data.terrain);
+    const Map map = Map_Make(data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
     Units units  = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_MAX, overview.color);
     Units floats = Units_Make(grid.size, video.cpu_count, CONFIG_UNITS_FLOAT_BUFFER, overview.color);
@@ -182,7 +181,7 @@ static void RunServer(const Args args)
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args);
     Sockets sockets = Sockets_Make(args.port);
     Sockets resets = Sockets_Make(args.port_reset);
-    Cache cache = Cache_Make(args.users, args.map_size);
+    Cache cache = Cache_Make(args.users);
     for(int32_t cycles = 0; true; cycles++)
     {
         const int32_t t0 = SDL_GetTicks();

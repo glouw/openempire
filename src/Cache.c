@@ -3,12 +3,11 @@
 #include "Util.h"
 #include "Config.h"
 
-Cache Cache_Make(const int32_t users, const int32_t map_size)
+Cache Cache_Make(const int32_t users)
 {
     static Cache zero;
     Cache cache = zero;
     cache.users = users;
-    cache.map_size = map_size;
     cache.seed = rand();
     return cache;
 }
@@ -126,7 +125,7 @@ int32_t Cache_GetPingMax(Cache* const cache)
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
     const int32_t kp =  32;
-    const int32_t ki = 128;
+    const int32_t ki =  64;
     const int32_t si = 512; // XXX. INTEGRAL SATURATE... ARBITRARY?
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
