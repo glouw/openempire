@@ -34,6 +34,8 @@ static bool DimensionsBlock(const Units units, Unit* const unit)
         for(int32_t i = 0; i < stack.count; i++)
         {
             Unit* const reference = stack.reference[i];
+            if(reference->trait.type == TYPE_FLAG && unit->trait.type == TYPE_FLAG)
+                return true;
             // UNITS BUILDING ON UNITS IS NOT A BLOCK.
             if(!reference->trait.is_inanimate && !unit->trait.is_inanimate)
                 continue;
