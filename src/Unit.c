@@ -508,7 +508,7 @@ Resource Unit_Melee(Unit* const unit, const Grid grid)
     }
     else
         Unit_Unlock(unit);
-out:return Resource_None();
+    return Resource_None();
 }
 
 static Point Nudge(Unit* const unit)
