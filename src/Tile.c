@@ -137,13 +137,7 @@ Tile Tile_GetGraphics(const Overview overview, const Grid grid, const Point cart
     const Dynamics dynamics = GetDynamics(animation, reference);
     const Point shifted = Unit_GetShift(reference, cart);
     const uint8_t height = Graphics_GetHeight(reference->file);
-    Point cart_out = shifted;
-    if(reference->trait.type == TYPE_TOWN_CENTER
-    || reference->trait.type == TYPE_SHADOW)
-    {
-        const Point shift = Graphics_GetShift(reference->file);
-        cart_out = Point_Add(cart_out, shift);
-    }
+    const Point cart_out = Point_Add(shifted, Graphics_GetShift(reference->file));
     Point offset_out = cart_grid_offset;
     if(reference->trait.type == TYPE_RUBBLE)
     {

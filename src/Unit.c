@@ -457,23 +457,35 @@ static Resource DoVillagerAction(Unit* const unit)
     return Resource_None();
 }
 
+static bool CanMelee(Unit* const unit)
+{
+    return  unit->interest != NULL
+        && !Unit_IsExempt(unit)
+        && !unit->is_floating
+        && !Unit_IsExempt(unit->interest)
+        && !unit->interest->is_floating
+        &&  Unit_IsDifferent(unit, unit->interest)   // DO NOT MELEE SELF.
+        &&  unit->interest->trait.type != TYPE_FLAG; // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
+}
+
+static bool MustEngage(Unit* const unit)
+{
+    // TODO: LET WOAD RAIDER CUT DOWN TREES.
+
+    if(!Unit_IsVillager(unit) && unit->interest->trait.is_resource)
+        return false;
+    return ( SameColor(unit, unit->interest) && unit->interest->is_being_built && Unit_IsVillager(unit))
+        || ( SameColor(unit, unit->interest) && unit->interest->trait.type == TYPE_MILL)
+        || (!SameColor(unit, unit->interest));
+}
+
 Resource Unit_Melee(Unit* const unit, const Grid grid)
 {
-    if(unit->interest != NULL
-    && !Unit_IsExempt(unit)
-    && !unit->is_floating
-    && !Unit_IsExempt(unit->interest)
-    && !unit->interest->is_floating
-    && Unit_IsDifferent(unit, unit->interest)   // DO NOT MELEE SELF.
-    && unit->interest->trait.type != TYPE_FLAG) // DO NOT ATTACK FLAGS THAT ARE RESEARCHING THINGS.
+    if(CanMelee(unit))
     {
-        if(unit->using_aggro_move && unit->interest->trait.is_resource)
-            goto out;
         if(CanEngage(unit, grid))
         {
-            if((SameColor(unit, unit->interest) && unit->interest->is_being_built && Unit_IsVillager(unit))
-            || (SameColor(unit, unit->interest) && unit->interest->trait.type == TYPE_MILL)
-            || !SameColor(unit, unit->interest))
+            if(MustEngage(unit))
             {
                 unit->is_engaged_in_melee = true;
                 Unit_SetState(unit, STATE_ATTACK, true);
