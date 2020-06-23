@@ -11,7 +11,6 @@ ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
 XRES=1280
 YRES=720
 USERS=2
-MAP_SIZE=64
 HOST=localhost
 PORT=1111
 
@@ -32,7 +31,7 @@ netsim()
 
 server()
 {
-    ./$BIN --server --quiet --users $USERS --map_size $MAP_SIZE --port $PORT
+    ./$BIN --server --users $USERS --port $PORT
 }
 
 client()
