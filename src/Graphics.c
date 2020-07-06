@@ -231,7 +231,7 @@ Graphics Graphics_GetGraphicsState(const Graphics graphics, const State index)
 {
     switch(graphics)
     {
-#define FILE_X(name, file, shift, states, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: { State s[] = states; return s[index]; }
+#define FILE_X(name, file, shift, states, upgrade, creator, prio, walkable, type, max_speed, health, attack, width, single_frame, multi_state, expire, inanimate, resource, dimensions, action, detail) case name: { Graphics s[] = states; return s[index]; }
         FILE_X_GRAPHICS
 #undef FILE_X
     }

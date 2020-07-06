@@ -198,7 +198,7 @@ void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycle
         const int32_t min_cycle = Cache_GetCycleMin(cache);
         if(max_cycle - min_cycle > CONFIG_PLAYER_CYCLE_WINDOW)
             cache->is_out_of_sync = true;
-        const int32_t setpoint = Cache_GetCycleSetpoint(cache);
+        const int32_t setpoint = (max_cycle + min_cycle) / 2;
         Cache_CalculateControl(cache, setpoint);
         Cache_CheckStability(cache, setpoint);
         cache->users_connected = CountConnectedPlayers(sockets);

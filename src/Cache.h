@@ -37,8 +37,6 @@ void Cache_ClearPacket(Cache* const);
 
 void Cache_ClearHistory(Cache* const);
 
-int32_t Cache_GetCycleSetpoint(Cache* const);
-
 int32_t Cache_GetCycleMax(Cache* const);
 
 int32_t Cache_GetCycleMin(Cache* const);

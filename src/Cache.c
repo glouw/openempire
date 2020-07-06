@@ -74,13 +74,6 @@ void Cache_ClearHistory(Cache* const cache)
     }
 }
 
-int32_t Cache_GetCycleSetpoint(Cache* const cache)
-{
-    const int32_t spectator = cache->users - 1;
-    const int32_t setpoint = cache->cycles[spectator];
-    return setpoint;
-}
-
 int32_t Cache_GetCycleMax(Cache* const cache)
 {
     int32_t max = 0;
@@ -124,6 +117,7 @@ int32_t Cache_GetPingMax(Cache* const cache)
 
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
+    // HIGHER KP, KI VALUES LOWER THE PI DRIVE STRENGTH
     const int32_t kp =  32;
     const int32_t ki =  64;
     const int32_t si = 512; // XXX. INTEGRAL SATURATE... ARBITRARY?

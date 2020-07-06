@@ -30,6 +30,9 @@ static Overview WaitInLobby(const Video video, const Sock sock)
             {
                 overview.users = packet.users;
                 overview.seed = packet.seed;
+                // THE LAST PLAYER TO CONNECT IS THE SPECTATOR.
+                // THE SPECTATOR DICTATES THE TRUE GAME SPEED AND STATE AND DOES NOT RENDER A GRAPHICAL OUTPUT.
+                // THE SPECTATOR MUST RUN ON THE FASTEST MOST TRUSTED MACHINE.
                 overview.spectator = (Color) (overview.users - 1);
                 break;
             }
@@ -45,6 +48,7 @@ static void Play(const Video video, const Data data, const Args args)
     const Sock sock = Sock_Connect(args.host, args.port);
     const Sock reset = Sock_Connect(args.host, args.port_reset);
     Overview overview = WaitInLobby(video, sock);
+    const bool is_spectator = Overview_IsSpectator(overview);
     Util_Srand(overview.seed);
     const Map map = Map_Make(data.terrain);
     const Grid grid = Grid_Make(map.size, map.tile_width, map.tile_height);
@@ -69,7 +73,7 @@ static void Play(const Video video, const Data data, const Args args)
         const Packet packet = Packet_Get(sock);
         if(packet.is_out_of_sync)
         {
-            if(Overview_IsSpectator(overview))
+            if(is_spectator)
             {
                 Units_FreeAllPathsForRecovery(units);
                 const Restore restore = Units_PackRestore(units, cycles);
@@ -102,35 +106,38 @@ static void Play(const Video video, const Data data, const Args args)
             cycles++;
             if(args.must_measure && cycles == 1024)
                 break;
+            // SERVER SPEEDS UP CLIENTS WITH POSITIVE CONTROL VALUES.
             if(packet.control != 0)
                 control = packet.control;
+            // POSITIVE CONTROL VALUE: CLIENT SPEEDS UP BY SKIPPING RENDERER.
             if(control > 0)
+            {
                 control--;
+                continue;
+            }
+            if(is_spectator)
+            {
+                if(Packet_IsReady(packet))
+                    Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
+            }
             else
             {
-                if(Overview_IsSpectator(overview))
-                {
-                    if(Packet_IsReady(packet))
-                        Video_PrintLobby(video, packet.users_connected, packet.users, cycles, "Spectating");
-                }
-                else
-                {
-                    floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share[units.color].motive);
-                    Video_Draw(video, data, map, units, floats, overview, grid);
-                    const int32_t t1 = SDL_GetTicks();
-                    const int32_t dt = t1 - t0;
-                    Video_Render(video, units, overview, map, dt, cycles, ping);
-                }
-                const int32_t t2 = SDL_GetTicks();
-                const int32_t dt = t2 - t0;
-                const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - dt;
-                if(ms > 0)
-                    SDL_Delay(ms);
-                if(control < 0)
-                {
-                    SDL_Delay(1);
-                    control++;
-                }
+                floats = Units_Float(floats, units, data.graphics, overview, grid, map, units.share[units.color].motive);
+                Video_Draw(video, data, map, units, floats, overview, grid);
+                const int32_t t1 = SDL_GetTicks();
+                const int32_t dt = t1 - t0;
+                Video_Render(video, units, overview, map, dt, cycles, ping);
+            }
+            const int32_t t2 = SDL_GetTicks();
+            const int32_t dt = t2 - t0;
+            const int32_t ms = CONFIG_MAIN_LOOP_SPEED_MS - dt;
+            if(ms > 0)
+                SDL_Delay(ms);
+            // NEGATIVE CONTRL VALUE: (SPECTATOR CLIENT ONLY) SLOWS DOWN WITH ARBITRARY DELAY.
+            if(is_spectator && control < 0)
+            {
+                SDL_Delay(3);
+                control++;
             }
         }
     }
