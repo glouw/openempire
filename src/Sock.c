@@ -24,7 +24,7 @@ Sock Sock_Connect(const char* const host, const int32_t port)
     }
     sock.server = SDLNet_TCP_Open(&ip);
     if(sock.server == NULL)
-        Util_Bomb("CLIENT :: Could not connect to %s:%d... Is the openempires server running?\n", host, port);
+        Util_Bomb("CLIENT :: Could not connect to %s:%d... Is the server running?\n", host, port);
     sock.set = SDLNet_AllocSocketSet(1);
     SDLNet_TCP_AddSocket(sock.set, sock.server);
     return sock;

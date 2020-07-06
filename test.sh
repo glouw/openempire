@@ -36,12 +36,12 @@ server()
 
 client()
 {
-    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH"
+    ./$BIN --slow_download --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH"
 }
 
 batch()
 {
-    BIN=openempires
+    BIN=openempire
     server &
     for (( i = 0; i < $(($USERS - 1)); i++ ))
     do

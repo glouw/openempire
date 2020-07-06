@@ -33,7 +33,7 @@ static Mode ConvertAllByteMasks(Mode mode, Outline* const outline_table, const i
     mode.mask_real = UTIL_ALLOC(SDL_Surface*, nr_tiles);
     mode.mask_demo = UTIL_ALLOC(SDL_Surface*, nr_tiles);
     // BOTH A DEMO AND REAL MASK ARE GENERATED. THE REAL MASK IS A PURE ALPHA CHANNEL USED FOR ACTUAL BLENDING.
-    // THE DEMO MASK CONVERTS THE ALPHA VALUE TO A GREY SCALE SO THE ALPHA CHANNEL CAN BE VISUALIZED IN THE DEMO RENDERER, EG. ./OPENEMPIRES --DEMO
+    // THE DEMO MASK CONVERTS THE ALPHA VALUE TO A GREY SCALE SO THE ALPHA CHANNEL CAN BE VISUALIZED IN THE DEMO RENDERER.
     for(int32_t which_tile = 0; which_tile < nr_tiles; which_tile++)
     {
         mode.mask_demo[which_tile] = ConvertByteMask(mode, outline_table, which_tile, true);

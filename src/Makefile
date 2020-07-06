@@ -1,4 +1,4 @@
-BIN = ../openempires
+BIN = ../openempire
 
 DUMP=objdump
 

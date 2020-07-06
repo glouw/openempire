@@ -1,6 +1,6 @@
 #pragma once
 
-#define CONFIG_MAIN_GAME_NAME ("Open Empires")
+#define CONFIG_MAIN_GAME_NAME ("Open Empire")
 
 #define CONFIG_GRID_CELL_SIZE (100)
 
