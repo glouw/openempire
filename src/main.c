@@ -134,10 +134,10 @@ static void Play(const Video video, const Data data, const Args args)
             if(ms > 0)
                 SDL_Delay(ms);
             // NEGATIVE CONTRL VALUE: (SPECTATOR CLIENT ONLY) SLOWS DOWN WITH ARBITRARY DELAY.
-            if(is_spectator && control < 0)
+            if(control < 0)
             {
-                SDL_Delay(3);
-                control++;
+                SDL_Delay(abs(control));
+                control = 0;
             }
         }
     }

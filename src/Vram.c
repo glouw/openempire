@@ -448,9 +448,9 @@ void Vram_DrawUnitSelections(const Vram vram, const Tiles tiles, const Color col
                     DrawEllipse(vram, rect, 0xFFFF00);
                 else
                 if(tile.reference->has_direct)
-                    DrawEllipse(vram, rect, 0x00FF00);
-                else
                     DrawEllipse(vram, rect, 0xFFFFFF);
+                else
+                    DrawEllipse(vram, rect, 0x00FF00);
             }
             else
             if(tile.reference->has_parent_lock)

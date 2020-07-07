@@ -471,7 +471,6 @@ static bool CanMelee(Unit* const unit)
 static bool MustEngage(Unit* const unit)
 {
     // TODO: LET WOAD RAIDER CUT DOWN TREES.
-
     if(!Unit_IsVillager(unit) && unit->interest->trait.is_resource)
         return false;
     return ( SameColor(unit, unit->interest) && unit->interest->is_being_built && Unit_IsVillager(unit))

@@ -88,14 +88,15 @@ int32_t Cache_GetCycleMax(Cache* const cache)
 
 int32_t Cache_GetCycleMin(Cache* const cache)
 {
-    int32_t min = INT32_MAX;
+    const int32_t max =  INT32_MAX;
+    int32_t min = max;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         const int32_t cycles = cache->cycles[i];
         if(cycles != 0 && cycles < min)
             min = cycles;
     }
-    return min;
+    return min == max ? 0 : min;
 }
 
 bool Cache_GetGameRunning(Cache* const cache)
@@ -115,6 +116,43 @@ int32_t Cache_GetPingMax(Cache* const cache)
     return max;
 }
 
+static bool IsActiveColor(Cache* const cache, const Color color)
+{
+    return cache->cycles[color] > 0;
+}
+
+static bool IsUnderSaturated(Cache* const cache)
+{
+    bool under = true;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        if(IsActiveColor(cache, i))
+            under &= cache->control[i] < 0;
+    return under;
+}
+
+static bool IsOverSaturated(Cache* const cache)
+{
+    bool over = true;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+        if(IsActiveColor(cache, i))
+            over &= cache->control[i] > 0;
+    return over;
+}
+
+static bool IsSaturated(Cache* const cache)
+{
+    return IsUnderSaturated(cache) || IsOverSaturated(cache);
+}
+
+static void ResetControl(Cache* const cache)
+{
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        cache->control[i] = 0;
+        cache->integral[i] = 0;
+    }
+}
+
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
     // HIGHER KP, KI VALUES LOWER THE PI DRIVE STRENGTH
@@ -123,10 +161,9 @@ void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
     const int32_t si = 512; // XXX. INTEGRAL SATURATE... ARBITRARY?
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
-        const int32_t cycles = cache->cycles[i];
-        if(cycles > 0)
+        if(IsActiveColor(cache, i))
         {
-            const int32_t diff = setpoint - cycles;
+            const int32_t diff = setpoint - cache->cycles[i];
             cache->integral[i] += diff;
             if(cache->integral[i] < -si) cache->integral[i] = -si;
             if(cache->integral[i] > +si) cache->integral[i] = +si;
@@ -136,4 +173,6 @@ void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
             cache->control[i] = control;
         }
     }
+    if(IsSaturated(cache))
+        ResetControl(cache);
 }
