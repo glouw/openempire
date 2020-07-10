@@ -8,8 +8,8 @@ GAME_PATH="$HOME/.wine/drive_c/Program Files (x86)/Microsoft Games/Age of Empire
 LATENCY=15ms
 VARIANCE=1ms
 ENTROPY=0.1% # REALISM = 0.1%. STRESS TEST = 1.1%.
-XRES=800
-YRES=600
+XRES=1400
+YRES=800
 USERS=2
 HOST=localhost
 PORT=1111
@@ -36,7 +36,7 @@ server()
 
 client()
 {
-    ./$BIN --randomize --slow_download --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH"
+    ./$BIN --xres $1 --yres $2 --host $HOST --port $PORT --path "$GAME_PATH"
 }
 
 batch()

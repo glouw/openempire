@@ -401,6 +401,8 @@ static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, cons
         }
     UTIL_SORT(mags, count, CompareByMag);
 #if 0
+    (void) GetStackCount;
+    (void) units;
     return mags[0].point;
 #else
     // OF THE CLOSEST FOUR SIDES, PICK THE TILE WITH LEAST AMOUNT OF VILLAGERS.
