@@ -3,6 +3,7 @@
 #include "Sock.h"
 #include "Args.h"
 #include "Util.h"
+#include "Config.h"
 
 #include <SDL2/SDL_mutex.h>
 #include <assert.h>
