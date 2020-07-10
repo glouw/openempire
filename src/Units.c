@@ -36,13 +36,17 @@ static bool DimensionsBlock(const Units units, Unit* const unit)
             Unit* const reference = stack.reference[i];
             if(reference->trait.type == TYPE_FLAG && unit->trait.type == TYPE_FLAG)
                 return true;
-            // UNITS BUILDING ON UNITS IS NOT A BLOCK.
+            // BUILDING ON UNITS DOES NOT A BLOCK.
             if(!reference->trait.is_inanimate && !unit->trait.is_inanimate)
                 continue;
-            // UNITS BUILDING ON TOWN CENTER DETAILS IS NOT A BLOCK.
+            // BUILDING ON ARROW / SMOKE DOES NOT BLOCK.
+            if(reference->trait.can_expire)
+                continue;
+            // BUILDING ON TOWN CENTER DETAILS IS NOT A BLOCK, UNLESS IT IS A FLAG.
             if(reference->trait.type == TYPE_TOWN_CENTER
             && reference->trait.is_detail
-            && !unit->trait.is_inanimate)
+            && !unit->trait.is_inanimate
+            && unit->trait.type != TYPE_FLAG)
                 continue;
             return true;
         }

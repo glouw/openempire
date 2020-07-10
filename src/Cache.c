@@ -156,9 +156,9 @@ static void ResetControl(Cache* const cache)
 void Cache_CalculateControl(Cache* const cache, const int32_t setpoint)
 {
     // HIGHER KP, KI VALUES LOWER THE PI DRIVE STRENGTH
-    const int32_t kp =  32;
-    const int32_t ki =  64;
-    const int32_t si = 512; // XXX. INTEGRAL SATURATE... ARBITRARY?
+    const int32_t kp =   32;
+    const int32_t ki =   64;
+    const int32_t si = 1024; // XXX. INTEGRAL SATURATE... ARBITRARY?
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         if(IsActiveColor(cache, i))
