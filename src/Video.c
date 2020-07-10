@@ -9,11 +9,6 @@
 
 #include "Util.h"
 
-static void Present(const Video video)
-{
-    SDL_RenderPresent(video.renderer);
-}
-
 static void QuickClear(const Video video)
 {
     SDL_SetRenderDrawColor(video.renderer, 0, 0, 0, 0);
@@ -35,7 +30,7 @@ void Video_PrintLobby(const Video video, const int32_t users_connected, const in
             users_connected, users,
             string,
             periods[index]);
-    Present(video);
+    SDL_RenderPresent(video.renderer);
 }
 
 Video Video_Make(const int32_t xres, const int32_t yres, const char* const title)
@@ -206,7 +201,7 @@ void Video_Render(const Video video, const Units units, const Overview overview,
     PrintHotkeys(video);
     if(overview.event.tab)
         DrawMiniMap(video, units, map);
-    Present(video);
+    SDL_RenderPresent(video.renderer);
 }
 
 static void RenderDemoTile(const Video video, const Tile tile, const int32_t index, const int32_t count)

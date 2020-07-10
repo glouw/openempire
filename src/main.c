@@ -79,9 +79,12 @@ static void Play(const Video video, const Data data, const Args args)
                 const Restore restore = Units_PackRestore(units, cycles);
                 Restore_Send(restore, reset.server);
             }
-            Sock_Spin(reset);
             if(args.must_simulate_slow_download)
-                SDL_Delay(1000 + rand() % 1000);
+            {
+                const int32_t delay = 3000 + rand() % 2000;
+                printf("%d .. %d\n", overview.color, delay);
+                SDL_Delay(delay);
+            }
             const Restore restore = Restore_Recv(reset.server);
             Sock_GetServerRestoredAck(reset);
             units = Units_ApplyRestore(units, restore, grid, field);
@@ -90,6 +93,8 @@ static void Play(const Video video, const Data data, const Args args)
             Restore_Free(restore);
             packets = Packets_Clear(packets);
             Packet_Flush(sock);
+            // LET THE SERVER GET AHEAD OF THE CLIENTS BY ATTEMPTING A COUPLE SENDS.
+            SDL_Delay(2 * CONFIG_SOCKETS_SERVER_MS_PER_SEND);
         }
         else
         {
@@ -153,6 +158,8 @@ static void Play(const Video video, const Data data, const Args args)
 
 static void RunClient(const Args args)
 {
+    if(args.must_simulate_slow_download)
+        srand(time(NULL));
     Sock_Init();
     SDL_Init(SDL_INIT_VIDEO);
     const Video video = Video_Make(args.xres, args.yres, CONFIG_MAIN_GAME_NAME);
@@ -182,9 +189,8 @@ static int32_t RunServerPings(void* const data)
 
 static void RunServer(const Args args)
 {
+    srand(args.must_measure ? 0 : time(NULL));
     Sockets_Init();
-    if(!args.must_measure)
-        srand(time(NULL));
     SDL_CreateThread(RunServerPings, "N/A", (void*) &args);
     Sockets sockets = Sockets_Make(args.port);
     Sockets resets = Sockets_Make(args.port_reset);
@@ -199,7 +205,7 @@ static void RunServer(const Args args)
         Sockets_Send(sockets, &cache, cycles, args.is_quiet, max_ping);
         Sockets_Reset(resets, &cache, max_ping);
         const int32_t t1 = SDL_GetTicks();
-        const int32_t ms = 10 - (t1 - t0);
+        const int32_t ms = CONFIG_SOCKETS_SERVER_CYCLE_LENGTH_MS - (t1 - t0);
         if(ms > 0)
             SDL_Delay(ms);
     }

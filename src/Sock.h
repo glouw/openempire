@@ -17,6 +17,4 @@ void Sock_Disconnect(const Sock);
 
 void Sock_Init(void);
 
-void Sock_Spin(const Sock);
-
 void Sock_GetServerRestoredAck(const Sock);

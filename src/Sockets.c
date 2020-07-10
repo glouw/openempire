@@ -173,11 +173,6 @@ static void Send(const Sockets sockets, Cache* const cache, const int32_t max_cy
     for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
 }
 
-static bool ShouldSend(const int32_t cycles, const int32_t interval)
-{
-    return (cycles % interval) == 0;
-}
-
 static int32_t CountConnectedPlayers(const Sockets sockets)
 {
     int32_t count = 0;
@@ -192,7 +187,7 @@ static int32_t CountConnectedPlayers(const Sockets sockets)
 
 void Sockets_Send(const Sockets sockets, Cache* const cache, const int32_t cycles, const bool quiet, const int32_t max_ping)
 {
-    if(ShouldSend(cycles, CONFIG_SOCKETS_SERVER_UPDATE_SPEED_CYCLES))
+    if(cycles % CONFIG_SOCKETS_SERVER_CYCLES_PER_SEND == 0)
     {
         const int32_t max_cycle = Cache_GetCycleMax(cache);
         const int32_t min_cycle = Cache_GetCycleMin(cache);
@@ -267,7 +262,8 @@ static int32_t RunAckNeedle(void* data)
     {
         const uint8_t ack = RESTORE_SERVER_ACK;
         UTIL_TCP_SEND(needle->socket, &ack);
-        SDL_Delay(needle->delay);
+        if(needle->delay > 0)
+            SDL_Delay(needle->delay);
     }
     return 0;
 }

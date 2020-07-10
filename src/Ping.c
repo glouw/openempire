@@ -41,14 +41,14 @@ static int32_t Ping(void* const data)
         const uint8_t send = 0xAF;
         const int32_t t0 = SDL_GetTicks();
         UTIL_TCP_SEND(pinger.server, &send);
-        Sock_Spin(pinger);
         UTIL_TCP_RECV(pinger.server, &temp);
         const int32_t t1 = SDL_GetTicks();
         const int32_t dt = t1 - t0;
         if(temp == send)
             Set(dt);
-        const int32_t delay = 50 - dt; // ARBITRARY HZ. WHAT IF DT GETS TOO LARGE?
-        SDL_Delay(delay > 0 ? delay : 0);
+        const int32_t delay = CONFIG_SOCKETS_SERVER_MS_PER_SEND - dt;
+        if(delay > 0)
+            SDL_Delay(delay);
     }
     Sock_Disconnect(pinger);
     return 0;

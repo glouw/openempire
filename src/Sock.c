@@ -41,12 +41,6 @@ static bool Ready(const Sock sock, const int32_t timeout)
     return SDLNet_CheckSockets(sock.set, timeout) && SDLNet_SocketReady(sock.server);
 }
 
-void Sock_Spin(const Sock sock)
-{
-    while(!Ready(sock, 1))
-        SDL_Delay(1);
-}
-
 void Sock_GetServerRestoredAck(const Sock sock)
 {
     uint8_t ack;
