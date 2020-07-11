@@ -45,4 +45,6 @@ bool Cache_GetGameRunning(Cache* const);
 
 int32_t Cache_GetPingMax(Cache* const);
 
+int32_t Cache_GetPingMin(Cache* const);
+
 void Cache_CalculateControl(Cache* const, const int32_t setpoint);

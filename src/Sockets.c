@@ -268,7 +268,7 @@ static int32_t RunAckNeedle(void* data)
     return 0;
 }
 
-static void AckInTandem(const Sockets resets, Cache* const cache, const int32_t max_ping)
+static void AckInTandem(const Sockets resets, Cache* const cache, const int32_t max_ping, const int32_t min_ping)
 {
     AckNeedle   needles[COLOR_COUNT];
     SDL_Thread* threads[COLOR_COUNT];
@@ -279,6 +279,7 @@ static void AckInTandem(const Sockets resets, Cache* const cache, const int32_t 
     }
     for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunAckNeedle, "N/A", &needles[i]);
     for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
+    SDL_Delay(min_ping);
 }
 
 static void RestoreInTandem(const Sockets resets, const Restore restore)
@@ -294,7 +295,7 @@ static void RestoreInTandem(const Sockets resets, const Restore restore)
     for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
 }
 
-void Sockets_Reset(const Sockets resets, Cache* const cache, const int32_t max_ping)
+void Sockets_Reset(const Sockets resets, Cache* const cache, const int32_t max_ping, const int32_t min_ping)
 {
     if(SDLNet_CheckSockets(resets.set, 0))
         for(int32_t j = 0; j < COLOR_COUNT; j++)
@@ -309,7 +310,7 @@ void Sockets_Reset(const Sockets resets, Cache* const cache, const int32_t max_p
                     Restore_Free(restore);
                     Cache_ClearHistory(cache);
                     cache->restore_count += 1;
-                    AckInTandem(resets, cache, max_ping);
+                    AckInTandem(resets, cache, max_ping, min_ping);
                     printf("RESTORE TRANSMITTED TO CYCLE NUMBER %d\n", restore.cycles);
                     return;
                 }

@@ -26,6 +26,6 @@ Sockets Sockets_Accept(const Sockets);
 
 void Sockets_Ping(const Sockets);
 
-void Sockets_Reset(const Sockets, Cache* const, const int32_t max_ping);
+void Sockets_Reset(const Sockets, Cache* const, const int32_t max_ping, const int32_t min_ping);
 
 void Sockets_Init(void);

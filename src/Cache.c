@@ -88,7 +88,7 @@ int32_t Cache_GetCycleMax(Cache* const cache)
 
 int32_t Cache_GetCycleMin(Cache* const cache)
 {
-    const int32_t max =  INT32_MAX;
+    const int32_t max = INT32_MAX;
     int32_t min = max;
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
@@ -114,6 +114,19 @@ int32_t Cache_GetPingMax(Cache* const cache)
             max = ping;
     }
     return max;
+}
+
+int32_t Cache_GetPingMin(Cache* const cache)
+{
+    const int32_t max = INT32_MAX;
+    int32_t min = max;
+    for(int32_t i = 0; i < COLOR_COUNT; i++)
+    {
+        const int32_t ping = cache->pings[i];
+        if(ping < min)
+            min = ping;
+    }
+    return min == max ? 0 : min;
 }
 
 static bool IsActiveColor(Cache* const cache, const Color color)

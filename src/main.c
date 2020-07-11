@@ -202,8 +202,9 @@ static void RunServer(const Args args)
         resets = Sockets_Accept(resets);
         sockets = Sockets_Recv(sockets, &cache);
         const int32_t max_ping = Cache_GetPingMax(&cache);
+        const int32_t min_ping = Cache_GetPingMin(&cache);
         Sockets_Send(sockets, &cache, cycles, args.is_quiet, max_ping);
-        Sockets_Reset(resets, &cache, max_ping);
+        Sockets_Reset(resets, &cache, max_ping, min_ping);
         const int32_t t1 = SDL_GetTicks();
         const int32_t ms = CONFIG_SOCKETS_SERVER_CYCLE_LENGTH_MS - (t1 - t0);
         if(ms > 0)
