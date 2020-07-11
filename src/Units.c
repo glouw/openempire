@@ -365,7 +365,7 @@ static int32_t CompareByMag(const void* a, const void* b)
     return ma > mb;
 }
 
-static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, const Grid grid, const Field field) // XXX. DEPENDING ON NUMBER OF UNITS SELECTED, RANDOMLY SPREAD OUT.
+static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, const Grid grid, const Field field)
 {
 #define WIDTH   (4)
 #define SIDES   (4)
@@ -400,14 +400,8 @@ static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, cons
             }
         }
     UTIL_SORT(mags, count, CompareByMag);
-#if 0
-    (void) GetStackCount;
-    (void) units;
-    return mags[0].point;
-#else
     // OF THE CLOSEST FOUR SIDES, PICK THE TILE WITH LEAST AMOUNT OF VILLAGERS.
-#define MIN (4)
-    Point out = { -1,-1 };
+    Point out = { -1, -1 };
     int32_t min = INT_MAX;
     for(int32_t i = 0; i < SIDES; i++)
     {
@@ -419,22 +413,27 @@ static Point GetNextBestInanimateCoord(const Units units, Unit* const unit, cons
             out = cart;
         }
     }
-#undef MIN
     return out;
-#endif
 #undef WIDTH
 #undef SIDES
 #undef CORNERS
 #undef MAX
 }
 
-static void SetupGoal(const Units units, Unit* const unit, const Grid grid, const Field field)
+static void SetupGoal(const Units units, Unit* const unit, const Grid grid, const Field field, const bool is_repath)
 {
     if(unit->interest->trait.is_inanimate) // PURSUE BUILDING NEXT BEST.
     {
-        static Point zero;
-        unit->cart_goal = GetNextBestInanimateCoord(units, unit, grid, field);
-        unit->cart_grid_offset_goal = zero;
+        if(is_repath)
+        {
+            // REPATHS MESS UP THE RECALCULATION BEST INANIMATE COORD AS UNITS MOVE AROUND.
+        }
+        else
+        {
+            static Point zero;
+            unit->cart_goal = GetNextBestInanimateCoord(units, unit, grid, field);
+            unit->cart_grid_offset_goal = zero;
+        }
     }
     else // PURSUE ANIMATE.
     {
@@ -445,12 +444,12 @@ static void SetupGoal(const Units units, Unit* const unit, const Grid grid, cons
     }
 }
 
-static void FindPath(const Units units, Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field)
+static void FindPath(const Units units, Unit* const unit, const Point cart_goal, const Point cart_grid_offset_goal, const Grid grid, const Field field, const bool is_repath)
 {
     if(!Unit_IsExempt(unit))
     {
         if(unit->interest)
-            SetupGoal(units, unit, grid, field);
+            SetupGoal(units, unit, grid, field, is_repath);
         else
         {
             unit->cart_goal = cart_goal;
@@ -469,7 +468,7 @@ static void Repath(const Units units, Unit* const unit, const Grid grid, const F
     if(!Unit_IsExempt(unit)
     && unit->path_index_timer > CONFIG_UNIT_PATHING_TIMEOUT_CYCLES
     && Unit_HasPath(unit))
-        FindPath(units, unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
+        FindPath(units, unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field, true);
 }
 
 static void AdvanceBuildAnimate(const Units units, Unit* const unit, const Grid grid, const Field field, const bool allowed_to_unlock_parent)
@@ -483,7 +482,7 @@ static void AdvanceBuildAnimate(const Units units, Unit* const unit, const Grid 
             {
                 unit->command_group = Unit_GetCommandGroupNext();
                 Unit_SetInterest(unit, unit->parent->interest);
-                FindPath(units, unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field);
+                FindPath(units, unit, unit->parent->cart_goal, unit->parent->cart_grid_offset_goal, grid, field, false);
             }
             unit->parent->child_lock_id = -1;
             unit->parent->child_count -= 1;
@@ -508,7 +507,7 @@ static Units FindPathForSelected(Units units, const Overview overview, const Reg
             else
             {
                 unit->command_group = Unit_GetCommandGroupNext();
-                FindPath(units, unit, cart_goal, cart_grid_offset_goal, grid, field);
+                FindPath(units, unit, cart_goal, cart_grid_offset_goal, grid, field, false);
             }
         }
     }
@@ -1694,7 +1693,7 @@ static void RestorePaths(const Units units, const Grid grid, const Field field)
         Unit* const unit = &units.unit[i];
         if(unit->must_repath_with_recover)
         {
-            FindPath(units, unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field);
+            FindPath(units, unit, unit->cart_goal, unit->cart_grid_offset_goal, grid, field, true);
             unit->must_repath_with_recover = false;
         }
     }
