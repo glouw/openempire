@@ -203,7 +203,8 @@ int32_t Tiles_SelectWithBox(const Tiles tiles, const Rect rect, const Color colo
     for(int32_t i = 0; i < tiles.count; i++)
     {
         const Tile tile = tiles.tile[i];
-        if(tile.reference->trait.is_inanimate)
+        if(tile.reference->trait.is_inanimate
+        || tile.reference->trait.type == TYPE_FLAG)
             continue;
         if(Tile_IsHotspotInRect(tile, box))
         {

@@ -275,10 +275,12 @@ static void AckInTandem(const Sockets resets, Cache* const cache, const int32_t 
     for(int32_t i = 0; i < COLOR_COUNT; i++)
     {
         needles[i].socket = resets.socket[i];
+        // THIS DELAY SYNC THE ARRIVAL TIME OF THE FINAL ACK PACKET FOR ALL CLIENTS.
         needles[i].delay = max_ping - cache->pings[i];
     }
     for(int32_t i = 0; i < COLOR_COUNT; i++) threads[i] = SDL_CreateThread(RunAckNeedle, "N/A", &needles[i]);
     for(int32_t i = 0; i < COLOR_COUNT; i++) SDL_WaitThread(threads[i], NULL);
+    // THIS DELAY SYNCS THE SERVER WITH THE FINAL ACK OF ALL CLIENTS.
     SDL_Delay(min_ping);
 }
 

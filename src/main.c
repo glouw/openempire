@@ -93,8 +93,8 @@ static void Play(const Video video, const Data data, const Args args)
             Restore_Free(restore);
             packets = Packets_Clear(packets);
             Packet_Flush(sock);
-            // LET THE SERVER GET AHEAD OF THE CLIENTS BY ATTEMPTING A COUPLE SENDS.
-            SDL_Delay(2 * CONFIG_SOCKETS_SERVER_MS_PER_SEND);
+            // THIS DELAY LETS THE SERVER GET AHEAD OF ALL CLIENTS BY A SINGLE CYCLE.
+            SDL_Delay(CONFIG_SOCKETS_SERVER_MS_PER_SEND);
         }
         else
         {
